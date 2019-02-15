@@ -1,0 +1,15 @@
+#if ($action.hasErrorMessages())
+	<tr>
+		<td colspan="2">
+			<div class="aui-message error">
+				<span class="aui-icon icon-error"></span>
+				<p class="title">$i18n.getText('common.words.errors')</p>
+				<ul>
+					#foreach ($error in $action.getFlushedErrorMessages())
+	                    <li>$textutils.htmlEncode(${error})</li>
+	                #end
+				</ul>
+			</div>
+		</td>
+	</tr>
+#end

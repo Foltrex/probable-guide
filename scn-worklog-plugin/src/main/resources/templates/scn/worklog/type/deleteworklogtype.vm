@@ -1,0 +1,32 @@
+#set($jiraformActionName = "DeleteWorklogType.jspa")
+#set($jiraformTitle = "$action.getText('admin.issuesettings.worklogtypes.delete.worklogtype'): $action.constant.getString('name')")
+#set($jiraformSubmitText = $action.getText('common.words.delete'))
+#set($jiraformCancelURI = "ViewWorklogTypes.jspa") ## baseurl is already prefixed in the getIssuePath() method
+#parse("templates/scn/decorators/jiraformHeader.vm")
+#parse("templates/scn/decorators/jiraErrorMessages.vm")
+	
+	<tr class="descriptionrow">
+		<td colspan="2" class="jiraformheader">
+			<div class="desc-wrap">
+				<div class="aui-message warning">
+					<span class="aui-icon icon-warning"></span>
+	                <p>$action.getText('admin.issuesettings.worklogtypes.delete.confirm')</p>
+	                <p>$action.getText('admin.issuesettings.worklogtypes.delete.current.matching.worklogs', "<b>$action.numberMatchingWorklogs</b>")</p>
+	            </div>
+			</div>
+		</td>
+	</tr>
+
+	#normalHeader($action 'newId' $action.getText('admin.issuesettings.worklogtypes.delete.new.worklog.for.matching.worklogs') false)
+        <select name="newId">
+            <option value="">$i18n.getText('portlet.fastworklog.notDefinedWorklogtype')</option>
+            #foreach($newConstant in $action.newConstants)
+                <option value="$newConstant.getString('id')">$newConstant.getString('name')</option>
+            #end
+        </select>
+	#normalFooter($action '')		
+
+	<input type="hidden" id="id" name="id" value="$action.id"/>
+	<input type="hidden" id="confirm" name="confirm" value="true"/>
+
+#parse("templates/scn/decorators/jiraformFooter.vm")

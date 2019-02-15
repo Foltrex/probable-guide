@@ -1,0 +1,42 @@
+{namespace templates.wltypes}
+/**
+ * Renders a table of selected AJS.params
+ * @param pageId
+ * @param pageTitle
+ * @param parentPageId
+ * @param spaceKey
+ * @param spaceName
+ */
+{template .listSelectedAjsParams}
+	<b>{getText('confluence.tutorial.soy.templates.intro')}</b>
+	<table class="aui" id="basic">
+	    <thead>
+	        <tr>
+	            <th>{getText('confluence.tutorial.soy.templates.name')}</th>
+	            <th>{getText('confluence.tutorial.soy.templates.value')}</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+		    <tr>
+			    <td>pageId</td>
+			    <td>{$pageId}</td>
+		    </tr>
+		    <tr>
+			    <td>pageTitle</td>
+			    <td>{$pageTitle}</td>
+		    </tr>
+		    <tr>
+			    <td>parentPageId</td>
+			    <td>{$parentPageId}</td>
+		    </tr>
+		    <tr>
+			    <td>spaceKey</td>
+			    <td>{$spaceKey}</td>
+		    </tr>
+		    <tr>
+			    <td>spaceName</td>
+			    <td>{$spaceName}</td>
+		    </tr>
+	    <tbody>
+	</table>
+{/template}

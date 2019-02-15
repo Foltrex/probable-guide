@@ -1,0 +1,166 @@
+#macro(hiddenField $name $value)
+	<tr class="hidden">
+	    <td>
+	        <input type="hidden" id="$name" name="$name" value="$!{value}"/>
+	    </td>
+	</tr>
+#end
+
+<html>
+<head>
+    <title>$i18n.getText("scn.scnworklog.deletelogwork.htmlheader.title")</title>
+    <meta name="decorator" content="issueaction" />
+    <link rel="index" href="${baseurl}$issuePath" />
+</head>
+<body>
+
+<script language="JavaScript">
+    function selectNewEstimate()
+    {
+        document.forms['jiraform'].elements['new_estimate_id'].checked = true;
+    }
+
+    function selectManualAdjustEstimate()
+    {
+        document.forms['jiraform'].elements['manual_adjust_estimate_id'].checked = true;
+    }
+
+    function resetSelect(form, selectId)
+    {
+        if (form[selectId])
+        {
+            form[selectId].selectedIndex = 0;
+        }
+    }
+</script>
+#if($issueValid)
+	#set($pageId = 'scn-log-work')
+	#set($jiraformActionName = "${actionName}.jspa")
+	#set($jiraformTitle = "$i18n.getText('worklog.delete.title')*")
+	#set($jiraformDesc = $i18n.getText('worklog.delete.desc'))
+	#set($jiraformSubmitText = $i18n.getText('common.words.delete'))
+	#set($jiraformSubmitId = 'delete')
+	#set($jiraformCancelURI = "${baseurl}$issuePath")
+	#parse("templates/scn/decorators/jiraformHeader.vm")
+
+        #if($issueExists)
+            ## <worklogId>
+            #hiddenField("worklogId" $worklogId)
+
+            #if($errors.adjustmentAmount)
+                <tr>
+                    <td class="fieldLabelArea formErrors">&nbsp;</td>
+                    <td class="fieldValueArea formErrors">
+                        <span class="errMsg">$errors.adjustmentAmount</span>
+                    </td>
+                </tr>
+            #end
+            #if($errors.newEstimate)
+                <tr>
+                    <td class="fieldLabelArea formErrors">&nbsp;</td>
+                    <td class="fieldValueArea formErrors">
+                        <span class="errMsg">$errors.newEstimate</span>
+                    </td>
+                </tr>
+            #end
+            <tr>
+                #if($errors.newEstimate || $errors.adjustmentAmount)
+                    <td class="fieldLabelArea formErrors">
+                #else
+                    <td class="fieldLabelArea">
+                #end
+                    $i18n.getText("logwork.adjustestimate"):
+                </td>
+            #if($errors.newEstimate || $errors.adjustmentAmount)
+                <td class="fieldValueArea formErrors">
+            #else
+                <td class="fieldValueArea">
+            #end
+                    ## radio <adjustEstimate=auto>
+                    <input type="radio" name="adjustEstimate" id="auto_adjust_estimate_id" align="middle"
+                    value="auto"
+                        #if($adjustEstimate == "auto")
+                            checked
+                        #end
+                    >
+                    <label for="auto_adjust_estimate_id">
+                        $i18n.getText("logwork.bullet1.autoadjust")<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; <span class="subText">($i18n.getText("logwork.bullet1.autoadjust.desc"))</span><br>
+                    </label>
+                    ## radio <adjustEstimate=leave>
+                    <input type="radio" name="adjustEstimate" id="leave_estimate_id" align="middle"
+                    value="leave"
+                        #if($adjustEstimate == "leave")
+                            checked
+                        #end
+                    >
+                    <label for="leave_estimate_id">
+                        #if("$!estimate" == "")    
+                            $i18n.getText("logwork.bullet2.estimateunknown")<br>
+                        #else
+                            $i18n.getText("logwork.bullet2.leaveestimate","<b>$estimate</b>")<br>
+                        #end
+                    </label>
+                    ## radio <adjustEstimate=new>
+                    <input type="radio" name="adjustEstimate" id="new_estimate_id" align="middle"
+                        value="new"
+                        #if($adjustEstimate == "new")
+                            checked
+                        #end
+                    >
+                    <label for="new_estimate_id">
+                        $i18n.getText("logwork.bullet3.setnewestimate")
+                    </label>
+                    <input type="text" name="newEstimate" align="middle" size="5" onChange="selectNewEstimate();"
+                           value="$!newEstimate">
+                    <br>
+                    ## radio <adjustEstimate=manual>
+                    <input type="radio" name="adjustEstimate" id="manual_adjust_estimate_id" align="middle"
+                           value="manual"
+                           #if($adjustEstimate == "manual")
+                                checked
+                           #end
+                    >
+                    <label for="manual_adjust_estimate_id">
+                        $i18n.getText("logwork.bullet4.increaseestimate")
+                    </label>
+                    <input type="text" name="adjustmentAmount" align="middle" size="5" onChange="selectManualAdjustEstimate();"
+                           value="$!adjustmentAmount">
+                    <br>
+                </td>
+            </tr>
+            <tr id="newEstimateTableRow" >
+                #if($errors.newEstimate)
+                    <td class="fieldValueArea formErrors">
+                #else
+                    <td class="fieldValueArea">
+                #end
+                    <span class="subText">
+                        $i18n.getText("worklog.delete.adjust.desc", "${daysPerWeek}d", "${hoursPerDay}h", "*w *d *h *m", "4d, 5h 30m, 60m", "3w", "1w", "1d")
+                    </span>
+                </td>
+            </tr>
+            
+            ## wlAutoCopy checkbox
+            #if ($action.hasPermissionToViewWL())
+                #controlHeader ($action "comment" $i18n.getText("scn.scnworklog.logwork.wlautocopy.label") false false)
+                    <input #if($wlAutoCopyDisabled) disabled #elseif($wlAutoCopyChecked) checked="checked" #end id="${pageId}-wl-autocopy" name="wlAutoCopy" type="checkbox" value="true"/>
+                #controlFooter ($action $i18n.getText("scn.scnworklog.logwork.wlautocopy.delete.descr") false)
+            #end
+            
+			## issue id
+			#hiddenField("id" $req.getParameter('id'))
+        #end
+      
+        #if($hasErrorMessages)
+			#set($messageHtml = '')
+			#foreach($error in $errorMessages)
+				#set($messageHtml = "${messageHtml}<p>${error}</p>")
+			#end
+			#AUImessage('error' '' $messageHtml '' '' '' 'false')
+	    #end
+		        
+    #parse("templates/scn/decorators/jiraformFooter.vm")
+#end
+</body>
+</html>

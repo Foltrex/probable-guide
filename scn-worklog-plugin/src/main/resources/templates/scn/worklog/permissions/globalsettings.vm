@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <title>$i18n.getText("scn.global_settings.tt.label")</title>
+    <meta name="decorator" content="atl.admin">
+  </head>
+  <body>
+	$webResourceManager.requireResource("com.scnsoft.jira.plugin.scnsoft-worklog-plugin:globalsettings")
+
+        <header class="aui-page-header">
+          <div class="aui-page-header-inner">
+            <div class="aui-page-header-main">
+              <h1>$i18n.getText("scn.global_settings.tt.descr")</h1>
+            </div>
+          </div>
+        </header>
+
+		<div class="aui-group aui-group-highlighted">
+		    <div class="aui-item" style="width:25%">
+				<div class="aui-group">
+				    <div class="aui-item">
+	                    <h4>
+	                        $i18n.getText("scn.global_settings.tt.panel.available.groups")
+	                    </h4>
+				    </div>
+				</div>
+				<div class="aui-group">
+				    <div class="aui-item">
+		                <select class="selectGroup" id="groupsToAdd" multiple size="10" style="width:100%">
+		                	#foreach ($group in $availableGroups)
+		                		<option value="${group}">${group}</option>
+		                	#end
+		                </select>
+				    </div>
+				</div>
+				<div class="aui-group">
+				    <div class="aui-item">
+               	        <button class="aui-button" id="add">Add &gt&gt</button>
+				    </div>
+				</div>
+		    </div>
+		    <div class="aui-item" style="width:25%">
+				<div class="aui-group">
+				    <div class="aui-item">
+	                    <h4>
+	                        $i18n.getText("scn.global_settings.tt.panel.groups")
+	                    </h4>
+				    </div>
+				</div>
+				<div class="aui-group">
+				    <div class="aui-item">
+		                <select class="selectGroup" id="groupsToRemove" multiple size="10" style="width:100%">
+	                        #foreach ($group in $wlGroups)
+		                		<option value="${group}">${group}</option>
+		                	#end
+		                </select>
+				    </div>
+				</div>
+				<div class="aui-group">
+				    <div class="aui-item">
+						<button class="aui-button" id="remove">&lt&lt Remove</button>
+				    </div>
+				</div>
+		    </div>
+		    <div class="aui-item">
+		    	<div id="aui-message-bar" class="fadeout closable"></div>
+		    </div>
+		</div>
+  </body>
+
+</html>
