@@ -34,7 +34,7 @@ public class ExtendedDeleteWorklog extends DeleteWorklog {
 	public ExtendedDeleteWorklog(WorklogService worklogService, CommentService commentService,
 								 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
 								 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-								 RendererManager rendererManager, @Qualifier("overridedWorklogManager")  WorklogManager worklogManager, UserUtil userUtil, FeatureManager featureManager,
+								 RendererManager rendererManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager, UserUtil userUtil, FeatureManager featureManager,
 								 ExtendedWorklogService extWorklogService, ExtendedConstantsManager extendedConstantsManager,
 								 IScnProjectSettingsManager psManager) {
 		super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),

@@ -39,16 +39,16 @@
             <artifactId>atlassian-rest-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.scn.jira</groupId>
             <artifactId>scn-worklog-plugin</artifactId>
             <version>4.1.0</version>
         </dependency>
-    </dependencies>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

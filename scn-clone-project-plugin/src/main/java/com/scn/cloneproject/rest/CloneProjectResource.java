@@ -67,15 +67,10 @@ public class CloneProjectResource {
 
     @POST
     @Produces("text/plain")
-//    @RequiresXsrfCheck
     @PublicApi
     public String DoClonePost(@QueryParam("pkey") String pkey, @QueryParam("pname") String pname, @QueryParam("templatekey") String templatekey,
     		@QueryParam("lead") String lead, @QueryParam("descr") String descr, @QueryParam("url") String url)
     {
-    	// + pkey, pname, templatekey, lead, descr
-    	// + check authentication
-    	// + check authorisation access for New Project Create permission
-    	// + params validation
     	@SuppressWarnings("deprecation")
 		ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser(); // TODO cannot avoid, coz validatecreateproject does not support AppUser :(
 
@@ -108,28 +103,7 @@ public class CloneProjectResource {
 		final Project newprojectObj = projectService.createProject(result);
 		// project category
 		projectManager.setProjectCategory(newprojectObj, projectManager.getProjectCategoryForProject(sourceProject));
-		// user roles - should NOT be copied !!!
-//    	SimpleErrorCollection errorCollection = new SimpleErrorCollection();
-//
-//    	for (ProjectRole projectRole : projectRoleService.getProjectRoles(errorCollection)){
-//
-//    		ProjectRoleActors projectRoleActors = projectRoleService.getProjectRoleActors(projectRole, sourceProject, errorCollection);
-//
-//    		//String[] actorCategories = {UserRoleActorFactory.TYPE, GroupRoleActorFactory.TYPE};
-//    		String[] actorCategories = {"atlassian-user-role-actor", "atlassian-group-role-actor"};
-//
-//    		for (String actorFactoryType : actorCategories){
-//
-//    			List<String> newProjectRoleActors = new ArrayList<String>();
-//
-//    			for (RoleActor actor : projectRoleActors.getRoleActorsByType(actorFactoryType)){
-//
-//    				newProjectRoleActors.add(actor.getParameter());
-//
-//    			}
-//    			projectRoleService.addActorsToProjectRole(newProjectRoleActors, projectRole, newprojectObj, actorFactoryType, errorCollection);
-//    		}
-//    	}
+
     	// workflow scheme
     	if (workflowSchemeManager.getSchemeFor(sourceProject) != workflowSchemeManager.getDefaultSchemeObject()){
     		workflowSchemeManager.addSchemeToProject(newprojectObj,workflowSchemeManager.getSchemeFor(sourceProject));

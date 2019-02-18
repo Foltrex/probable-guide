@@ -1,10 +1,10 @@
-package it.com.scn.jira.worklog.rest;
+package com.scn.jira;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TimesheetResourceTest {
+public class TimesheetPluginTest {
 
     @Before
     public void setup() {
