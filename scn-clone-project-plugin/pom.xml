@@ -11,7 +11,7 @@
         <version>4.1.0</version>
     </parent>
 
-    <artifactId>scn-clone-project</artifactId>
+    <artifactId>scn-clone-project-plugin</artifactId>
 
     <name>JIRA ScienceSoft Clone Project</name>
     <description>The plugin for cloning projects</description>
