@@ -1,0 +1,167 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <version>${project.version}</version>
+        <description>${project.description}</description>
+        <application-version min="5.0"/>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <bundle-instructions>
+			<Export-Package>*</Export-Package>
+			<Import-Package>*;resolution:=optional</Import-Package>
+        </bundle-instructions>
+    </plugin-info>
+
+    <resource type="i18n" name="i18n-timesheet" location="com.scn.jira.plugin.portlet.timesheet.timesheet_portlet" />
+    <resource type="i18n" name="i18n-pivot" location="com.scn.jira.plugin.portlet.pivot.pivot_portlet" />
+
+    <resource type="download" name="i18n" location="i18n/ALL_ALL.xml">
+        <param name="content-type" value="text/xml; charset=UTF-8"/>
+    </resource>
+
+    <!-- Gadgets -->
+    <gadget key="scn-timesheet-gadget" name="SCN Time Sheet* Gadget" location="gadget.xml">
+        <param name="roles-required">browse</param>
+        <resource type="download" name="timesheet-gadget-screenshot.png" location="images/timesheet-gadget-screenshot.png"/>
+    	<resource type="download" name="timesheet-gadget-thumb.png" location="images/timesheet-gadget-thumb.png"/>
+    </gadget>
+    <gadget key="scn-project-pivot-gadget" name="SCN Project Pivot Gadget" location="project-pivot-gadget.xml">
+        <param name="roles-required">browse</param>
+        <resource type="download" name="project-pivot-gadget-screenshot.png" location="images/project-pivot-gadget-screenshot.png"/>
+    	<resource type="download" name="project-pivot-gadget-thumb.png" location="images/project-pivot-gadget-thumb.png"/>
+    </gadget>
+
+    <rest key="scn-timesheet-gadget-rest-resources" name="SCN TimeSheet* REST Endpoint" path="/scn-timesheet-gadget" version="1.0">
+        <description>Provides the REST resource for the timesheet*.</description>
+    </rest>
+
+    <!-- Timesheet Report -->
+    <report key="scn-timesheet-report" name="SCN Timesheet* Report" class="com.scn.jira.plugin.report.timesheet.TimeSheet">
+        <description key="scn.report.timesheet.description"/>
+        <label key="scn.report.timesheet.label" />
+
+        <resource type="velocity" name="view" location="templates/scn/timesheetreport/timesheet-report.vm" />
+        <resource type="velocity" name="excel" location="templates/scn/timesheetreport/timesheet-report-excel.vm" />
+        <resource type="i18n" name="i18n" location="com.scn.jira.plugin.report.timesheet.timesheet_report" />
+
+        <properties>
+            <property>
+                <key>startDate</key>
+                <name>report.timesheet.startdate</name>
+                <description>report.timesheet.startdate.description</description>
+                <type>date</type>
+            </property>
+            <property>
+                <key>endDate</key>
+                <name>report.timesheet.enddate</name>
+                <description>report.timesheet.enddate.description</description>
+                <type>date</type>
+            </property>
+            <property>
+                <key>targetUser</key>
+                <name>report.timesheet.targetuser</name>
+                <description>report.timesheet.targetuser.description</description>
+                <type>user</type>
+            </property>
+            <property>
+                <key>targetGroup</key>
+                <name>report.timesheet.targetgroup</name>
+                <description>report.timesheet.targetgroup.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.GroupValuesGenerator"/>
+            </property>
+            <property>
+                <key>priority</key>
+                <name>report.timesheet.priority.label</name>
+                <description>report.timesheet.priority.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.PrioritiesValuesGenerator"/>
+                <default></default>
+            </property>
+            <property>
+                <key>project</key>
+                <name>report.timesheet.project.label</name>
+                <description>report.timesheet.project.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.ProjectValuesGenerator"/>
+                <default></default>
+            </property>
+            <property>
+                <key>filterid</key>
+                <name>report.timesheet.filterid.name</name>
+                <description>report.timesheet.filterid.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.util.OptionalSearchRequestValuesGenerator"/>
+                <default></default>
+            </property>
+            <property>
+                <key>weekends</key>
+                <name>report.timesheet.weekends.label</name>
+                <description>report.timesheet.weekends.description</description>
+                <type>checkbox</type>
+                <default>true</default>
+            </property>
+            <property>
+                <key>showUsers</key>
+                <name>report.timesheet.showusers.label</name>
+                <description>report.timesheet.showusers.description</description>
+                <type>checkbox</type>
+                <default>true</default>
+            </property>
+            <property>
+                <key>groupByField</key>
+                <name>report.timesheet.groupbyfield.label</name>
+                <description>report.timesheet.groupbyfield.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.GroupByFieldValuesGenerator" />
+                <default></default>
+             </property>
+        </properties>
+    </report>
+    
+    <!-- Project Pivot Report -->
+    <report key="scn-projectpivot" name="SCN Project Pivot* Report" class="com.scn.jira.plugin.report.pivot.Pivot">
+        <description key="report.pivot.description">i18n description</description>
+        <label key="scn.report.pivot.label" />
+
+        <resource type="velocity" name="view" location="templates/scn/pivotreport/pivot-report.vm" />
+        <resource type="velocity" name="excel" location="templates/scn/pivotreport/pivot-report-excel.vm" />
+        <resource type="i18n" name="i18n" location="com.scn.jira.plugin.report.pivot.pivot_report" />
+
+        <properties>
+            <property>
+                <key>projectid</key>
+                <name>report.pivot.projectid.name</name>
+                <description>report.pivot.projectid.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.ProjectValuesGenerator"/>
+                <default></default>
+            </property>
+            <property>
+                <key>filterid</key>
+                <name>report.pivot.filterid.name</name>
+                <description>report.pivot.filterid.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.util.OptionalSearchRequestValuesGenerator"/>
+                <default></default>
+            </property>
+            <property>
+                <key>targetGroup</key>
+                <name>report.pivot.targetgroup.name</name>
+                <description>report.pivot.targetgroup.description</description>
+                <type>select</type>
+                <values class="com.scn.jira.plugin.report.timesheet.GroupValuesGenerator"/>
+            </property>
+            <property>
+                <key>startDate</key>
+                <name>report.pivot.startdate</name>
+                <description>report.pivot.startdate.description</description>
+                <type>date</type>
+            </property>
+            <property>
+                <key>endDate</key>
+                <name>report.pivot.enddate</name>
+                <description>report.pivot.enddate.description</description>
+                <type>date</type>
+            </property>
+        </properties>
+    </report>
+</atlassian-plugin>

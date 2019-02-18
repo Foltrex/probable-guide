@@ -1,0 +1,76 @@
+#if ($loggedin)
+## Style Declaration
+<style type="text/css">
+    .businessDay {
+    }
+    .nonBusinessDay {
+        background-color: #ffeedd;
+    }
+    .nonWorkedDay {
+        color: #bbb;
+    }
+    .workedDay {
+    }
+    .toDay {
+        background-color: #ccffcc;
+    }
+</style>
+
+<div id="jira">
+    <div class="results-wrap">
+        <div>
+            <table class="grid" border="0" cellpadding="3" cellspacing="0" width="100%">
+                <tbody>
+                    <tr class=rowHeader>
+                        <td class="colHeaderLink" colspan="1">
+                            $i18n.getText("group.timesheet.summary", $targetGroup.name)
+                            &nbsp;<font size="1">(<a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$dpc.getString($startDate)&endDate=$dpc.getString($endDate)&targetGroup=$targetGroup.name&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report&weekends=true&showUsers=false">$i18n.getText("portlet.timesheet.details")</a>)</font>
+                        </td>
+                        #foreach ($weekDay in $weekDays)
+                            <td align="center" width="1%" class="$weekDay.getWeekDayCSS()" title="$outlookDate.formatDMY($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</td>
+                        #end
+                        <td align="center" width="1%">$i18n.getText("portlet.timesheet.tot")</td>
+                    </tr>
+                    #if ($users && $users.size())
+                        #foreach ($user in $users)
+                            #parse('templates/scn/grouptimesheet/group-timesheet-entry.vm')
+                            #set ($lastVelocityCount = $velocityCount + 1)
+                        #end
+                        <tr #if ($lastVelocityCount % 2 != 0) class="rowNormal" #else class="rowAlternate" #end >
+                            #set ($total = 0)
+                            <td align="center" colspan="1">$i18n.getText("portlet.timesheet.total")</td>
+                            #foreach ($weekDay in $weekDays)
+                                #set ($dayOfMonth = $weekDay.weekDayDate.time)
+                                #if ($weekTotalTimeSpents.get($dayOfMonth))
+                                    #set ($timeSpent = $weekTotalTimeSpents.get($dayOfMonth).intValue())
+                                    #set ($cellCSS = "$weekDay.weekDayCSS workedDay")
+                                #else
+                                    #set ($timeSpent = 0)
+                                    #set ($cellCSS = "$weekDay.weekDayCSS nonWorkedDay")
+                                #end
+                                <td align="center" class="$cellCSS" ><b>
+                                    #if ($timeSpent != 0) 
+                                        $textUtil.getPrettyHours($timeSpent)
+                                    #end
+                                </b></td>
+                                #set ($total = $total + $timeSpent)
+                            #end
+                            <td align="center"><b>
+                                #if ($total != 0)
+                                    $textUtil.getPrettyHours($total)
+                                #end
+                            </b></td>
+                        </tr>
+                    #else
+                        <tr>
+                            <td align="center">
+                                $i18n.getText('group.timesheet.notFound')
+                            </td>
+                        </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+#end

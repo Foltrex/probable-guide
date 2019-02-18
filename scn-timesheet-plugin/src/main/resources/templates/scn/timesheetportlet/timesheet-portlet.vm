@@ -1,0 +1,97 @@
+#if ($loggedin)
+## Style Declaration
+<style type="text/css">
+	#set ($H = '#')
+    .businessDay {
+    }
+    .nonBusinessDay {
+        background-color: ${H}FFCC99;
+    }
+    .nonWorkedDay {
+        color: ${H}bbb;
+    }
+    .workedDay {
+    }
+    .toDay {
+        background-color: ${H}ccffcc;
+    }
+    .issuerow:hover .toDay,
+    .rowFooter:hover .toDay {
+        background-color: ${H}99CC99;
+    }
+    .issuerow:hover .nonBusinessDay,
+    .rowFooter:hover .nonBusinessDay {
+        background-color: ${H}DDAA77;
+    }
+    ${H}issuetable .day,
+    ${H}issuetable .total {
+    	text-align: center;
+    	border-left: 1px solid ${H}EEE;
+    	width: 16px;
+    }
+    ${H}issuetable .total {
+    	font-weight: bold;
+    }
+    ${H}issuetable .colFooter.total {
+    	text-align: right;
+    }
+    ${H}issuetable .rowFooter:hover {
+		background-color: ${H}f0f0f0;
+	}
+	${H}issuetable tfoot th {
+		padding: 3px 7px;
+	}
+</style>
+    
+<div id="jira">
+    <div class="results-wrap">
+        <div>
+        	#set ($worklogKeys = $weekWorkLog.keySet())
+        	#if ($worklogKeys.size() > 0)
+            <table id="issuetable">
+            	<thead>
+			        <tr class="rowHeader">
+                        <th class="colHeaderLink" colspan="4">
+                            $i18n.getText("scn.portlet.timesheet.summary", $targetUser.displayName)
+                            &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$dpc.getString($startDate)&endDate=$dpc.getString($endDate)#if ($targetUser)&targetUser=$targetUser.name#end&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report&weekends=true&showUsers=true">$i18n.getText("portlet.timesheet.details")</a></font>)
+                        </th>
+                    #foreach ($weekDay in $weekDays)
+                        <th class="colHeaderLink day $weekDay.getWeekDayCSS()" align="center" title="$outlookDate.formatDMY($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</th>
+                    #end
+                        <th class="colHeaderLink total" align="center">$i18n.getText("portlet.timesheet.tot")</th>
+                    </tr>
+			    </thead>
+                <tbody>
+                    #foreach ($issue in $worklogKeys)
+                        #parse('templates/scn/timesheetportlet/timesheet-entry.vm')
+                        #set ($lastVelocityCount = $velocityCount + 1)
+                    #end
+                </tbody>
+            	<tfoot>
+                    <tr class="rowFooter">
+                        #set ($total = 0)
+                        <th class="colFooter total" colspan="4">$i18n.getText("portlet.timesheet.total")</th>
+                        #foreach ($weekDay in $weekDays)
+                            #set ($dayOfMonth = $weekDay.weekDayDate.time)
+                            #if ($weekTotalTimeSpents.get($dayOfMonth))
+                                #set ($timeSpent = $weekTotalTimeSpents.get($dayOfMonth).intValue())
+                                #set ($cellCSS = "$weekDay.weekDayCSS workedDay")
+                            #else
+                                #set ($timeSpent = 0)
+                                #set ($cellCSS = "$weekDay.weekDayCSS nonWorkedDay")
+                            #end
+                            <th class="total $cellCSS">#if ($timeSpent != 0) $textUtil.getPrettyHours($timeSpent) #end</th>
+                            #set ($total = $total + $timeSpent)
+                        #end
+                        <th class="total">#if ($total != 0) $textUtil.getPrettyHours($total) #end</th>
+                    </tr>
+            	</tfoot>
+            </table>
+            #else
+            	$i18n.getText('portlet.timesheet.noData')
+           	#end
+        </div>
+    </div>
+</div>
+
+#end
