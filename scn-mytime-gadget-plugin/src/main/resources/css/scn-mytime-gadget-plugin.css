@@ -1,0 +1,438 @@
+html, body, div, span, iframe, form, label,
+h1, h2, h3, h4, h5, h6,
+table, caption, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+   /* vertical-align: baseline;*/
+    background: transparent;
+}
+
+:focus {
+    outline: 0;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: Arial, Tahoma, Verdana, sans-serif;
+    min-height: 100% !important;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+p {
+    margin: 0 0 18px
+}
+
+img {
+    border: none;
+}
+
+input {
+    vertical-align: middle;
+}
+
+label {
+    font-family: arial,sans-serif;
+    font-size: 14px;
+	color: #444;	
+}
+
+table.mytime-table{
+	font-family: arial,sans-serif;
+	font-size: 14px;    
+    line-height: 1.4em;
+    font-style: normal;
+    border-collapse:collapse;
+	width:500px;
+	margin: 0 auto;
+}
+
+table.mytime-table thead th {   
+    border-right: 0px none;
+    border-top: 0px none;
+    color: black;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 1px 5px;
+	text-align: center;
+}
+
+table.mytime-table thead th.weekendCss {
+    color: #B22222;
+	font-weight: normal;
+	border-top: 1px solid #FFFFFF;
+}
+
+table.mytime-table thead th.totalheader {
+	font-weight: bold;
+}
+
+
+table.mytime-table tr.topRow {    
+	border-left: 1px solid #B2BCCA;
+    border-right: 1px solid #B2BCCA;
+    border-top: 1px solid #B2BCCA;	
+}
+
+table.mytime-table tr.bottomRow {    
+	border-left: 1px solid #B2BCCA;
+    border-right: 1px solid #B2BCCA;   
+	border-bottom: 1px solid #B2BCCA;
+}
+
+table.mytime-table td {    
+    color: #black;
+    font-size: 13px; 
+    padding: 5px 5px;
+	text-align: center;
+}
+
+table.mytime-table td.timeCell {    
+	border-left: 1px solid #B2BCCA;
+	background-color: #d6e8ff;
+	width: 30px;
+	height: 25px;
+}
+
+table.mytime-table td.timeCell.current, table.mytime-table td.timeCell.red.current,table.mytime-table td.timeCell.green.current {   
+	border-left: 2px solid #0071CD;
+	border-bottom: 2px solid #0071CD;	
+}
+
+table.mytime-table td.timeCell.total {    
+  font-weight: bold;
+}
+
+table.mytime-table td.wicketTimeCell {        
+	border-bottom: 1px solid white;
+	border-left: 1px solid #B2BCCA;
+	background-color:#eaeaea;
+	width: 30px;
+	height: 25px;
+}
+
+table.mytime-table td.wicketTimeCell.current, table.mytime-table td.wicketTimeCell.red.current,table.mytime-table td.wicketTimeCell.green.current {   
+	border-left: 2px solid #0071CD;
+	border-top: 2px solid #0071CD;	
+}
+
+table.mytime-table td.wicketTimeCell.total{    
+   font-weight: bold;
+}
+
+table.mytime-table td.timeCell.red, table.mytime-table td.wicketTimeCell.red,table.mytime-table td.timeCell.total.red,table.mytime-table td.wicketTimeCell.total.red{
+    color: #D03E1C;
+}
+
+table.mytime-table td.timeCell.green, table.mytime-table td.wicketTimeCell.green,table.mytime-table td.timeCell.total.green,table.mytime-table td.wicketTimeCell.total.green{
+    color: #6B8E22;
+}
+
+table.mytime-table td.dayNum {        
+	border-bottom: 1px solid #B2BCCA;
+	border-top: 1px solid #B2BCCA;
+    font-size: 16px; 
+	width: 30px;
+}
+
+
+table.mytime-table td.dayNumGray {        
+	border-bottom: 1px solid #B2BCCA;
+	border-top: 1px solid #B2BCCA;
+    font-size: 16px; 
+	width: 30px;
+	color: gray;
+}
+
+table.mytime-table td.dayNumGray.current {
+	border-top: 2px solid #0071CD;
+	border-right: 2px solid #0071CD;	
+	border-bottom: 2px solid #0071CD;	
+	}
+
+table.mytime-table td.dayNum.current {
+	border-top: 2px solid #0071CD;
+	border-right: 2px solid #0071CD;	
+	border-bottom: 2px solid #0071CD;	
+	
+}
+
+table.mytime-legend {        
+	border: 0px none;	
+    font-size: 13px; 
+    margin: 0 auto;
+}
+
+table.mytime-legend td {        
+	border: 0px none;	
+    font-size: 13px; 
+	padding: 5px 5px;
+	height: 10px;
+}
+
+
+table.mytime-legend  td.mytimeActual{        
+	background-color: #eaeaea;
+	width: 30px;
+}
+
+table.mytime-legend  td.mytimeActualText{        	
+	width: 100px;
+}
+
+table.mytime-legend  td.mytimeRegistered{        
+	background-color: #d6e8ff;
+	width: 30px;
+	
+}
+
+table.mytime-legend  td.mytimeRegisteredText{        	
+	width: 100px;
+}
+
+table.mytime-legend  td.mytimeSpace{        	
+	width: 60px;
+}
+
+
+table.mytime-table-week{
+	font-family: arial,sans-serif;
+	font-size: 14px;    
+    line-height: 1.4em;
+    font-style: normal;
+    border-collapse:collapse;
+	width:515px;
+}
+
+table.mytime-table-week thead th {   
+    border: 3px solid #000000;
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 1px 5px;
+	text-align: center;
+}
+
+table.mytime-table-week thead th.weekendCss {    
+	font-weight: bold;
+	background-color: #E9B8BB;
+}
+
+table.mytime-table-week thead th.totalheader {
+	font-weight: bold;
+	background-color: #BDD19E;
+}
+
+table.mytime-table-week tr.topRow {    
+	border-left: 3px solid #000000;
+    border-right: 3px solid #000000;
+    border-top: 3px solid #000000;	
+}
+
+table.mytime-table-week tr.bottomRow {    
+	border-left: 3px solid #000000;
+    border-right: 3px solid #000000;   
+	border-bottom: 3px solid #000000;
+}
+
+table.mytime-table-week td {    
+    color: #black;
+    font-size: 13px; 
+    padding: 5px 5px;
+	text-align: center;
+}
+
+table.mytime-table-week td.timeCell {    	
+	border-left: 3px solid #000000;
+	background-color: #F4E8D0;
+	width: 30px;
+	height: 25px;
+}
+
+table.mytime-table-week td.timeCell.current {    	
+	border-left: 2px solid #0071CD;	
+	border-bottom: 2px solid #0071CD;	
+}
+
+table.mytime-table-week td.timeCell.total {    
+  font-weight: bold;
+}
+
+table.mytime-table-week td.wicketTimeCell {        
+	border-left: 3px solid #000000;
+	background-color: #DAECF6;;
+	width: 30px;
+	height: 25px;
+}
+
+table.mytime-table-week td.wicketTimeCell.current {    	
+	border-left: 2px solid #0071CD;
+	border-top: 2px solid #0071CD;		
+}
+
+table.mytime-table-week td.wicketTimeCell.total{    
+   font-weight: bold;
+}
+
+table.mytime-table-week td.dayNum {        
+	border-bottom: 3px solid #000000;
+	border-top: 3px solid #000000;
+    font-size: 16px; 
+	width: 30px;
+}
+
+table.mytime-table-week td.dayNumGray {        
+	border-bottom: 3px solid #000000;
+	border-top: 3px solid #000000;
+    font-size: 16px; 
+	width: 30px;
+	color: gray;
+}
+
+
+table.mytime-legend-week{        
+	border: 0px none;	
+    font-size: 13px; 
+}
+
+table.mytime-legend-week td {        
+	border: 0px none;	
+    font-size: 13px; 
+	padding: 5px 5px;
+	height: 10px;
+}
+
+
+table.mytime-legend-week  td.mytimeActual{        
+	background-color: #DAECF6;
+	width: 30px;
+}
+
+table.mytime-legend-week  td.mytimeActualText{        	
+	width: 200px;
+	color: black;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 1px 5px;
+}
+
+table.mytime-legend-week  td.mytimeRegistered{        
+	background-color: #F4E8D0;
+	width: 30px;
+	
+}
+
+table.mytime-legend-week  td.mytimeRegisteredText{        	
+	width: 200px;
+	color: black;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 1px 5px;
+}
+
+table.mytime-legend-week  td.mytimeSpace{        	
+	width: 10px;
+}
+
+button.btn-view{
+	display: block;
+	width: 90px;
+	height: 30px;	
+	background: transparent;
+	background-color:transparent;
+	border: activeborder;
+	border: 0 none;
+    color: #0071CD;
+    cursor: pointer;   
+    margin: 0;
+    outline: 0 none;
+    overflow: visible;
+    padding: 1px 5px;
+    white-space: nowrap;
+	font-weight: bold;
+}
+
+table.my-gadget-slide{
+	width:515px;
+	margin: 0 auto;
+}
+
+table.switch-slide{
+	margin: 0 auto;
+}
+
+
+table.my-gadget-slide td.slide-back button.slide-back{
+	width:50px;
+	background-color:#8EA2B7;
+	background:url(css/images/back.png) no-repeat;
+	color:white;
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+}
+
+table.my-gadget-slide td.slide-forward button.slide-forward{
+	width:50px;
+	background-color:#8EA2B7;
+	background:url(css/images/forward.png) no-repeat;
+	color:white;
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+}
+
+table.my-gadget-slide td.period-title{
+	width:415px;
+	background-color:#8EA2B7;
+	color:white;
+	font-weight: bold;
+	font-size: 18px;
+	text-align: center;
+}
+
+table.my-gadget-slide-week td.slide-back{
+	width:125px;
+	color:black;
+	font-weight: normal;
+	font-size: 14px;
+	text-align: right;
+}
+
+table.my-gadget-slide-week td.slide-forward{
+	width:125px;
+	color:black;
+	font-weight: normal;
+	font-size: 14px;
+	text-align: left;
+}
+
+table.my-gadget-slide-week td.period-title{
+	width:250px;
+	color:black;
+	font-weight: normal;
+	font-size: 14px;
+	text-align: center;
+}
+
+
+
+
+ 

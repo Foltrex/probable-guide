@@ -1,0 +1,4 @@
+<messagebundle>
+    <msg name="mytime.gadget.title">MyTime JIRA Gadget</msg>
+    <msg name="mytime.gadget.description">MyTime gadget to install into JIRA.</msg>
+</messagebundle>

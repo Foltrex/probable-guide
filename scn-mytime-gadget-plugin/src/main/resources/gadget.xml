@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <!--<ModulePrefs title="__MSG_mytime.gadget.title__" directory_title="__MSG_mytime.gadget.title__" description="__MSG_mytime.gadget.description__">-->
+    <ModulePrefs title="MyTime JIRA Gadget" directory_title="MyTime JIRA Gadget" description="MyTime gadget to install into JIRA.">
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                JIRA
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="views" />
+        <Require feature="settitle"/>
+        <Require feature="oauthpopup" />
+        <Require feature="dynamic-height"/>
+
+        #oauth
+
+        <!--<Locale messages="__ATLASSIAN_BASE_URL__/download/resources/scn-mytime-gadget-plugin/i18n/ALL_ALL.xml"/>-->
+    </ModulePrefs>
+    <UserPref name="isConfigured" datatype="hidden" default_value="true" />
+    <UserPref name="project"  default_value="1"/>
+    <UserPref name="refresh" datatype="hidden" default_value="false" />
+
+    <Content type="html" view="profile">
+        <![CDATA[
+
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.auiplugin:ajs")
+        #requireResource("com.scn.jira.mytime.scn-mytime-gadget-plugin:my-resources")
+
+        #includeResources()
+
+        <div style="overflow-x: auto; height:65px">
+
+		<table class="switch-slide">
+		<tr>
+			<td class="filterView" width="18%">
+	       		<button id="viewButton" class="btn-view" onclick="changeView()">Weekly view</button>
+	       	</td>
+	    </tr>
+		</table>
+
+	    <script type="text/javascript">
+        	var buttonNameText=document.getElementById('viewButton').innerHTML;
+        </script>
+
+		<table id="slideTable" class="my-gadget-slide">
+		<tr>
+			<td id="slideBack" class="slide-back" onclick="slideBack()">
+				<button class="slide-back" onclick="slideBack()"></button>
+			</td>
+	       	<td id="periodId" class="period-title"></td>
+	       	<td id="slideForward" class="slide-forward" onclick="slideForward()">
+	       		<button class="slide-forward" onclick="slideForward()"></button>
+	       	</td>
+	    </tr>
+		</table>
+
+        <script type="text/javascript">
+          		var currentPeriod=0;
+		  	    var slideStep=0;
+
+
+                var gadgetMyTime = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+
+                    view:{
+                    	onResizeAdjustHeight: true,
+                        onResizeReload: true,
+						enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+
+                            gadget.getView().html(args.timeobj.html);
+                        },
+                        args: [
+                        {
+                            key: "timeobj",
+                            ajaxOptions: function() {
+                                return {
+                                    url: "/rest/mytime-gadget/1.0/timeobj.json",
+                                    data: {
+                                        viewType: buttonNameText,
+                                        currentPeriod: currentPeriod,
+                                       	slideStep: slideStep
+                                    }
+                                };
+                            }
+                        }
+                        ]
+                    }
+
+                });
+
+
+            function reloadMe(){
+            	AJS.$( ".gadget" ).remove();
+
+               gadgetMyTime = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+                    view:{
+                    	onResizeAdjustHeight: true,
+                        onResizeReload: true,
+						enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+
+                            gadget.getView().html(args.timeobj.html);
+                        },
+                        args: [
+                        {
+                            key: "timeobj",
+                            ajaxOptions: function() {
+                                return {
+                                    url: "/rest/mytime-gadget/1.0/timeobj.json",
+                                    data: {
+                                        viewType: buttonNameText,
+                                        currentPeriod: currentPeriod,
+                                       	slideStep: slideStep
+                                    }
+                                };
+                            }
+                        }
+                        ]
+                    }
+
+                });
+				//gadgetMyTime.showView(true);
+			};
+
+			function slideForward(){
+				currentPeriod=0;
+
+				document.getElementById('slideStepHidden').value= parseInt(document.getElementById('slideStepHidden').value)+1;
+
+				slideStep = document.getElementById('slideStepHidden').value;
+
+				reloadMe();
+
+			}
+
+			function slideBack(){
+				currentPeriod=0;
+
+				document.getElementById('slideStepHidden').value= parseInt(document.getElementById('slideStepHidden').value)-1;
+
+				slideStep = document.getElementById('slideStepHidden').value;
+
+				reloadMe();
+			}
+
+			function changeView(){
+				//var ele = document.getElementById('slideTable');
+				//if(ele.getAttribute('class')=='my-gadget-slide'){
+				//	ele.setAttribute('class', 'my-gadget-slide-week');
+				//	document.getElementById('slideBack').innerHTML="<<";
+				//	document.getElementById('slideForward').innerHTML=">>";
+			//	}else{
+			//		ele.setAttribute('class', 'my-gadget-slide');
+			//		document.getElementById('slideBack').innerHTML="<";
+		   //		document.getElementById('slideForward').innerHTML=">";
+		  //	}
+				if(document.getElementById('viewButton').innerHTML=="Weekly view"){
+					document.getElementById('viewButton').innerHTML="Monthly view";
+				}else{
+					document.getElementById('viewButton').innerHTML="Weekly view"
+				}
+				buttonNameText=document.getElementById('viewButton').innerHTML;
+				currentPeriod=1;
+				slideStep = document.getElementById('slideStepHidden').value;
+				reloadMe();
+				currentPeriod=0;
+			};
+
+
+        </script>
+        </div >
+
+        ]]>
+    </Content>
+</Module>
