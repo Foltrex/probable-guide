@@ -53,14 +53,14 @@ public class MyTimeResource {
 
 	@Inject
 	public MyTimeResource(@ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
-			  IssueManager issueManager, ProjectRoleManager projectRoleManager, WorklogManager worklogManager,
+			  IssueManager issueManager, ProjectRoleManager projectRoleManager, @ComponentImport WorklogManager overridedWorklogManager,
 			  I18nResolver i18nResolver) {
 		super();
 		this.userUtil = userUtil;
 		this.authenticationContext = jiraAuthenticationContext;
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = worklogManager;
+		this.worklogManager = overridedWorklogManager;
 		this.i18nResolver = i18nResolver;
 	}
 	

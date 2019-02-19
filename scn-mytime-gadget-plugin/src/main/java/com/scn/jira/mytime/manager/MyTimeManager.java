@@ -28,19 +28,17 @@ public class MyTimeManager {
 	
 	private IssueManager issueManager;
 	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
 	private ScnWorklogMyTimeStore scnWorklogMyTimeStore;
 	private WicketStore wicketStore;
 	private I18nResolver i18nResolver;
 
 	@Inject
 	public MyTimeManager(@ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-                         @ComponentImport WorklogManager worklogManager, @ComponentImport I18nResolver i18nResolver) {
+                         @ComponentImport WorklogManager overridedWorklogManager, @ComponentImport I18nResolver i18nResolver) {
 		super();
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = worklogManager;
-		this.scnWorklogMyTimeStore = new ScnWorklogMyTimeStore(issueManager, projectRoleManager, worklogManager);
+		this.scnWorklogMyTimeStore = new ScnWorklogMyTimeStore(issueManager, projectRoleManager, overridedWorklogManager);
 		this.i18nResolver = i18nResolver;
 		this.wicketStore = new WicketStore(i18nResolver);
 	}

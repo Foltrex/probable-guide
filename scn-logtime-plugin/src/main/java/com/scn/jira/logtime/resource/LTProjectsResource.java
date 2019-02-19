@@ -102,7 +102,7 @@ public class LTProjectsResource {
 			  @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
 			  @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
 			  @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-			  WorklogManager overridedWorklogManager,
+							  @ComponentImport WorklogManager overridedWorklogManager,
 			  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
 			  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
 			  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
