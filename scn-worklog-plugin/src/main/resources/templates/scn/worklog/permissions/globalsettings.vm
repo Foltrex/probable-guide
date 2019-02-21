@@ -4,7 +4,7 @@
     <meta name="decorator" content="atl.admin">
   </head>
   <body>
-	$webResourceManager.requireResource("com.scnsoft.jira.plugin.scnsoft-worklog-plugin:globalsettings")
+	$webResourceManager.requireResource("com.scn.jira.scn-worklog-plugin:globalsettings")
 
         <header class="aui-page-header">
           <div class="aui-page-header-inner">

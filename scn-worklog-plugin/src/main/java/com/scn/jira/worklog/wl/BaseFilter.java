@@ -196,7 +196,7 @@ public abstract class BaseFilter implements Filter
 		List<CustomField> customFields = this.cfManager.getCustomFieldObjects();
 		for (CustomField field : customFields)
 		{
-			if ("com.scnsoft.jira.plugin.scnsoft-worklog-plugin:scn-timetracking-custom-field-type"
+			if ("com.scn.jira.scn-worklog-plugin:scn-timetracking-custom-field-type"
 					.equals(field.getCustomFieldType().getKey()))
 			{
 				scncf = field;

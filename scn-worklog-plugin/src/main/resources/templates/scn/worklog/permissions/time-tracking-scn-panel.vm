@@ -13,7 +13,7 @@
 	#parse("templates/scn/decorators/jiraformHeader.vm")
 	#parse("templates/scn/decorators/jiraErrorMessages.vm")
 	
-	$webResourceManager.requireResource("com.scnsoft.jira.plugin.scnsoft-worklog-plugin:scn-worklog-resources")
+	$webResourceManager.requireResource("com.scn.jira.scn-worklog-plugin:scn-worklog-resources")
 	
 		<tr>
 	        <td colspan="2">

@@ -229,7 +229,7 @@
      <label key="logwork.title"/><label>LOG WORK</label>
      <tooltip key="admin.issue.operations.plugin.log.work.name"/>
      <styleClass>issueaction-log-work</styleClass>
-     <link linkId="log-work2">/secure/CreateWorklog2!default.jspa?id=${issueId}</link>
+     <link linkId="log-work2">/secure/CreateWorklog!default.jspa?id=${issue.id}</link>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.HasIssuePermissionCondition">

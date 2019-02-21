@@ -41,7 +41,7 @@ import com.scn.jira.worklog.core.wl.WorklogType;
  * Created by IntelliJ IDEA. User: Khadarovich Date: 10.08.2010 Time: 15:49:20 To change this template use File | Settings | File
  * Templates.
  */
-public class AbstractScnWorklogAction extends AbstractIssueSelectAction {
+public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction {
 
 	private static final long serialVersionUID = -7430574077126963463L;
 	protected static final String ADJUST_ESTIMATE_AUTO = "auto";
