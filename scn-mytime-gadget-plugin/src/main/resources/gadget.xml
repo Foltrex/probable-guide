@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
     <!--<ModulePrefs title="__MSG_mytime.gadget.title__" directory_title="__MSG_mytime.gadget.title__" description="__MSG_mytime.gadget.description__">-->
-    <ModulePrefs title="MyTime JIRA Gadget" directory_title="MyTime JIRA Gadget" description="MyTime gadget to install into JIRA.">
+    <ModulePrefs author="ScienceSoft" title="MyTime JIRA Gadget" directory_title="MyTime JIRA Gadget" description="MyTime gadget to install into JIRA.">
         <Optional feature="gadget-directory">
             <Param name="categories">
                 JIRA
@@ -27,7 +27,7 @@
 
         #requireResource("com.atlassian.jira.gadgets:common")
         #requireResource("com.atlassian.auiplugin:ajs")
-        #requireResource("com.scn.jira.mytime.scn-mytime-gadget-plugin:my-resources")
+        #requireResource("com.scn.jira.scn-mytime-gadget-plugin:my-resources")
 
         #includeResources()
 

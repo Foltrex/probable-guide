@@ -19,6 +19,7 @@ import com.scn.jira.mytime.representation.WeekRepresentation;
 import com.scn.jira.mytime.store.ScnWorklogMyTimeStore;
 import com.scn.jira.mytime.store.WicketStore;
 import com.scn.jira.mytime.util.DateUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +35,7 @@ public class MyTimeManager {
 
 	@Inject
 	public MyTimeManager(@ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-                         @ComponentImport WorklogManager overridedWorklogManager, @ComponentImport I18nResolver i18nResolver) {
+						 @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager, @ComponentImport I18nResolver i18nResolver) {
 		super();
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;

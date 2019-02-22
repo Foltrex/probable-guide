@@ -30,7 +30,6 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 @Path("/projects")
 @Named
 public class ProjectsResource {
-	private UserManager userManager;
 	private PermissionManager permissionManager;
 	private UserUtil userUtil;
 	
@@ -48,9 +47,8 @@ public class ProjectsResource {
 	 *            projects
 	 */
 	@Inject
-	public ProjectsResource(@ComponentImport UserManager userManager, UserUtil userUtil,
+	public ProjectsResource(UserUtil userUtil,
 							@ComponentImport PermissionManager permissionManager) {
-		this.userManager = userManager;
 		this.userUtil = userUtil;
 		this.permissionManager = permissionManager;
 	}
@@ -69,7 +67,7 @@ public class ProjectsResource {
 	public Response getProjects(@Context HttpServletRequest request) {
 		// the request was automatically injected with @Context, so
 		// we can use SAL to extract the username from it
-		String username = userManager.getRemoteUsername(request);
+		String username = request.getRemoteUser();
 		
 		// get the corresponding com.opensymphony.os.User object for
 		// the request

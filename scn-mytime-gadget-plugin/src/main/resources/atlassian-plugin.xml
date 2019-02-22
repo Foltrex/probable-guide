@@ -30,6 +30,8 @@
         <resource type="i18n" name="i18n" location="scn-mytime-gadget-plugin" />
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.jira.gadgets:common</dependency>
+        <context>jira.userprofile</context>
+        <context>jira.view.issue</context>
     </web-resource>
 
 	<!--&lt;!&ndash; Automatically finds all JAX-RS resource classes in the plugin and publishes -->

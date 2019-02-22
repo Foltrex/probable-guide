@@ -18,7 +18,6 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.mytime.manager.MyTimeManager;
 import com.scn.jira.mytime.representation.MyTimeRepresentation;
@@ -26,13 +25,8 @@ import org.apache.velocity.exception.VelocityException;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.mytime.representation.WeekRepresentation;
 import com.scn.jira.mytime.util.DateUtils;
@@ -44,24 +38,14 @@ import com.scn.jira.mytime.util.ServletUtil;
 @Path("/timeobj")
 @Named
 public class MyTimeResource {
-	private UserUtil userUtil;
 	private JiraAuthenticationContext authenticationContext;
-	private IssueManager issueManager;
-	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
-	private I18nResolver i18nResolver;
+	private MyTimeManager myTimeManager;
 
 	@Inject
-	public MyTimeResource(@ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
-			  IssueManager issueManager, ProjectRoleManager projectRoleManager, @ComponentImport WorklogManager overridedWorklogManager,
-			  I18nResolver i18nResolver) {
+	public MyTimeResource(MyTimeManager myTimeManager, @ComponentImport JiraAuthenticationContext jiraAuthenticationContext) {
 		super();
-		this.userUtil = userUtil;
 		this.authenticationContext = jiraAuthenticationContext;
-		this.issueManager = issueManager;
-		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = overridedWorklogManager;
-		this.i18nResolver = i18nResolver;
+		this.myTimeManager = myTimeManager;
 	}
 	
 	private CacheControl getNoCacheControl() {
@@ -162,9 +146,7 @@ public class MyTimeResource {
 			}
 			
 		}
-		
-		MyTimeManager myTimeManager = new MyTimeManager(issueManager, projectRoleManager, worklogManager, i18nResolver);
-		
+
 		String reportView = (viewType != null && viewType.equals("Monthly view")) ? "week" : "month";
 		List<WeekRepresentation> weeksToRepresent = myTimeManager.getWeeksRepresentation(loggeduser.getName(), startDate, endDate,reportView);
 		

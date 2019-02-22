@@ -24,6 +24,7 @@ import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class ScnWorklogMyTimeStore {
 	
@@ -33,7 +34,7 @@ public class ScnWorklogMyTimeStore {
 	private ProjectRoleManager projectRoleManager;
 	private WorklogManager worklogManager;
 	
-	public ScnWorklogMyTimeStore(IssueManager issueManager, ProjectRoleManager projectRoleManager, WorklogManager worklogManager) {
+	public ScnWorklogMyTimeStore(IssueManager issueManager, ProjectRoleManager projectRoleManager, @Qualifier("overridedWorklogManager")WorklogManager worklogManager) {
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
 		this.worklogManager = worklogManager;
