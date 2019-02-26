@@ -11,12 +11,11 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.util.SettingsManager;
 import com.scn.jira.util.TextUtil;
 import com.scn.jira.util.UserToNameFunction;
 import com.scn.jira.util.WeekPortletHeader;
 import com.scn.jira.util.WorklogUtil;
-import com.scn.jira.util.*;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.ofbiz.core.entity.EntityCondition;
@@ -65,7 +64,7 @@ public class TimeSheet extends AbstractReport {
 	private final OutlookDateManager outlookDateManager;
 	private final PermissionManager permissionManager;
 	private final IssueManager issueManager;
-	private final SettingsManager scnGlobalPermissionManager;
+	private final GlobalSettingsManager scnGlobalPermissionManager;
 	private final UserManager userManager;
 	private final SearchProvider searchProvider;
 	private final VisibilityValidator visibilityValidator;
@@ -91,7 +90,7 @@ public class TimeSheet extends AbstractReport {
 			 @ComponentImport IssueManager issueManager, @ComponentImport SearchProvider searchProvider,
 			 @ComponentImport VisibilityValidator visibilityValidator, @ComponentImport UserManager userManager,
 			 @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			 @ComponentImport ProjectRoleManager projectRoleManager, SettingsManager globalSettingsManager,
+			 @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager,
 			 @ComponentImport FieldVisibilityManager fieldVisibilityManager)
 	{
 		this.outlookDateManager = outlookDateManager;

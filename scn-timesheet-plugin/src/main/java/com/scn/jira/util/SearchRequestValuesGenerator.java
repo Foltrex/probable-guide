@@ -5,6 +5,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.filter.SearchRequestService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.search.SearchRequest;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.ApplicationUsers;
 import java.util.Collection;
 import java.util.Iterator;
@@ -21,8 +22,8 @@ public class SearchRequestValuesGenerator implements ValuesGenerator {
 
     public Map getValues(Map params) {
         Map savedFilters = null;
-        User u = (User)params.get("User");
-        Collection<SearchRequest> savedFiltersList = ((SearchRequestService)ComponentAccessor.getComponent(SearchRequestService.class)).getFavouriteFilters(ApplicationUsers.from(u));
+        final ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getUser();
+        Collection<SearchRequest> savedFiltersList = ((SearchRequestService)ComponentAccessor.getComponent(SearchRequestService.class)).getFavouriteFilters(user);
         savedFilters = new ListOrderedMap();
         Iterator i$ = savedFiltersList.iterator();
 

@@ -12,11 +12,10 @@ import java.util.*;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.util.MyFullNameComparator;
 import com.scn.jira.util.MyUser;
-import com.scn.jira.util.SettingsManager;
 import com.scn.jira.util.TextUtil;
 import com.scn.jira.util.UserToNameFunction;
 import com.scn.jira.util.WorklogUtil;
-import com.scn.jira.util.*;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.ofbiz.core.entity.EntityCondition;
@@ -71,7 +70,7 @@ public class Pivot extends AbstractReport
 	private final GroupManager groupManager;
 	private final ProjectRoleManager projectRoleManager;
 	private final DateTimeFormatterFactory fFactory;
-	private final SettingsManager scnGlobalPermissionManager;
+	private final GlobalSettingsManager scnGlobalPermissionManager;
 	
 	private Map<Issue, List<IScnWorklog>> allWorkLogs = new Hashtable<Issue, List<IScnWorklog>>();
 	
@@ -86,7 +85,7 @@ public class Pivot extends AbstractReport
 			 @ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
 			 @ComponentImport SearchProvider searchProvider, @ComponentImport FieldVisibilityManager fieldVisibilityManager,
 			 @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			 @ComponentImport ProjectRoleManager projectRoleManager, SettingsManager globalSettingsManager)
+			 @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.outlookDateManager = outlookDateManager;

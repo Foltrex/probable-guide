@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.plugin.report.timesheet.TimeSheet;
-import com.scn.jira.util.SettingsManager;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.exception.VelocityException;
 
@@ -70,17 +70,17 @@ public class TimeSheetResource
 	private final ProjectRoleManager projectRoleManager;
 	private final GroupManager groupManager;
 	private final SearchRequestManager searchRequestManager;
-	private final SettingsManager scnPermissionManager;
+	private final GlobalSettingsManager scnPermissionManager;
 	private final FieldVisibilityManager fieldVisibilityManager;
 
 	@Autowired
 	public TimeSheetResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-			 @ComponentImport PermissionManager permissionManager, @ComponentImport ApplicationProperties applicationProperties,
-			 @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport IssueManager issueManager,
-			 @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
-			 @ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
-			 @ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
-			 SettingsManager globalSettingsManager, @ComponentImport FieldVisibilityManager fieldVisibilityManager)
+							 @ComponentImport PermissionManager permissionManager, @ComponentImport ApplicationProperties applicationProperties,
+							 @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport IssueManager issueManager,
+							 @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
+							 @ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
+							 @ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
+							 GlobalSettingsManager globalSettingsManager, @ComponentImport FieldVisibilityManager fieldVisibilityManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;

@@ -70,7 +70,7 @@
             	<tfoot>
                     <tr class="rowFooter">
                         #set ($total = 0)
-                        <th class="colFooter total" colspan="4">$i18n.getText("portlet.timesheet.total")</th>
+                        <th class="colFooter total" colspan="4">$i18n.getText("portlet.timesheet.total.label")</th>
                         #foreach ($weekDay in $weekDays)
                             #set ($dayOfMonth = $weekDay.weekDayDate.time)
                             #if ($weekTotalTimeSpents.get($dayOfMonth))

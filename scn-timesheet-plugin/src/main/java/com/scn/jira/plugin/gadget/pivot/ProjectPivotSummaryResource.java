@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.util.SettingsManager;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.VelocityException;
@@ -71,7 +71,7 @@ public class ProjectPivotSummaryResource
 	private final GroupManager groupManager;
 	private final ProjectRoleManager projectRoleManager;
 	private final DateTimeFormatterFactory fFactory;
-	private final SettingsManager scnGlobalPermissionManager;
+	private final GlobalSettingsManager scnGlobalPermissionManager;
 
 	@Autowired
 	public ProjectPivotSummaryResource(@ComponentImport JiraAuthenticationContext authenticationContext,
@@ -80,7 +80,7 @@ public class ProjectPivotSummaryResource
 			   @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
 			   @ComponentImport FieldVisibilityManager fieldVisibilityManager, @ComponentImport ProjectManager projectManager,
 			   @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			   @ComponentImport ProjectRoleManager projectRoleManager, SettingsManager globalSettingsManager)
+			   @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;

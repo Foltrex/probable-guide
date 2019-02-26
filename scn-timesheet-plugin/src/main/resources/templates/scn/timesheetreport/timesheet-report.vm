@@ -40,7 +40,7 @@ $i18n.getText("report.timesheet.enddate") : $outlookDate.formatDMY($endDate)
 					#foreach ($weekDay in $weekDays)
 						<td align="center" width="1%" class="$weekDay.getWeekDayCSS()" title="$outlookDate.formatDMY($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</td>
 					#end
-					<td align="center"><b>$i18n.getText("report.timesheet.total")</b></td>
+					<td align="center"><b>$i18n.getText("report.timesheet.total.label")</b></td>
 				</tr>
 				#if ($weekWorkLog)
 					#set ($count = 0)

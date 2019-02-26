@@ -38,7 +38,7 @@
                         #end
                         <tr #if ($lastVelocityCount % 2 != 0) class="rowNormal" #else class="rowAlternate" #end >
                             #set ($total = 0)
-                            <td align="center" colspan="1">$i18n.getText("portlet.timesheet.total")</td>
+                            <td align="center" colspan="1">$i18n.getText("portlet.timesheet.total.label")</td>
                             #foreach ($weekDay in $weekDays)
                                 #set ($dayOfMonth = $weekDay.weekDayDate.time)
                                 #if ($weekTotalTimeSpents.get($dayOfMonth))
