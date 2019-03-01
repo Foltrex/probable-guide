@@ -271,8 +271,8 @@
    </webwork1>
 
 <!--   <!-- TIMETRACKING* OPS BAR ACTION --> -->
-   <web-item key="scn-logwork-operation" name="Log Work* menu item" section="operations-work" weight="12">
-     <label>Log Work*</label>
+   <web-item key="scn-logwork-operation" name="Log work* menu item" section="operations-work" weight="12">
+     <label>Log work*</label>
      <tooltip key="admin.issue.operations.plugin.log.work.name"/>
      <styleClass>issueaction-log-work</styleClass>
      <link linkId="scn-logwork-operation">/secure/CreateScnWorklogAction!default.jspa?id=${issueId}</link>

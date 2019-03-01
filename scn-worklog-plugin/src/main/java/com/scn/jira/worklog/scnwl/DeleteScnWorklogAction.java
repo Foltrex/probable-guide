@@ -39,8 +39,7 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     		ProjectRoleManager projectRoleManager,
     		GroupManager groupManager,
     		IScnExtendedIssueStore extIssueStore, 
-    		IScnWorklogService scnWorklogService, 
-    		IScnWorklogManager worklogManager,
+    		IScnWorklogService scnWorklogService,
     		IScnProjectSettingsManager projectSettignsManager,
     		ExtendedConstantsManager extendedConstantsManager) 
     {
@@ -49,8 +48,7 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     			ComponentAccessor.getComponent(JiraDurationUtils.class), 
     			groupManager, 
     			extIssueStore, 
-    			scnWorklogService, 
-    			worklogManager, 
+    			scnWorklogService,
     			projectSettignsManager, 
     			extendedConstantsManager);
     }

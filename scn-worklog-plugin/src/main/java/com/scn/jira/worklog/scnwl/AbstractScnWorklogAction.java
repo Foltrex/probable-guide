@@ -74,7 +74,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
 	public AbstractScnWorklogAction(CommentService commentService, ProjectRoleManager projectRoleManager,
 			JiraDurationUtils jiraDurationUtils, GroupManager groupManager, IScnExtendedIssueStore extIssueStore,
-			IScnWorklogService worklogService, IScnWorklogManager worklogManager,
+			IScnWorklogService worklogService,
 			IScnProjectSettingsManager projectSettignsManager, ExtendedConstantsManager extendedConstantsManager) {
 		adjustEstimate = "auto";
 		this.commentService = commentService;

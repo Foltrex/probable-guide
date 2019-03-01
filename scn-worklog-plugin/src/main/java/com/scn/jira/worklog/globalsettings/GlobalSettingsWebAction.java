@@ -20,7 +20,7 @@ public class GlobalSettingsWebAction extends JiraWebActionSupport {
 
     @Inject
 	public GlobalSettingsWebAction(@ComponentImport final GroupManager groupManager,
-			@ComponentImport final IGlobalSettingsManager wlGlobalSettingsManager) {
+								   final IGlobalSettingsManager wlGlobalSettingsManager) {
 		this.groupManager = groupManager;
 		this.wlGlobalSettingsManager = wlGlobalSettingsManager;
 	}

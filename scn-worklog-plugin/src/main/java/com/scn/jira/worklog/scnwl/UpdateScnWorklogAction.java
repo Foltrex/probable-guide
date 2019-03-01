@@ -34,8 +34,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
     public UpdateScnWorklogAction(ProjectRoleManager projectRoleManager,
     		GroupManager groupManager,
     		IScnExtendedIssueStore extIssueStore, 
-    		IScnWorklogService scnWorklogService, 
-    		IScnWorklogManager worklogManager,
+    		IScnWorklogService scnWorklogService,
     		IScnProjectSettingsManager projectSettignsManager,
     		ExtendedConstantsManager extendedConstantsManager) 
     {
@@ -44,8 +43,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
     			ComponentAccessor.getComponent(JiraDurationUtils.class), 
     			groupManager, 
     			extIssueStore, 
-    			scnWorklogService, 
-    			worklogManager, 
+    			scnWorklogService,
     			projectSettignsManager, 
     			extendedConstantsManager);
     }

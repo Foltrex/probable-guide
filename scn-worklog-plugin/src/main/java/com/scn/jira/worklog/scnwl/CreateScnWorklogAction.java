@@ -20,6 +20,7 @@ import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 
@@ -36,12 +37,12 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 
 	@Inject
 	public CreateScnWorklogAction(ProjectRoleManager projectRoleManager,
-		  GroupManager groupManager, IScnExtendedIssueStore extIssueStore,
-		  @ComponentImport IScnWorklogService defaultScnWorklogService, IScnWorklogManager worklogManager,
+		  GroupManager groupManager, @Qualifier("ofBizScnExtendedIssueStore") IScnExtendedIssueStore extIssueStore,
+		  @ComponentImport IScnWorklogService defaultScnWorklogService,
 		  IScnProjectSettingsManager projectSettignsManager, ExtendedConstantsManager extendedConstantsManager) {
 
 		super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
-				extIssueStore, defaultScnWorklogService, worklogManager, projectSettignsManager, extendedConstantsManager);
+				extIssueStore, defaultScnWorklogService, projectSettignsManager, extendedConstantsManager);
 		this.fvManager = ComponentAccessor.getComponent(FieldVisibilityManager.class);
 	}
 

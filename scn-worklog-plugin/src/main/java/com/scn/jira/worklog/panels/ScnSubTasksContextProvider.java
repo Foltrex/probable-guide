@@ -73,7 +73,7 @@ public class ScnSubTasksContextProvider implements CacheableContextProvider {
 	public ScnSubTasksContextProvider(@ComponentImport SubTaskManager subTaskManager, @ComponentImport JiraAuthenticationContext authenticationContext,
 				  @ComponentImport VelocityRequestContextFactory velocityRequestContextFactory,
 				  @ComponentImport AggregateTimeTrackingCalculatorFactory aggregateTimeTrackingCalculatorFactory,
-				  @ComponentImport VelocityTemplatingEngine templatingEngine, @ComponentImport ApplicationProperties appProperties,
+				  @ComponentImport VelocityTemplatingEngine templatingEngine,
 				  @ComponentImport TimeTrackingGraphBeanFactory ttGraphBeanFactory, @ComponentImport PermissionManager permissionManager,
 				  IScnExtendedIssueStore eiStore,
 				  IScnProjectSettingsManager psManager, IGlobalSettingsManager gpManager) {
@@ -84,7 +84,7 @@ public class ScnSubTasksContextProvider implements CacheableContextProvider {
 		this.velocityRequestContextFactory = velocityRequestContextFactory;
 		this.aggregateTimeTrackingCalculatorFactory = aggregateTimeTrackingCalculatorFactory;
 		this.templatingEngine = templatingEngine;
-		this.appProperties = appProperties;
+		this.appProperties = ComponentAccessor.getApplicationProperties();
 		this.ttGraphBeanFactory = ttGraphBeanFactory;
 		this.permissionManager = permissionManager;
 		this.eiStore = eiStore;
