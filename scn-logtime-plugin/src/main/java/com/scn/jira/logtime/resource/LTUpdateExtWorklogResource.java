@@ -51,6 +51,7 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * REST resource that provides a list of projects in JSON format.
@@ -102,7 +103,7 @@ public class LTUpdateExtWorklogResource {
               @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
               @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
               @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-              @ComponentImport WorklogManager worklogManager,
+									  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
               @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
               @ComponentImport DefaultScnWorklogManager scnWorklogManager,
               @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
@@ -119,7 +120,7 @@ public class LTUpdateExtWorklogResource {
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = worklogManager;
+		this.worklogManager = overridedWorklogManager;
 		this.extendedConstantsManager = defaultExtendedConstantsManager;
 		this.scnWorklogManager = scnWorklogManager;
 		this.extendedWorklogManager = extendedWorklogManager;

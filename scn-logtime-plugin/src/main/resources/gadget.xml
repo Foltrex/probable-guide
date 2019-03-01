@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-    <ModulePrefs title="JIRA LogTime Gadget" 
+    <ModulePrefs author="ScienceSoft"
+                 title="JIRA LogTime Gadget"
 			directory_title="JIRA LogTime Gadget_" 
 			description="A sample gadget to install into JIRA.">
         <Optional feature="gadget-directory">
@@ -38,87 +39,101 @@
         #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
         #requireResource("com.atlassian.jira.gadgets:g-filter-results")
         #requireResource("com.atlassian.auiplugin:ajs")
-        #requireResource("com.scn.jira.logtime.scn-logtime-plugin:logtime-resources")
+        #requireResource("com.scn.jira.scn-logtime-plugin:logtime-resources")
 
         #includeResources()
         
         <br/>
 
-        <table class="table-filter">       
-        <tbody style="overflow-x:auto;width:1000px;">
-        <tr>
-        <td nowrap>        
-        <select id="s1" multiple="">
-			<option>All projects</option>
-		</select>
-	
-	
-       	</td>
-       	<td class="emptyTd"><td>
-       	<td id="wlsc" class="filterCheck" nowrap>
-                   	
-	       	<input id="ScnWl" type="checkbox" onclick="checkboxScnClick()" name="ScnWL" value="ScnWL" checked>
-	       	<label for="ScnWl" name="checkbox2_lbl" >WL*</label>
-       	
-       	</td>
-      	
-       	<td class="filterCheck" nowrap>
-	       	<input id="ExtWl" type="checkbox" onclick="checkboxExtClick()" name="ExtWL" value="ExtWL" checked>
-	       	<label for="ExtWl" name="checkbox2_lbl2" >WL</label>
-       	</td>
-       	
-       	<!--<td class="filterCheckAssigned" nowrap>
-       	
-	       	<input id="Assigned" type="checkbox" onclick="checkboxAssignedClick()" name="Assigned" value="Assigned" checked>
-	       	<label for="Assigned" name="checkbox2_lbl3" >Assigned to me</label>
-       	
-       	</td>-->
-       	
-       	<td class="filterEmployee" nowrap>
-       		<label> Employee(s) </label>
-       	</td>
-       	
-       	<td class="filterUser" nowrap>
-       	<fieldset rel="myFieldId" class="hidden user-picker-params">
-			<input type="hidden" id="formName" value="jiraform">
-			<input type="hidden" id="fieldName" value="myFieldId">		 
-			<input type="hidden" id="multiSelect" value="true">
-			<input type="hidden" id="userPickerEnabled" value="true">
-		</fieldset>
-		
-		<div class="ajax_autocomplete" id="myFieldId_container">
+        <table>
+        <tbody>
+            <tr>
+                <td class="emptyTd"><td>
+                <td nowrap>
+                <select id="s1" multiple="">
+                    <option>All projects</option>
+                </select>
 
-			<input type="text" name="myFieldId" id="myFieldId" value="" class="userpickerfield text" size="20" />
-			
-			<br/><div id="myFieldId_results" class="ajax_results"></div>
-			<div id="noUser" style="color:red;display:none;">Please, specify at least one employee </div>
-		</div>		
-		</td>
-		
-		<td >
-			<button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
-		</td>
-		<td nowrap> 
-       		<label id="periodId">                 </label>
-       	</td>
-       	<td class="filterBackForward">
-			<button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
-		</td>
-		
-		<td class="filterView">
-       		<button id="viewButton" class="btn-view" onclick="changeView()">Weekly view</button>
-       	</td>
-		
-		<script type="text/javascript"> 
-        	var buttonNameText=document.getElementById('viewButton').innerHTML;        	
-        </script>	
-		
-		<td class="filterView">
-		<button class="showWorklog" onclick="reloadMeClean()">Show Work Log </button>
-		</td>
-		</tr>
+
+                </td>
+                <td class="emptyTd"><td>
+                <td id="wlsc" class="filterCheck" nowrap>
+
+                    <input id="ScnWl" type="checkbox" onclick="checkboxScnClick()" name="ScnWL" value="ScnWL" checked>
+                    <label for="ScnWl" name="checkbox2_lbl" >WL*</label>
+
+                </td>
+
+                <td class="filterCheck" nowrap>
+                    <input id="ExtWl" type="checkbox" onclick="checkboxExtClick()" name="ExtWL" value="ExtWL" checked>
+                    <label for="ExtWl" name="checkbox2_lbl2" >WL</label>
+                </td>
+
+                <!--<td class="filterCheckAssigned" nowrap>
+
+                    <input id="Assigned" type="checkbox" onclick="checkboxAssignedClick()" name="Assigned" value="Assigned" checked>
+                    <label for="Assigned" name="checkbox2_lbl3" >Assigned to me</label>
+
+                </td>-->
+
+                <td class="filterEmployee" nowrap>
+                    <label> Employee(s) </label>
+                </td>
+
+                <td class="filterUser" nowrap>
+                <fieldset rel="myFieldId" class="hidden user-picker-params">
+                    <input type="hidden" id="formName" value="jiraform">
+                    <input type="hidden" id="fieldName" value="myFieldId">
+                    <input type="hidden" id="multiSelect" value="true">
+                    <input type="hidden" id="userPickerEnabled" value="true">
+                </fieldset>
+
+                <div class="ajax_autocomplete" id="myFieldId_container">
+
+                    <input type="text" name="myFieldId" id="myFieldId" value="" class="userpickerfield text" size="20" />
+
+                    <br/><div id="myFieldId_results" class="ajax_results"></div>
+                    <div id="noUser" style="color:red;display:none;">Please, specify at least one employee </div>
+                </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+                <td class="emptyTd"><td>
+            </tr>
+            <tr>
+                <td class="emptyTd"><td>
+                <td >
+                    <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
+                </td>
+                <td nowrap>
+                    <label id="periodId">                 </label>
+                </td>
+                <td class="filterBackForward">
+                    <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
+                </td>
+
+                <td class="filterView">
+                    <button id="viewButton" class="btn-view" onclick="changeView()">Weekly view</button>
+                </td>
+
+                <script type="text/javascript">
+                    var buttonNameText=document.getElementById('viewButton').innerHTML;
+                </script>
+
+                <td class="filterView">
+                <button class="showWorklog" onclick="reloadMeClean()">Show Work Log </button>
+                </td>
+                <td class="emptyTd"><td>
+            </tr>
 		</tbody> 
 		</table>
+
 		<br></br>
 
 		 <script type="text/javascript">

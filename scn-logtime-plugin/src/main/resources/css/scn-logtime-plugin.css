@@ -471,7 +471,9 @@ button.saveUpdate{
 
 td.emptyTd{
 	width: 30px!important;
-	min-width:30px!important;	
+	min-width:30px!important;
+    height:10px!important;
+    min-height:10px!important;
 }
 
 .spanWrap{

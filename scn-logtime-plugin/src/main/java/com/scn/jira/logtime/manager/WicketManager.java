@@ -4,20 +4,20 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
-import com.atlassian.sal.api.message.I18nResolver;
+import com.atlassian.jira.util.I18nHelper;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.logtime.representation.WicketRepresentation;
 
 public class WicketManager {
 
-	private I18nResolver i18nResolver;
+	private I18nHelper i18nResolver;
 	private String driverName1;
 	private String connection1;
 	private String loginTatsi1;
 	private String password1;
 
-	public WicketManager(I18nResolver i18nResolver) {
+	public WicketManager(I18nHelper i18nResolver) {
 		super();
 		this.i18nResolver = i18nResolver;
 	}

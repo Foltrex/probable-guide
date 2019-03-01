@@ -15,14 +15,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.servlet.http.HttpServletRequest;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.representation.ProjectRepresentation;
 import com.scn.jira.logtime.representation.ProjectsRepresentation;
@@ -34,7 +32,6 @@ import com.scn.jira.logtime.representation.ProjectsRepresentation;
 @Path("/projectsuser")
 public class ProjectsResource
 {
-    private UserManager userManager;
     private PermissionManager permissionManager;
     private UserUtil userUtil;
 
@@ -48,10 +45,9 @@ public class ProjectsResource
      * for users and projects
      */
     @Inject
-    public ProjectsResource(@ComponentImport UserManager userManager, @ComponentImport UserUtil userUtil,
+    public ProjectsResource(@ComponentImport UserUtil userUtil,
                             @ComponentImport PermissionManager permissionManager)
     {
-        this.userManager = userManager;
         this.userUtil = userUtil;
         this.permissionManager = permissionManager;
     }
@@ -69,7 +65,7 @@ public class ProjectsResource
     {
         // the request was automatically injected with @Context, so
         // we can use SAL to extract the username from it
-        String username = userManager.getRemoteUsername(request);
+        String username = request.getRemoteUser();
 
         // get the corresponding com.opensymphony.os.User object for
         // the request

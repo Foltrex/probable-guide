@@ -65,6 +65,7 @@ import com.scn.jira.logtime.representation.ProjectRepresentation;
 import com.scn.jira.logtime.representation.WLsTypeRepresentation;
 import com.scn.jira.logtime.representation.WeekRepresentation;
 import com.scn.jira.logtime.representation.WicketRepresentation;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * REST resource that provides a list of projects in JSON format.
@@ -80,7 +81,6 @@ public class LTProjectsResource {
 	private ProjectManager projectManager;
 	private ExtendedConstantsManager extendedConstantsManager;
 
-	private I18nResolver i18nResolver;
 	private IGlobalSettingsManager scnGlobalPermissionManager;
 
 	private IWorklogLogtimeManager iWorklogLogtimeManager;
@@ -102,12 +102,12 @@ public class LTProjectsResource {
 			  @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
 			  @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
 			  @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-							  @ComponentImport WorklogManager overridedWorklogManager,
+							  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
 			  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
 			  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
 			  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
 			  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-			  @ComponentImport I18nResolver i18nResolver, @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+			  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
 			  @ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
 			  @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
 		super();
@@ -117,13 +117,12 @@ public class LTProjectsResource {
 		this.outlookDateManager = outlookDateManager;
 		this.projectManager = projectManager;
 		this.extendedConstantsManager = defaultExtendedConstantsManager;
-		this.i18nResolver = i18nResolver;
 		this.scnGlobalPermissionManager = scnGlobalPermissionManager;
 		this.iWorklogLogtimeManager = new WorklogLogtimeManager(userManager, projectManager, issueManager, userUtil,
 				permissionManager, scnWorklogManager, projectRoleManager, overridedWorklogManager, extendedConstantsManager,
 				ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
 		System.out.println("LTProjectsResource CONSTRUCTOR");
-		this.wicketManager = new WicketManager(this.i18nResolver);
+		this.wicketManager = new WicketManager(ComponentAccessor.getJiraAuthenticationContext().getI18nHelper());
 
 	}
 
