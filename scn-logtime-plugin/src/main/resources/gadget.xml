@@ -2,8 +2,10 @@
 <Module>
     <ModulePrefs author="ScienceSoft"
                  title="JIRA LogTime Gadget"
-			directory_title="JIRA LogTime Gadget_" 
-			description="A sample gadget to install into JIRA.">
+			directory_title="ScienceSoft LogTime Gadget"
+			description="A sample gadget to install into JIRA."
+            screenshot='#staticResourceUrl("com.scn.jira.scn-logtime-plugin:logtime-gadget", "logtime-gadget-screenshot.png")'
+            thumbnail='#staticResourceUrl("com.scn.jira.scn-logtime-plugin:logtime-gadget", "logtime-gadget-thumb.png")'>
         <Optional feature="gadget-directory">
             <Param name="categories">
                 JIRA
@@ -48,88 +50,63 @@
         <table>
         <tbody>
             <tr>
-                <td class="emptyTd"><td>
-                <td nowrap>
-                <select id="s1" multiple="">
-                    <option>All projects</option>
-                </select>
-
-
+                <td nowrap style="padding-left:10px;">
+                    <select id="s1" multiple="">
+                        <option>All projects</option>
+                    </select>
                 </td>
-                <td class="emptyTd"><td>
-                <td id="wlsc" class="filterCheck" nowrap>
-
-                    <input id="ScnWl" type="checkbox" onclick="checkboxScnClick()" name="ScnWL" value="ScnWL" checked>
-                    <label for="ScnWl" name="checkbox2_lbl" >WL*</label>
-
+                <td id="wlsc" class="filterCheck" nowrap style="padding-left:10px">
+                    <div style="width: 100%; display: flex;">
+                        <div style="width: 50px">
+                            <input id="ScnWl" type="checkbox" onclick="checkboxScnClick()" name="ScnWL" value="ScnWL" checked>
+                            <label for="ScnWl" name="checkbox2_lbl" >WL*</label>
+                        </div>
+                        <div style="width: 50px">
+                            <input id="ExtWl" type="checkbox" onclick="checkboxExtClick()" name="ExtWL" value="ExtWL" checked>
+                            <label for="ExtWl" name="checkbox2_lbl2" >WL</label>
+                        </div>
+                    </div>
                 </td>
-
-                <td class="filterCheck" nowrap>
-                    <input id="ExtWl" type="checkbox" onclick="checkboxExtClick()" name="ExtWL" value="ExtWL" checked>
-                    <label for="ExtWl" name="checkbox2_lbl2" >WL</label>
-                </td>
-
-                <!--<td class="filterCheckAssigned" nowrap>
-
-                    <input id="Assigned" type="checkbox" onclick="checkboxAssignedClick()" name="Assigned" value="Assigned" checked>
-                    <label for="Assigned" name="checkbox2_lbl3" >Assigned to me</label>
-
-                </td>-->
 
                 <td class="filterEmployee" nowrap>
                     <label> Employee(s) </label>
                 </td>
 
                 <td class="filterUser" nowrap>
-                <fieldset rel="myFieldId" class="hidden user-picker-params">
-                    <input type="hidden" id="formName" value="jiraform">
-                    <input type="hidden" id="fieldName" value="myFieldId">
-                    <input type="hidden" id="multiSelect" value="true">
-                    <input type="hidden" id="userPickerEnabled" value="true">
-                </fieldset>
+                    <fieldset rel="myFieldId" class="hidden user-picker-params">
+                        <input type="hidden" id="formName" value="jiraform">
+                        <input type="hidden" id="fieldName" value="myFieldId">
+                        <input type="hidden" id="multiSelect" value="true">
+                        <input type="hidden" id="userPickerEnabled" value="true">
+                    </fieldset>
 
-                <div class="ajax_autocomplete" id="myFieldId_container">
-
-                    <input type="text" name="myFieldId" id="myFieldId" value="" class="userpickerfield text" size="20" />
-
-                    <br/><div id="myFieldId_results" class="ajax_results"></div>
-                    <div id="noUser" style="color:red;display:none;">Please, specify at least one employee </div>
-                </div>
+                    <div class="ajax_autocomplete" id="myFieldId_container">
+                        <input type="text" name="myFieldId" id="myFieldId" value="" class="userpickerfield text" size="21"/>
+                        <br/><div id="myFieldId_results" class="ajax_results"></div>
+                        <div id="noUser" style="color:red;display:none;">Please, specify at least one employee </div>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
-                <td class="emptyTd"><td>
             </tr>
+		</tbody>
+		</table>
+        <table>
+        <tbody>
             <tr>
-                <td class="emptyTd"><td>
-                <td >
-                    <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
-                </td>
-                <td nowrap>
-                    <label id="periodId">                 </label>
-                </td>
-                <td class="filterBackForward">
-                    <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
-                </td>
-
                 <td class="filterView">
-                    <button id="viewButton" class="btn-view" onclick="changeView()">Weekly view</button>
+                    <div style="display: flex;">
+                        <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
+                        <label id="periodId"></label>
+                        <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
+                        <button id="viewButton" class="btn-view" style="margin-left:20px" onclick="changeView()">Weekly view</button>
+                        <button class="showWorklog" style="margin-left:10px" onclick="reloadMeClean()">Show Work Log </button>
+                    </div>
                 </td>
-
                 <script type="text/javascript">
                     var buttonNameText=document.getElementById('viewButton').innerHTML;
                 </script>
-
-                <td class="filterView">
-                <button class="showWorklog" onclick="reloadMeClean()">Show Work Log </button>
-                </td>
-                <td class="emptyTd"><td>
             </tr>
 		</tbody> 
 		</table>
@@ -143,7 +120,6 @@
 			
 			   //document.getElementById('ScnWl').checked=prefs.getBool("wlScnCheck"); 
 			   //document.getElementById('ExtWl').checked=prefs.getBool("wlExtCheck");
-			   
 			   document.getElementById('ScnWl').checked=true; 
 			   document.getElementById('ExtWl').checked=false; 
 			   
@@ -176,7 +152,29 @@
           	   		usersSelected=document.getElementById('myFieldId').value;
           	   		
           	   }
-				    
+                // :(
+                setTimeout(function() {
+                    while (true) {
+                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery.data(jQuery("#myFieldId")[0], "events" ) &&
+                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
+                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
+                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
+                            ) {
+                               var keyupaction = jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
+                               AJS.$("#myFieldId").off("keyup");
+                               AJS.$("#myFieldId").on("keyup", function() {
+                                    if (AJS.$("#myFieldId").val() && AJS.$("#myFieldId").val().length > 2) {
+                                       keyupaction.apply(null, Array.from(arguments));
+                                    }
+                               });
+                               break;
+                        }
+                    }
+                }, 1000);
+
+
+               // AJS.$("#myFieldId").addEventListener("keyup", );
+
 			    // Get the array of search terms entered by the user
 			    
                var gadget123 = AJS.Gadget({
@@ -200,17 +198,17 @@
 			            	  success: function(msg){
                                 var ii=0;
                                 AJS.$.each(msg.projects, function(idx, val) {
-                                        if(ii < 17) {
-                                            if(search_project=="0" || search_project.lastIndexOf(val.id)!=-1){
-                                                AJS.$('#s1').append("<option value='"+ii+"' selected=\"selected\">"+val.name+"</option>");
-                                            }else{
-                                                AJS.$('#s1').append("<option value='"+ii+"'>"+val.name+"</option>");
-                                            }
-                                            projectArr[ii++]=val.id;
-                                        }
+                                    if(search_project=="0" || search_project.lastIndexOf(val.id)!=-1){
+                                        AJS.$('#s1').append("<option value='"+ii+"' selected=\"selected\">"+val.name+"</option>");
+                                    } else {
+                                        AJS.$('#s1').append("<option value='"+ii+"'>"+val.name+"</option>");
+                                    }
+                                    projectArr[ii++]=val.id;
                                 });
                                 AJS.$("#s1").dropdownchecklist({ firstItemChecksAll: true, explicitClose: '...close' });
-
+                                AJS.$(".ui-dropdownchecklist-dropcontainer").css("max-height", "250px");
+                                AJS.$(".ui-dropdownchecklist-dropcontainer").css("max-width", "300px");
+                                AJS.$(".ui-dropdownchecklist-selector").css("max-width", "300px");
                             }
 			            	});
 			               

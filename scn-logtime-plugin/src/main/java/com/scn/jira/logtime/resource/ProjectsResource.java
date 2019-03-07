@@ -15,9 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.servlet.http.HttpServletRequest;
 
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -37,7 +37,6 @@ public class ProjectsResource
 
     /**
      * Constructor.
-     * @param userManager a SAL object used to find remote usernames in
      * Atlassian products
      * @param userUtil a JIRA object to resolve usernames to JIRA's internal
      * {@code com.opensymphony.os.User} objects
@@ -73,7 +72,7 @@ public class ProjectsResource
 
         // retrieve all objects for projects this user has permission to browse
         Collection<Project> projects =
-                permissionManager.getProjects(Permissions.BROWSE, user);
+                permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, user);
 
         // convert the project objects to ProjectRepresentations
         Collection<ProjectRepresentation> projectRepresentations =

@@ -9,8 +9,10 @@
 	<!-- Registers the gadget spec as a plugin module. This allows the gadget 
 		to appear in the gadget directory and also allows administrators to disable/enable 
 		the gadget. -->
-	<gadget key="logtime-gadget" name="JIRA LogTime Gadget"
-		location="gadget.xml" />
+	<gadget key="logtime-gadget" name="JIRA LogTime Gadget" location="gadget.xml" >
+		<resource type="download" name="logtime-gadget-screenshot.png" location="images/logtime-gadget-screenshot.png"/>
+		<resource type="download" name="logtime-gadget-thumb.png" location="images/logtime-gadget-thumb.png"/>
+	</gadget>
 
 	<!-- Makes the gadget Locale messages available for the gadget's use. -->
 	<web-resource key="logtime-resources">
