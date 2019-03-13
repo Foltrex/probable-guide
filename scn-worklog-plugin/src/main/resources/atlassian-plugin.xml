@@ -54,24 +54,10 @@
   </web-resource>
 
   <!-- ------------- WL TYPES ----------------------------------------------------------------------------------------------- -->
-<!-- WLTypes Web Item (Main Admin Menu item) -->
-  <web-item key="wltypes-webitem" name="WLTypes Web Item" section="admin_plugins_menu/globalsettings-websection" system="true" weight="21">
-    <label>WL Types new</label>
-    <link linkId="wltypes">/secure/admin/ViewWorklogTypes2.jspa</link>
-  </web-item>
-<!-- WLTypes Web Actions -->
-  <webwork1 key="wltypes-webwork" name="WLTypes Web Work (actions)" class="java.lang.Object">
-    <actions>
-<!--       View Worklog Types -->
-      <action name="com.scn.jira.wl.wltypes.webactions.WorklogTypesListWebAction" alias="ViewWorklogTypes2" roles-required="admin">
-        <view name="success">/templates/scn/worklog/type/viewworklogtypes2.vm</view>
-      </action>
-    </actions>
-  </webwork1>
 
   <!-- ------------- WL TYPES OLD IMPLEMENTATION ---------------------------------------------------------------------------- -->
   <web-item key="worklogtypes" name="Worklog Types Link" section="admin_plugins_menu/globalsettings-websection" i18n-name-key="webfragments.admin.menu.item.worklogtypes.name" system="true" weight="20">
-    <label>WL Types old</label>
+    <label>WL/WL* Types</label>
     <link linkId="worklogtypes">/secure/admin/ViewWorklogTypes.jspa</link>
   </web-item>
   <webwork1 key="WorklogTypesActions" name="Actions for WorklogTypes Management" class="java.lang.Object">
