@@ -193,7 +193,7 @@
                             AJS.$.ajax({
 			            	  url: "/rest/logtime-gadget/1.0/projectsuser.json",
 			            	  timeout: 9*60*1000, // 9 minutes for Alex Murashko
-			            	  type: "GET",            	  
+			            	  type: "GET",
 			            	  dataType: "json",
 			            	  success: function(msg){
                                 var ii=0;
@@ -218,6 +218,7 @@
                             key: "projectsobj",
                             ajaxOptions: function() {
                                 return {
+                                    type: "POST",
                                     url: "/rest/logtime-gadget/1.0/projectsobj.json",
                                     timeout: 9*60*1000, // 9 minutes for Alex Murashko
                                     data: {
@@ -268,7 +269,7 @@
              };
             
             function reloadMeClean(){
-            	slideStep = document.getElementById('slideStepHidden').value;
+            	slideStep = document.getElementById('slideStepHidden') ? document.getElementById('slideStepHidden').value : slideStep;
             	currentPeriod=0;
             	reloadMe();
             }
@@ -329,6 +330,7 @@
                             key: "projectsobj",
                             ajaxOptions: function() {
                                 return {
+                                    type: "POST",
                                     url: "/rest/logtime-gadget/1.0/projectsobj.json",
                                     timeout: 9*60*1000, // 9 minutes for Alex Murashko
                                     data: {

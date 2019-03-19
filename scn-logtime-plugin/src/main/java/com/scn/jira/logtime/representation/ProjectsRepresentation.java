@@ -1,7 +1,7 @@
 package com.scn.jira.logtime.representation;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlElement;
@@ -32,7 +32,7 @@ public class ProjectsRepresentation
      */
     public ProjectsRepresentation(Iterable<ProjectRepresentation> projects)
     {
-        this.projects = new HashSet<ProjectRepresentation>();
+        this.projects = new ArrayList<ProjectRepresentation>();
         for (ProjectRepresentation representation : projects)
         {
             this.projects.add(representation);

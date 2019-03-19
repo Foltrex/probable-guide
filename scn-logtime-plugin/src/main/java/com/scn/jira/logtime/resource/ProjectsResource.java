@@ -1,7 +1,11 @@
 package com.scn.jira.logtime.resource;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -71,8 +75,14 @@ public class ProjectsResource
         ApplicationUser user = userUtil.getUser(username);
 
         // retrieve all objects for projects this user has permission to browse
-        Collection<Project> projects =
-                permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, user);
+        List<Project> projects =
+                new ArrayList<Project>(permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, user));
+
+        Collections.sort(projects, new Comparator<Project>() {
+            public int compare(Project pr1, Project pr2) {
+                return pr1.getName().toUpperCase().compareTo(pr2.getName().toUpperCase());
+            }
+        });
 
         // convert the project objects to ProjectRepresentations
         Collection<ProjectRepresentation> projectRepresentations =

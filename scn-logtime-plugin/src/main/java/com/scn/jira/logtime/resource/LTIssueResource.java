@@ -128,10 +128,8 @@ public class LTIssueResource {
 	public Response getIssues(@Context HttpServletRequest request,
 			@QueryParam("projectId") String projectId) {
 
-		IExtWorklogLogtimeStore iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(
-				userManager, projectManager, issueManager, permissionManager,
-				projectRoleManager, worklogManager, extendedConstantsManager,
-				extendedWorklogManager,scnDefaultWorklogService);
+		IExtWorklogLogtimeStore iExtWorklogLogtimeStore =
+				new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
 
 		Project prj = this.projectManager.getProjectObj(Long.valueOf(projectId
 				.trim()));

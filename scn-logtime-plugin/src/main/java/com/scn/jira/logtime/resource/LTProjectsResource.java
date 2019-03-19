@@ -16,10 +16,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -42,6 +42,7 @@ import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
+import org.apache.log4j.Logger;
 import org.apache.velocity.exception.VelocityException;
 
 import com.atlassian.jira.component.ComponentAccessor;
@@ -57,7 +58,6 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.web.util.OutlookDateManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
@@ -73,6 +73,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Named
 @Path("/projectsobj")
 public class LTProjectsResource {
+
+	protected static Logger logger = Logger.getLogger(LTProjectsResource.class);
+
 	private UserManager userManager;
 	private PermissionManager permissionManager;
 	private JiraAuthenticationContext authenticationContext;
@@ -98,18 +101,20 @@ public class LTProjectsResource {
 	 */
 
 	@Inject
-	public LTProjectsResource(@ComponentImport PermissionManager permissionManager,
-			  @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-			  @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
-			  @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
+	public LTProjectsResource(
+			 @ComponentImport PermissionManager permissionManager,
+							  @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
+							  @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
+							  @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
 							  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-			  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-			  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-			  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-			  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-			  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-			  @ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
-			  @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
+							  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
+							  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
+							  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
+							  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
+							  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+							  @ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
+							  @ComponentImport DefaultScnWorklogService scnDefaultWorklogService
+			 ) {
 		super();
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
@@ -139,11 +144,11 @@ public class LTProjectsResource {
 	 *            the context-injected {@code HttpServletRequest}
 	 * @return a {@code Response} with the marshalled projects
 	 */
-	@GET
+	@POST
 	@AnonymousAllowed
 	@Produces({ "application/json", "application/xml" })
-	public Response getTimesheet(@Context HttpServletRequest request, @QueryParam("prjList") String prjList,
-			@QueryParam("usersSelected") String usersSelected, @QueryParam("viewType") String viewType) {
+	public Response getTimesheet(@Context HttpServletRequest request, @FormParam("prjList") String prjList,
+			@FormParam("usersSelected") String usersSelected, @FormParam("viewType") String viewType) {
 
 		int scnWl = ServletUtil.getIntParam(request, "scnWl", 1);
 		int extWl = ServletUtil.getIntParam(request, "extWl", 1);

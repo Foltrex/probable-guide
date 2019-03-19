@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.ofbiz.core.entity.EntityCondition;
 import org.ofbiz.core.entity.EntityConditionList;
 import org.ofbiz.core.entity.EntityExpr;
@@ -32,19 +33,14 @@ import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.issue.worklog.WorklogImpl;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.wl.ExtWorklog;
-import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
-import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import com.scn.jira.logtime.util.DateUtils;
 
 
 public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
+	protected static Logger logger = Logger.getLogger(ExtWorklogLogtimeStore.class);
 	
 	public static final String EXT_WORKLOG_LOGTIME_ENTITY = "ExtWorklogByIssueView";
 	
@@ -52,29 +48,16 @@ public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
 	public static final String EXT_WORKLOG_PROJECT_ENTITY = "ExtWorklogByProjectView";
 	public static final String ISSUE_PROJECT_ENTITY = "IssueByProjectView";
 
-	private UserManager userManager;
-    private ProjectManager projectManager;
     private IssueManager issueManager;
-    private PermissionManager permissionManager;
-    private ProjectRoleManager projectRoleManager;
     private WorklogManager worklogManager;
-    private ExtendedConstantsManager extendedConstantsManager;
     private ExtendedWorklogManager extendedWorklogManager;
-	private IScnWorklogService scnDefaultWorklogService;
     
-    public ExtWorklogLogtimeStore(UserManager userManager,ProjectManager projectManager,IssueManager issueManager, 
-            PermissionManager permissionManager,ProjectRoleManager projectRoleManager,WorklogManager worklogManager,
-            ExtendedConstantsManager extendedConstantsManager,  ExtendedWorklogManager extendedWorklogManager,IScnWorklogService scnDefaultWorklogService)
+    public ExtWorklogLogtimeStore(IssueManager issueManager, WorklogManager worklogManager,
+								  ExtendedWorklogManager extendedWorklogManager)
 		{
-		this.userManager = userManager;
-		this.projectManager = projectManager;
-		this.issueManager= issueManager;		
-		this.permissionManager = permissionManager;		
-		this.projectRoleManager=projectRoleManager;
+		this.issueManager= issueManager;
 		this.worklogManager= worklogManager;
-		this.extendedConstantsManager= extendedConstantsManager;
 		this.extendedWorklogManager=  extendedWorklogManager;
-		this.scnDefaultWorklogService= scnDefaultWorklogService;	
 		}
 
 	public List<ExtWorklog> getExtWorklogsByProjectBetweenDates(boolean assignedCh,Project project, Date startDate, Date endDate,String user) throws DataAccessException{
@@ -90,18 +73,25 @@ public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
 	//	List<GenericValue> worklogExtGVs = ComponentAccessor.getOfBizDelegator().findByCondition(VIEW_EXT_WORKLOG_LOGTIME_ENTITY, conditionList, null, EasyList.build("created ASC"));
 
 		List<ExtWorklog> extWorklogs = new ArrayList<ExtWorklog>();
-		Iterator<GenericValue> worklogGVsExtIterator = worklogExtGVs.iterator();		
-		
-		while (worklogGVsExtIterator.hasNext()) {
-			GenericValue genericWorklog = (GenericValue) worklogGVsExtIterator.next();
-			
-			if(genericWorklog!=null){
-				Issue issue = issueManager.getIssueObject(genericWorklog.getLong("issue"));
-				if (assignedCh && issue!=null &&  issue.getAssignee()!=null && issue.getAssignee().getName().equals(user)
-						|| !assignedCh) {
-					ExtWorklog extWorklog = convertToExtWorklog(worklogManager, genericWorklog, issue);
+
+		List<Long> issueIds = new ArrayList<Long>();
+		for (GenericValue worklogGV : worklogExtGVs) {
+			issueIds.add(worklogGV.getLong("issue"));
+		}
+
+		List<Issue> issueObjects = issueManager.getIssueObjects(issueIds);
+		Map<Long, Issue> issueObjectsMap = new HashMap<Long, Issue>();
+
+		for (Issue issueObject : issueObjects) {
+			issueObjectsMap.put(issueObject.getId(), issueObject);
+		}
+
+		for (GenericValue worklogGV : worklogExtGVs) {
+			if (worklogGV != null) {
+				Issue issue = issueObjectsMap.get(worklogGV.getLong("issue"));
+				if (assignedCh && issue != null && issue.getAssignee() != null && user.equals(issue.getAssignee().getName()) || !assignedCh) {
+					ExtWorklog extWorklog = convertToExtWorklog(worklogManager, worklogGV, issue);
 					extWorklogs.add(extWorklog);
-					
 				}
 			}
 		}
@@ -155,23 +145,13 @@ public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
     }
 	
 	public List<Issue> getIssuesByProjects(Project project) throws DataAccessException{
-		
-		List<EntityCondition> conditions2 = new ArrayList<EntityCondition>();
-		conditions2.add(new EntityExpr("projectId", EQUALS, project.getId()));
-		
-		List<GenericValue> worklogGVs2 = ComponentAccessor.getOfBizDelegator().findByAnd(ISSUE_PROJECT_ENTITY, conditions2);
-		
-		List<Issue> issues = new ArrayList<Issue>();
-		
-		
-		Iterator<GenericValue>worklogGVsExtIterator = worklogGVs2.iterator();
-		while (worklogGVsExtIterator.hasNext()) {
-			GenericValue genericWorklog = (GenericValue) worklogGVsExtIterator.next();
-			Issue issue = this.issueManager.getIssueObject(genericWorklog.getLong("id"));
-			issues.add(issue);
-		}	
-		return issues;
-    }
+		try {
+			return this.issueManager.getIssueObjects(issueManager.getIssueIdsForProject(project.getId()));
+		} catch (GenericEntityException e) {
+			logger.error(e.getMessage());
+		}
+		return new ArrayList<Issue>();
+	}
 	
 	public GenericValue getExtWorklog(Long _worklogId) throws DataAccessException
 		{
@@ -265,11 +245,12 @@ public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
 	
 	public ExtWorklog convertToExtWorklog(WorklogManager worklogManager, GenericValue gv, Issue issue)
    	{
-   		Timestamp startDateTS = gv.getTimestamp("startdate");   	
-   		
+   		Timestamp startDateTS = gv.getTimestamp("startdate");
+		String worklogType = "0";
    	    GenericValue gExw =  getExtWorklog(gv.getLong("id"));
-   		   		
-   	    String worklogType = (gExw.getString("worklogtype")==null || gExw.getString("worklogtype")=="")?"0":gExw.getString("worklogtype");
+		if (gExw != null && gExw.getString("worklogtype") != null && "".equals(gExw.getString("worklogtype")))  {
+			worklogType = gExw.getString("worklogtype");
+		}
    	    ExtWorklog worklogExt =  new ExtWorklog(worklogManager,
    				issue,
    				gv.getString("author"),

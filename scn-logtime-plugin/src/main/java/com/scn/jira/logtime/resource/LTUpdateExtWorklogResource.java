@@ -128,8 +128,7 @@ public class LTUpdateExtWorklogResource {
 		this.OfBizScnWorklogStore = ofBizScnWorklogStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnDefaultWorklogService = scnDefaultWorklogService;
-		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, extendedWorklogManager,scnDefaultWorklogService);
+		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
 		
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
 				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);

@@ -210,10 +210,6 @@ public class WicketManager {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			
-			
-
 		}
 		return calendarMap;
 	}

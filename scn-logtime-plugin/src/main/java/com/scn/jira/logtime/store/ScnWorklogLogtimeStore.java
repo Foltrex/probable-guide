@@ -96,17 +96,25 @@ public class ScnWorklogLogtimeStore /* extends OfBizScnWorklogStore */implements
 		
 	   List<GenericValue> worklogGVs = ComponentAccessor.getOfBizDelegator().findByCondition(SCN_WORKLOG_PROJECT_ENTITY, conditionList, null, EasyList.build("created ASC"));
 	//	List<GenericValue> worklogGVs = ComponentAccessor.getOfBizDelegator().findByCondition(VIEW_SCN_WORKLOG_ISSUE_ENTITY, conditionList, null,	EasyList.build("created ASC"));
-		
+
+		List<Long> issueIds = new ArrayList<Long>();
+		for (GenericValue worklogGV : worklogGVs) {
+			issueIds.add(worklogGV.getLong("issue"));
+		}
+
+		List<Issue> issueObjects = issueManager.getIssueObjects(issueIds);
+		Map<Long, Issue> issueObjectsMap = new HashMap<Long, Issue>();
+
+		for (Issue issueObject : issueObjects) {
+			issueObjectsMap.put(issueObject.getId(), issueObject);
+		}
+
 		List<IScnWorklog> iScnWorklogs = new ArrayList<IScnWorklog>();
-		Iterator worklogGVsIterator = worklogGVs.iterator();
-		while (worklogGVsIterator.hasNext()) {
-			GenericValue genericWorklog = (GenericValue) worklogGVsIterator.next();
-			Issue issue = issueManager.getIssueObject(genericWorklog.getLong("issue"));
-			if (assignedCh && issue != null && issue.getAssignee() != null && issue.getAssignee().getName().equals(user) || !assignedCh) {
-				IScnWorklog iScnWorklog = convertToWorklog(projectRoleManager, genericWorklog, issue);
-				iScnWorklogs.add(iScnWorklog);
+		for (GenericValue worklogGV : worklogGVs) {
+			Issue issue = issueObjectsMap.get(worklogGV.getLong("issue"));
+			if (assignedCh && issue != null && issue.getAssignee() != null && user.equals(issue.getAssignee().getName()) || !assignedCh) {
+				iScnWorklogs.add(convertToWorklog(projectRoleManager, worklogGV, issue));
 			}
-			
 		}
 		
 		return iScnWorklogs;
