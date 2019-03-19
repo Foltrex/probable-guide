@@ -51,6 +51,7 @@ import com.scn.jira.util.CalendarUtil;
 import com.scn.jira.util.ServletUtil;
 import com.scn.jira.util.TextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Named
 @Path("/timesheet")
@@ -80,7 +81,7 @@ public class TimeSheetResource
 							 @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
 							 @ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
 							 @ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
-							 GlobalSettingsManager globalSettingsManager, @ComponentImport FieldVisibilityManager fieldVisibilityManager)
+							 @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager, @ComponentImport FieldVisibilityManager fieldVisibilityManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;

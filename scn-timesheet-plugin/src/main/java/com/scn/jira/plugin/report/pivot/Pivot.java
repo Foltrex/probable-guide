@@ -52,6 +52,7 @@ import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.jira.web.util.OutlookDateManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Named;
 
@@ -85,7 +86,7 @@ public class Pivot extends AbstractReport
 			 @ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
 			 @ComponentImport SearchProvider searchProvider, @ComponentImport FieldVisibilityManager fieldVisibilityManager,
 			 @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			 @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager)
+			 @ComponentImport ProjectRoleManager projectRoleManager, @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.outlookDateManager = outlookDateManager;

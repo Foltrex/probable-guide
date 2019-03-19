@@ -53,6 +53,7 @@ import com.atlassian.jira.web.util.OutlookDateManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.plugin.report.pivot.Pivot;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Named;
 
@@ -90,7 +91,7 @@ public class TimeSheet extends AbstractReport {
 			 @ComponentImport IssueManager issueManager, @ComponentImport SearchProvider searchProvider,
 			 @ComponentImport VisibilityValidator visibilityValidator, @ComponentImport UserManager userManager,
 			 @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			 @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager,
+			 @ComponentImport ProjectRoleManager projectRoleManager, @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
 			 @ComponentImport FieldVisibilityManager fieldVisibilityManager)
 	{
 		this.outlookDateManager = outlookDateManager;

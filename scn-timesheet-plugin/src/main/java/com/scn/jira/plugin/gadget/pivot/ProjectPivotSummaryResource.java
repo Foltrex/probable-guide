@@ -51,6 +51,7 @@ import com.scn.jira.plugin.report.pivot.Pivot;
 import com.scn.jira.util.CalendarUtil;
 import com.scn.jira.util.TextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Named
 @Path("/project-pivot-summary")
@@ -80,7 +81,7 @@ public class ProjectPivotSummaryResource
 			   @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
 			   @ComponentImport FieldVisibilityManager fieldVisibilityManager, @ComponentImport ProjectManager projectManager,
 			   @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			   @ComponentImport ProjectRoleManager projectRoleManager, GlobalSettingsManager globalSettingsManager)
+			   @ComponentImport ProjectRoleManager projectRoleManager, @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager)
 	{
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;
