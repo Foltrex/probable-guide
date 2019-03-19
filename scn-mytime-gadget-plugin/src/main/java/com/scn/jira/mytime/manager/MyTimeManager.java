@@ -11,36 +11,23 @@ import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.message.I18nResolver;
+import com.atlassian.jira.util.I18nHelper;
 import com.scn.jira.mytime.representation.DayRepresentation;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.mytime.representation.WeekRepresentation;
 import com.scn.jira.mytime.store.ScnWorklogMyTimeStore;
 import com.scn.jira.mytime.store.WicketStore;
 import com.scn.jira.mytime.util.DateUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named
 public class MyTimeManager {
-	
-	private IssueManager issueManager;
-	private ProjectRoleManager projectRoleManager;
+
 	private ScnWorklogMyTimeStore scnWorklogMyTimeStore;
 	private WicketStore wicketStore;
-	private I18nResolver i18nResolver;
 
-	@Inject
-	public MyTimeManager(@ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-						 @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager, @ComponentImport I18nResolver i18nResolver) {
+	public MyTimeManager(IssueManager issueManager,ProjectRoleManager projectRoleManager,
+						 WorklogManager overridedWorklogManager, I18nHelper i18nResolver) {
 		super();
-		this.issueManager = issueManager;
-		this.projectRoleManager = projectRoleManager;
 		this.scnWorklogMyTimeStore = new ScnWorklogMyTimeStore(issueManager, projectRoleManager, overridedWorklogManager);
-		this.i18nResolver = i18nResolver;
 		this.wicketStore = new WicketStore(i18nResolver);
 	}
 	

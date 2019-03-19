@@ -18,6 +18,9 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.mytime.manager.MyTimeManager;
 import com.scn.jira.mytime.representation.MyTimeRepresentation;
@@ -31,6 +34,7 @@ import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.mytime.representation.WeekRepresentation;
 import com.scn.jira.mytime.util.DateUtils;
 import com.scn.jira.mytime.util.ServletUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * REST resource that provides a list of projects in JSON format.
@@ -42,10 +46,12 @@ public class MyTimeResource {
 	private MyTimeManager myTimeManager;
 
 	@Inject
-	public MyTimeResource(MyTimeManager myTimeManager, @ComponentImport JiraAuthenticationContext jiraAuthenticationContext) {
+	public MyTimeResource(@ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
+						  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
+						  @ComponentImport JiraAuthenticationContext jiraAuthenticationContext) {
 		super();
 		this.authenticationContext = jiraAuthenticationContext;
-		this.myTimeManager = myTimeManager;
+		this.myTimeManager = new MyTimeManager(issueManager, projectRoleManager, overridedWorklogManager, authenticationContext.getI18nHelper());
 	}
 	
 	private CacheControl getNoCacheControl() {

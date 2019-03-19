@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.scn.jira.mytime.util.DateUtils;
@@ -20,13 +21,13 @@ import javax.inject.Named;
 
 public class WicketStore {
 	
-	private I18nResolver i18nResolver;
+	private I18nHelper i18nResolver;
 	private static String driverName;
 	private static String connection;
 	private static String loginTatsi;
 	private static String password;
 
-	public WicketStore(I18nResolver i18nResolver) {
+	public WicketStore(I18nHelper i18nResolver) {
 		super();
 		this.i18nResolver = i18nResolver;
 	}
