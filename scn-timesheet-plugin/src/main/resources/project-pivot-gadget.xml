@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="__MSG_scn.gadget.project.pivot.title__" directory_title="__MSG_scn.gadget.project.pivot.title__" 
+                 description="__MSG_scn.gadget.project.pivot.description__"
+                 author="ScienceSoft"
+                 height="100" screenshot='#staticResourceUrl("com.scn.jira.plugin.scn-timesheet-plugin:scn-project-pivot-gadget", "project-pivot-gadget-screenshot.png")'
+                 thumbnail='#staticResourceUrl("com.scn.jira.plugin.scn-timesheet-plugin:scn-project-pivot-gadget", "project-pivot-gadget-thumb.png")'>
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                JIRA
+            </Param>
+        </Optional>
+        <Require feature="dynamic-height"/>
+        <Require feature="setprefs" />
+        <Require feature="views" />
+        <Optional feature="atlassian.util"/>
+        <Optional feature='auth-refresh'/>
+        <Require feature="oauthpopup" />
+        #oauth
+        #supportedLocales("gadget.common")
+        <Locale messages="__ATLASSIAN_BASE_URL__/download/resources/com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-gadget/i18n?nocache"/>
+    </ModulePrefs>
+    <UserPref name="isConfigured" datatype="hidden" default_value="false" />
+    <UserPref name="isConfigurable" datatype="hidden" default_value="true" />
+    <UserPref name="num_weeks" datatype="hidden" default_value="1"/>
+    <UserPref name="reporting_day" datatype="hidden" default_value="2"/>
+    <UserPref name="project_key" datatype="hidden" default_value=""/>
+    <UserPref name="filter_id" datatype="hidden" default_value="0"/>
+    <UserPref name="group" datatype="hidden" default_value=""/>
+    <Content type="html" view="default">
+        <![CDATA[
+        <style type="text/css">
+            body, .gadget .footer {background-color: #fff !important}
+		</style>
+
+        #requireResource("com.atlassian.jira.gadgets:g-assigned-to-me")
+        #includeResources()
+
+        <script type="text/javascript">
+        	AJS.Gadget({
+            		baseUrl: "__ATLASSIAN_BASE_URL__",
+            		useOauth: "/rest/gadget/1.0/currentUser",
+                    config: {
+                        descriptor: function (args) {
+                            var gadget = this;
+                            return  {
+                                action: "/rest/scn-timesheet-gadget/1.0/project-pivot-summary/validate.json",
+                                theme: "gdt",
+                                fields: [
+                                    {
+                                        id: "num_weeks",
+                                        userpref: "num_weeks",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.num_weeks__"),
+                                        type: "text",
+                                        value: gadget.getPref("num_weeks")
+                                    },
+                                    {
+                                        id: "reporting_day",
+                                        userpref: "reporting_day",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.reporting_day__"),
+                                        type: "select",
+                                        selected: gadget.getPref("reporting_day"),
+                                        options:[
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.today__",
+                                                value:"0"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Monday__",
+                                                value:"2"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Tuesday__",
+                                                value:"3"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Wednesday__",
+                                                value:"4"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Thursday__",
+                                                value:"5"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Friday__",
+                                                value:"6"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Saturday__",
+                                                value:"7"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Sunday__",
+                                                value:"1"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: "project_key",
+                                        userpref: "project_key",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.project__"),
+                                        type: "text",
+                                        value: gadget.getPref("project_key"),
+                                        description: gadget.getMsg("__MSG_scn.gadget.pref.description.project__")
+                                    },
+                                    {
+                                        id: "filter_id",
+                                        userpref: "filter_id",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.filter__"),
+                                        type: "text",
+                                        value: gadget.getPref("filter_id"),
+                                        description: gadget.getMsg("__MSG_scn.gadget.pref.description.filter__")
+                                    },
+                                    {
+                                        id: "group",
+                                        userpref: "group",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.group__"),
+                                        type: "text",
+                                        value: gadget.getPref("group"),
+                                        description: gadget.getMsg("__MSG_scn.gadget.pref.description.group__")
+                                    },
+                                    AJS.gadget.fields.nowConfigured()
+                                ]
+                            };
+                        }
+                    },
+                    view: {
+                        template: function(args) {
+                            var gadget = this;
+
+                            gadget.getView().html(args.timesheet.html);
+                        },
+                        args: [
+                        {
+                            key: "timesheet",
+                            ajaxOptions: function() {
+                                return {
+                                    url: "/rest/scn-timesheet-gadget/1.0/project-pivot-summary.json",
+                                    data: {
+                                        targetGroup: this.getPref("group"),
+                                        filterId: this.getPref("filter_id"),
+                                        projectKey: this.getPref("project_key"),
+                                        numOfWeeks:  this.getPref("num_weeks"),
+                                        reportingDay: this.getPref("reporting_day")
+                                    }
+                                };
+                            }
+                        }
+                        ]
+                    }
+                });
+        </script>
+        ]]>
+    </Content>
+</Module>

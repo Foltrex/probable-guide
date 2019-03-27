@@ -1,0 +1,167 @@
+#macro(renderIcon $url $altText)
+	#if($url.startsWith("http://") == false && $url.startsWith("https://") == false)
+		#set ($iconUrl = "${baseurl}${url}")
+	#else
+		#set ($iconUrl = "${url}")
+	#end
+	<img src="${iconUrl}" height="16" width="16" border="0" align="absmiddle" alt="$textutils.htmlEncode(${altText}, false)">
+#end
+<html>
+<head>
+	<title>$action.getText('admin.issuesettings.worklogtypes.view.worklogtypes')</title>
+	<script language="JavaScript">
+	    function openWindow()
+	    {	
+	        var vWinUsers = window.open("$baseurl/secure/popups/IconPicker.jspa?fieldType=worklogType&formName=jiraform",'IconPicker', 'status=no,resizable=yes,top=100,left=200,width=580,height=650,scrollbars=yes');
+	        vWinUsers.opener = self;
+		    vWinUsers.focus();
+	    }
+	</script>
+</head>
+<body>
+
+## PAGE HEADER
+
+	<table class="jiraform jirapanel maxWidth">
+		<tr>
+		    <td class="jiraformheader">
+		    	<h3 class="formtitle">$action.getText("admin.issuesettings.worklogtypes.view.worklogtypes")</h3>
+		    </td>
+		</tr>
+	
+		#if ($action.hasErrorMessages())
+	    <tr>
+			<td colspan="2">
+	            <div class="aui-message error">
+	                <span class="aui-icon icon-error"></span>
+	                <p class="title">$i18n.getText('common.words.errors')</p>
+	                <ul>
+	                    #foreach ($error in $action.getFlushedErrorMessages())
+	                        <li>$textutils.htmlEncode(${error})</li>
+	                    #end
+	                </ul>
+	            </div>
+	        </td>
+	    </tr>
+	    #end
+		
+		<tr>
+			<td class="jiraformbody">
+				<p>
+					$action.getText("admin.issuesettings.worklogtypes.the.table.below")
+				</p>
+				<ul class="square">
+					<li>$action.getText('admin.issuesettings.worklogtypes.translations', '<a href="ViewTranslations!default.jspa?issueConstantType=WorklogType"/>', '</a>')</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+
+## CONSTANTS TABLE
+
+	<table class="aui aui-table-rowhover">
+		<thead>
+	        <tr>
+	            <th><b>$action.getText('common.words.name')</b></th>
+	            <th><b>$action.getText('common.words.description')</b></th>
+	            <th><b>$action.getText('iconpicker.label.icon')</b></th>
+	            <th><b>$action.getText('admin.common.words.color')</b></th>
+	            <th><b>$action.getText('admin.issuesettings.order')</b></th>
+	            <th width="10%"><b>$action.getText('common.words.operations')</b></th>
+	        </tr>
+	    </thead>
+    	<tbody>
+    	#set($worklogTypes = $action.worklogTypeObjects)
+    	#foreach($worklogType in $worklogTypes)
+			<tr>
+	            <td>
+	            	<b>$worklogType.name</b>
+	            #if($action.isDefault($worklogType))
+	            	<i>($action.getText("admin.common.words.default"))</i>
+	            #end
+	            </td>
+	            <td>
+	            	$worklogType.description
+	            </td>
+	            <td>
+	            	#renderIcon("$worklogType.iconUrl" "$worklogType.name")</td>
+	            <td>
+	                <table><tr><td bgcolor="$worklogType.statusColor"><img src="${baseurl}/images/border/spacer.gif" border="0" width="16" height="16" alt=""/></td></tr></table>
+	            </td>
+	            <td>
+		            #if($velocityCount != 1) ## first item
+	                    <a href="WorklogTypeUp.jspa?up=$worklogType.id"><img alt="$action.getText('admin.issuesettings.worklogtypes.move.up')"  class="sortArrow" src="$baseurl/images/icons/arrow_up_blue_small.gif" /></a>
+					#else
+	                    <img class="sortArrow" src="$baseurl/images/border/spacer.gif" />
+					#end
+					#if($velocityCount != $worklogTypes.size()) ## last item
+	                    <a href="WorklogTypeDown.jspa?down=$worklogType.id"><img alt="$action.getText('admin.issuesettings.worklogtypes.move.down')"  class="sortArrow" src="$baseurl/images/icons/arrow_down_blue_small.gif" /></a>
+					#else
+	                    <img class="sortArrow" src="$baseurl/images/border/spacer.gif" />
+					#end
+	            </td>
+	            <td>
+	                <ul class="operations-list">
+	                    <li><a href="EditWorklogType!default.jspa?id=$worklogType.id">$action.getText('common.words.edit')</a></li>
+	                    <li><a href="DeleteWorklogType!default.jspa?id=$worklogType.id">$action.getText('common.words.delete')</a></li>
+	                #if(!$isDefault)
+	                    <li><a href="MakeDefaultWorklogType.jspa?make=$worklogType.id">$action.getText('admin.common.words.default')</a></li>
+	                #end
+	                </ul>
+	            </td>
+	        </tr>
+		#end
+		</tbody>
+	</table>
+
+## FORM
+
+	<div class="module">
+		<div class="mod-content">
+			#set($jiraformActionName = "AddWorklogType.jspa")
+			#set($jiraformTitle = "$action.getText('admin.issuesettings.worklogtypes.add.new.worklogtype')")
+			#set($jiraformSubmitText = $action.getText('common.forms.add'))
+			#set($jiraformSubmitId = 'add')
+			#set($jiraformFocus = true)
+			#parse("templates/scn/decorators/jiraformHeader.vm")
+			#parse("templates/scn/decorators/jiraErrorMessages.vm")
+			
+				#normalHeader($action 'name' $action.getText('common.words.name') true)
+					<input type="text" size="30" name="name" id="name" value="$!{action.name}"/>
+			    #normalFooter($action '')
+			    
+			    #normalHeader($action 'description' $action.getText('common.words.description') false)
+			        <input type="text" size="60" name="description" id="description" value="$!{action.description}"/>
+			    #normalFooter($action '')
+			    
+			    #normalHeader($action 'iconurl' $action.getText('admin.common.phrases.icon.url') true)
+			        <input type="text" size="60" name="iconurl" id="iconurl" value="$!{action.iconurl}" />
+					<span class="subText">[<a onclick="openWindow();return false;" class="subText" href="#">$action.getText('admin.text.image.select.image')</a>]</span>
+				#normalFooter($action $action.getText('admin.common.phrases.relative.to.jira'))
+			    
+				#normalHeader($action 'statusColor' $action.getText('admin.common.words.color') true)
+					<table cellpadding="0" cellspacing="0" border="0">
+					    <tr>
+					        <td style="padding:0px">
+					            <input type="text" name="statusColor" id="statusColor" size="40" value="$!{action.statusColor}"/>
+					        </td>
+					        <td style="padding:0px">&nbsp;</td>
+					        <td style="padding:0px">
+					            <table cellpadding="0" cellspacing="1" border="1">
+					                <td id="statusColor-rep" style="padding:0px;height:18px;width:18px;background-color:$!{action.statusColor}">
+					                    <a id="colorpicker-statusColor" href="#" onClick="window.open('$baseurl/secure/popups/colorpicker.jsp?element=statusColor&defaultColor=$!{action.statusColor}', 'colorpicker', 'menubar=yes,location=no,personalbar=no,scrollbar=yes,width=580,height=300,resizable');">
+					                        <img src="$baseurl/images/border/spacer.gif" width="15" height="15" border="0">
+					                    </a>
+					                </td>
+					            </table>
+					        </td>
+					    </tr>
+					</table>
+			    #normalFooter($action '')
+				
+			#parse("templates/scn/decorators/jiraformFooter.vm")
+		</div>
+	</div>
+	
+</body>
+</html>

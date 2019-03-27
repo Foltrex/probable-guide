@@ -1,0 +1,121 @@
+<script type="text/javascript">
+						
+						var arrayCount = [];
+						
+</script>	
+
+</br>
+#if($reportView=="week")
+	#set($mytimeTable = "mytime-table" + "-week")										
+#else
+	#set($mytimeTable = "mytime-table")										
+#end	
+
+<div id="jiratime" style="overflow-x: auto;">
+	<div class="results-wrap-time">
+	<table class='$mytimeTable'>
+		<thead>
+		<tr>
+			#set($i=0)
+			#foreach ($day in $days) 			
+				#if($reportView!="week")
+					#if($i>4)
+						<th class="weekendCss">$day</th>
+					#else
+						<th>$day</th>
+					#end
+					<th>  </th>
+				#else
+					#if($i>4)
+						<th colspan="2" class="weekendCss">$day</th>
+					#else
+						<th colspan="2">$day</th>
+					#end
+				#end
+				#set($i=$i+1)
+			#end	
+			<th align="center" class="totalheader">Total</th>
+		</tr>		
+		</thead>		
+		
+		 <tbody>	  					 
+					 <script type="text/javascript">												
+					 </script>	
+					
+					 #foreach ($weekToRepresent in $weeksToRepresent) 
+					  			#set($daysToRepresent = $weekToRepresent.getDaysRepresentation())
+								<tr class="topRow">
+									#foreach ($dayToRepresent in $daysToRepresent) 
+										
+										#set($wicketTimeCellClass = "wicketTimeCell" + $dayToRepresent.getCssClassWicket()+" " + $dayToRepresent.getDayColor())
+										
+										<td class='$wicketTimeCellClass'>$dayToRepresent.getWicketTime()</td>										
+										#if($dayToRepresent.getMonth()==false)
+											#set($currentDay = "dayNumGray"+" " + $dayToRepresent.getDayColor())
+										#else
+											#set($currentDay = "dayNum"+" " +$dayToRepresent.getDayColor())
+										#end
+										<td rowspan="2" class='$currentDay'>$dayToRepresent.getDay()</td>
+									#end
+										#set($timeCellTotalWicketClass = "wicketTimeCell total" + $weekToRepresent.getCssClassWicketTotal())										
+										<td class='$timeCellTotalWicketClass'>$weekToRepresent.getTotalWicket()</td>
+										
+										
+										<tr class="bottomRow">									
+										#foreach ($dayToRepresent in $daysToRepresent)
+											#set($timeCellClass = "timeCell" + $dayToRepresent.getCssClassWl()+" " + $dayToRepresent.getDayColor())									
+											<td rowspan="1" class='$timeCellClass'>$dayToRepresent.getTime()</td>
+										#end
+										
+										#set($timeCellTotalClass = "timeCell total" + $weekToRepresent.getCssClassWlTotal())											
+										
+										<td class='$timeCellTotalClass'>$weekToRepresent.getTotal()</td>									
+									</tr>							
+																
+								</tr>
+								
+					#end
+     </tbody>
+	
+	</table>
+	
+	</br>
+	
+	#if($reportView=="week")	
+		<table class="mytime-legend-week">
+			<tr>
+				<td class="mytimeRegistered"></td>
+				<td class="mytimeSpace">--</td>
+				<td class="mytimeRegisteredText">Registered time</td>
+			</tr>
+			<tr>
+				<td class="mytimeActual"></td>
+				<td class="mytimeSpace">--</td>
+				<td class="mytimeActualText">Actual time</td>			
+			</tr>
+		</table>
+	#else
+		<table class="mytime-legend">
+			<tr>
+				<td class="mytimeActual"></td>
+				<td class="mytimeActualText">Actual time</td>
+				<td class="mytimeSpace"></td>
+				<td class="mytimeRegistered"></td>
+				<td class="mytimeRegisteredText">Registered time</td>
+			</tr>
+		</table>
+	#end
+	
+	
+</div>
+
+</div>
+
+<input type="hidden" value="$slidePeriod" id="labelPeriodHidden">
+<input type="hidden" value="$slideStep" id="slideStepHidden">
+
+
+ <script type="text/javascript">	
+		document.getElementById('periodId').innerHTML = document.getElementById('labelPeriodHidden').value;	
+</script>
+

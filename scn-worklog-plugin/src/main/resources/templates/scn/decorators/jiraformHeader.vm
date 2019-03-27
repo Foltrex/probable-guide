@@ -1,0 +1,49 @@
+## USAGE
+#*
+
+	#parse("decorator/jira/jiraformHeader.vm")
+		... your code
+	#parse("decorator/jira/jiraformFooter.vm")
+	
+	Based on /decorators/panels/jiraform.jsp
+	N.B. If you have multiple jira forms, do not forget to reset the values. Otherwise, they might bleed into each others.
+	
+	The hidden preview tag is included in the footer.
+	
+	PARAMETERS:	
+	$jiraformTitle		- a title for this form (HTML)
+	$jiraformActionName	- the URI to submit this form to. Will create the required <form> tag if $jiraFormActionName is different from null or false.
+	$jiraformSubmitText	- Text value of the submit button. (no submit button if is false or unset)
+    						- Suggested values
+    							-add : $action.getText('common.forms.add')
+    							-update: $action.getText('common.forms.update')
+	$jiraformCancelURI	- the location to redirect to for the cancel button (no cancel button if it is false or unset)
+	$jiraformFocus		- Gives the focus to the first field in the form ($jiraformActionName must be defined for this to work)
+*#
+#if($jiraformActionName)
+<form 
+	onsubmit="if (this.submitted) return false; this.submitted = true; return true" 
+	action="$jiraformActionName" 
+	name="jiraform" 
+	method="post"
+	#if($jiraformClass)
+	class="$jiraformClass"
+	#end>
+#end
+<table class="jiraform maxWidth">
+	<tr class="titlerow">
+		<td colspan="2" class="jiraformheader">
+        #if($jiraformActionName)
+		   	<h3 class="formtitle">$jiraformTitle</h3>
+		#else
+			<h1>$jiraformTitle</h1>
+		#end
+        </td>
+	</tr>
+#if($jiraformDesc)
+	<tr>
+        <td colspan="2" class="jiraformbody">$jiraformDesc</td>
+    </tr>
+#else
+	<tr class="hidden"><td colspan="2"></td></tr>
+#end

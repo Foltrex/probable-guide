@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>$action.getText('admin.issuesettings.worklogtypes.edit.worklogtype')</title>
+		<script language="JavaScript">
+			function openWindow()
+			{
+				var vWinUsers = window.open('$baseurl/secure/popups/IconPicker.jspa?fieldType=worklogType&formName=jiraform','IconPicker', 'status=no,resizable=yes,top=100,left=200,width=580,height=650,scrollbars=yes');
+				vWinUsers.opener = self;
+				vWinUsers.focus();
+			}
+		</script>
+	</head>
+	<body>
+		#set($jiraformActionName = "EditWorklogType.jspa")
+		#set($jiraformTitle = "$action.getText('admin.issuesettings.worklogtypes.edit.worklogtype') : $action.name")
+		#set($jiraformSubmitText = $action.getText('common.forms.update'))
+		#set($jiraformSubmitId = 'update')
+		#set($jiraformCancelURI = "ViewWorklogTypes.jspa")
+		#set($jiraformFocus = true)
+		#parse("templates/scn/decorators/jiraformHeader.vm")
+		#parse("templates/scn/decorators/jiraErrorMessages.vm")
+		
+			#normalHeader($action 'name' $action.getText('common.words.name') true)
+				<input type="text" size="30" name="name" id="name" value="$!{action.name}"/>
+		    #normalFooter($action '')
+		    
+		    #normalHeader($action 'description' $action.getText('common.words.description') false)
+		        <input type="text" size="60" name="description" id="description" value="$!{action.description}"/>
+		    #normalFooter($action '')
+		    
+		    #normalHeader($action 'iconurl' $action.getText('admin.common.phrases.icon.url') true)
+		        <input type="text" size="60" name="iconurl" id="iconurl" value="$!{action.iconurl}" />
+				<span class="subText">[<a onclick="openWindow();return false;" class="subText" href="#">$action.getText('admin.text.image.select.image')</a>]</span>
+			#normalFooter($action $action.getText('admin.common.phrases.relative.to.jira'))
+		    
+			#normalHeader($action 'statusColor' $action.getText('admin.common.words.color') true)
+				<table cellpadding="0" cellspacing="0" border="0">
+				    <tr>
+				        <td style="padding:0px">
+				            <input type="text" name="statusColor" id="statusColor" size="40" value="$!{action.statusColor}"/>
+				        </td>
+				        <td style="padding:0px">&nbsp;</td>
+				        <td style="padding:0px">
+				            <table cellpadding="0" cellspacing="1" border="1">
+				                <td id="statusColor-rep" style="padding:0px;height:18px;width:18px;background-color:$!{action.statusColor}">
+				                    <a id="colorpicker-statusColor" href="#" onClick="window.open('$baseurl/secure/popups/colorpicker.jsp?element=statusColor&defaultColor=$!{action.statusColor}', 'colorpicker', 'menubar=yes,location=no,personalbar=no,scrollbar=yes,width=580,height=300,resizable');">
+				                        <img src="$baseurl/images/border/spacer.gif" width="15" height="15" border="0">
+				                    </a>
+				                </td>
+				            </table>
+				        </td>
+				    </tr>
+				</table>
+		    #normalFooter($action $action.getText('admin.common.phrases.relative.to.jira'))
+			
+			<input type="hidden" id="id", name="id" value="$action.id" />
+			
+		#parse("templates/scn/decorators/jiraformFooter.vm")
+	</body>
+</html>

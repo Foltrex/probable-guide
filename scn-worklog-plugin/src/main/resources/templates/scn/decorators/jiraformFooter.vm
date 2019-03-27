@@ -1,0 +1,58 @@
+## see jiraformHeader.vm for documentation
+#if($jiraformActionName)
+	    <tr class="hidden">
+	    	<td>
+	    		<input type="hidden" value="false" name="preview" id="preview" />
+	    	</td>
+	    </tr>
+	    
+    #if($xsrfToken)
+		<tr class="hidden">
+			<td>
+				<input name="atl_token" type="hidden" value="$xsrfToken">
+			</td>
+		</tr>
+	#end
+
+	    <tr class="buttons-container">
+	        <td class="jiraformfooter">&nbsp;</td>
+	        <td colspan="1">
+            #if($jiraformSubmitText)
+                <input type="submit" 
+                	name="$jiraformSubmitText" 
+                	value="$jiraformSubmitText"
+				#if($jiraformSubmitId)
+        			id="${jiraformSubmitId}-submit"
+        		#else
+        			id="${jiraformSubmitText}-submit"
+        		#end 
+					accesskey="$action.getText('common.forms.submit.accesskey')"
+					title="$action.getText('common.forms.submit.tooltip', 'common.forms.submit.accesskey', $modifierKey)"
+					class="aui-button"/>
+			#end
+			#if($jiraformCancelURI)
+				<a accesskey="$i18n.getText('AUI.form.cancel.link.accesskey')" 
+	               	class="aui-button-cancel" 
+	               	href="$jiraformCancelURI" 
+	               	id="cancelButton"
+	               	name="cancelButton" 
+	               	title="$i18n.getText('AUI.form.cancel.link.tooltip', $i18n.getText('AUI.form.cancel.link.accesskey'), $modifierKey)"
+	               	>
+	               	$i18n.getText('AUI.form.cancel.link.text')
+				</a>
+	        #end
+			</td>
+		</tr>
+	</table>
+</form>
+	#if($jiraformFocus)
+	<script language="javascript" type="text/javascript">
+		jQuery(function () {
+			AJS.$("form[name='jiraform'] :input:visible:first").focus();
+		});
+	</script>
+	#end
+#else
+	</table>
+#end
+

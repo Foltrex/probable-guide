@@ -1,0 +1,65 @@
+<html>
+<head>
+    <title>$i18n.getText("scn.global_settings.tt.label")</title>
+    <meta name="decorator" content="atl.admin">
+    <meta name="admin.active.section" content="admin_plugins_menu/scn-global-settings-section"/>
+	<meta name="admin.active.tab" content="scnTimeTracking"/>
+</head>
+<body>
+	#set($jiraformActionName = "$req.contextPath/secure/ScnTimeTrackingSettings.jspa")
+	#set($jiraformTitle = "$i18n.getText('scn.global_settings.tt.panel.title')")
+	#set($jiraformDesc = "$i18n.getText('scn.global_settings.tt.panel.description')")
+	#set($jiraformFocus = true)
+	#parse("templates/scn/decorators/jiraformHeader.vm")
+	#parse("templates/scn/decorators/jiraErrorMessages.vm")
+	
+	$webResourceManager.requireResource("com.scn.jira.scn-worklog-plugin:scn-worklog-resources")
+	
+		<tr>
+	        <td colspan="2">
+	            <div id="userGroupPicker" class="ab-drag-wrap">
+	                <div class="ab-drag-container">
+	                    <h4>
+	                        $i18n.getText("scn.global_settings.tt.panel.available.groups")
+	                    </h4>
+	                    <div class="ab-items">
+		                    #if (!$availableGroups || $availableGroups.size() == 0)
+				        		<div class="aui-message info"><span class="aui-icon icon-info"><ww:property value="parameters['iconText']"></span>$i18n.getText("scn.global_settings.tt.panel.available.groups.no")</div>
+				        	#else
+				                <select class="selectGroup" name="groupsToAdd" multiple size="20">
+				                	#foreach ($group in $availableGroups)
+				                		<option value="${group}">${group}</option>
+				                	#end
+				                </select>
+				                <div class="buttons-container">
+	                                <a href="/jira/secure/ScnTimeTrackingSettings!add.jspa" id="add2" type="submit">ADD</a>
+	                            </div>
+				        	#end
+	                    </div>
+	                </div>
+	                <div class="ab-drag-container">
+	                    <h4>
+	                        $i18n.getText("scn.global_settings.tt.panel.groups")
+	                    </h4>
+	                    <div class="ab-items">
+	                    	#if (!$wlGroups || $wlGroups.size() == 0)
+				        		<div class="aui-message info"><span class="aui-icon icon-info"><ww:property value="parameters['iconText']"></span>$i18n.getText("scn.global_settings.tt.panel.available.groups.no")</div>
+				        	#else
+				                <select class="selectGroup" name="groupsToRemove" multiple="" size="20">
+			                        #foreach ($group in $wlGroups)
+				                		<option value="${group}">${group}</option>
+				                	#end
+				                </select>
+				                <div class="buttons-container">
+									<a href="/jira/secure/ScnTimeTrackingSettings!remove.jspa" id="remove2" type="submit">REMOVE</a>
+	                            </div>
+				        	#end
+	                    </div>
+	                </div>
+	           </div>
+	        </td>
+	    </tr>
+
+    #parse("templates/scn/decorators/jiraformFooter.vm")
+</body>
+</html>

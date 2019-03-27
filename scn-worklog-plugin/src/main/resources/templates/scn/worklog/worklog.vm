@@ -1,0 +1,276 @@
+#macro(fieldsetHeader $label $class)
+	<fieldset 
+		#if($class && $class != '')
+			class="$class"
+		#end>
+	#if($label && $label != '')
+		<legend><span>$label</span></legend>
+	#end
+#end
+
+#macro(fieldsetFooter )
+	</fieldset>
+#end
+
+#macro(hiddenField $name $value)
+	<div class="hidden">
+		<input name="$name" type="hidden" value="$!{value}">
+	</div>
+#end
+
+#macro(fieldHeader $id $label $required $class)
+	<div
+		#if($class && $class != '')
+			class="$class"
+		#end>
+	#if($label && $label != '')
+		<label for="$id">
+			$!label
+		#if($required)
+			<span class="aui-icon icon-required"></span>
+			<span class="content">$i18n.getText('AUI.form.label.text.required')</span>
+		#end
+		</label>
+	#end
+#end
+
+#macro(fieldFooter $id $name $error $example $helpUrl $description)
+	#if($error)
+		<div id="${id}-error" data-field="$name" class="error">$error</div>
+	#end
+	#if($example && $example != '')
+		<span class="aui-form example">$example</span>
+	#end
+	#if($helpUrl && $helpUrl != '')
+		<a class="aui-icon icon-help" title="Get local help about Logging Work"
+			href="${helpUrl}#if($xsrfToken)&amp;atl_token=${xsrfToken}#end"
+			onclick="var child = window.open('${helpUrl}#if($xsrfToken)&amp;atl_token=${xsrfToken}#end', 'jiraLocalHelp', 'width=600, height=500, resizable, scrollbars=yes'); child.focus(); return false;">
+		</a>
+	#end
+	#if($description && $description != '')
+		<div class="description">
+			$description
+		</div>
+	#end
+	</div>
+#end
+
+<html>
+
+<head>
+    #if($action.shouldDisplay()) 
+    	<title>
+    		#if($editMode) $i18n.getText('logwork.edit.title')
+    		#else $i18n.getText('logwork.title') #end
+        </title>
+        <meta name="decorator" content="issueaction" />
+        <link rel="index" href="$issuePath" />
+        $webResourceManager.requireResource("jira.webresources:calendar")
+		$webResourceManager.requireResource("jira.webresources:calendar-en")
+		$webResourceManager.requireResource("jira.webresources:global-static")
+    #else 
+    	<title>$i18n.getText('common.words.error')</title>
+    	<meta name="decorator" content="message" />
+    #end
+</head>
+<body>
+#if($action.shouldDisplay()) 
+	#set($pageId = 'log-work')
+	<form action="${baseurl}/secure/${superActionName}.jspa" class="aui" method="post" name="jiraform" id="$pageId">
+
+	    <div class="form-body">
+	   	
+	    #if($hasErrorMessages)
+			#set($messageHtml = '')
+			#foreach($error in $errorMessages)
+				#set($messageHtml = "${messageHtml}<p>${error}</p>")
+			#end
+			#AUImessage('error' '' $messageHtml '' '' '' 'false')
+	    #end
+			<h2 class="dialog-title">
+		    #if($cameFromParent)
+		    	$i18n.getText('logwork.title.subtask')
+		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
+		    #else
+		    	#if($editMode)$i18n.getText('logwork.edit.title')
+		    	#else $i18n.getText('logwork.title')#end
+		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
+		    #end
+			    <a class="header-issue-key" #if($cameFromIssue)style="display:none"#end title="${issueObject.summary}" href="${baseurl}/browse/${issueObject.key}">${issueObject.key}</a>   
+			</h2>
+
+			#hiddenField("worklogId" $worklogId)
+			#hiddenField("id" $req.getParameter('id'))
+		#if($xsrfToken)
+	    	#hiddenField("atl_token" $xsrfToken)
+		#end
+			
+			#fieldsetHeader($i18n.getText('logwork.time.entry') '')
+					
+				## time spent
+				#fieldHeader("${pageId}-time-logged" $i18n.getText('common.concepts.time.spent') true "field-group")
+					<input class="text short-field" id="${pageId}-time-logged" name="timeLogged" type="text" value="$!{action.timeLogged}"/>
+				#fieldFooter("${pageId}-time-logged" "timeLogged" $errors.timeLogged $i18n.getText('logwork.example', '3w 4d 12h') "${baseurl}/secure/ShowTimeTrackingHelp.jspa?decorator=popup#LogWork" $i18n.getText('logwork.timespent.desc.short'))
+				
+				## reporter
+				#fieldHeader("${pageId}-wl-reporter" $i18n.getText('logwork.reporter.label') true "field-group")
+					<select class="select" id="${pageId}-wl-reporter" name="inputReporter" type="text">
+						#foreach ($item in $assignableUsers.entrySet())
+	                    <option value="$item.key"
+	                        #if($createWorklog)
+	                            #if ($item.key == $jiraServiceContext.loggedInUser.name) selected="selected" #end
+	                        #else
+	                            #if ($worklog && $item.key.toLowerCase() == $worklog.author) selected="selected" #end
+	                        #end
+	                        >$item.value
+	                    </option>
+		                #end
+					</select>
+				#fieldFooter("${pageId}-wl-reporter" "inputReporter" $errors.inputReporter '' '' '')
+				
+				## worklog types
+				#fieldHeader("${pageId}-wl-type" $i18n.getText('logwork.worklogtype') $wlTypeRequired "field-group")
+					<select class="select" id="${pageId}-wl-type" name="worklogType" type="text">
+						<option value="" #if($action.isWorklogTypeSelected($worklogType.id)) selected="selected" #end>
+							$i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
+						</option>
+					    #foreach($worklogType in $action.worklogTypeObjects)
+		                <option value="$worklogType.id" #if($action.isWorklogTypeSelected($worklogType.id)) selected="selected" #end >
+		                      $worklogType.nameTranslation
+		                </option>
+		                #end
+					</select>
+				#fieldFooter("${pageId}-wl-type" "worklogType" $errors.worklogType '' '' $i18n.getText('logwork.worklogtype.desc'))
+				
+				## date
+				#fieldHeader("${pageId}-date-logged" $i18n.getText('logwork.date.started') true "field-group")
+					<input class="text medium-field" id="${pageId}-date-logged-date-picker" name="startDate" type="text" value="$startDate" />
+					<a href="#" id="${pageId}-date-logged-icon" title="$i18n.getText('date.picker.select.date')">
+						<span class="aui-icon icon-date"></span>
+						<span class="content">$i18n.getText('date.picker.select.date')</span>
+					</a>
+					<script type="text/javascript">
+						Calendar.setup({
+						firstDay : 0, // first day of the week
+						inputField : "${pageId}-date-logged-date-picker", // id of the input field
+						button : "${pageId}-date-logged-icon", // trigger for the calendar (button ID)
+						align : "Br", // alignment (defaults to "Bl")
+						singleClick : true,
+						useISO8601WeekNumbers : false, // use ISO8061 date/time standard
+						showsTime : "true",
+						ifFormat : "$action.dateTimeFormat",
+						date : $action.currentTimeMillis,
+						timeFormat : "$action.timeFormat"
+						});
+					</script>
+				#fieldFooter("${pageId}-date-logged" "startDate" $errors.startDate '' '' '')
+				
+				## radio adjust estimate
+				#fieldsetHeader($i18n.getText('common.concepts.remaining.estimate') "group")
+					#fieldHeader('' '' '' "radio")
+						<input class="radio" #if($adjustEstimate == 'auto')checked="checked"#end id="${pageId}-adjust-estimate-auto" name="adjustEstimate" type="radio" value="auto" />
+						<label for="${pageId}-adjust-estimate-auto">$i18n.getText('logwork.bullet1.adjust.automatically')</label>
+					#fieldFooter("${pageId}-adjust-estimate" "adjustEstimate" $errors.adjustEstimate '' '' $i18n.getText('logwork.bullet1.autoadjust.desc'))
+					#fieldHeader('' '' '' "radio")
+						<input class="radio" #if($adjustEstimate == 'leave')checked="checked"#end id="${pageId}-adjust-estimate-leave" name="adjustEstimate" type="radio" value="leave" />
+						<label for="${pageId}-adjust-estimate-leave">
+							#if("$!estimate" == "") $i18n.getText('logwork.bullet2.leave.unset')
+							#else $i18n.getText('logwork.bullet2.use.existing.estimate', $estimate) #end
+						</label>
+					#fieldFooter("${pageId}-adjust-estimate-leave" "adjustEstimate" $errors.leaveEstimate '' '' '')
+					#fieldHeader('' '' '' "radio")
+						<input class="radio" #if($adjustEstimate == 'new')checked="checked"#end id="${pageId}-adjust-estimate-new" name="adjustEstimate" type="radio" value="new" />
+						<label for="${pageId}-adjust-estimate-new">$i18n.getText('logwork.bullet3.set.to')</label>
+						<input class="text short-field" id="${pageId}-adjust-estimate-new-value" name="newEstimate" type="text" value="$!newEstimate"/>
+					#fieldFooter("${pageId}-adjust-estimate-new" "adjustEstimate" $errors.newEstimate $i18n.getText('logwork.example', '3w 4d 12h') '' '')
+				#if($createWorklog)
+					#fieldHeader('' '' '' "radio")
+						<input class="radio" #if($adjustEstimate == 'manual')checked="checked"#end id="${pageId}-adjust-estimate-manual" name="adjustEstimate" type="radio" value="manual" />
+						<label for="${pageId}-adjust-estimate-manual">$i18n.getText('logwork.bullet4.reduce.by')</label>
+						<input class="text short-field" id="${pageId}-adjust-estimate-manual-value" name="adjustmentAmount" type="text" value="$!adjustmentAmount"/>
+					#fieldFooter("${pageId}-adjust-estimate-manual" "adjustmentAmount" $errors.adjustmentAmount $i18n.getText('logwork.example', '3w 4d 12h') '' '')
+				#end
+				#fieldsetFooter( ) <!-- // .group -->
+				
+				#set($fieldId = 'comment')
+				#fieldHeader($fieldId $i18n.getText('logwork.workdesc') false "field-group")
+					$!{workDescriptionEditHtml}
+					#set($rolesPresent = !$action.roleLevels.empty)
+				    #set($groupsPresent = !$action.groupLevels.empty)
+					<div class="security-level">
+						<fieldset class="hidden parameters">
+							<input type="hidden" title="securityLevelViewableByAll" value="$i18n.getText('security.level.viewable.by.all')">
+								<input type="hidden" title="securityLevelViewableRestrictedTo" value="$i18n.getText('security.level.restricted.to')">
+						</fieldset>
+						<a class="drop" href="#">
+							<span class="icon #if($!commentLevel) icon-unlocked #else icon-locked #end"></span>
+							<span class="icon drop-menu"></span>
+						</a>
+						<select name="commentLevel" id="commentLevel">
+							<option value="">$i18n.getText('comment.constants.allusers')</option>
+							#if($rolesPresent)
+								<optgroup label="$i18n.getText('common.words.project.roles')">
+									<!-- TODO: keep value on error -->
+								#foreach($roleLevel in $action.roleLevels)
+									<option value="role:$roleLevel.id" #if($action.isLevelSelected("role:$roleLevel.id")) selected #end>$!roleLevel.name</option>
+								#end
+								</optgroup>
+							#end
+							#if($groupsPresent)
+		                        <optgroup label="$action.getText('common.words.groups')">
+		    					#foreach($groupLevel in $action.groupLevels)
+		                            <option value="group:$groupLevel" #if($action.isLevelSelected("group:$groupLevel"))selected#end>$groupLevel</option>
+		                        #end
+		                        </optgroup>
+		    				#end
+						</select>
+						<span class="current-level">$!{selectedLevelName}</span>
+					</div>
+				#fieldFooter($fieldId $fieldId '' '' '' '')
+			#fieldsetFooter( )
+	    </div>
+	    
+	    <div class="buttons-container form-footer">
+	        <div class="buttons">
+	       		<input 
+	       			accesskey="$i18n.getText('AUI.form.submit.button.accesskey')"
+				    class="button" 
+				    id="${pageId}-submit"
+				    name="$i18n.getText('common.forms.log')"
+				    title="$i18n.getText('AUI.form.submit.button.tooltip', $i18n.getText('AUI.form.submit.button.accesskey'), $modifierKey)"
+				    type="submit"
+				    value="$i18n.getText('common.forms.log')"
+				    />
+	       	    #if($issueValid == true)
+	            <a accesskey="$i18n.getText('AUI.form.cancel.link.accesskey')" 
+	               	class="cancel" 
+	               	href="$!{baseurl}$issuePath" 
+	               	id="${pageId}-cancel" 
+	               	title="$i18n.getText('AUI.form.cancel.link.tooltip', $i18n.getText('AUI.form.cancel.link.accesskey'), $modifierKey)">$i18n.getText('AUI.form.cancel.link.text')</a>
+	            #end
+	        </div>
+	    </div>
+	    
+	</form>  
+
+#else
+	<div class="form-body">
+        <header>
+            <h1>$i18n.getText('common.words.error')</h1>
+        </header>
+        #if($hasErrorMessages)
+        	#set($messageHtml = '')
+			#foreach($error in $flushedErrorMessages)
+				#set($messageHtml = '${messageHtml}<p>${error}</p>')
+			#end
+			#AUImessage('error' '' $messageHtml '' '' '' 'false')
+		#end
+		#if($issueExists)
+			#set($messageHtml = "<p>$i18n.getText('contact.admin.for.perm', $administratorContactLink)</p>")
+			#AUImessage('warning' '' $messageHtml '' '' '' 'false')
+		#end
+    </div>
+#end
+
+</body>
+</html>

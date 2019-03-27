@@ -1,0 +1,46 @@
+<messagebundle>
+    <msg name="gadget.common.configure">Configure</msg>
+	<msg name="gadget.common.save">Save</msg>
+	<msg name="gadget.common.cancel">Cancel</msg>
+    <msg name="scn.gadget.timesheet.title">SCN Time Sheet*</msg>
+    <msg name="scn.gadget.timesheet.description">Displays a summary of worked time* in a table.</msg>
+    <msg name="scn.gadget.timesheet.details">Details</msg>
+    <msg name="scn.gadget.timesheet.noentries">No data retrieved</msg>
+    <msg name="scn.gadget.timesheet.issue">Issue</msg>
+    <msg name="scn.gadget.timesheet.Mon">Mo</msg>
+    <msg name="scn.gadget.timesheet.Tue">Tu</msg>
+    <msg name="scn.gadget.timesheet.Wed">We</msg>
+    <msg name="scn.gadget.timesheet.Thu">Th</msg>
+    <msg name="scn.gadget.timesheet.Fri">Fr</msg>
+    <msg name="scn.gadget.timesheet.Sat">Sa</msg>
+    <msg name="scn.gadget.timesheet.Sun">Su</msg>
+    <msg name="scn.gadget.timesheet.today">Today</msg>
+    <msg name="scn.gadget.timesheet.Monday">Monday</msg>
+    <msg name="scn.gadget.timesheet.Tuesday">Tuesday</msg>
+    <msg name="scn.gadget.timesheet.Wednesday">Wednesday</msg>
+    <msg name="scn.gadget.timesheet.Thursday">Thursday</msg>
+    <msg name="scn.gadget.timesheet.Friday">Friday</msg>
+    <msg name="scn.gadget.timesheet.Saturday">Saturday</msg>
+    <msg name="scn.gadget.timesheet.Sunday">Sunday</msg>
+    <msg name="scn.gadget.timesheet.total">Total:</msg>
+
+    <msg name="scn.gadget.pref.label.num_weeks">Number of weeks*:</msg>
+    <msg name="scn.gadget.pref.label.reporting_day">Reporting day*:</msg>
+    <msg name="scn.gadget.pref.label.user">User:</msg>
+    <msg name="scn.gadget.pref.description.user">User to display entries for</msg>
+
+    <msg name="scn.gadget.group.timesheet.title">SCN Group Time Sheet*</msg>
+    <msg name="scn.gadget.group.timesheet.description">Displays a summary of worked time* for each user in a specified group.</msg>
+    <msg name="scn.gadget.pref.label.group">Group:</msg>
+    <msg name="scn.gadget.pref.description.group">Show summary for users in group</msg>
+
+    <msg name="scn.gadget.project.pivot.title">SCN Project Pivot Report*</msg>
+    <msg name="scn.gadget.project.pivot.description">Displays a summary of worked time* in a specified project.</msg>
+    <msg name="scn.gadget.pref.label.project">Project key:</msg>
+    <msg name="scn.gadget.pref.description.project">Show summary for project</msg>
+    <msg name="scn.gadget.pref.label.filter">Filter id*:</msg>
+    <msg name="scn.gadget.pref.description.filter">Show summary for filter</msg>
+
+    <msg name="scn.gadget.error.num_weeks.empty">Number of weeks is a required field</msg>
+    <msg name="scn.gadget.error.filter_id.empty">Filter id is a required field</msg>
+</messagebundle>

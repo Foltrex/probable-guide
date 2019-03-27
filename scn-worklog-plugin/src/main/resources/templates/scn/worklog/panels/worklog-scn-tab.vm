@@ -1,0 +1,59 @@
+#macro(iconUrl $url)
+	#if($url.startsWith("http://") == false && $url.startsWith("https://") == false)
+		#set ($iconUrl = "${baseurl}${url}")
+	#else
+		#set ($iconUrl = "${url}")
+	#end
+	$iconUrl
+#end
+
+#if ($requestContext.getRequestParameter('focusedWorklogId') && "$worklog.id" == $requestContext.getRequestParameter('focusedWorklogId'))
+    #set ($focusedWorklog = " focused")
+#end
+<div id="worklog-${worklog.id}" class="issue-data-block$!focusedWorklog">
+    <div class="actionContainer">
+        <div class="action-links">
+        	<a href="${requestContext.baseUrl}/browse/$worklog.issue.key?focusedWorklogId=$worklog.id&page=com.scn.jira.scn-worklog-plugin%3Ascn-worklog-tab-panel#worklog-$worklog.id" title="$i18n.getText('viewissue.worklog.permlink.title')" class="icon icon-perma"><span>$i18n.getText('viewissue.permlink')</span></a>
+            #if ($action.canEditWorklog)
+                <a id="edit_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/UpdateScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.edit')" class="icon icon-edit-sml"><span>$i18n.getText('common.words.edit')</span></a>
+            #end
+            #if ($action.canDeleteWorklog)
+        		<a id="delete_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/DeleteScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.delete')" class="icon icon-delete"><span>$i18n.getText('common.words.delete')</span></a>
+            #end
+        </div>
+        <div class="action-details">#worklogDetailsBody($worklog $i18n $dateFormatter)</div>
+
+        <div class="action-body">
+            <ul id="worklog_details_${worklog.id}" class="item-details">
+                <li>
+                    <dl>
+                        <dt>$i18n.getText('viewissue.worklog.timeworked'):</dt>
+                        <dd id="wl-${worklog.id}-d" class="worklog-duration">$action.getPrettyDuration($worklog.timeSpent.toString())</dd>
+                    </dl>
+                #if ($worklogType)
+                    <dl>
+                        <dt>Type:</dt>
+                        <dd id="wl-${worklog.id}-c" class="worklog-comment">
+                            <img align="top" src="#iconUrl($!worklogType.iconUrl)" width="16px" height="16px"/>&nbsp;$!worklogType.nameTranslation
+                        </dd>
+                    </dl>
+                #end
+                    <dl>
+                        <dt>&nbsp;</dt>
+                        <dd id="wl-${worklog.id}-c" class="worklog-comment">
+                            #if($content && $content.length() != 0)
+                            	#disable_html_escaping()
+                            	$content
+                            ## if you need comment to render as one line without wiki uncomment this code and comment the above code
+                            ##if($worklog.comment && $worklog.comment.length() != 0)
+                                ##$worklog.comment
+                            #else
+                                &lt;$i18n.getText('viewissue.tabs.worklog.nocomment')&gt;
+                            #end
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE entitymodel PUBLIC "-//OFBiz//DTD Entity Model//EN" "http://www.ofbiz.org/dtds/entitymodel.dtd">
+
+<entitymodel>
+	<title>Entity Model for JIRA ScnWorklog</title>
+	<description>Entities added to extend Worklog Features</description>
+        <copyright>Copyright (c) 2010 ScienceSoft Inc.</copyright>
+	<author>Ihar Khadarovich</author>
+	<version>3.0</version>
+
+	<entity entity-name="WorklogType" table-name="worklogtype_scn" package-name="">
+		<field name="id" type="short-varchar" />
+		<field name="sequence" type="numeric" />
+		<field name="name" col-name="pname" type="short-varchar" />
+		<field name="description" type="very-long" />
+		<field name="iconurl" type="long-varchar" />
+		<field name="statusColor" type="short-varchar" />
+
+		<prim-key field="id" />
+	</entity>
+
+	<entity entity-name="WorklogExt" table-name="worklog_worklogtype_scn" package-name="">
+		<field name="id" type="numeric" />
+		<field name="worklogtype" type="short-varchar" />
+
+		<prim-key field="id" />
+
+		<relation type="one" title="Parent" rel-entity-name="WorklogType">
+			<key-map field-name="worklogtype" rel-field-name="id" />
+		</relation>
+	</entity>
+</entitymodel>

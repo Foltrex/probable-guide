@@ -1,0 +1,100 @@
+#if ($loggedin)
+<style type="text/css">
+	#set ($H = '#')
+    ${H}issuetable .userTime,
+    ${H}issuetable .total {
+    	text-align: center;
+    	border-left: 1px solid ${H}EEE;
+    	width: 16px;
+    }
+    ${H}issuetable .total {
+    	font-weight: bold;
+    }
+    ${H}issuetable .colFooter.total {
+    	text-align: right;
+    }
+    ${H}issuetable .rowFooter:hover {
+		background-color: ${H}f0f0f0;
+	}
+	${H}issuetable tfoot th {
+		padding: 3px 7px;
+	}
+</style>
+
+<div id="jira">
+    <div class="results-wrap">
+        <div>
+        	#if ($workedIssues && $workedIssues.size())
+            <table id="issuetable">
+            	<thead>
+			        <tr class="rowHeader">
+                        <th class="colHeaderLink" colspan="4">
+                            #if ($filter)
+                                $i18n.getText("project.pivot.report", $filter.name)
+                                &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$startDate&endDate=$endDate&filterid=$filter.id&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-projectpivot">$i18n.getText("project.pivot.details")</a></font>)
+                            #elseif ($project) 
+                                $i18n.getText("project.pivot.report", $project.name)
+                                &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$startDate&endDate=$endDate&projectid=$project.id&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-projectpivot">$i18n.getText("project.pivot.details")</a></font>)
+                            #else
+                                $i18n.getText("project.pivot.report.all")
+                                &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$startDate&endDate=$endDate&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-projectpivot">$i18n.getText("project.pivot.details")</a></font>)
+                            #end
+                        </th>
+	                    #foreach ($user in $workedUsers.keySet())
+	                         <th class="colHeaderLink userTime" width="1%"><a href="$req.contextPath/secure/ConfigureReport.jspa?targetUser=${user.name}&startDate=$startDate&endDate=$endDate&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:report">$user.fullName</a></th>
+	                    #end
+                        <th class="colHeaderLink total">$i18n.getText("portlet.timesheet.tot")</th>
+                    </tr>
+			    </thead>
+                <tbody>
+                    #foreach ($issue in $workedIssues.keySet())
+		                #set($issueWorkLog = $workedIssues.get($issue))
+                        <tr class="issuerow">
+							<td class="nav issuetype">#displayType($issue)</td>
+							<td class="nav issuekey"><a href="$req.contextPath/browse/$issue.key">$issue.key</a></td>
+							<td class="nav summary">
+							    #if ($issue.isSubTask())
+							    	<a href="$req.contextPath/browse/$issue.getParent().getString('key')" class="parentIssue" title="$issue.getParent().getString('summary')">$issue.getParent().getString('key')</a>
+							    #end
+							    <a href="$req.contextPath/browse/$issue.getKey()" target="_parent">$textutils.plainTextToHtml($issue.getSummary())</a>
+							</td>
+							<td class="nav priority">
+							    #if ($fieldVisibility.isFieldHidden($issue.getProject().getLong("id"), "priority", $issue.getIssueType().getString("name")) == false)
+							    	#displayPriorityNoLink($issue)
+							    #else
+							    	&nbsp;
+							    #end
+							</td>
+							#set ($totalWorked = 0)
+							#foreach ($user in $workedUsers.keySet())
+							    #if ($issueWorkLog.get($user))
+								    #set ($worked = $issueWorkLog.get($user).intValue())
+							    #else 
+							    	#set ($worked = 0)
+							    #end
+							    <td class="nav userTime">$textUtil.getPrettyHours($worked)</td>
+							    #set ($totalWorked = $totalWorked + $worked)
+							#end
+							<td class="nav total">$textUtil.getPrettyHours($totalWorked)</td>
+	                    </tr>
+	                #end
+                </tbody>
+                <tfoot>
+                	<tr class="rowFooter">
+                        #set ($total = 0)
+                        <th class="colFooter total" colspan="4">$i18n.getText("project.pivot.total")</th>
+                        #foreach ($user in $workedUsers.keySet())
+                            <th class="total userTime">$textUtil.getPrettyHours($workedUsers.get($user))</th>
+                            #set ($total = $total + $workedUsers.get($user).intValue())
+                        #end
+                        <th class="total">#if ($total != 0) $textUtil.getPrettyHours($total) #end</th>
+                    </tr>
+                </tfoot>
+            </table>
+            #else
+            	$i18n.getText('project.pivot.notFound')
+            #end
+        </div>
+    </div>
+</div>
+#end

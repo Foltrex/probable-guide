@@ -1,0 +1,169 @@
+#macro(rowClear )
+<tr>
+	<td class="fieldLabelArea"> </td>
+	<td class="rowClear"> </td>
+</tr>
+#end
+
+#macro(sectionBreak $sectionBreakTitle $sectionBreakDesc)
+<tr  class="jiraformSectionBreak">
+	<td colspan="2">
+        <h3 class="formtitle">$!sectionBreakTitle</h3>
+    </td>
+</tr>
+<tr>
+    <td colspan="2" class="jiraformheader">
+        $!sectionBreakDesc
+    </td>
+</tr>
+#end
+
+<html>
+<head>
+    <title>$i18n.getText("scn.project_settings.label")</title>
+    <meta name="decorator" content="admin" />
+    <meta name="projectKey" content="$project.key"/>
+	<meta name="projectId" content="$project.id"/>
+	<meta name="application-base-url" content="$applicationProperties.baseUrl">
+	<meta name="admin.active.section" content="atl.jira.proj.config"/>
+	<meta name="admin.active.tab" content="scnProjectSettings"/>
+	$webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+	$webResourceManager.requireResource("jira.webresources:calendar")
+	$webResourceManager.requireResource("jira.webresources:calendar-en")
+	$webResourceManager.requireResource("jira.webresources:global-static")
+</head>
+<body>
+    <script language="JavaScript">
+		function setWlTypeDisabled(wlAutoCopy) 
+		{
+            var value = (wlAutoCopy.value == "false");
+            jQuery("[name='inputWorklogTypes']").attr("disabled", value);
+            jQuery('[name="inputUnspecifiedWorklogType"]').attr("disabled", value);
+		}
+	</script>
+
+## PAGE HEADER
+
+	#set($jiraformTitle = "$i18n.getText('scn.project_settings.label')")
+	#set($jiraformDesc = "$i18n.getText('scn.project_settings.descr')")
+	#parse("templates/scn/decorators/jiraformHeader.vm")
+	#parse("templates/scn/decorators/jiraErrorMessages.vm")
+	#parse("templates/scn/decorators/jiraformFooter.vm")
+	
+## FORM
+	
+	#set($jiraformActionName = "$req.contextPath/secure/ScnProjectSettings.jspa")
+	#set($jiraformClass = "aui")
+	#set($jiraformTitle = "$action.getText('scn.project_settings.wl_auto_copy.section')")
+	#set($jiraformDesc = "$i18n.getText('scn.project_settings.wl_auto_copy.instructions')")
+	#set($jiraformSubmitText = $action.getText('common.forms.update'))
+	#set($jiraformSubmitId = 'update')
+	#set($jiraformCancelURI = "project/ViewProject.jspa?pid=$req.getParameter('pid')")
+	#set($jiraformFocus = true)
+	#parse("templates/scn/decorators/jiraformHeader.vm")
+
+        #controlHeader($action "wlAutoCopy" $i18n.getText("scn.project_settings.wl_auto_copy.label") true false)
+            <input type="radio" name="inputWLAutoCopy" value="true" #if ($inputWLAutoCopy == "true") checked #end onclick="setWlTypeDisabled(this)">$i18n.getText("scn.project_settings.wl_auto_copy.values.on")
+            &nbsp;&nbsp;
+            <input type="radio" name="inputWLAutoCopy" value="false" #if ($inputWLAutoCopy == "false") checked #end onclick="setWlTypeDisabled(this)">$i18n.getText("scn.project_settings.wl_auto_copy.values.off")
+        #controlFooter($action "" false)
+
+        #controlHeader ($action "inputWorklogTypes" $i18n.getText("scn.project_settings.wl_types.label") false false)
+        <table border="0" cellpadding="0" cellspacing="0">
+        	<tr>
+        		<td>
+            		<input type="checkbox" value="true" name="inputUnspecifiedWorklogType" id="inputUnspecifiedWorklogType" 
+            			#if ($inputWLAutoCopy == "false")
+                            disabled="true"
+                        #elseif ($inputUnspecifiedWorklogType)
+            				checked="true"
+            			#end
+            		>
+            	</td>
+        		<td valign="center">&nbsp;<label for="unspecifiedWorklogType">Unspecified Type</label></td>
+        	</tr>
+        #foreach($wlType in $action.worklogTypes)
+            <tr><td>
+                <input type="checkbox" value="$wlType.id" name="inputWorklogTypes" id="inputWorklogTypes_$wlType.id"  
+					#if ($inputWLAutoCopy == "false")
+                        disabled="true"
+                    #end
+                    #if ($action.inputWorklogTypes)
+                        #foreach($id in $action.inputWorklogTypes)
+                            #if ($id == $wlType.id)
+                                checked="true"
+                            #end
+                        #end
+                    #end
+                ></td>
+                <td valign="center">&nbsp;<label for="inputWorklogTypes_$wlType.id">$wlType.name</label></td>
+            </tr>
+        #end
+        </table>
+        #controlFooter ($action "" false)
+        
+        #controlHeader($action "wlTypeRequired" $i18n.getText("scn.project_settings.wl_type_required.label") true false)
+	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end >
+	    #controlFooter ($action "" false)
+	                
+	    #rowClear()
+        #sectionBreak($i18n.getText("scn.project_settings.wl_blocking_date.section") $i18n.getText("scn.project_settings.wl_blocking_date.instructions"))
+
+        ## set date picker
+        #set ($field_id="inputBlockingDate")
+        #set ($field_name="inputBlockingDate")
+        #set ($field_value=$inputBlockingDate)
+        #controlHeader ($action $field_id $i18n.getText("scn.project_settings.wl_blocking_date.label") false false)
+	        <div>
+		        <input class="text medium-field" type="text" name="$field_name" id="$field_id" value="$!field_value"/>
+		        #if($hasCalendarTranslation)
+		        	<a href="#" id="${field_id}-icon" title="$i18n.getText('date.picker.select.date')">
+						<span class="aui-icon icon-date">$i18n.getText('date.picker.select.date')</span>
+					</a>
+					<script type="text/javascript">
+						Calendar.setup({
+							firstDay : 0, // first day of the week
+							inputField : "$field_id", // id of the input field
+							button : "${field_id}-icon", // trigger for the calendar (button ID)
+							align : "Br", // alignment (defaults to "Bl")
+							singleClick : true,
+							useISO8601WeekNumbers : false, // use ISO8061 date/time standard
+							showsTime : "false",
+							ifFormat : "$action.dateFormat",
+							date : $action.currentCalendar.timeInMillis,
+							timeFormat : "$action.timeFormat"
+						});
+					</script>
+		        #end
+		    </div>
+        #controlFooter ($action "" false)
+        
+        #rowClear()
+        #sectionBreak($i18n.getText("scn.project_settings.wl_project_roles.section") $i18n.getText("scn.project_settings.wl_project_roles.instructions"))
+        
+        #controlHeader ($action "inputProjectRolesToViewWL" $i18n.getText("scn.project_settings.wl_project_roles.label") false false)
+        <table border="0" cellpadding="0" cellspacing="0">
+        #foreach($projRole in $action.projectRoles)
+            <tr><td>
+                <input type="checkbox" value="$projRole.id" name="inputProjectRolesToViewWL" id="inputProjectRolesToViewWL_$projRole.id"
+                       #if ($action.inputProjectRolesToViewWL)
+                           #foreach($id in $action.inputProjectRolesToViewWL)
+                               #if ($id == $projRole.id)
+                                   checked
+                               #end
+                           #end
+                       #end
+                ></td>
+                <td valign="center">&nbsp;<label for="inputProjectRolesToViewWL_$projRole.id">$projRole.name</label></td>
+            </tr>
+        #end
+        </table>
+        #controlFooter ($action "" false)
+
+        #rowClear()
+		
+		<input type="hidden" name="pid" value="$req.getParameter("pid")">
+				
+	#parse("templates/scn/decorators/jiraformFooter.vm")
+</body>
+</html>

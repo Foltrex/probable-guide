@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+	<ModulePrefs title="__MSG_scn.gadget.timesheet.title__"
+		directory_title="__MSG_scn.gadget.timesheet.title__" description="__MSG_scn.gadget.timesheet.description__"
+		author="ScienceSoft" height="100"
+		screenshot='#staticResourceUrl("com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-gadget", "timesheet-gadget-screenshot.png")'
+		thumbnail='#staticResourceUrl("com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-gadget", "timesheet-gadget-thumb.png")'>
+		<Optional feature="gadget-directory">
+			<Param name="categories">
+				JIRA
+			</Param>
+		</Optional>
+		<Require feature="dynamic-height" />
+		<Require feature="setprefs" />
+		<Require feature="views" />
+		<Optional feature="atlassian.util" />
+		<Optional feature='auth-refresh' />
+		<Require feature="oauthpopup" />
+		#oauth
+<!-- 		#supportedLocales("gadget.common") -->
+		<Locale messages="__ATLASSIAN_BASE_URL__/download/resources/com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-gadget/i18n?nocache" />
+	</ModulePrefs>
+	<UserPref name="isConfigured" datatype="hidden" default_value="false" />
+	<UserPref name="isConfigurable" datatype="hidden" default_value="true" />
+	<UserPref name="num_weeks" datatype="hidden" default_value="1" />
+	<UserPref name="reporting_day" datatype="hidden" default_value="2" />
+	<UserPref name="user" datatype="hidden" default_value="" />
+	<Content type="html" view="default">
+        <![CDATA[
+        <style type="text/css">
+            body, .gadget .footer {background-color: #fff !important}
+		</style>
+
+        #requireResource("com.atlassian.jira.gadgets:g-assigned-to-me")
+        #includeResources()
+
+		<script type="text/javascript">
+			
+				function intNum(num_weeks){
+					var pattern = '^[0-9]+$';
+					var value = num_weeks.value;
+					if(value.match(pattern) && value>0){
+						num_weeks.setCustomValidity('');
+					} else {
+						if (AJS.$.browser.msie && parseInt(AJS.$.browser.version,10)<10)
+							alert('Value must be integer greater or equal to 1.');
+						num_weeks.setCustomValidity('Value must be integer greater or equal to 1.');
+					}
+				}
+				
+				function exist(val){
+					var optionFound = false,
+      				datalist = val.list;
+      				for (var i = 0; i < datalist.options.length; i++) {
+    					if (datalist.options[i].value==val.value) {
+							optionFound = true;
+            				break;
+        				}
+    				}
+    				if (optionFound) {
+      					val.setCustomValidity('');
+    				} else {
+      					val.setCustomValidity('Not valid login.');
+    				}
+				}
+				
+				AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+                    config: {
+                        descriptor: function (args) {
+                            var gadget = this;
+                            var users = function()
+                            {
+                                var options = args.availableUsers.userList;
+                                var selected = args.availableUsers.currentUser.value;
+                                var defaultValue = selected;
+                                if (gadget.getPref("user")) {
+                                    selected = gadget.getPref("user");
+                                }
+                                return {
+                                    id: "user-input",
+                                    label: gadget.getMsg("__MSG_scn.gadget.pref.label.user__"),
+                                    description: gadget.getMsg("__MSG_scn.gadget.pref.description.user__"),
+                                    type: "callbackBuilder",
+                                    callback: function(parentDiv){
+                                    	var datalist;
+                                    	if (AJS.$.browser.msie && parseInt(AJS.$.browser.version,10)<10) {
+             								datalist = AJS.$("<select>").attr({ id: "user", name: "user"});
+        								} else {
+             								parentDiv.append(
+                                    		AJS.$("<input>").attr({ id: "user", value: selected, list: "usersSelect", name: "user", defaultValue: defaultValue, onblur: "exist(this)", autocomplete:"off"})
+                                    		);
+                                    		datalist = AJS.$("<datalist>").attr("id","usersSelect");
+                                    	}
+                                    	for (var i=0;i<options.length;i++){
+                                    		var option;
+                                    		if (options[i].value == selected){
+                                    			option = AJS.$("<option>").attr("value",options[i].value).attr("label",options[i].label).attr("selected", "selected");
+                                    		} else {
+                                    			option = AJS.$("<option>").attr("value",options[i].value).attr("label",options[i].label);
+                                    		}
+        									datalist.append(option);
+        								};
+                                    	parentDiv.append(datalist);
+             						}
+                                };
+                            };
+                            return  {
+                                action: "/rest/scn-timesheet-gadget/1.0/timesheet/validate.json",
+                                theme: "gdt",
+                                fields: [
+                                    {
+                                        id: "num_weeks_div",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.num_weeks__"),
+                                        type: "callbackBuilder",
+                                        callback: function(parentDiv){
+                                    		parentDiv.append(
+                                    			AJS.$("<input>").attr({ id: "num_weeks", value: gadget.getPref("num_weeks"), name: "num_weeks", type:"number", min:"1", autocomplete:"off", oninput:"intNum(this)"})
+                                    	);}
+                                    },
+                                    {
+                                        id: "reporting_day",
+                                        userpref: "reporting_day",
+                                        label: gadget.getMsg("__MSG_scn.gadget.pref.label.reporting_day__"),
+                                        type: "select",
+                                        selected: gadget.getPref("reporting_day"),
+                                        options:[
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.today__",
+                                                value:"0"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Monday__",
+                                                value:"2"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Tuesday__",
+                                                value:"3"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Wednesday__",
+                                                value:"4"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Thursday__",
+                                                value:"5"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Friday__",
+                                                value:"6"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Saturday__",
+                                                value:"7"
+                                            },
+                                            {
+                                                label:"__MSG_scn.gadget.timesheet.Sunday__",
+                                                value:"1"
+                                            }
+                                        ]
+                                    },
+                                    users(),
+                                    AJS.gadget.fields.nowConfigured()
+                                ]
+                            };
+                        },
+                        args: [
+                            {
+                                key: "availableUsers",
+                                ajaxOptions: "/rest/scn-timesheet-gadget/1.0/user-list"
+                            }
+                        ]
+                    },
+                    view: {
+                        onResizeAdjustHeight: true,
+
+                        template: function(args) {
+                            var gadget = this;
+                            gadget.getView().html(args.timesheet.html); 
+                        },
+                        args: [
+                        {
+                            key: "timesheet",
+                            ajaxOptions: function() {
+                                return {
+                                    url: "/rest/scn-timesheet-gadget/1.0/timesheet.json",
+                                    data: {
+                                        targetUser: this.getPref("user"),
+                                        numOfWeeks: this.getPref("num_weeks"),
+                                        reportingDay: this.getPref("reporting_day"),
+                                        noCache: (new Date()).getTime()
+                                    }
+                                };
+                            }
+                        }
+                        ]
+                    }
+                });
+  		</script>
+        ]]>
+	</Content>
+</Module>
