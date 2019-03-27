@@ -1,13 +1,8 @@
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
     <plugin-info>
-        <version>${project.version}</version>
         <description>${project.description}</description>
-        <application-version min="5.0"/>
-        <vendor name="${project.organization.name}" url="${project.organization.url}" />
-        <bundle-instructions>
-			<Export-Package>*</Export-Package>
-			<Import-Package>*;resolution:=optional</Import-Package>
-        </bundle-instructions>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
     </plugin-info>
 
     <resource type="i18n" name="i18n-timesheet" location="com.scn.jira.plugin.portlet.timesheet.timesheet_portlet" />
