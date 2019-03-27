@@ -2,8 +2,18 @@ package com.scn.jira.worklog.scnwl;
 
 import java.util.Date;
 
-import com.atlassian.jira.bc.JiraServiceContext;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.jira.bc.issue.util.VisibilityValidator;
+import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
+import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
+import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
+import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
+import com.scn.jira.worklog.core.scnwl.OfBizScnWorklogStore;
+import com.scn.jira.worklog.core.scnwl.ScnTimeTrackingIssueManager;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.jira.bc.issue.comment.CommentService;
@@ -15,12 +25,7 @@ import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
-import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 
@@ -37,12 +42,31 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 
 	@Inject
 	public CreateScnWorklogAction(ProjectRoleManager projectRoleManager,
-		  GroupManager groupManager, @Qualifier("ofBizScnExtendedIssueStore") IScnExtendedIssueStore extIssueStore,
-		  @ComponentImport IScnWorklogService defaultScnWorklogService,
-		  IScnProjectSettingsManager projectSettignsManager, ExtendedConstantsManager extendedConstantsManager) {
+		  GroupManager groupManager) {
 
 		super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
-				extIssueStore, defaultScnWorklogService, projectSettignsManager, extendedConstantsManager);
+				new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
+				new DefaultScnWorklogService(
+						ComponentAccessor.getComponent(VisibilityValidator.class),
+						ComponentAccessor.getApplicationProperties(),
+						projectRoleManager,
+						ComponentAccessor.getIssueManager(),
+						ComponentAccessor.getComponent(TimeTrackingConfiguration.class),
+						ComponentAccessor.getGroupManager(),
+						new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()),
+						new DefaultScnWorklogManager(
+								new OfBizScnWorklogStore(ComponentAccessor.getOfBizDelegator(), ComponentAccessor.getIssueManager(), projectRoleManager, new ExtendedWorklogManagerImpl()),
+								ComponentAccessor.getComponent(TimeTrackingIssueUpdater.class),
+								new ScnTimeTrackingIssueManager(new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()))
+
+								),
+
+						new GlobalSettingsManager(ComponentAccessor.getGroupManager()),
+						new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
+						new ScnUserBlockingManager()
+
+				),
+				new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()), new DefaultExtendedConstantsManager());
 		this.fvManager = ComponentAccessor.getComponent(FieldVisibilityManager.class);
 	}
 

@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.PropertiesManager;
-import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.dbc.Assertions;
@@ -28,13 +27,10 @@ public class GlobalSettingsManager implements IGlobalSettingsManager {
 
 	private final GroupManager groupManager;
 	private final PropertiesManager propertiesManager;
-	private final PermissionManager permissionManager;
 
 	@Inject
-	public GlobalSettingsManager(@ComponentImport final GroupManager groupManager,
-			@ComponentImport final PermissionManager permissionManager) {
+	public GlobalSettingsManager(@ComponentImport final GroupManager groupManager) {
 		this.groupManager = groupManager;
-		this.permissionManager = permissionManager; // we need this to force spring scanner to index this dependency for webcondition
 		this.propertiesManager = ComponentAccessor.getComponent(PropertiesManager.class);// this is the only way to resolve it
 	}
 

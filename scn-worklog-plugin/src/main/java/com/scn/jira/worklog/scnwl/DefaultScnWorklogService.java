@@ -15,7 +15,6 @@ import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRole;
@@ -60,7 +59,6 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	private final IGlobalSettingsManager scnGlobalPermissionManager;
 	private final IScnExtendedIssueStore extIssueStore;
 
-	@Inject
 	private ScnUserBlockingManager scnUserBlockingManager;
 
 	@Inject
@@ -69,7 +67,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			@ComponentImport TimeTrackingConfiguration timeTrackingConfiguration, GroupManager groupManager,
 			IScnProjectSettingsManager scnProjectSettingsManager,
 		    IScnWorklogManager worklogManager, IGlobalSettingsManager scnGlobalPermissionManager,
-			IScnExtendedIssueStore extendedIssueStore) {
+			IScnExtendedIssueStore extendedIssueStore, ScnUserBlockingManager scnUserBlockingManager) {
 
 		this.visibilityValidator = visibilityValidator;
 		this.applicationProperties = applicationProperties;
@@ -82,6 +80,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		this.scnWorklogManager = worklogManager;
 		this.scnGlobalPermissionManager = scnGlobalPermissionManager;
 		this.extIssueStore = extendedIssueStore;
+		this.scnUserBlockingManager = scnUserBlockingManager;
 	}
 
 	public IScnWorklog validateDelete(JiraServiceContext jiraServiceContext, Long worklogId) {

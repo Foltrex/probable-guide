@@ -59,7 +59,6 @@ public class OfBizScnWorklogStore implements IScnWorklogStore
 			OfBizDelegator ofBizDelegator,
 			@ComponentImport IssueManager issueManager,
 			@ComponentImport ProjectRoleManager projectRoleManager,
-//		 	@ComponentImport WorklogManager worklogManager,
 			ExtendedWorklogManagerImpl extendedWorklogManager)
 	{
 		this.ofBizDelegator = ofBizDelegator;
@@ -158,6 +157,11 @@ public class OfBizScnWorklogStore implements IScnWorklogStore
 		else
 		{
 			updatedWorklog = update(worklog);
+			if (worklog.getLinkedWorklog() != null) {
+				final Long id = worklog.getLinkedWorklog().getId();
+				ofBizDelegator.removeByAnd(WORKLOG_ENTITY, MapBuilder.build("id", id));
+				this.extWorklogManager.deleteExtWorklogType(id);
+			}
 		}
 		return updatedWorklog;
 	}

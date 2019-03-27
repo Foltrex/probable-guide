@@ -11,7 +11,6 @@ import com.atlassian.jira.util.DefaultBaseUrl;
 import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.lazyloading.LazyLoadingCache;
 
@@ -22,7 +21,6 @@ import org.ofbiz.core.entity.GenericValue;
 
 import java.util.*;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 @ExportAsService({DefaultExtendedConstantsManager.class })
@@ -40,18 +38,13 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
 			new WorklogTypeCacheLoader());
 	
 	protected static final List<String> ORDER_BY_LIST = Lists.newArrayList("sequence ASC");
-	
-	@Inject
-	public DefaultExtendedConstantsManager(
-			@ComponentImport final JiraAuthenticationContext authenticationContext,
-			@ComponentImport final TranslationManager translationManager, 
-			@ComponentImport final OfBizDelegator ofBizDelegator, 
-			@ComponentImport final ConstantsManager constantsManager)
+
+	public DefaultExtendedConstantsManager()
 	{
-		this.translationManager = translationManager;
-		this.authenticationContext = authenticationContext;
-		this.ofBizDelegator = ofBizDelegator;
-		this.constantsManager = constantsManager;
+		this.translationManager = ComponentAccessor.getTranslationManager();
+		this.authenticationContext = ComponentAccessor.getJiraAuthenticationContext();
+		this.ofBizDelegator = ComponentAccessor.getOfBizDelegator();
+		this.constantsManager = ComponentAccessor.getConstantsManager();
 	}
 	
 	public GenericValue getConstant(String constantType, String id)

@@ -31,7 +31,6 @@ import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;

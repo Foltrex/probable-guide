@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import org.ofbiz.core.entity.GenericEntityException;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.web.action.admin.constants.AbstractViewConstants;
@@ -29,11 +30,11 @@ public class WorklogTypesWebAction extends AbstractViewConstants<WorklogType> {
 
 	@Inject
 	public WorklogTypesWebAction(@ComponentImport final TranslationManager translationManager,
-			@ComponentImport final OfBizDelegator ofBizDelegator, final ExtendedConstantsManager ecManager) {
+			@ComponentImport final OfBizDelegator ofBizDelegator) {
 		super(translationManager);
 
 		this.ofBizDelegator = ofBizDelegator;
-		this.ecManager = ecManager;
+		this.ecManager = new DefaultExtendedConstantsManager();
 	}
 
 	protected String getConstantEntityName() {

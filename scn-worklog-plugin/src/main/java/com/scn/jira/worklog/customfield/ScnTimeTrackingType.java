@@ -123,19 +123,19 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 	@Override
 	public Map<String, String> getValueFromIssue(CustomField cf, Issue issue) {
 		Map<String, String> values = new HashMap<String, String>();
-//		IScnExtendedIssue scnExtendedIssue = issueStore.getByIssue(issue);
-//
-//		if (hasPermissionToViewScnWorklog() && scnExtendedIssue != null) {
-//			if (isLegacyBehaviorEnabled()) {
-//				if (hasWorkStarted(issue))
-//					values.put(REMAINING_ESTIMATE, getFormattedDuration(scnExtendedIssue.getEstimate()));
-//				else
-//					values.put(ORIGINAL_ESTIMATE, getFormattedDuration(scnExtendedIssue.getOriginalEstimate()));
-//			} else {
-//				values.put(ORIGINAL_ESTIMATE, getFormattedDuration(scnExtendedIssue.getOriginalEstimate()));
-//				values.put(REMAINING_ESTIMATE, getFormattedDuration(scnExtendedIssue.getEstimate()));
-//			}
-//		}
+		IScnExtendedIssue scnExtendedIssue = issueStore.getByIssue(issue);
+
+		if (hasPermissionToViewScnWorklog() && scnExtendedIssue != null) {
+			if (isLegacyBehaviorEnabled()) {
+				if (hasWorkStarted(issue))
+					values.put(REMAINING_ESTIMATE, getFormattedDuration(scnExtendedIssue.getEstimate()));
+				else
+					values.put(ORIGINAL_ESTIMATE, getFormattedDuration(scnExtendedIssue.getOriginalEstimate()));
+			} else {
+				values.put(ORIGINAL_ESTIMATE, getFormattedDuration(scnExtendedIssue.getOriginalEstimate()));
+				values.put(REMAINING_ESTIMATE, getFormattedDuration(scnExtendedIssue.getEstimate()));
+			}
+		}
 
 		return values;
 	}
