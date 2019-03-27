@@ -12,15 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.atlassian.jira.util.I18nHelper;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.message.I18nResolver;
 import com.scn.jira.mytime.util.DateUtils;
+import org.apache.log4j.Logger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class WicketStore {
-	
+
+	protected static Logger logger = Logger.getLogger(WicketStore.class);
 	private I18nHelper i18nResolver;
 	private static String driverName;
 	private static String connection;
@@ -42,7 +40,7 @@ public class WicketStore {
 	public Map<String, Long> gerUserWicketTimeForthePeriod(String login, Date startDate, Date endDate) {
 		getDbProperties();
 		Map<String, Long> timesMap = new HashMap<String, Long>();
-		
+
 		try {
 			Class.forName(driverName);
 			Connection con = DriverManager.getConnection((connection), loginTatsi, password);
@@ -125,10 +123,13 @@ public class WicketStore {
 			
 			return timesMap;
 		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (SQLException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 		
