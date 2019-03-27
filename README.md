@@ -43,3 +43,7 @@ edit-webapp/WEB-INF/classes/entitydefs/entitymodel-scn-worklog.xml
 
 Merge Jira/WEB-INF/classes/entitydefs/entitygroup.xml
 and edit-webapp/WEB-INF/classes/entitydefs/entitygroup.xml
+
+## Plugins
+
+The Package plugins contains actual jar files. 
