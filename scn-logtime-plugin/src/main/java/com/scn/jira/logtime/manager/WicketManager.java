@@ -8,8 +8,11 @@ import com.atlassian.jira.util.I18nHelper;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.logtime.representation.WicketRepresentation;
+import org.apache.log4j.Logger;
 
 public class WicketManager {
+
+	protected static Logger logger = Logger.getLogger(WicketManager.class);
 
 	private I18nHelper i18nResolver;
 	private String driverName1;
@@ -78,10 +81,13 @@ public class WicketManager {
 			con.close();
 
 		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (SQLException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			long total = 0;
@@ -140,10 +146,13 @@ public class WicketManager {
 			con.close();
 
 		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (SQLException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} 
 		
@@ -205,10 +214,13 @@ public class WicketManager {
 			
 
 		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (SQLException e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 		return calendarMap;

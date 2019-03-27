@@ -158,7 +158,7 @@ public class LTProjectsResource {
 		ApplicationUser user = getUser(request);
 
 		List<String> usersAll = new ArrayList<String>();
-		usersAll.add(user.getDisplayName());
+		usersAll.add(user.getName());
 		List<String> selectedProjects = (prjList != null && !prjList.equals("")) ? Arrays.asList(prjList.split(","))
 				: new ArrayList<String>();
 
