@@ -9,6 +9,7 @@ import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
 import java.sql.Timestamp;
 import java.util.*;
 
+import com.atlassian.jira.issue.search.SearchQuery;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.util.MyFullNameComparator;
 import com.scn.jira.util.MyUser;
@@ -130,12 +131,13 @@ public class Pivot extends AbstractReport
 			this.filter = this.searchRequestManager.getSearchRequestById(appUser, filterId);
 			
 			if (this.filter == null) return;
-				
-			SearchResults issues = this.searchProvider.search(this.filter.getQuery(), (ApplicationUser) remoteUser,
-					PagerFilter.getUnlimitedFilter());
-			for (Issue issue : issues.getIssues())
-			{
-				filteredIssues.add(issue.getId());
+
+			SearchQuery searchQuery = SearchQuery.create(this.filter.getQuery(), remoteUser);
+			SearchResults issues = this.searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
+			for (Object result : issues.getResults()) {
+				if (result instanceof Issue) {
+					filteredIssues.add(((Issue)result).getId());
+				}
 			}
 		}
 		

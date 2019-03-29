@@ -10,6 +10,7 @@ import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
 import java.sql.Timestamp;
 import java.util.*;
 
+import com.atlassian.jira.issue.search.SearchQuery;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.util.TextUtil;
 import com.scn.jira.util.UserToNameFunction;
@@ -144,11 +145,13 @@ public class TimeSheet extends AbstractReport {
 			log.info("Using filter: " + filterId);
 			SearchRequest filter = this.searchRequestManager.getSearchRequestById(appUser, filterId);
 			if (filter != null) {
-				SearchResults issues = this.searchProvider.search(filter.getQuery(), appUser, PagerFilter
-						.getUnlimitedFilter());
-				for (i = issues.getIssues().iterator(); i.hasNext();) {
-					AbstractIssue value = (AbstractIssue) i.next();
-					filteredIssues.add(value.getId());
+
+				SearchQuery searchQuery = SearchQuery.create(filter.getQuery(), appUser);
+				SearchResults issues = this.searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
+				for (Object result : issues.getResults()) {
+					if (result instanceof Issue) {
+						filteredIssues.add(((Issue)result).getId());
+					}
 				}
 			}
 		}
