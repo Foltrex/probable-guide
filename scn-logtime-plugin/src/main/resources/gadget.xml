@@ -155,12 +155,12 @@
                 // :(
                 setTimeout(function() {
                     while (true) {
-                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery.data(jQuery("#myFieldId")[0], "events" ) &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
+                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery._data(jQuery("#myFieldId")[0], "events" ) &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
                             ) {
-                               var keyupaction = jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
+                               var keyupaction = jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
                                AJS.$("#myFieldId").off("keyup");
                                AJS.$("#myFieldId").on("keyup", function() {
                                     if (AJS.$("#myFieldId").val() && AJS.$("#myFieldId").val().length > 2) {
