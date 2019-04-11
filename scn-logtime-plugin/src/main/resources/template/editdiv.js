@@ -442,7 +442,7 @@ function addWorklogsToDb(){
 					checkProjects(msg.message);					
 					//alert("ArraySaved");
 					//projectChanged(projectId,issueTdId,worklogTypeSel, userId)
-					reloadMeClean();
+					//reloadMeClean();
 					
 					
             	  }
@@ -544,11 +544,6 @@ function updateWorklogAJAX()
 							//alert("We need not to updateId");
 						}
 						current_editId="";
-						if(msg.typeChanged){						
-							reloadMeClean();
-						}else{
-							
-						}
 					  }
 				  }
             	});	
