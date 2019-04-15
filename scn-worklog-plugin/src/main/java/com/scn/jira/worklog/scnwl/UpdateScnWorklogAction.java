@@ -1,6 +1,18 @@
 package com.scn.jira.worklog.scnwl;
 
+import com.atlassian.jira.bc.issue.util.VisibilityValidator;
+import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
+import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
+import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
+import com.scn.jira.worklog.core.scnwl.OfBizScnWorklogStore;
+import com.scn.jira.worklog.core.scnwl.ScnTimeTrackingIssueManager;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
+import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.core.util.DateUtils;
@@ -32,20 +44,35 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 
     @Inject
     public UpdateScnWorklogAction(ProjectRoleManager projectRoleManager,
-    		GroupManager groupManager,
-    		IScnExtendedIssueStore extIssueStore, 
-    		IScnWorklogService scnWorklogService,
-    		IScnProjectSettingsManager projectSettignsManager,
-    		ExtendedConstantsManager extendedConstantsManager) 
+    		GroupManager groupManager)
     {
     	super(ComponentAccessor.getComponent(CommentService.class),
     			projectRoleManager, 
     			ComponentAccessor.getComponent(JiraDurationUtils.class), 
-    			groupManager, 
-    			extIssueStore, 
-    			scnWorklogService,
-    			projectSettignsManager, 
-    			extendedConstantsManager);
+    			groupManager,
+                new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
+    			new DefaultScnWorklogService(
+                        ComponentAccessor.getComponent(VisibilityValidator.class),
+                        ComponentAccessor.getApplicationProperties(),
+                        projectRoleManager,
+                        ComponentAccessor.getIssueManager(),
+                        ComponentAccessor.getComponent(TimeTrackingConfiguration.class),
+                        ComponentAccessor.getGroupManager(),
+                        new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()),
+                        new DefaultScnWorklogManager(
+                                new OfBizScnWorklogStore(ComponentAccessor.getOfBizDelegator(), ComponentAccessor.getIssueManager(), projectRoleManager, new ExtendedWorklogManagerImpl()),
+                                ComponentAccessor.getComponent(TimeTrackingIssueUpdater.class),
+                                new ScnTimeTrackingIssueManager(new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()))
+
+                        ),
+
+                        new GlobalSettingsManager(ComponentAccessor.getGroupManager()),
+                        new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
+                        new ScnUserBlockingManager()
+
+                ),
+                new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()),
+                new DefaultExtendedConstantsManager());
     }
 
     public String doDefault() throws Exception {        
