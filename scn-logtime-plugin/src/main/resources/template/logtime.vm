@@ -302,7 +302,7 @@
 									#end				
 								#end							
 								<td rowspan=$issueSize class="table-col table-col-bold" >
-									<a href="$req.contextPath/browse/$issue.getKey()" style="text-decoration: none; " title="$issue.getKey() - $issue.getName()" >$issue.getUrlName()</a>
+									<a href="$req.contextPath/browse/$issue.getName()" style="text-decoration: none; " title="$issue.getKey() - $issue.getName()" >$issue.getUrlName()</a>
 								</td>
 								
 								#set($wlLineIssueRepresentations = $issue.getWlTypes())
