@@ -36,7 +36,7 @@
         <jcip>1.0</jcip>
         <mapstruct>1.3.0.Final</mapstruct>
         <ao.version>3.0.0</ao.version>
-        <jsoup.version>1.11.3</jsoup.version>
+        <jsoup.version>1.8.3</jsoup.version>
         <jtds.version>1.3.1</jtds.version>
 
         <junit>4.11</junit>
