@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.GenericValue;
@@ -62,12 +66,11 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
 	private Worklog worklog;
 
 	public ExtendedUpdateWorklog(WorklogService worklogService, CommentService commentService,
-			ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
-			FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-			RendererManager rendererManager, UserUtil userUtil, FeatureManager featureManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-			ExtendedWorklogService extWorklogService, WorkflowManager workflowManager,
-			JiraAuthenticationContext authenticationContext, ExtendedConstantsManager extendedConstantsManager,
-			IScnProjectSettingsManager psManager) {
+								 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
+								 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
+								 RendererManager rendererManager, UserUtil userUtil, FeatureManager featureManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
+								 WorkflowManager workflowManager,
+								 JiraAuthenticationContext authenticationContext) {
 		super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
 				dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
 				null, null, null, null);
@@ -75,9 +78,9 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
 		this.worklogManager = worklogManager;
 		this.worklogService = worklogService;
 		this.authenticationContext = authenticationContext;
-		this.extWorklogService = extWorklogService;
-		this.extendedConstantsManager = extendedConstantsManager;
-		this.psManager = psManager;
+		this.extWorklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+		this.extendedConstantsManager = new DefaultExtendedConstantsManager();
+		this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
 	}
 
 	public boolean shouldDisplay() {

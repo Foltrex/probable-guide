@@ -3,10 +3,16 @@ package com.scn.jira.worklog.wl;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.atlassian.core.util.DateUtils;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +52,7 @@ import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
+import org.ofbiz.core.entity.GenericValue;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 public class ExtendedCreateWorklog extends CreateWorklog {
@@ -66,29 +73,36 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 	private Long adjustmentAmountLong;
 
 	public ExtendedCreateWorklog(WorklogService worklogService, CommentService commentService,
-			ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
-			FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-			RendererManager rendererManager, UserUtil userUtil, FeatureManager featureManager,
+								 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
+								 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
+								 RendererManager rendererManager, UserUtil userUtil,
 								 @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-			ExtendedWorklogService extWorklogService, WorkflowManager workflowManager,
-			JiraAuthenticationContext authenticationContext, ExtendedConstantsManager extendedConstantsManager,
-			IScnProjectSettingsManager psManager) {
+								 JiraAuthenticationContext authenticationContext ) {
 		super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
 				dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
 				null, null, null, null);
 
 		this.worklogService = worklogService;
 		this.worklogManager = worklogManager;
-		this.extWorklogService = extWorklogService;
 		this.authenticationContext = authenticationContext;
-		this.extendedConstantsManager = extendedConstantsManager;
-		this.psManager = psManager;
+		this.extWorklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+		this.extendedConstantsManager = new DefaultExtendedConstantsManager();
+		this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
 	}
 
 	public boolean shouldDisplay() {
 		return isIssueValid() && /*hasIssuePermission("work", getIssueObject()) &&*/ !isTimeTrackingFieldHidden(getIssueObject())
 				&& isWorkflowAllowsEdit(getIssueObject())
 				&& psManager.hasPermissionToViewWL(getLoggedInApplicationUser(), getIssueObject().getProjectObject());
+	}
+
+	public String doDefault() throws Exception {
+		if (!this.worklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), false)) {
+			return "securitybreach";
+		}
+		this.setStartDate(this.getFormattedStartDate(new Date()));
+
+		return "input";
 	}
 
 	protected String doExecute() throws Exception {

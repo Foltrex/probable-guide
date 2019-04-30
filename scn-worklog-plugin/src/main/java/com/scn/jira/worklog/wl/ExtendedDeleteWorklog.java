@@ -15,7 +15,10 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.DeleteWorklog;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -34,17 +37,15 @@ public class ExtendedDeleteWorklog extends DeleteWorklog {
 	public ExtendedDeleteWorklog(WorklogService worklogService, CommentService commentService,
 								 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
 								 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-								 RendererManager rendererManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager, UserUtil userUtil, FeatureManager featureManager,
-								 ExtendedWorklogService extWorklogService, ExtendedConstantsManager extendedConstantsManager,
-								 IScnProjectSettingsManager psManager) {
+								 RendererManager rendererManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
+								 UserUtil userUtil) {
 		super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
 				dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, worklogManager, userUtil,
 				null, null, null, null);
-
-		this.extendedConstantsManager = extendedConstantsManager;
-		this.worklogService = extWorklogService;
 		this.worklogManager = worklogManager;
-		this.psManager = psManager;
+		this.worklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+		this.extendedConstantsManager = new DefaultExtendedConstantsManager();
+		this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
 	}
 
 	public boolean shouldDisplay() {
