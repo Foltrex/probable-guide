@@ -178,7 +178,7 @@
      <label key="logwork.title"/><label>LOG WORK</label>
      <tooltip key="logwork.title.desc"/>
      <styleClass>issueaction-log-work aui-icon aui-icon-small aui-iconfont-add issueaction-aui-icon</styleClass>
-     <link linkId="log-work-link">/secure/CreateWorklog!default.jspa?id=${issue.id}</link>
+     <link linkId="log-work-link">/secure/ExtendedCreateWorklog!default.jspa?id=${issue.id}</link>
  	<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
  	<condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition" />
  	<condition class="com.atlassian.jira.plugin.webfragment.conditions.HasIssuePermissionCondition">
@@ -215,7 +215,7 @@
      <label key="logwork.title"/><label>LOG WORK</label>
      <tooltip key="admin.issue.operations.plugin.log.work.name"/>
      <styleClass>issueaction-log-work</styleClass>
-     <link linkId="log-work2">/secure/CreateWorklog2!default.jspa?id=${issueId}</link>
+     <link linkId="log-work2">/secure/ExtendedCreateWorklog!default.jspa?id=${issueId}</link>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
      <condition class="com.atlassian.jira.plugin.webfragment.conditions.HasIssuePermissionCondition">
@@ -230,7 +230,7 @@
    <webwork1 key="WorklogAction2" name="Worklog Actions" class="java.lang.Object">
      <actions>
  <!--       Worklog Actions for Creation with Worklog Type  -->
-       <action name="com.scn.jira.worklog.wl.ExtendedCreateWorklog" alias="CreateWorklog2">
+       <action name="com.scn.jira.worklog.wl.ExtendedCreateWorklog" alias="ExtendedCreateWorklog">
          <view name="error">/templates/scn/worklog/worklog.vm</view>
          <view name="input">/templates/scn/worklog/worklog.vm</view>
          <view name="securitybreach">/secure/views/securitybreach.jsp</view>

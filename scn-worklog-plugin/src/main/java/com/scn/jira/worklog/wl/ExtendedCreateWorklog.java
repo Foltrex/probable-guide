@@ -262,8 +262,7 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 	}
 
 	public String getSuperActionName() {
-		String classname = super.getClass().getSuperclass().getName();
-		return classname.substring(classname.lastIndexOf('.') + 1);
+		return ExtendedCreateWorklog.class.getSimpleName();
 	}
 
 	public String getInputReporter() {
