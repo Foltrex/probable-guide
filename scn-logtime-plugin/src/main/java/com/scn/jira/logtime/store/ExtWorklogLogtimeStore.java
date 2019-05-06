@@ -248,7 +248,7 @@ public class ExtWorklogLogtimeStore  implements IExtWorklogLogtimeStore {
    		Timestamp startDateTS = gv.getTimestamp("startdate");
 		String worklogType = "0";
    	    GenericValue gExw =  getExtWorklog(gv.getLong("id"));
-		if (gExw != null && gExw.getString("worklogtype") != null && "".equals(gExw.getString("worklogtype")))  {
+		if (gExw != null && gExw.getString("worklogtype") != null && !"".equals(gExw.getString("worklogtype")))  {
 			worklogType = gExw.getString("worklogtype");
 		}
    	    ExtWorklog worklogExt =  new ExtWorklog(worklogManager,

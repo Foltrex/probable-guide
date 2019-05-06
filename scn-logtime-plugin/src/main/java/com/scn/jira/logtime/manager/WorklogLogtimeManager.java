@@ -468,14 +468,12 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			
 			wlRepresentation.setWlScnRepresentation(makeWLRepresentation(scnWorklog, status));
 			if (scnWorklog.getLinkedWorklog() != null) {
-				ids.add(String.valueOf(scnWorklog.getLinkedWorklog().getId()));
 				ExtWorklog extWorklog = getExtWorklogById(extWorklogs, scnWorklog.getLinkedWorklog().getId());
-				if (extWorklog != null) {
+				if (extWorklog != null && wlRepresentation.getWlTypeId().equals(extWorklog.getWorklogTypeId())) {
+					ids.add(String.valueOf(scnWorklog.getLinkedWorklog().getId()));
 					wlRepresentation.setWlExtRepresentation(makeWLRepresentation(extWorklog, status));
-				}
-				else {
+				} else {
 					wlRepresentation.setWlExtRepresentation(new WLRepresentation(day, status));
-					
 				}
 			}
 			else {
