@@ -110,7 +110,7 @@
 		    	$i18n.getText('logwork.title.subtask')*
 		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
 		    #else
-		    	#if($editMode)$i18n.getText('logwork.edit.title')*
+		    	#if($editMode)$i18n.getText('scn.scnworklog.logwork.edit.title')*
 		    	#else $i18n.getText('logwork.title')*#end
 		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
 		    #end

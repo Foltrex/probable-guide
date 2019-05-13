@@ -482,7 +482,7 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			wlList.add(wlRepresentation);
 		}
 		for (ExtWorklog extWorklog : extWorklogs) {
-			if (!ids.contains(String.valueOf(extWorklog.getId()))) {
+			if (extWorklog != null && extWorklog.getId() != null && !ids.contains(String.valueOf(extWorklog.getId()))) {
 				
 				WLsRepresentation wlRepresentation = new WLsRepresentation();
 				wlRepresentation.setDay(day);

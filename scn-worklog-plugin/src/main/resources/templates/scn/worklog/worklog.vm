@@ -60,8 +60,8 @@
 <head>
     #if($action.shouldDisplay()) 
     	<title>
-    		#if($editMode) $i18n.getText('logwork.edit.title')
-    		#else $i18n.getText('logwork.title') #end
+    		#if($editMode) $i18n.getText('scn.scnworklog.logwork.edit.title')
+			#else $i18n.getText('logwork.title') #end
         </title>
         <meta name="decorator" content="issueaction" />
         <link rel="index" href="$issuePath" />
@@ -92,8 +92,8 @@
 		    	$i18n.getText('logwork.title.subtask')
 		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
 		    #else
-		    	#if($editMode)$i18n.getText('logwork.edit.title')
-		    	#else $i18n.getText('logwork.title')#end
+		    	#if($editMode)$i18n.getText('scn.scnworklog.logwork.edit.title')
+				#else $i18n.getText('logwork.title')#end
 		    	<span #if($cameFromIssue)style="display:none"#end class="header-separator">:&nbsp;</span>
 		    #end
 			    <a class="header-issue-key" #if($cameFromIssue)style="display:none"#end title="${issueObject.summary}" href="${baseurl}/browse/${issueObject.key}">${issueObject.key}</a>   
