@@ -228,11 +228,26 @@ public class ScnWorklogLogtimeStore /* extends OfBizScnWorklogStore */implements
 	
 		IScnWorklog scnWorklog =  scnDefaultWorklogService.getById(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), _worklogId);
 		if (scnWorklog != null) {
-			scnDefaultWorklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), updateWorklog(scnWorklog, linkedWorklog), true, false);
+			scnDefaultWorklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), updateWorklog(scnWorklog, linkedWorklog), true, true);
 			
 		}
 		return true;
 		
+	}
+
+	public boolean updateScnWorklogAndExt(Long _worklogId, Worklog linkedWorklog) throws DataAccessException {
+
+		IScnWorklog scnWorklog =  scnDefaultWorklogService.getById(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), _worklogId);
+		if (scnWorklog != null) {
+			IScnWorklog worklog = new ScnWorklogImpl(this.projectRoleManager, scnWorklog.getIssue(), scnWorklog.getId(), scnWorklog.getAuthor(),
+					scnWorklog.getComment(), scnWorklog.getStartDate(), scnWorklog.getGroupLevel(), scnWorklog.getRoleLevelId(),
+					scnWorklog.getTimeSpent(), scnWorklog.getUpdateAuthor(), scnWorklog.getCreated(), scnWorklog.getUpdated(),
+					scnWorklog.getWorklogTypeId());
+			worklog.setLinkedWorklog(linkedWorklog);
+
+			scnDefaultWorklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), worklog, true, true);
+		}
+		return true;
 	}
 	
 	public IScnWorklog getScnWorklog(Long _worklogId) throws DataAccessException {

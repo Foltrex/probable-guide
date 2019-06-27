@@ -22,7 +22,9 @@ public interface IScnWorklogLogtimeStore {
 	public boolean deleteScnWorklogById(Long worklogId) throws DataAccessException;
 	
 	public boolean updateScnWorklog(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;
-	
+
+	public boolean updateScnWorklogAndExt(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;
+
 	public boolean updateScnWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;
 	
 	public boolean createScnWorklog(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,

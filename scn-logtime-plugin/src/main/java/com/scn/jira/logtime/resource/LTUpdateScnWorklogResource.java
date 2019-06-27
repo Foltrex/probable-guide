@@ -46,6 +46,8 @@ import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import com.scn.jira.worklog.settings.IScnProjectSettingsService;
+import com.scn.jira.worklog.settings.ScnProjectSettingsService;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -77,6 +79,8 @@ public class LTUpdateScnWorklogResource {
 	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 	
 	private IScnWorklogService scnDefaultWorklogService;
+	private final ScnWorklogLogtimeStore scnWorklogLogtimeStore;
+
 	
 	/**
 	 * Constructor.
@@ -125,6 +129,8 @@ public class LTUpdateScnWorklogResource {
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
 				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
+		this.scnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
+				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		
 	}
 	
@@ -332,13 +338,17 @@ public class LTUpdateScnWorklogResource {
 					+ worklogExtId);
 			
 			Worklog extWorklog = iExtWorklogLogtimeStore.getExtWorklogObj(worklogExtId, issueId);
-			
+
 			if (scnWorklog != null && extWorklog != null) {
-				iScnWorklogLogtimeStore.updateScnWorklog(scnWorklog.getId(), extWorklog);
+				boolean isWlAutoCopy = scnWorklogLogtimeStore.isWlAutoCopy(scnWorklog.getIssue(), scnWorklog.getWorklogTypeId());
+				if (isWlAutoCopy) {
+					iScnWorklogLogtimeStore.updateScnWorklog(scnWorklog.getId(), extWorklog);
+				}
 			}
 			if(scnWorklog!=null){
 				id =scnWorklog.getId();
 			}
+
 			resultMap.put("wlId", id);
 			resultMap.put("isAuto", isAuto);
 			resultMap.put("wlIdExt", 0L);
