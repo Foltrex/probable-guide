@@ -157,6 +157,20 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 
 		propertiesManager.getPropertySet().setDate(WL_BLOCKING_DATE + String.valueOf(projectId), value);
 	}
+	
+	@Nullable
+	public Date getWLWorklogBlockingDate(Long projectId) throws PropertyException {
+		Assertions.notNull("projectId", projectId);
+		
+		return propertiesManager.getPropertySet().getDate(WL_WORKLOG_BLOCKING_DATE + String.valueOf(projectId));
+	}
+
+	public void setWLWorklogBlockingDate(Long projectId, Date value) 
+			throws PropertyException {
+		Assertions.notNull("projectId", projectId);
+
+		propertiesManager.getPropertySet().setDate(WL_WORKLOG_BLOCKING_DATE + String.valueOf(projectId), value);
+	}
 
 	@Nonnull
 	public Collection<ProjectRole> getProjectRolesToViewWL(Long projectId)

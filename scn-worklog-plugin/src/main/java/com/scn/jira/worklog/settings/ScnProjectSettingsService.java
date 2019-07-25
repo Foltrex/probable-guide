@@ -179,6 +179,29 @@ public class ScnProjectSettingsService implements IScnProjectSettingsService
 		}
 	}
 	
+	public Date getWLWorklogBlockingDate(JiraServiceContext srvContext, Long projectId) {
+		if (isNotValid(srvContext, projectId))
+			return null;
+
+		try {
+			return psManager.getWLWorklogBlockingDate(projectId);
+		} catch (Exception e) {
+			addErrorMessage(srvContext, "scn.transaction.failure");
+			return null;
+		}
+	}
+
+	public void setWLWorklogBlockingDate(JiraServiceContext srvContext, Long projectId, Date value) {
+		if (isNotValid(srvContext, projectId))
+			return;
+
+		try {
+			psManager.setWLWorklogBlockingDate(projectId, value);
+		} catch (Exception e) {
+			addErrorMessage(srvContext, "scn.transaction.failure");
+		}
+	}
+	
 	public void setProjectRolesToViewWL(JiraServiceContext srvContext, Long projectId, Collection<ProjectRole> projectRoles)
 	{
 		if (isNotValid(srvContext, projectId)) return;

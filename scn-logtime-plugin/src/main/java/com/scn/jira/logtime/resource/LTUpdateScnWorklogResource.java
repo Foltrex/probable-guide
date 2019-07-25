@@ -46,8 +46,6 @@ import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import com.scn.jira.worklog.settings.IScnProjectSettingsService;
-import com.scn.jira.worklog.settings.ScnProjectSettingsService;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -79,8 +77,6 @@ public class LTUpdateScnWorklogResource {
 	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 	
 	private IScnWorklogService scnDefaultWorklogService;
-	private final ScnWorklogLogtimeStore scnWorklogLogtimeStore;
-
 	
 	/**
 	 * Constructor.
@@ -129,8 +125,6 @@ public class LTUpdateScnWorklogResource {
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
 				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
-		this.scnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		
 	}
 	
@@ -193,7 +187,9 @@ public class LTUpdateScnWorklogResource {
 		Issue issue = this.issueManager.getIssueObject(issueId);
 		Date day = DateUtils.stringToDate(date);
 		
-		boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLBlocked(issue.getProjectObject().getId(), day);
+		boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(issue.getProjectObject().getId(), day)
+				|| (iScnWorklogLogtimeStore.isWlAutoCopy(issue, wlType)
+						&& iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
 		if(isBlocked){
 			LTMessages message = new LTMessages("BLOCKED", false, false,null);
 			return Response.ok(message).build();
@@ -221,9 +217,12 @@ public class LTUpdateScnWorklogResource {
 					
 						
 						System.out.println("Day "+  day);
-						Map<String,Object> resultMap = createScnWorklogMap(issueId, worklogId, wlType, timeSpent, comment != null ? comment : "", userCreated, day,
-								String.valueOf(worklogTypeId), worklogExtId);
-						result = (Boolean)resultMap.get("isAuto");
+						Map<String, Object> resultMap = iScnWorklogLogtimeStore.createScnWorklogResultMap(issueId,
+								wlType, timeSpent, comment != null ? comment : "", userCreated, day, wlType);
+//						Map<String, Object> resultMap = createScnWorklogMap(issueId, worklogId, wlType, timeSpent,
+//								comment != null ? comment : "", userCreated, day, String.valueOf(worklogTypeId),
+//								worklogExtId);
+						result = (Boolean) resultMap.get("isAuto");
 						wlId = (Long)resultMap.get("wlId");
 						wlIdExt = (Long)resultMap.get("wlIdExt");
 						if (!wlType.equals(worklogTypeId)) {
@@ -331,31 +330,16 @@ public class LTUpdateScnWorklogResource {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		Long id = 0L;
 		boolean isAuto = false;
-		if (worklogExtId != 0) {
-			IScnWorklog scnWorklog = iScnWorklogLogtimeStore.createScnWorklogWithoutCopy(issueId, _worklogType, _timeSpent, _comment, authorKey,
-					date, worklogTypeId);
-			System.out.println("Worklogs should be linked as we create an scnWorklog we also need to make a link to Extworklog with id  "
-					+ worklogExtId);
-			
-			Worklog extWorklog = iExtWorklogLogtimeStore.getExtWorklogObj(worklogExtId, issueId);
 
-			if (scnWorklog != null && extWorklog != null) {
-				boolean isWlAutoCopy = scnWorklogLogtimeStore.isWlAutoCopy(scnWorklog.getIssue(), scnWorklog.getWorklogTypeId());
-				if (isWlAutoCopy) {
-					iScnWorklogLogtimeStore.updateScnWorklog(scnWorklog.getId(), extWorklog);
-				}
-			}
-			if(scnWorklog!=null){
-				id =scnWorklog.getId();
-			}
+		IScnWorklog scnWorklog = iScnWorklogLogtimeStore.createScnWorklogWithoutCopy(issueId, _worklogType, _timeSpent, _comment, authorKey,
+				date, worklogTypeId);
+		if(scnWorklog!=null){
+			id =scnWorklog.getId();
+		}
 
-			resultMap.put("wlId", id);
-			resultMap.put("isAuto", isAuto);
-			resultMap.put("wlIdExt", 0L);
-		}
-		else {
-			resultMap = iScnWorklogLogtimeStore.createScnWorklogResultMap(issueId, _worklogType, _timeSpent, _comment, authorKey, date, worklogTypeId);
-		}
+		resultMap.put("wlId", id);
+		resultMap.put("isAuto", isAuto);
+		resultMap.put("wlIdExt", 0L);
 		
 		return resultMap;
 	}

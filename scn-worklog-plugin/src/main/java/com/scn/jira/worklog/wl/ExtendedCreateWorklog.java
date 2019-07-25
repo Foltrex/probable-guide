@@ -174,8 +174,9 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 				.getErrorCollection().addError("worklogType",
 						getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
 
-		if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(), getIssueObject().getProjectObject(),
-				false)) return;
+		if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(),
+				getIssueObject().getProjectObject(), false))
+			return;
 
 		ApplicationUser reporter = null;
 		if (!StringUtils.isBlank(getInputReporter())) {

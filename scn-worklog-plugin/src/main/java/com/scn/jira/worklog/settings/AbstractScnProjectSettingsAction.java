@@ -33,6 +33,7 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 	private String[] inputWorklogTypes;
 	private boolean inputUnspecifiedWorklogType;
 	private String inputBlockingDate;
+	private String inputWorklogBlockingDate;
 	private String inputWLAutoCopy;
 	private String inputWLTypeRequired;
 
@@ -56,6 +57,23 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 		} catch (Exception e) {
 			addError(
 					"inputBlockingDate",
+					getJiraServiceContext().getI18nBean().getText("scn.project_settings.wl_blocking_date.error.format",
+							getApplicationProperties().getDefaultBackedString("jira.date.picker.java.format"),
+							getDateTimeFormatter().withStyle(DateTimeStyle.DATE).format(new Date())));
+			return null;
+		}
+	}
+	
+	protected Date getParsedWorklogBlockingDate() {
+		try {
+			if (StringUtils.isNotBlank(getInputWorklogBlockingDate())) {
+				return getDateTimeFormatter().withStyle(DateTimeStyle.DATE).parse(getInputWorklogBlockingDate());
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			addError(
+					"inputWorklogBlockingDate",
 					getJiraServiceContext().getI18nBean().getText("scn.project_settings.wl_blocking_date.error.format",
 							getApplicationProperties().getDefaultBackedString("jira.date.picker.java.format"),
 							getDateTimeFormatter().withStyle(DateTimeStyle.DATE).format(new Date())));
@@ -93,6 +111,14 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 
 	public void setInputBlockingDate(String inputBlockingDate) {
 		this.inputBlockingDate = inputBlockingDate;
+	}
+	
+	public String getInputWorklogBlockingDate() {
+		return inputWorklogBlockingDate;
+	}
+
+	public void setInputWorklogBlockingDate(String inputWorklogBlockingDate) {
+		this.inputWorklogBlockingDate = inputWorklogBlockingDate;
 	}
 
 	public String getInputWLAutoCopy() {

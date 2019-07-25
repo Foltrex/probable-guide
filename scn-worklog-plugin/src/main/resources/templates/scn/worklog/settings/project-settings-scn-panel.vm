@@ -138,6 +138,35 @@
 		    </div>
         #controlFooter ($action "" false)
         
+        ## set date picker
+        #set ($field_id="inputWorklogBlockingDate")
+        #set ($field_name="inputWorklogBlockingDate")
+        #set ($field_value=$inputWorklogBlockingDate)
+        #controlHeader ($action $field_id $i18n.getText("scn.project_settings.wl_worklog_blocking_date.label") false false)
+	        <div>
+		        <input class="text medium-field" type="text" name="$field_name" id="$field_id" value="$!field_value"/>
+		        #if($hasCalendarTranslation)
+		        	<a href="#" id="${field_id}-icon" title="$i18n.getText('date.picker.select.date')">
+						<span class="aui-icon icon-date">$i18n.getText('date.picker.select.date')</span>
+					</a>
+					<script type="text/javascript">
+						Calendar.setup({
+							firstDay : 0, // first day of the week
+							inputField : "$field_id", // id of the input field
+							button : "${field_id}-icon", // trigger for the calendar (button ID)
+							align : "Br", // alignment (defaults to "Bl")
+							singleClick : true,
+							useISO8601WeekNumbers : false, // use ISO8061 date/time standard
+							showsTime : "false",
+							ifFormat : "$action.dateFormat",
+							date : $action.currentCalendar.timeInMillis,
+							timeFormat : "$action.timeFormat"
+						});
+					</script>
+		        #end
+		    </div>
+        #controlFooter ($action "" false)
+        
         #rowClear()
         #sectionBreak($i18n.getText("scn.project_settings.wl_project_roles.section") $i18n.getText("scn.project_settings.wl_project_roles.instructions"))
         

@@ -17,6 +17,8 @@ import java.util.List;
  */
 public interface IScnWorklogService {
     public boolean isBlocked(JiraServiceContext jiraServiceContext, IScnWorklog wl);
+    
+    public boolean isWLAutoCopyBlocked(JiraServiceContext jiraServiceContext, IScnWorklog wl);
 
     public IScnWorklog validateDelete(JiraServiceContext paramJiraServiceContext, Long paramLong);
 

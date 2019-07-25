@@ -20,6 +20,7 @@ public interface IScnProjectSettingsManager
 {
 	public static final String WL_AUTO_COPY = "scn_wl_auto_copy_";
 	public static final String WL_BLOCKING_DATE = "scn_wl_blocking_date_";
+	public static final String WL_WORKLOG_BLOCKING_DATE = "scn_wl_worklog_blocking_date_";
 	public static final String PROJECT_ROLES_TO_VIEW_WL = "scn_wl_project_roles_";
 	public static final String WORKLOG_TYPES = "scn_wl_worklog_types_";
 	public static final String UNSPECIFIED_WORKLOG_TYPE = "scn_wl_unspecified_worklog_type_";
@@ -39,6 +40,10 @@ public interface IScnProjectSettingsManager
 
     Date getWLBlockingDate(Long projectId) throws PropertyException;
 	
+    Date getWLWorklogBlockingDate(Long projectId) throws PropertyException;
+	
+	void setWLWorklogBlockingDate(Long projectId, Date value) throws PropertyException;
+    
 	void setWLBlockingDate(Long projectId, Date value) throws PropertyException;
 	
 	void setUnspecifiedWLTypeAutoCopyEnabled(Long projectId, String value) throws PropertyException;

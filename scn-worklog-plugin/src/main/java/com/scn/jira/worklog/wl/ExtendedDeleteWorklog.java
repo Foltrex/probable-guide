@@ -56,8 +56,9 @@ public class ExtendedDeleteWorklog extends DeleteWorklog {
 
 	@Override
 	public void doValidation() {
-		if (worklogService.isDateExpired(getJiraServiceContext(), worklogManager.getById(getWorklogId()).getStartDate(),
-				getIssueObject().getProjectObject(), true)) return;
+		if (worklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(),
+				getIssueObject().getProjectObject(), true))
+			return;
 
 		super.doValidation();
 

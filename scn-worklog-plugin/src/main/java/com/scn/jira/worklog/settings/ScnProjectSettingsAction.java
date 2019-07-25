@@ -22,6 +22,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 
 	private Long pid;
 	private Date blockingDate;
+	private Date worklogBlockingDate;
 	private boolean wlAutoCopy;
 	private boolean wlTypeRequired;
 	private Collection<ProjectRole> projectRolesToViewWL;
@@ -46,6 +47,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 		}
 
 		final Date blockingDate = psService.getWLBlockingDate(getJiraServiceContext(), pid);
+		final Date worklogBlockingDate = psService.getWLWorklogBlockingDate(getJiraServiceContext(), pid);
 		final boolean wlAutoCopy = psService.isWLAutoCopyEnabled(getJiraServiceContext(), pid);
 		boolean isWLTypeRequired = psService.isWLTypeRequired(getJiraServiceContext(), pid);
 		final Collection<ProjectRole> selectedProjectRoles = psService.getProjectRolesToViewWL(getJiraServiceContext(), pid);
@@ -56,6 +58,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 			return ERROR;
 		} else {
 			setInputBlockingDate(blockingDate != null ? getFormattedInputBlockingDate(blockingDate) : "");
+			setInputWorklogBlockingDate(worklogBlockingDate != null ? getFormattedInputBlockingDate(worklogBlockingDate) : "");
 			setInputWLAutoCopy(String.valueOf(wlAutoCopy));
 			setInputWLTypeRequired(String.valueOf(isWLTypeRequired));
 			setInputProjectRolesToViewWL(selectedProjectRoles);
@@ -77,6 +80,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 		psService.setWLAutoCopy(getJiraServiceContext(), pid, isWlAutoCopy());
 		psService.setWLTypeRequired(getJiraServiceContext(), pid, isWLTypeRequired());
 		psService.setWLBlockingDate(getJiraServiceContext(), pid, getBlockingDate());
+		psService.setWLWorklogBlockingDate(getJiraServiceContext(), pid, getWorklogBlockingDate());
 		psService.setProjectRolesToViewWL(getJiraServiceContext(), pid, getProjectRolesToViewWL());
 		psService.setWorklogTypes(getJiraServiceContext(), pid, getWlTypes());
 		psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, getUnspecifiedWLType());
@@ -95,6 +99,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 		super.doValidation();
 
 		setBlockingDate(getParsedBlockingDate());
+		setWorklogBlockingDate(getParsedWorklogBlockingDate());
 		setWlAutoCopy(Boolean.valueOf(getInputWLAutoCopy()));
 		setWLTypeRequired(Boolean.valueOf(getInputWLTypeRequired()));
 		setProjectRolesToViewWL(getSelectedProjectRolesToViewWL());
@@ -116,6 +121,10 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 	public Date getBlockingDate() {
 		return blockingDate;
 	}
+	
+	public Date getWorklogBlockingDate() {
+		return worklogBlockingDate;
+	}
 
 	public void setBlockingDate(Date blockingDate) {
 		if (blockingDate != null) {
@@ -127,6 +136,19 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 			cal.set(Calendar.MILLISECOND, 990);
 
 			this.blockingDate = cal.getTime();
+		}
+	}
+	
+	public void setWorklogBlockingDate(Date worklogBlockingDate) {
+		if (worklogBlockingDate != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(worklogBlockingDate);
+			cal.set(Calendar.HOUR, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 990);
+
+			this.worklogBlockingDate = cal.getTime();
 		}
 	}
 

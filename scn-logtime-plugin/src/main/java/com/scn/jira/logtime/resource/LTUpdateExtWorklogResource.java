@@ -83,7 +83,6 @@ public class LTUpdateExtWorklogResource {
 	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
 	
 	private IScnWorklogService scnDefaultWorklogService;
-	private final ScnWorklogLogtimeStore scnWorklogLogtimeStore;
 	
 	/**
 	 * Constructor.
@@ -132,8 +131,6 @@ public class LTUpdateExtWorklogResource {
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
 		
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
-		this.scnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
 				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 	}
 	
@@ -219,7 +216,7 @@ public class LTUpdateExtWorklogResource {
 	
 		Date day = DateUtils.stringToDate(date);
 		
-		boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLBlocked(prj.getId(), day);
+		boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(prj.getId(), day);
 		
 		if(isBlocked){
 			LTMessages message = new LTMessages("BLOCKED", false, false,null);
@@ -320,10 +317,7 @@ public class LTUpdateExtWorklogResource {
 		Worklog worklog = iExtWorklogLogtimeStore.createExtWorklog(issueId, _worklogType, _timeSpent, _comment, authorKey, date);
 		if (worklogScnId != 0) {
 			System.out.println("Worklogs should be linked as we create an extWorklog we also need to make a ling to worklog with id  "+worklogScnId);
-			boolean isWlAutoCopy = scnWorklogLogtimeStore.isWlAutoCopy(worklog.getIssue(), _worklogType);
-			if (isWlAutoCopy) {
-				iScnWorklogLogtimeStore.updateScnWorklog(worklogScnId, worklog);
-			}
+			iScnWorklogLogtimeStore.updateScnWorklogAndExt(worklogScnId, worklog);
 			iExtWorklogLogtimeStore.updateExtWorklog(worklog.getId(), _worklogType, _timeSpent, _comment);
 		}
 		return worklog.getId();

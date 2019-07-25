@@ -36,6 +36,10 @@ public interface IScnProjectSettingsService
 	
 	void setWLBlockingDate(JiraServiceContext srvContext, Long projectId, Date value);
 	
+	Date getWLWorklogBlockingDate(JiraServiceContext srvContext, Long projectId);
+	
+	void setWLWorklogBlockingDate(JiraServiceContext srvContext, Long projectId, Date value);
+	
 	Collection<ProjectRole> getProjectRolesToViewWL(JiraServiceContext srvContext, Long projectId);
 	
 	void setProjectRolesToViewWL(JiraServiceContext srvContext, Long projectId, Collection<ProjectRole> projectRoles);

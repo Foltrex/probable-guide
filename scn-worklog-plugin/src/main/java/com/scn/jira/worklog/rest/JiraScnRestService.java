@@ -1,6 +1,8 @@
 package com.scn.jira.worklog.rest;
 
 import java.rmi.RemoteException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -21,6 +23,12 @@ import javax.ws.rs.core.Response.Status;
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.permission.GlobalPermissionKey;
+import com.atlassian.jira.project.ProjectManager;
+import com.atlassian.jira.security.GlobalPermissionManager;
+import com.atlassian.jira.user.ApplicationUser;
+import com.opensymphony.module.propertyset.PropertyException;
+import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import com.scn.jira.worklog.remote.service.IRemoteScnExtIssueService;
 import com.scn.jira.worklog.remote.service.IRemoteScnWorklogService;
@@ -30,17 +38,23 @@ import com.scn.jira.worklog.remote.service.object.RemoteScnWorklog;
 
 @Path("/")
 public class JiraScnRestService {
-
 	private final IRemoteScnWorklogService remoteScnWorklogService;
 	private final IRemoteScnExtIssueService remoteScnExtIssueService;
 	private final IGlobalSettingsManager settingsManager;
+	private final ProjectManager projectManager;
+	private final IScnProjectSettingsManager projectSettingManager;
+	private final GlobalPermissionManager permissionManager;
 
 	@Inject
 	public JiraScnRestService(RemoteScnWorklogService remoteScnWorklogService,
-			IRemoteScnExtIssueService remoteScnExtIssueService, IGlobalSettingsManager settingsManager) {
+			IRemoteScnExtIssueService remoteScnExtIssueService, IGlobalSettingsManager settingsManager,
+			ProjectManager projectManager, IScnProjectSettingsManager projectSettingManager, GlobalPermissionManager permissionManager) {
 		this.remoteScnWorklogService = remoteScnWorklogService;
 		this.remoteScnExtIssueService = remoteScnExtIssueService;
 		this.settingsManager = settingsManager;
+		this.projectManager = projectManager;
+		this.projectSettingManager = projectSettingManager;
+		this.permissionManager = permissionManager;
 	}
 
 	@GET
@@ -50,13 +64,14 @@ public class JiraScnRestService {
 	public Response getScnWorklogs(@Context HttpServletRequest request, @PathParam("ikey") String issueKey)
 			throws RemoteException {
 		User user = getUser(request);
-		if (user == null) return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
-		if (issueKey == null || issueKey.isEmpty()) return Response.status(Status.BAD_REQUEST)
-				.entity("Issue key can't be NULL or Empty. ").build();
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
+		if (issueKey == null || issueKey.isEmpty())
+			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
 		RemoteScnWorklog[] scnWorklogs = remoteScnWorklogService.getScnWorklogs(user, issueKey);
-		if (scnWorklogs == null || scnWorklogs.length == 0) return Response
-				.ok("There are no SCN worklogs or you don't have permission to see them. ").cacheControl(getNoCacheControl())
-				.build();
+		if (scnWorklogs == null || scnWorklogs.length == 0)
+			return Response.ok("There are no SCN worklogs or you don't have permission to see them. ")
+					.cacheControl(getNoCacheControl()).build();
 		return Response.ok(scnWorklogs).cacheControl(getNoCacheControl()).build();
 	}
 
@@ -64,16 +79,17 @@ public class JiraScnRestService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/scn-ext-issues")
 	@PublicApi
-	public Response getScnExtendedIssues(@Context HttpServletRequest request, @QueryParam("ikey") List<String> issueKeys)
-			throws RemoteException {
+	public Response getScnExtendedIssues(@Context HttpServletRequest request,
+			@QueryParam("ikey") List<String> issueKeys) throws RemoteException {
 		User user = getUser(request);
-		if (user == null) return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
-		if (issueKeys == null || issueKeys.isEmpty()) return Response.status(Status.BAD_REQUEST)
-				.entity("Issue keys can't be NULL or Empty. ").build();
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
+		if (issueKeys == null || issueKeys.isEmpty())
+			return Response.status(Status.BAD_REQUEST).entity("Issue keys can't be NULL or Empty. ").build();
 		RemoteScnExtIssue[] scnExtIssues = remoteScnExtIssueService.getScnExtIssues(user, issueKeys);
-		if (scnExtIssues == null || scnExtIssues.length == 0) return Response
-				.ok("There are no SCN Extended Issues or you don't have permission to see them. ")
-				.cacheControl(getNoCacheControl()).build();
+		if (scnExtIssues == null || scnExtIssues.length == 0)
+			return Response.ok("There are no SCN Extended Issues or you don't have permission to see them. ")
+					.cacheControl(getNoCacheControl()).build();
 		return Response.ok(scnExtIssues).cacheControl(getNoCacheControl()).build();
 	}
 
@@ -84,12 +100,14 @@ public class JiraScnRestService {
 	public Response getScnExtendedIssue(@Context HttpServletRequest request, @PathParam("ikey") String issueKey)
 			throws RemoteException {
 		User user = getUser(request);
-		if (user == null) return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
-		if (issueKey == null || issueKey.isEmpty()) return Response.status(Status.BAD_REQUEST)
-				.entity("Issue key can't be NULL or Empty. ").build();
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
+		if (issueKey == null || issueKey.isEmpty())
+			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
 		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(user, issueKey);
-		if (scnExtIssue == null) return Response.ok("There is such SCN Extended Issues or you don't have permission to see it. ")
-				.cacheControl(getNoCacheControl()).build();
+		if (scnExtIssue == null)
+			return Response.ok("There is such SCN Extended Issues or you don't have permission to see it. ")
+					.cacheControl(getNoCacheControl()).build();
 		return Response.ok(scnExtIssue).cacheControl(getNoCacheControl()).build();
 	}
 
@@ -97,21 +115,46 @@ public class JiraScnRestService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/globalsettings/moveGroup/")
 	@PublicApi
-	public Response moveGlobalSecurityGroup(@Context HttpServletRequest request, @FormParam("operation") String operation,
-			@FormParam("groupnames") List<String> groupnames) throws RemoteException {
+	public Response moveGlobalSecurityGroup(@Context HttpServletRequest request,
+			@FormParam("operation") String operation, @FormParam("groupnames") List<String> groupnames)
+			throws RemoteException {
 		// TODO: Admin user required???
 		User user = getUser(request);
-		if (user == null) return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
+		if (user == null)
+			return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
 		if (operation.equals("add")) {
 			settingsManager.addGroups(groupnames);
 		} else if (operation.equals("remove")) {
 			settingsManager.removeGroups(groupnames);
-		} else return Response.status(Status.BAD_REQUEST).entity("Unknown operation code. ").build();
+		} else
+			return Response.status(Status.BAD_REQUEST).entity("Unknown operation code. ").build();
 		return Response.ok().cacheControl(getNoCacheControl()).build();
 	}
 
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Path("/worklogblockingdate/{projectKey}")
+	@PublicApi
+	public Response setWorklogBlockingDate(@Context HttpServletRequest request,
+			@PathParam("projectKey") String projectKey, @QueryParam("date") String date) throws RemoteException {
+		if (!permissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, getApplicationUser(request)))
+			return Response.status(Status.BAD_REQUEST).entity("Don't have permission.").build();
+		try {
+			projectSettingManager.setWLWorklogBlockingDate(projectManager.getProjectObjByKey(projectKey).getId(),
+					new SimpleDateFormat("yyyyMMddhhmmss").parse(date));
+		} catch (PropertyException | ParseException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Incorrect data format.").build();
+		}
+		return Response.ok().cacheControl(getNoCacheControl()).entity("OK").build();
+	}
+
 	private User getUser(HttpServletRequest request) {
-		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser().getDirectoryUser(); // TODO should be re-factored
+		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser().getDirectoryUser();
+		// TODO should be re-factored
+	}
+	
+	private ApplicationUser getApplicationUser(HttpServletRequest request) {
+		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 	}
 
 	private CacheControl getNoCacheControl() {
@@ -119,5 +162,4 @@ public class JiraScnRestService {
 		noCache.setNoCache(true);
 		return noCache;
 	}
-
 }

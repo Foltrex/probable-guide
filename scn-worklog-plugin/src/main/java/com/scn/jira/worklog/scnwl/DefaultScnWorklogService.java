@@ -289,7 +289,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		}
 
 		IScnWorklog originalWorklog = this.scnWorklogManager.getById(worklog.getId());
-		if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog)) {
+		boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
+		if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog) || isWLAutoCopyBlocked) {
 			return false;
 		}
 
@@ -326,7 +327,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		}
 
 		IScnWorklog originalWorklog = this.scnWorklogManager.getById(worklog.getId());
-		if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog)) {
+		boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
+		if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog) || isWLAutoCopyBlocked) {
 			return null;
 		}
 
@@ -723,8 +725,9 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.issue.null"));
 			return null;
 		}
-
-		if (isBlocked(jiraServiceContext, worklog)) {
+		
+		boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
+		if (isBlocked(jiraServiceContext, worklog) || isWLAutoCopyBlocked) {
 			return null;
 		}
 
@@ -744,6 +747,20 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return wl != null
 				&& (isProjectWLBlocked(serviceContext, getProjectId(wl), wl.getStartDate()) || isUserWLBlocked(serviceContext,
 						wl.getStartDate()));
+	}
+	
+	public boolean isWLAutoCopyBlocked(JiraServiceContext jiraServiceContext, IScnWorklog wl) {
+		if (wl == null)
+			return false;
+		Date wlWorklogBlockingDate = this.scnProjectSettingsManager.getWLWorklogBlockingDate(getProjectId(wl));
+		if (wlWorklogBlockingDate == null || wl.getStartDate().after(wlWorklogBlockingDate)) {
+			return false;
+		}
+
+		addErrorMessage(jiraServiceContext, "scn.scnworklog.service.error.wl.blocking.date.on.save",
+				formatDate(jiraServiceContext, wlWorklogBlockingDate));
+
+		return true;
 	}
 
 	protected boolean isProjectWLBlocked(JiraServiceContext serviceContext, Long projectId, Date date) {

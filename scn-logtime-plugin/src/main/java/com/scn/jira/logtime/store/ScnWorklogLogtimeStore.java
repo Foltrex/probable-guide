@@ -228,7 +228,7 @@ public class ScnWorklogLogtimeStore /* extends OfBizScnWorklogStore */implements
 	
 		IScnWorklog scnWorklog =  scnDefaultWorklogService.getById(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), _worklogId);
 		if (scnWorklog != null) {
-			scnDefaultWorklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), updateWorklog(scnWorklog, linkedWorklog), true, true);
+			scnDefaultWorklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), updateWorklog(scnWorklog, linkedWorklog), true, false);
 			
 		}
 		return true;
@@ -238,7 +238,7 @@ public class ScnWorklogLogtimeStore /* extends OfBizScnWorklogStore */implements
 	public boolean updateScnWorklogAndExt(Long _worklogId, Worklog linkedWorklog) throws DataAccessException {
 
 		IScnWorklog scnWorklog =  scnDefaultWorklogService.getById(new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getUser()), _worklogId);
-		if (scnWorklog != null) {
+		if (scnWorklog != null && scnWorklog.getLinkedWorklog() != null) {
 			IScnWorklog worklog = new ScnWorklogImpl(this.projectRoleManager, scnWorklog.getIssue(), scnWorklog.getId(), scnWorklog.getAuthor(),
 					scnWorklog.getComment(), scnWorklog.getStartDate(), scnWorklog.getGroupLevel(), scnWorklog.getRoleLevelId(),
 					scnWorklog.getTimeSpent(), scnWorklog.getUpdateAuthor(), scnWorklog.getCreated(), scnWorklog.getUpdated(),
@@ -378,6 +378,16 @@ public class ScnWorklogLogtimeStore /* extends OfBizScnWorklogStore */implements
 		Date wlBlockingDate = this.projectSettignsManager.getWLBlockingDate(projectId);
 		
 		if (wlBlockingDate == null || date.after(wlBlockingDate)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean isProjectWLWorklogBlocked(Long projectId, Date date) {
+		Date wlWorklogBlockingDate = this.projectSettignsManager.getWLWorklogBlockingDate(projectId);
+		
+		if (wlWorklogBlockingDate == null || date.after(wlWorklogBlockingDate)) {
 			return false;
 		}
 		

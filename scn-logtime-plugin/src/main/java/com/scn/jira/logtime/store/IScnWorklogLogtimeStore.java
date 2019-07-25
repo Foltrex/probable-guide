@@ -40,4 +40,8 @@ public interface IScnWorklogLogtimeStore {
 	
 	public boolean isProjectWLBlocked(Long projectId, Date date);
 	
+	public boolean isProjectWLWorklogBlocked(Long projectId, Date date);
+	
+	public boolean isWlAutoCopy(Issue issue, String worklogTypeId);
+	
 }

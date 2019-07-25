@@ -6,3 +6,6 @@ scn-mytime-gadget-plugin/target
 scn-clone-project-plugin/target
 scn-timesheet-plugin/target
 scn-worklog-plugin/target
+.project
+.settings
+.classpath
