@@ -252,11 +252,6 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 				}
 			}else{
 				var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
-				if(document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML!=""){					
-					var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
-				}else{					
-					var complexId2 = "";
-				}
 			}
 			
 			console.log("ON FUNCTION LOST 6 READY TO AJAX");	
@@ -282,9 +277,9 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 							if(msg.copied && identifierSE!='-1'){							
 								document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
 								document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color="green";
-								/*if(msg.wlIdExt!=arrayCount[arrayCountE[userIdentifier][identifierSE]]){
+								if(msg.wlIdExt!=arrayCount[arrayCountE[userIdentifier][identifierSE]]){
 									arrayCount[arrayCountE[userIdentifier][identifierSE]]=msg.wlIdExt;
-								}*/
+								}
 							}	
 							
 							if(msg.wlId!=arrayCount[cur]){																			
@@ -438,13 +433,10 @@ function addWorklogsToDb(){
             	  data: ({wlsToSave : wlsToSave, issueId: document.getElementById("issueSelect"+  document.getElementById('pop_user_identifier').value).value}),
             	  dataType: "json",
             	  success: function(msg){
-					
 					checkProjects(msg.message);					
 					//alert("ArraySaved");
 					//projectChanged(projectId,issueTdId,worklogTypeSel, userId)
-					//reloadMeClean();
-					
-					
+					reloadMeClean();			
             	  }
             	});	
 
@@ -497,11 +489,7 @@ function updateWorklogAJAX()
 					var complexId2 = "";
 				}
 			}else{
-				if(document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML!=""){					
-					var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
-				}else{					
-					var complexId2 = "";
-				}
+				complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
 			}
 		
 		AJS.$.ajax({
@@ -531,17 +519,14 @@ function updateWorklogAJAX()
 							document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color="green";
 							arrayCountComments[arrayCountE[userIdentifier][identifierSE]]=replaceSymbols(commentTmp);	
 							document.getElementById(arrayCountE[userIdentifier][identifierSE]).title=vlTypeText+  ' ' +arrayCountComments[current_editId];
-							/*if(msg.wlIdExt!=arrayCountE[userIdentifier][identifierSE]){
-								arrayCountE[userIdentifier][identifierSE]=msg.wlIdExt;
-							}*/
+							if(msg.wlIdExt!=arrayCount[arrayCountE[userIdentifier][identifierSE]]){
+								arrayCount[arrayCountE[userIdentifier][identifierSE]]=msg.wlIdExt;
+							}
 							
 						} 
 						
 						if(msg.wlId!=arrayCount[current_editId]){
-							//alert("We need to updateId "+ msg.wlId);
 							arrayCount[current_editId]=msg.wlId;
-						}else{
-							//alert("We need not to updateId");
 						}
 						current_editId="";
 					  }

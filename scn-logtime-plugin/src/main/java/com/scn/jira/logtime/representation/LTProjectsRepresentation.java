@@ -14,7 +14,6 @@ import net.jcip.annotations.Immutable;
  * JAXB representation of a group of projects.
  */
 @Immutable
-@SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
 public class LTProjectsRepresentation {
 	@XmlElement
@@ -128,7 +127,4 @@ public class LTProjectsRepresentation {
 	public void setWeekRepresentations(List<WeekRepresentation> weekRepresentations) {
 		this.weekRepresentations = weekRepresentations;
 	}
-	
-	
-
 }

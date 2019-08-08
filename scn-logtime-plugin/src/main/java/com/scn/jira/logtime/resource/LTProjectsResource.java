@@ -2,6 +2,8 @@ package com.scn.jira.logtime.resource;
 
 import static com.scn.jira.worklog.globalsettings.GlobalSettingsManager.SCN_TIMETRACKING;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,8 +12,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,15 +51,14 @@ import org.apache.velocity.exception.VelocityException;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.web.util.OutlookDateManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
@@ -73,83 +75,50 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Named
 @Path("/projectsobj")
 public class LTProjectsResource {
-
-	protected static Logger logger = Logger.getLogger(LTProjectsResource.class);
+	private static final Logger LOGGER = Logger.getLogger(LTProjectsResource.class);
 
 	private UserManager userManager;
 	private PermissionManager permissionManager;
 	private JiraAuthenticationContext authenticationContext;
-	private final OutlookDateManager outlookDateManager;
-
 	private ProjectManager projectManager;
 	private ExtendedConstantsManager extendedConstantsManager;
-
 	private IGlobalSettingsManager scnGlobalPermissionManager;
-
 	private IWorklogLogtimeManager iWorklogLogtimeManager;
 	private WicketManager wicketManager;
 
-	/**
-	 * Constructor.
-	 * 
-//	 * @param userManager
-	 *            a SAL object used to find remote usernames in Atlassian products
-	 * @param userUtil
-	 *            a JIRA object to resolve usernames to JIRA's internal {@code com.opensymphony.os.User} objects
-	 * @param permissionManager
-	 *            the JIRA object which manages permissions for users and projects
-	 */
-
 	@Inject
-	public LTProjectsResource(
-			 @ComponentImport PermissionManager permissionManager,
-							  @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-							  @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
-							  @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-							  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-							  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-							  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-							  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-							  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-							  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-							  @ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
-							  @ComponentImport DefaultScnWorklogService scnDefaultWorklogService
-			 ) {
+	public LTProjectsResource(@ComponentImport PermissionManager permissionManager, @ComponentImport UserUtil userUtil,
+			@ComponentImport JiraAuthenticationContext authenticationContext,
+			@ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
+			@ComponentImport ProjectRoleManager projectRoleManager,
+			@Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
+			@ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
+			@ComponentImport DefaultScnWorklogManager scnWorklogManager,
+			@ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
+			@ComponentImport ScnProjectSettingsManager projectSettignsManager,
+			@ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+			@ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
+			@ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
 		super();
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
 		this.authenticationContext = authenticationContext;
-		this.outlookDateManager = outlookDateManager;
 		this.projectManager = projectManager;
 		this.extendedConstantsManager = defaultExtendedConstantsManager;
 		this.scnGlobalPermissionManager = scnGlobalPermissionManager;
 		this.iWorklogLogtimeManager = new WorklogLogtimeManager(userManager, projectManager, issueManager, userUtil,
-				permissionManager, scnWorklogManager, projectRoleManager, overridedWorklogManager, extendedConstantsManager,
-				ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
-		System.out.println("LTProjectsResource CONSTRUCTOR");
+				permissionManager, scnWorklogManager, projectRoleManager, overridedWorklogManager,
+				extendedConstantsManager, ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,
+				scnDefaultWorklogService);
 		this.wicketManager = new WicketManager(ComponentAccessor.getJiraAuthenticationContext().getI18nHelper());
-
 	}
 
-	private CacheControl getNoCacheControl() {
-		CacheControl noCache = new CacheControl();
-		noCache.setNoCache(true);
-		return noCache;
-	}
-
-	/**
-	 * Returns the list of projects browsable by the user in the specified request.
-	 * 
-	 * @param request
-	 *            the context-injected {@code HttpServletRequest}
-	 * @return a {@code Response} with the marshalled projects
-	 */
 	@POST
 	@AnonymousAllowed
 	@Produces({ "application/json", "application/xml" })
 	public Response getTimesheet(@Context HttpServletRequest request, @FormParam("prjList") String prjList,
 			@FormParam("usersSelected") String usersSelected, @FormParam("viewType") String viewType) {
-
+		Instant start = Instant.now();
 		int scnWl = ServletUtil.getIntParam(request, "scnWl", 1);
 		int extWl = ServletUtil.getIntParam(request, "extWl", 1);
 		int assignedCheck = ServletUtil.getIntParam(request, "assignedCheck", 1);
@@ -157,43 +126,31 @@ public class LTProjectsResource {
 		// Logged in user
 		ApplicationUser user = getUser(request);
 
-		List<String> usersAll = new ArrayList<String>();
-		usersAll.add(user.getName());
 		List<String> selectedProjects = (prjList != null && !prjList.equals("")) ? Arrays.asList(prjList.split(","))
 				: new ArrayList<String>();
-
-		List<String> selectedUsers = (usersSelected != null && usersSelected.length() != 0 && usersSelected != "") ? Arrays
-				.asList(usersSelected.split(",")) : usersAll;
-
-		List<String> usersAllWithouDuplicatesLower = new ArrayList<String>();
-		List<String> usersAllWithouDuplicates = new ArrayList<String>();
-
-		for (String userCur : selectedUsers) {
-			userCur = userCur.trim();
-			if (!usersAllWithouDuplicatesLower.contains(userCur.toLowerCase())) {
-				usersAllWithouDuplicatesLower.add(userCur.toLowerCase());
-				usersAllWithouDuplicates.add(userCur);
-			} else {
-				System.out.println("DUPLICATE:" + userCur);
-			}
-		}
-
-		selectedUsers = usersAllWithouDuplicates;
+		List<String> selectedUsers = (usersSelected != null && !usersSelected.isEmpty())
+				? Arrays.asList(usersSelected.split(",")).stream().map(String::trim).map(String::toLowerCase).distinct()
+						.map(userManager::getUserByName).filter(x -> x != null).map(ApplicationUser::getKey).collect(
+								Collectors.toList())
+				: Arrays.asList(user.getKey());
 		VelocityManager vm = ComponentAccessor.getVelocityManager();
+		Response response;
 		try {
-			return Response
-					.ok(new LogTimeRepresentation(vm.getBody("template/", "logtime.vm",
-							getVelocityParams(request, selectedProjects, scnWl, extWl, assignedCheck, selectedUsers, viewType))))
+			response = Response
+					.ok(new LogTimeRepresentation(vm.getBody("template/", "logtime.vm", getVelocityParams(request,
+							selectedProjects, scnWl, extWl, assignedCheck, selectedUsers, viewType))))
 					.cacheControl(getNoCacheControl()).build();
 		} catch (VelocityException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
+			response = Response.serverError().build();
 		}
-		return Response.serverError().build();
+		LOGGER.info(String.format("The request duration: %s", Duration.between(start, Instant.now()).toMillis()));
+		return response;
 	}
 
-    private ApplicationUser getUser(HttpServletRequest request) {
-        return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-    }
+	private ApplicationUser getUser(HttpServletRequest request) {
+		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+	}
 
 	private Map<String, Object> getVelocityParams(HttpServletRequest request, List<String> projectIds, int scnWlCheck,
 			int extWlCheck, int assignedCheck, List<String> users, String viewType) {
@@ -202,16 +159,18 @@ public class LTProjectsResource {
 
 		ApplicationUser appuser = getUser(request);
 
-		Map<String, Object> params = getVelocityParams(appuser, projectIds, scnWlCheck, extWlCheck, assignedCheck, users,
-				viewType, currentPeriod, currentslideStep);
+		Map<String, Object> params = getVelocityParams(appuser, projectIds, scnWlCheck, extWlCheck, assignedCheck,
+				users, viewType, currentPeriod, currentslideStep);
 
 		params.put("i18n", this.authenticationContext.getI18nHelper());
 		params.put("req", request);
+		
 		return params;
 	}
 
 	private Map<String, Object> getVelocityParams(ApplicationUser loggeduser, List<String> projectIds, int scnWlCheck,
-			int extWlCheck, int assignedCheck, List<String> users, String viewType, int currentperiod, int currentslideStep) {
+			int extWlCheck, int assignedCheck, List<String> users, String viewType, int currentperiod,
+			int currentslideStep) {
 		Date date = new Date();
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -228,7 +187,6 @@ public class LTProjectsResource {
 			// if period was switched we need to recount slideStep from Monthly
 			// to weekly
 			if (currentperiod == 1) {
-				System.out.println("SWITCHING THE VIEW TO WEEKLY");
 				Date startDateMonth = DateUtils.getMonthStartDate(currentslideStep, date);
 				startDate = DateUtils.getWeekStartDate(0, startDateMonth);
 				endDate = DateUtils.getWeekEndDate(0, startDateMonth);
@@ -239,7 +197,6 @@ public class LTProjectsResource {
 			}
 		} else {
 			if (currentperiod == 1) {
-				System.out.println("SWITCHING THE VIEW TO MONTHLY");
 				Date startDateWeek = DateUtils.getWeekEndDate(currentslideStep, date);
 				startDate = DateUtils.getMonthStartDate(0, startDateWeek);
 				endDate = DateUtils.getMonthEndDate(0, startDateWeek);
@@ -249,12 +206,9 @@ public class LTProjectsResource {
 				endDate = DateUtils.getMonthEndDate(currentslideStep, date);
 			}
 		}
-
 		Map<String, Map<String, Integer>> calendarMap = wicketManager.gerUsersCalendar(users, startDate, endDate);
 		iWorklogLogtimeManager.setCalendarMap(calendarMap);
-
 		Collection<WorklogType> wlTypes = extendedConstantsManager.getWorklogTypeObjects();
-
 		List<String> datesWeekString = DateUtils.getStringListDate(startDate, endDate);
 		boolean scnWlCh = (scnWlCheck == 1 ? true : false);
 		boolean extWlCh = (extWlCheck == 1 ? true : false);
@@ -268,23 +222,19 @@ public class LTProjectsResource {
 		params.put("weekDaysString", datesWeekString);
 		params.put("startDate", startDate.getTime());
 		params.put("endDate", endDate.getTime());
-
-		Map<String, WicketRepresentation> userWickets = wicketManager.gerUserWicketTimeForthePeriods(users, startDate, endDate);
-
+		Map<String, WicketRepresentation> userWickets = wicketManager.gerUserWicketTimeForthePeriods(users, startDate,
+				endDate);
 		params.put("userWickets", userWickets);
-
 		params.put("wicketPermission", wicketManager.gerUserWicketPermission(loggeduser.getKey()));
-
+		
 		boolean hasScnWLPermission = scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, loggeduser);
 		if (!hasScnWLPermission) {
 			scnWlCh = false;
 		}
 		params.put("scnWlCheck", scnWlCh);
 		params.put("extWlCheck", extWlCh);
-
-		List<LTProjectsRepresentation> ltProjectsRepresentations = getLTProjectRepresentation(loggeduser, projectIds, startDate,
-				endDate, scnWlCh, extWlCh, assignedCh, users, calendarMap);
-
+		List<LTProjectsRepresentation> ltProjectsRepresentations = getLTProjectRepresentation(loggeduser, projectIds,
+				startDate, endDate, scnWlCh, extWlCh, assignedCh, users, calendarMap);
 		Collections.sort(ltProjectsRepresentations, new Comparator<LTProjectsRepresentation>() {
 
 			public int compare(LTProjectsRepresentation o1, LTProjectsRepresentation o2) {
@@ -295,32 +245,28 @@ public class LTProjectsResource {
 				}
 			}
 		});
-
 		params.put("textUtil", new TextFormatUtil());
 		params.put("scnWlChShow", hasScnWLPermission);
 		params.put("projects", ltProjectsRepresentations);
 		params.put("projectUserKeys", ltProjectsRepresentations);
-
-		params.put("outlookDate", this.outlookDateManager.getOutlookDate(Locale.ENGLISH));
 		params.put("projectsTest", getProjectRepresentations(loggeduser));
-
 		return params;
 	}
 
 	private List<ProjectRepresentation> getProjectRepresentations(ApplicationUser loggeduser) {
-		Collection<Project> projectsTest = permissionManager.getProjects(Permissions.BROWSE, loggeduser);
-
+		Collection<Project> projectsTest = permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS,
+				loggeduser);
 		List<ProjectRepresentation> projectRepresentations = new ArrayList<ProjectRepresentation>();
 		ProjectRepresentation pr = new ProjectRepresentation(0L, "", "");
 		projectRepresentations.add(pr);
 		for (Project project : projectsTest) {
 			projectRepresentations.add(new ProjectRepresentation(project));
 		}
+		
 		return projectRepresentations;
 	}
 
 	private List<WLsTypeRepresentation> getWlTypeRepresentations(Collection<WorklogType> wlTypes) {
-
 		List<WLsTypeRepresentation> wLsTypeRepresentations = new ArrayList<WLsTypeRepresentation>();
 		WLsTypeRepresentation wLsTypeRepresentation = new WLsTypeRepresentation();
 		wLsTypeRepresentation.setWlTypeId("0");
@@ -335,39 +281,31 @@ public class LTProjectsResource {
 		return wLsTypeRepresentations;
 	}
 
-	private List<LTProjectsRepresentation> getLTProjectRepresentation(ApplicationUser loggedUser, List<String> projectIds,
-			Date startDate, Date endDate, boolean scnWlCheck, boolean extWlCheck, boolean assignedCh, List<String> users,
-			Map<String, Map<String, Integer>> calendarMap) {
-
+	private List<LTProjectsRepresentation> getLTProjectRepresentation(ApplicationUser loggedUser,
+			List<String> projectIds, Date startDate, Date endDate, boolean scnWlCheck, boolean extWlCheck,
+			boolean assignedCh, List<String> users, Map<String, Map<String, Integer>> calendarMap) {
 		List<LTProjectsRepresentation> representations = new ArrayList<LTProjectsRepresentation>();
-
-		List<Project> projects = new ArrayList<Project>();
-		if (projectIds.size() != 0) {
-			for (String projectId : projectIds) {
-				if (projectId != null && !projectId.equals("")) {
-					Project prj = this.projectManager.getProjectObj(Long.valueOf(projectId.trim()));
-					if (prj != null) {
-						projects.add(prj);
-					}
-				}
-			}
-		} else {
-			Collection<Project> projectsColl = permissionManager.getProjects(Permissions.BROWSE, loggedUser);
-			projects.addAll(projectsColl);
-		}
-
-		Collections.sort(projects, new Comparator<Project>() {
-
-			public int compare(Project o1, Project o2) {
-				if (o1.getName() != null && o2.getName() != null) {
-					return o1.getName().compareTo(o2.getName());
-				} else {
-					return 0;
-				}
-			}
-		});
-
-		System.out.println("USERS selected size list " + users.size());
+		List<Long> projectIdsLong = (projectIds.size() != 0)
+				? projectIds.stream().filter(x -> x != null && !x.isEmpty()).map(x -> Long.valueOf(x.trim()))
+						.collect(Collectors.toList())
+				: permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, loggedUser).stream()
+						.map(Project::getId).collect(Collectors.toList());
+		List<Project> projects = projectManager
+				.convertToProjectObjects(Stream.of(
+						scnWlCheck
+								? iWorklogLogtimeManager.getProjectIdsWithScnWorklogsBetweenDates(projectIdsLong, users,
+										DateUtils.getStartDate(-28, startDate), DateUtils.getEndDate(28, endDate))
+								: new ArrayList<Long>(),
+						extWlCheck
+								? iWorklogLogtimeManager.getProjectIdsWithExtWorklogsBetweenDates(projectIdsLong, users,
+										DateUtils.getStartDate(-28, startDate), DateUtils.getEndDate(28, endDate))
+								: new ArrayList<Long>())
+						.flatMap(List::stream).distinct().collect(Collectors.toList()))
+				.stream()
+				.sorted((o1, o2) -> (o1.getName() != null && o2.getName() != null)
+						? o1.getName().compareTo(o2.getName())
+						: 0)
+				.collect(Collectors.toList());
 
 		for (String userString : users) {
 			userString = userString.trim();
@@ -377,7 +315,7 @@ public class LTProjectsResource {
 				userMap = calendarMap.get(userString);
 			}
 
-			List<java.util.Date> datesWeek = DateUtils.getDatesListDate(startDate, endDate);
+			List<Date> datesWeek = DateUtils.getDatesListDate(startDate, endDate);
 
 			List<WeekRepresentation> weekRepresentations = DateUtils.getWeekRepresentationList(datesWeek, userMap);
 			ltProjectsRepresentation.setWeekRepresentations(weekRepresentations);
@@ -388,10 +326,10 @@ public class LTProjectsResource {
 				continue;
 			}
 
-			ApplicationUser user = ComponentAccessor.getUserManager().getUser(userString);
+			ApplicationUser user = userManager.getUserByKey(userString);
 
 			if (user == null) {
-				System.out.println("USER WAS NOT FOUND! ");
+				LOGGER.error("USER WAS NOT FOUND!");
 				continue;
 			}
 
@@ -400,24 +338,23 @@ public class LTProjectsResource {
 			Map<String, Integer> totalExtList = new HashMap<String, Integer>();
 
 			for (Project project : projects) {
-
-				LTProjectRepresentation ltProjectRepresentation = iWorklogLogtimeManager.getLTProjectRepresentationBetweenDates(
-						loggedUser, project, startDate, endDate, scnWlCheck, extWlCheck, assignedCh, userString);
+				LTProjectRepresentation ltProjectRepresentation = iWorklogLogtimeManager
+						.getLTProjectRepresentationBetweenDates(loggedUser, project, startDate, endDate, scnWlCheck,
+								extWlCheck, assignedCh, userString);
 
 				for (String date : dates) {
 					Integer totalScn = totalScnList.get(date) == null ? new Integer(0) : totalScnList.get(date);
-					totalScn = totalScn
-							+ (ltProjectRepresentation == null ? new Integer(0) : ltProjectRepresentation.getScnWlTotal().get(
-									date));
+					totalScn = totalScn + (ltProjectRepresentation == null ? new Integer(0)
+							: ltProjectRepresentation.getScnWlTotal().get(date));
 					totalScnList.put(date, totalScn);
 
 					Integer totalExt = totalExtList.get(date) == null ? new Integer(0) : totalExtList.get(date);
-					totalExt = totalExt
-							+ (ltProjectRepresentation == null ? new Integer(0) : ltProjectRepresentation.getExtWlTotal().get(
-									date));
+					totalExt = totalExt + (ltProjectRepresentation == null ? new Integer(0)
+							: ltProjectRepresentation.getExtWlTotal().get(date));
 					totalExtList.put(date, totalExt);
 				}
-				if (ltProjectRepresentation == null) continue;
+				if (ltProjectRepresentation == null)
+					continue;
 
 				list.add(ltProjectRepresentation);
 			}
@@ -427,10 +364,10 @@ public class LTProjectsResource {
 			List<String> scnTotalList = new ArrayList<String>();
 			List<String> extTotalList = new ArrayList<String>();
 			for (String date : dates) {
-				scnTotalList.add(TextFormatUtil.timeToString(String.valueOf(totalScnList.get(date) == null ? "0" : totalScnList
-						.get(date))));
-				extTotalList.add(TextFormatUtil.timeToString(String.valueOf(totalExtList.get(date) == null ? "0" : totalExtList
-						.get(date))));
+				scnTotalList.add(TextFormatUtil
+						.timeToString(String.valueOf(totalScnList.get(date) == null ? "0" : totalScnList.get(date))));
+				extTotalList.add(TextFormatUtil
+						.timeToString(String.valueOf(totalExtList.get(date) == null ? "0" : totalExtList.get(date))));
 				scnProjectsTotal += (totalScnList.get(date) == null) ? 0 : totalScnList.get(date);
 				extProjectsTotal += (totalExtList.get(date) == null) ? 0 : totalExtList.get(date);
 			}
@@ -448,7 +385,13 @@ public class LTProjectsResource {
 			representations.add(ltProjectsRepresentation);
 
 		}
+		
 		return representations;
 	}
-
+	
+	private CacheControl getNoCacheControl() {
+		CacheControl noCache = new CacheControl();
+		noCache.setNoCache(true);
+		return noCache;
+	}
 }

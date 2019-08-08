@@ -19,6 +19,8 @@ public interface IExtWorklogLogtimeStore {
 	
 	public List<Issue> getIssuesByProjects(Project project) throws DataAccessException;
 	
+	public List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) throws DataAccessException;
+	
 	public boolean deleteExtWorklogById(Long worklogId) throws DataAccessException;
 	
 	public void updateExtWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;

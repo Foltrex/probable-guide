@@ -16,7 +16,7 @@
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
 	<description>The plugin provide access to custom time tracking implementation.</description>
 	<packaging>atlassian-plugin</packaging>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -48,7 +48,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct-jdk8</artifactId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -71,6 +72,7 @@
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<enableQuickReload>true</enableQuickReload>
+					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -93,6 +95,23 @@
 						</dependency>
 					</scannedDependencies>
 					<verbose>false</verbose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<excludeDefaultDirectories>true</excludeDefaultDirectories>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+							<excludes>
+								<exclude>container/**</exclude>
+								<exclude>jira/**</exclude>
+							</excludes>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 		</plugins>

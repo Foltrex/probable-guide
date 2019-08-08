@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import net.jcip.annotations.Immutable;
 
 @Immutable
-@SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
 public class LTMessages {
 	@XmlElement

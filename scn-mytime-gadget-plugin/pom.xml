@@ -16,6 +16,7 @@
     <name>JIRA ScienceSoft MyTime gadget</name>
     <description>The plugin for cloning projects</description>
     <packaging>atlassian-plugin</packaging>
+    <version>4.1.1</version>
 
     <dependencies>
         <dependency>
@@ -92,10 +93,6 @@
                     </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

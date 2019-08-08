@@ -19,6 +19,8 @@ public interface IScnWorklogLogtimeStore {
 	
 	public List<IScnWorklog> getScnWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate) throws DataAccessException;
 	
+	public List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) throws DataAccessException;
+	
 	public boolean deleteScnWorklogById(Long worklogId) throws DataAccessException;
 	
 	public boolean updateScnWorklog(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;

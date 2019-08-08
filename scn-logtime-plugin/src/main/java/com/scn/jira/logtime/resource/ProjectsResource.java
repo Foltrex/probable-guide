@@ -19,11 +19,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.servlet.http.HttpServletRequest;
 
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.representation.ProjectRepresentation;
@@ -34,85 +34,53 @@ import com.scn.jira.logtime.representation.ProjectsRepresentation;
  */
 @Named
 @Path("/projectsuser")
-public class ProjectsResource
-{
-    private PermissionManager permissionManager;
-    private UserUtil userUtil;
+public class ProjectsResource {
+	private PermissionManager permissionManager;
 
-    /**
-     * Constructor.
-     * Atlassian products
-     * @param userUtil a JIRA object to resolve usernames to JIRA's internal
-     * {@code com.opensymphony.os.User} objects
-     * @param permissionManager the JIRA object which manages permissions
-     * for users and projects
-     */
-    @Inject
-    public ProjectsResource(@ComponentImport UserUtil userUtil,
-                            @ComponentImport PermissionManager permissionManager)
-    {
-        this.userUtil = userUtil;
-        this.permissionManager = permissionManager;
-    }
+	@Inject
+	public ProjectsResource(@ComponentImport PermissionManager permissionManager) {
+		this.permissionManager = permissionManager;
+	}
 
-    /**
-     * Returns the list of projects browsable by the user in the specified
-     * request.
-     * @param request the context-injected {@code HttpServletRequest}
-     * @return a {@code Response} with the marshalled projects
-     */
-    @GET
-    @AnonymousAllowed
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getProjects(@Context HttpServletRequest request)
-    {
-        // the request was automatically injected with @Context, so
-        // we can use SAL to extract the username from it
-        String username = request.getRemoteUser();
+	@GET
+	@AnonymousAllowed
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Response getProjects(@Context HttpServletRequest request) {
+		// get the corresponding com.opensymphony.os.User object for
+		// the request
+		ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 
-        // get the corresponding com.opensymphony.os.User object for
-        // the request
-        ApplicationUser user = userUtil.getUser(username);
+		// retrieve all objects for projects this user has permission to browse
+		List<Project> projects = new ArrayList<Project>(
+				permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, user));
 
-        // retrieve all objects for projects this user has permission to browse
-        List<Project> projects =
-                new ArrayList<Project>(permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, user));
+		Collections.sort(projects, new Comparator<Project>() {
+			public int compare(Project pr1, Project pr2) {
+				return pr1.getName().toUpperCase().compareTo(pr2.getName().toUpperCase());
+			}
+		});
 
-        Collections.sort(projects, new Comparator<Project>() {
-            public int compare(Project pr1, Project pr2) {
-                return pr1.getName().toUpperCase().compareTo(pr2.getName().toUpperCase());
-            }
-        });
+		// convert the project objects to ProjectRepresentations
+		Collection<ProjectRepresentation> projectRepresentations = new LinkedList<ProjectRepresentation>();
+		for (Project project : projects) {
+			projectRepresentations.add(new ProjectRepresentation(project));
+		}
+		ProjectsRepresentation allProjects = new ProjectsRepresentation(projectRepresentations);
 
-        // convert the project objects to ProjectRepresentations
-        Collection<ProjectRepresentation> projectRepresentations =
-                new LinkedList<ProjectRepresentation>();
-        for (Project project : projects)
-        {
-            projectRepresentations.add(new ProjectRepresentation(project));
-        }
-        ProjectsRepresentation allProjects =
-                new ProjectsRepresentation(projectRepresentations);
-     
-        return Response.ok(allProjects).build();
-    }
-    
-    private CacheControl getNoCacheControl()
-	{
+		return Response.ok(allProjects).build();
+	}
+
+	private CacheControl getNoCacheControl() {
 		CacheControl noCache = new CacheControl();
 		noCache.setNoCache(true);
 		return noCache;
 	}
-	
+
 	@GET
 	@Path("/validate")
 	@AnonymousAllowed
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response validate(@QueryParam("project") String projects)
-	{
-		
+	public Response validate(@QueryParam("project") String projects) {
 		return Response.ok().cacheControl(getNoCacheControl()).build();
-		
 	}
-
 }

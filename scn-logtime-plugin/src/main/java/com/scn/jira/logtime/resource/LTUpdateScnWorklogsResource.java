@@ -23,9 +23,7 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.web.util.OutlookDateManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.jira.user.util.UserManager;
@@ -47,6 +45,7 @@ import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -59,7 +58,6 @@ public class LTUpdateScnWorklogsResource {
 	private PermissionManager permissionManager;
 	private UserUtil userUtil;
 	private JiraAuthenticationContext authenticationContext;
-	private final OutlookDateManager outlookDateManager;
 	
 	private ProjectManager projectManager;
 	private IssueManager issueManager;
@@ -77,40 +75,24 @@ public class LTUpdateScnWorklogsResource {
 	private IScnUserBlockingManager scnUserBlockingManager;	
 	
 	private IScnWorklogService scnDefaultWorklogService;
-	
-	/**
-	 * Constructor.
-	 * 
-//	 * @param userManager
-	 *            a SAL object used to find remote usernames in Atlassian
-	 *            products
-	 * @param userUtil
-	 *            a JIRA object to resolve usernames to JIRA's internal
-	 *            {@code com.opensymphony.os.User} objects
-	 * @param permissionManager
-	 *            the JIRA object which manages permissions for users and
-	 *            projects
-	 */
 
 	@Inject
 	public LTUpdateScnWorklogsResource(@ComponentImport PermissionManager permissionManager,
-               @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-               @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
-               @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-									   @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-               @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-               @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-               @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
-               @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-               @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-               @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-               @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
-		super();
+			@ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
+			@ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
+			@ComponentImport ProjectRoleManager projectRoleManager,
+			@Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
+			@ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
+			@ComponentImport DefaultScnWorklogManager scnWorklogManager,
+			@ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
+			@ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
+			@ComponentImport ScnProjectSettingsManager projectSettignsManager,
+			@ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+			@ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
 		this.userUtil = userUtil;
 		this.authenticationContext = authenticationContext;
-		this.outlookDateManager = outlookDateManager;
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
@@ -122,18 +104,11 @@ public class LTUpdateScnWorklogsResource {
 		this.OfBizScnWorklogStore = ofBizScnWorklogStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnDefaultWorklogService = scnDefaultWorklogService;
-		iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				overridedWorklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
+		iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager,
+				permissionManager, projectRoleManager, overridedWorklogManager, extendedConstantsManager,
+				OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
 	}
 	
-	/**
-	 * Returns the list of projects browsable by the user in the specified
-	 * request.
-	 * 
-	 * @param request
-	 *            the context-injected {@code HttpServletRequest}
-	 * @return a {@code Response} with the marshalled projects
-	 */
 	@GET
 	@AnonymousAllowed
 	@Produces({ "application/json", "application/xml" })
@@ -142,7 +117,6 @@ public class LTUpdateScnWorklogsResource {
 		
 		// 07:33_sss_04-10-2013_admin_testing
 		if (wlsToSave == null) {
-			System.out.println("There is nothing to save");
 			return Response.ok("NOTHING TO SAVE").build();
 		}
 		Issue issue = issueManager.getIssueObject(Long.parseLong(issueId));
@@ -166,12 +140,9 @@ public class LTUpdateScnWorklogsResource {
 					.valueOf(getWlIdFromRequestParameter(wlString, 4)));
 			
 			userKey= userKey!=null?userKey.toLowerCase():"";
-			System.out.println("Scn time: " + time + " Scn userKey: " + userKey + " comment: " + comment + " Scn date: " + date
-					+ " Scn worklogTypeId: " + worklogTypeId);
 			
 			createWorklogS(time, comment, date, userKey, worklogTypeId, issueId);
 		}
-		System.out.println("The worklogs were saved successfully");
 		
 		LTMessages message = new LTMessages("DONE!");
 		message.setMessage(issue != null ? String.valueOf(issue.getProjectObject().getId()) : "");
@@ -197,13 +168,10 @@ public class LTUpdateScnWorklogsResource {
 				//Long timeSpent = TextFormatUtil.stringToTime(time);
 				if (timeSpent.longValue() != 0) {
 					// Here we will create a worklog
-					ApplicationUser user = ComponentAccessor.getUserManager().getUser(userKey);
 					if (issueId != null && worklogTypeId != null) {
 						createScnWorklog(Long.parseLong(issueId), null, worklogTypeId, timeSpent, comment != null ? comment : "", userKey, day,
 								String.valueOf(worklogTypeId));
 					}
-					
-					System.out.println("The worklog was created!!");
 				}
 			}
 		}
@@ -227,8 +195,6 @@ public class LTUpdateScnWorklogsResource {
 		}
 		else {
 			return "";
-		}
-		
+		}	
 	}
-	
 }

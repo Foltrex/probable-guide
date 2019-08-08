@@ -26,6 +26,8 @@ import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
+
+import org.apache.log4j.Logger;
 import org.ofbiz.core.entity.GenericValue;
 
 import com.atlassian.jira.component.ComponentAccessor;
@@ -40,7 +42,6 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.web.util.OutlookDateManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.jira.user.util.UserManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
@@ -59,11 +60,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Named
 @Path("/updateExtWorklog")
 public class LTUpdateExtWorklogResource {
+	private static final Logger LOGGER = Logger.getLogger(LTUpdateExtWorklogResource.class);
+	
 	private UserManager userManager;
 	private PermissionManager permissionManager;
 	private UserUtil userUtil;
 	private JiraAuthenticationContext authenticationContext;
-	private final OutlookDateManager outlookDateManager;
 	
 	private ProjectManager projectManager;
 	private IssueManager issueManager;
@@ -84,24 +86,10 @@ public class LTUpdateExtWorklogResource {
 	
 	private IScnWorklogService scnDefaultWorklogService;
 	
-	/**
-	 * Constructor.
-	 * 
-//	 * @param userManager
-	 *            a SAL object used to find remote usernames in Atlassian
-	 *            products
-	 * @param userUtil
-	 *            a JIRA object to resolve usernames to JIRA's internal
-	 *            {@code com.opensymphony.os.User} objects
-	 * @param permissionManager
-	 *            the JIRA object which manages permissions for users and
-	 *            projects
-	 */
-
 	@Inject
 	public LTUpdateExtWorklogResource(PermissionManager permissionManager,
               @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-              @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport ProjectManager projectManager,
+              @ComponentImport ProjectManager projectManager,
               @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
 									  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
               @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
@@ -116,7 +104,6 @@ public class LTUpdateExtWorklogResource {
 		this.permissionManager = permissionManager;
 		this.userUtil = userUtil;
 		this.authenticationContext = authenticationContext;
-		this.outlookDateManager = outlookDateManager;
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
@@ -132,12 +119,6 @@ public class LTUpdateExtWorklogResource {
 		
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
 				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
-	}
-	
-	private CacheControl getNoCacheControl() {
-		CacheControl noCache = new CacheControl();
-		noCache.setNoCache(true);
-		return noCache;
 	}
 	
 	/**
@@ -163,9 +144,6 @@ public class LTUpdateExtWorklogResource {
 		String userCreated = getWlIdFromRequestParameter(complexWLId, 5).equals("") ? "" : (getWlIdFromRequestParameter(complexWLId, 5));
 		userCreated= userCreated!=null?userCreated.toLowerCase():"";
 		
-		System.out.println("worklogId: " + worklogId + " worklogTypeId: " + worklogTypeId + " newWLType: " + newWLType + " date: " + date +" newValue: " + newValue +" Scn userName: " + userCreated);
-		System.out.println("complexId2:" + complexId2);
-		
 		if(newValue!=null){
 			newValue = newValue.trim();
 		}
@@ -181,6 +159,7 @@ public class LTUpdateExtWorklogResource {
 		
 		boolean reloadRequired = false;
 		
+		@SuppressWarnings("unused")
 		boolean result = false;
 		// Check what to do with the worklog
 		Long timeSpent = 0L;
@@ -207,7 +186,7 @@ public class LTUpdateExtWorklogResource {
 			
 			boolean projectPermission = projectSettignsManager.hasPermissionToViewWL(appuser, prj);
 			if(!projectPermission){
-				System.out.println("The user does not have permission to create Ext worklog");
+				LOGGER.info("The user does not have permission to create Ext worklog");
 				LTMessages message = new LTMessages("DONE EXT!", false, false);
 				return Response.ok(message).build();
 			}
@@ -235,16 +214,11 @@ public class LTUpdateExtWorklogResource {
 						if (userCreated == null) {
 							userCreated = getUser(request).getDisplayName();
 						}
-						System.out.println("TIMESPEND!!! create "+  timeSpent);
-						System.out.println("Day "+  day);
 						wlIdExt = createExtWorklog(issueId, worklogId, wlType, timeSpent, (comment != null) ? comment : "", userCreated, day, worklogScnId);
 						
 						if (!wlType.equals(worklogTypeId)) {						
 							reloadRequired = true;
-						}
-						
-						System.out.println("The worklog was created!! "+ "wlType: " + wlType + " worklogTypeId: " + worklogTypeId);
-						
+						}	
 					}
 				}
 			}
@@ -260,19 +234,17 @@ public class LTUpdateExtWorklogResource {
 						reloadRequired = true;
 					}
 					wlIdExt = worklogId;
-					System.out.println("The worklog was updated!! "+ "wlType: " + wlType + " worklogTypeId: " + worklogTypeId);
 				}
 				else {					
-					result = deleteExtWorklog(worklogId);				
-					System.out.println("The worklog was deleted!!");
+					result = deleteExtWorklog(worklogId);
 				}
 			}
 			
 		}
 		String complexWLIdnew = changeWlIdFromRequestParameter(complexWLId,  wlIdExt);		
 		LTMessages message = new LTMessages("DONE EXT!", false, reloadRequired, complexWLIdnew);
-		
-		return Response.ok(message).build();
+
+		return Response.ok(message).cacheControl(getNoCacheControl()).build();
 	}
 
     private ApplicationUser getUser(HttpServletRequest request) {
@@ -316,7 +288,7 @@ public class LTUpdateExtWorklogResource {
 		
 		Worklog worklog = iExtWorklogLogtimeStore.createExtWorklog(issueId, _worklogType, _timeSpent, _comment, authorKey, date);
 		if (worklogScnId != 0) {
-			System.out.println("Worklogs should be linked as we create an extWorklog we also need to make a ling to worklog with id  "+worklogScnId);
+			LOGGER.info("Worklogs should be linked as we create an extWorklog we also need to make a ling to worklog with id  "+worklogScnId);
 			iScnWorklogLogtimeStore.updateScnWorklogAndExt(worklogScnId, worklog);
 			iExtWorklogLogtimeStore.updateExtWorklog(worklog.getId(), _worklogType, _timeSpent, _comment);
 		}
@@ -331,4 +303,9 @@ public class LTUpdateExtWorklogResource {
 		return iExtWorklogLogtimeStore.deleteExtWorklogById(worklogId);
 	}
 	
+	private CacheControl getNoCacheControl() {
+		CacheControl noCache = new CacheControl();
+		noCache.setNoCache(true);
+		return noCache;
+	}
 }

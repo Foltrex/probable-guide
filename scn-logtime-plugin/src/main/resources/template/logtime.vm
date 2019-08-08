@@ -184,7 +184,7 @@
 								<td class="total-rows"></td>
 							</tr>
 						#end
-						#if($projectUserKey.getUserKey()==$loggeduser || $wicketPermission )
+						#if($projectUserKey.getUserKey()==$loggeduserKey || $wicketPermission )
 							<tr class="total-wicket">
 								<td class="total-wicket">Wicket Tracker</td>	
 								<td class="total-wicket"></td><td class="total-wicket"></td><td class="total-wicket"></td>							
@@ -199,7 +199,7 @@
 								<td colspan="2" class="total-wicket">$wicketTotal</td>						
 							</tr>
 						#end
-						#if($projectUserKey.getUserKey()==$loggeduser )							
+						#if($projectUserKey.getUserKey()==$loggeduserKey )							
 							<tr class="add-project">
 						#else
 							<tr class="add-project" style="display:none;">
