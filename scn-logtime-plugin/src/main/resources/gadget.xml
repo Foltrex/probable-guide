@@ -291,7 +291,6 @@
             	              
                 prj_check_list_string="";
             	prj_check_cnt = 0;
-            	console.log("selected projects:");
             	for (ii=1; ii<=projectArr.length; ii++)
             	{
             		var check_id = "ddcl-s1-i"+ii;
@@ -303,7 +302,6 @@
             			}else{            			
             				prj_check_list_string=prj_check_list_string + ", "+ projectArr[ii-1];
             			}
-            			console.log(projectArr[ii-1]);
             		} 
             	}
             	

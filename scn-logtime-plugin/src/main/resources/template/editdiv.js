@@ -8,7 +8,7 @@ function toggle(div_id) {
 function setPosition(popUpDivVar,event) {
 	var popUpDiv1 = document.getElementById(popUpDivVar);
 	popUpDiv1.style.top = event.clientY-150 + 'px';
-	//popUpDiv1.style.left = event.clientX-370 + 'px';
+	popUpDiv1.style.left = window.innerWidth/2-200 + 'px';
 }
 
 function blanket_size(popUpDivVar) {
@@ -155,37 +155,28 @@ function issueChanged(userId){
 
 
 function inplace(userIdentifier,identifierSE, idetifier, isScn){	
-	console.log("INPLACE 1 START");
 	if(closedEdit) {
 		closedEdit=false;	
 		return;
 	}
 	if(doubleckicked) return;
 	clicked=true;
-	console.log("INPLACE 2 current_editId " +current_editId);
-	console.log("INPLACE 3 idetifier " +idetifier);
 	if(current_editId==idetifier){
 		return;
 	}
 	if(current_editId!=""){
-		console.log("INPLACE 4: current_editId " + current_editId);
 		var val = document.getElementById(current_editId+"_inplace").value;
 		document.getElementById(current_editId).innerHTML = val;
-		console.log("INPLACE 5: document.getElementById(current_editId).innerHTML " + document.getElementById(current_editId).innerHTML);
-		//console.log(arrayCount['current_editId']);
 		
 	}
 	current_editId = idetifier;	
 	var value = document.getElementById(idetifier).innerHTML;
 	document.getElementById(idetifier).innerHTML="<table><tr><td class=\"editble-input-td\"><input class=\"editble-input\" type=\"text\" size=\"5px\" onkeydown=\"customKeyUp(event,\'"+isScn+"\',\'"+userIdentifier+"\',\'"+identifierSE+"\',\'"+value+"\',\'"+idetifier+"\')\" onChange=\"onFunctionLost(\'"+isScn+"\',\'"+userIdentifier+"\',\'"+identifierSE+"\')\" name=\"t\" id=\""+idetifier+"_inplace\" value=\"" +value+"\" autofocus></td><td class=\"editble-button\"><button id=\"closebtn\" onClick=\"closeInplace(\'"+value+"\',\'"+idetifier+"\')\" class=\"close-small-btn\"/></td></tr></table> ";
-	console.log("INPLACE 5: document.getElementById(idetifier).innerHTML " + document.getElementById(idetifier).innerHTML);
 	setTimeout(function() {
 		document.getElementById(current_editId+"_inplace").focus();
-		console.log("INPLACE 6: FOCUS");
     }, 100);
 	
-	closedEdit=false;
-	console.log("INPLACE 7: END");	
+	closedEdit=false;	
 }
 
 var timepattern1 = /^\s*([0-9]*[0-9]):[0-5][0-9]\s*$/;
@@ -209,10 +200,7 @@ function onFunctionLost(isScn,userIdentifier,identifierSE){
 	}, 200)
 }
 
-function onFunctionLost1(isScn,userIdentifier,identifierSE){	
-		//alert(closedEdit);
-		console.log("ON FUNCTION LOST 1");
-		
+function onFunctionLost1(isScn,userIdentifier,identifierSE){
 		if(closedEdit) {
 			closedEdit=false;	
 			return;
@@ -222,7 +210,6 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 			return;
 		}		
 		var val = document.getElementById(current_editId+"_inplace").value;
-		console.log("ON FUNCTION LOST 2 val " + val);
 		var isValidated=false;
 		if ( timepattern1.test(val) || timepattern2.test(val) || timepattern3.test(val) ) {		
 			isValidated=true;
@@ -234,15 +221,8 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 		}
 		
 		if(isValidated==true){
-			
-			console.log("ON FUNCTION LOST 3 isValidated " + isValidated);
-			console.log("ON FUNCTION LOST 4 current_editId " + current_editId);
-			document.getElementById(current_editId).innerHTML = correctTime(val);
-			
-			console.log("ON FUNCTION LOST 5 document.getElementById(current_editId).innerHTML " + document.getElementById(current_editId).innerHTML);
-			
+			document.getElementById(current_editId).innerHTML = correctTime(val);			
 			//document.getElementById(current_editId).style.color="red";
-			console.log("Lost Focus2 " + arrayCount[current_editId]);
 			//var	current_editId_save=current_editId;					
 			if(isScn!='true'){
 				if(document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML!=""){					
@@ -252,9 +232,7 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 				}
 			}else{
 				var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
-			}
-			
-			console.log("ON FUNCTION LOST 6 READY TO AJAX");	
+			}	
 			var url = (isScn=='true'?"/rest/logtime-gadget/1.0/updateScnWorklog.json":"/rest/logtime-gadget/1.0/updateExtWorklog.json");						
 			var cur=current_editId;
 			AJS.$.ajax({
@@ -262,8 +240,7 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 					  type: "GET",
 					  data: ({complexWLId : arrayCount[current_editId], complexId2: complexId2, newValue: val, newWLType: 'undefined', comment: 'undefined'  }),
 					  dataType: "json",
-					  success: function(msg){
-						console.log("ON FUNCTION LOST 7 AJAX SUCCEED");			
+					  success: function(msg){		
 						if(msg.message=="BLOCKED"){
 							alert("Unfortunately work logs are locked");
 						}else{
@@ -289,11 +266,9 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 						  }
 					  }
 					});
-		}
-		console.log("ON FUNCTION LOST 8 END");			
+		}			
 		current_editId="";
-		clicked=false;
-		
+		clicked=false;	
 }
 
 
@@ -304,9 +279,7 @@ function addWorklog(event,userCount, identifier, addWlComment,dateWeek, userKey)
 	if(current_editId==identifier){
 		return;
 	}
-	current_editId=identifier;
-
-	console.log("CurrentEditId:" + current_editId);		
+	current_editId=identifier;	
 	
 	document.getElementById("pop_edit_worklog_id").value = identifier;
 
@@ -314,7 +287,11 @@ function addWorklog(event,userCount, identifier, addWlComment,dateWeek, userKey)
 	
 	// get value from table
 	document.getElementById("pop_time").value = document.getElementById(editableCellId).innerHTML;
-		
+	
+	setTimeout(function() {
+		document.getElementById("pop_time").focus();
+    }, 100);
+	
 	document.getElementById("textpopUp").value = document.getElementById(addWlComment).value;
 	
 	document.getElementById("commentId").value =addWlComment;	
@@ -352,8 +329,7 @@ function updateWorklog1(event,selCount, identifier, isExternal, timeSpent, wltyp
 	if(current_editId==selCount){
 		return;
 	}
-	current_editId=selCount;
-	console.log("CurrentEditId:" + current_editId);		
+	current_editId=selCount;	
 	
 	document.getElementById("pop_edit_worklog_id").value = identifier;
 
@@ -371,8 +347,7 @@ function updateWorklog1(event,selCount, identifier, isExternal, timeSpent, wltyp
     }, 100);
 	//document.getElementById("textpopUp").value = comment;
 	document.getElementById("textpopUp").value = arrayCountComments[selCount];
-	document.getElementById('worklogTypeSelect').value = wltypeId;
-	console.log("wltypeId:" + wltypeId);		
+	document.getElementById('worklogTypeSelect').value = wltypeId;		
 	
 	document.getElementById('pop_worklog_scn_ext').value = isExternal;
 	document.getElementById('pop_user_identifier').value = userIdentifier;
@@ -381,7 +356,6 @@ function updateWorklog1(event,selCount, identifier, isExternal, timeSpent, wltyp
 	document.getElementById('worklogTypeSelect').disabled=false;
 	//set also WorklogTime and add comment
 	showpopup('popUpWorklogDiv', event);
-	
 }
 
 
@@ -442,8 +416,7 @@ function addWorklogsToDb(){
 
 }
 
-function updateWorklogAJAX()
-{
+function updateWorklogAJAX(){
 	popup('popUpWorklogDiv');
 	var tmpId = document.getElementById("pop_edit_worklog_id").value;
 	var tmpTime = document.getElementById("pop_time").value;
@@ -533,9 +506,7 @@ function updateWorklogAJAX()
 				  }
             	});	
 	}
-	doubleckicked=false;	
-
-	
+	doubleckicked=false;		
 }
 
 function correctTime(tmpTime){
@@ -555,8 +526,7 @@ function replaceSymbols(str){
 	 return str;
 }
 
-function cancelWorklogAJAX()
-{
+function cancelWorklogAJAX(){
 	popup('popUpWorklogDiv');	
 	doubleckicked=false;
 	current_editId="";

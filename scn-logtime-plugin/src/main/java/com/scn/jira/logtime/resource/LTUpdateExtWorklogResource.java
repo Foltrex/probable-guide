@@ -41,7 +41,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.jira.user.util.UserManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
@@ -64,7 +63,6 @@ public class LTUpdateExtWorklogResource {
 	
 	private UserManager userManager;
 	private PermissionManager permissionManager;
-	private UserUtil userUtil;
 	private JiraAuthenticationContext authenticationContext;
 	
 	private ProjectManager projectManager;
@@ -88,21 +86,19 @@ public class LTUpdateExtWorklogResource {
 	
 	@Inject
 	public LTUpdateExtWorklogResource(PermissionManager permissionManager,
-              @ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-              @ComponentImport ProjectManager projectManager,
-              @ComponentImport IssueManager issueManager, @ComponentImport ProjectRoleManager projectRoleManager,
-									  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-              @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-              @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-              @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
-              @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-              @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-              @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-              @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
-		super();
+			@ComponentImport JiraAuthenticationContext authenticationContext,
+			@ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
+			@ComponentImport ProjectRoleManager projectRoleManager,
+			@Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
+			@ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
+			@ComponentImport DefaultScnWorklogManager scnWorklogManager,
+			@ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
+			@ComponentImport ScnProjectSettingsManager projectSettignsManager,
+			@ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
+			@ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+			@ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
-		this.userUtil = userUtil;
 		this.authenticationContext = authenticationContext;
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
@@ -116,9 +112,8 @@ public class LTUpdateExtWorklogResource {
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnDefaultWorklogService = scnDefaultWorklogService;
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
-		
-		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
+		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager, worklogManager,
+				projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
 	}
 	
 	/**

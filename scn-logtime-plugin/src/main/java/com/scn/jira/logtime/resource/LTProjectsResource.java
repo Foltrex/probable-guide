@@ -58,7 +58,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
@@ -87,7 +86,7 @@ public class LTProjectsResource {
 	private WicketManager wicketManager;
 
 	@Inject
-	public LTProjectsResource(@ComponentImport PermissionManager permissionManager, @ComponentImport UserUtil userUtil,
+	public LTProjectsResource(@ComponentImport PermissionManager permissionManager,
 			@ComponentImport JiraAuthenticationContext authenticationContext,
 			@ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
 			@ComponentImport ProjectRoleManager projectRoleManager,
@@ -99,14 +98,13 @@ public class LTProjectsResource {
 			@ComponentImport ScnUserBlockingManager scnUserBlockingManager,
 			@ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
 			@ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
-		super();
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
 		this.authenticationContext = authenticationContext;
 		this.projectManager = projectManager;
 		this.extendedConstantsManager = defaultExtendedConstantsManager;
 		this.scnGlobalPermissionManager = scnGlobalPermissionManager;
-		this.iWorklogLogtimeManager = new WorklogLogtimeManager(userManager, projectManager, issueManager, userUtil,
+		this.iWorklogLogtimeManager = new WorklogLogtimeManager(userManager, projectManager, issueManager,
 				permissionManager, scnWorklogManager, projectRoleManager, overridedWorklogManager,
 				extendedConstantsManager, ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,
 				scnDefaultWorklogService);

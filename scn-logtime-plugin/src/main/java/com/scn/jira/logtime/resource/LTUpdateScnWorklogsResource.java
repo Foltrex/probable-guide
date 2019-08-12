@@ -104,11 +104,10 @@ public class LTUpdateScnWorklogsResource {
 		this.OfBizScnWorklogStore = ofBizScnWorklogStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnDefaultWorklogService = scnDefaultWorklogService;
-		iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager,
-				permissionManager, projectRoleManager, overridedWorklogManager, extendedConstantsManager,
-				OfBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
+		iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager, overridedWorklogManager,
+				projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
 	}
-	
+
 	@GET
 	@AnonymousAllowed
 	@Produces({ "application/json", "application/xml" })

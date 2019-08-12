@@ -24,7 +24,6 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -70,7 +69,6 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 	private ExtendedConstantsManager extendedConstantsManager;
 	private ExtendedWorklogManager extendedWorklogManager;
 	
-	private UserUtil userUtil;
 	private IScnWorklogManager scnWorklogManager;
 	private IScnWorklogStore ofBizScnWorklogStore;
 	private IScnProjectSettingsManager projectSettignsManager;
@@ -81,13 +79,12 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 	
 	private Map<String, Map<String, Integer>> calendarMap;
 	
-	public WorklogLogtimeManager(UserManager userManager, ProjectManager projectManager, IssueManager issueManager, UserUtil userUtil,
+	public WorklogLogtimeManager(UserManager userManager, ProjectManager projectManager, IssueManager issueManager,
 			PermissionManager permissionManager, IScnWorklogManager scnWorklogManager, ProjectRoleManager projectRoleManager,
 			WorklogManager worklogManager, ExtendedConstantsManager extendedConstantsManager, IScnWorklogStore ofBizScnWorklogStore,
 			IScnProjectSettingsManager projectSettignsManager, IScnUserBlockingManager scnUserBlockingManager,IScnWorklogService scnDefaultWorklogService) {
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
-		this.userUtil = userUtil;
 		this.permissionManager = permissionManager;
 		this.scnWorklogManager = scnWorklogManager;
 		this.projectRoleManager = projectRoleManager;
@@ -97,8 +94,8 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 		this.projectSettignsManager = projectSettignsManager;
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
-		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
+		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
+				worklogManager, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		this.calendarMap = new HashMap<String, Map<String, Integer>>();
 	}
 	
