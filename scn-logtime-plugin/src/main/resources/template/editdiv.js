@@ -7,7 +7,7 @@ function toggle(div_id) {
 
 function setPosition(popUpDivVar,event) {
 	var popUpDiv1 = document.getElementById(popUpDivVar);
-	popUpDiv1.style.top = event.clientY-150 + 'px';
+	popUpDiv1.style.top = event.pageY-150 + 'px';
 	popUpDiv1.style.left = window.innerWidth/2-200 + 'px';
 }
 
@@ -412,8 +412,7 @@ function addWorklogsToDb(){
 					//projectChanged(projectId,issueTdId,worklogTypeSel, userId)
 					reloadMeClean();			
             	  }
-            	});	
-
+            	});
 }
 
 function updateWorklogAJAX(){
