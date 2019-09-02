@@ -12,53 +12,49 @@ import net.jcip.annotations.Immutable;
  * either JSON or XML, depending on what the client asks for.
  */
 @Immutable
-@SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
-public class ProjectRepresentation
-{
-    @XmlElement
-    private Long id;
+public class ProjectRepresentation {
+	@XmlElement
+	private Long id;
 
-    @XmlElement
-    private String key;
+	@XmlElement
+	private String key;
 
-    @XmlElement
-    private String name;
+	@XmlElement
+	private String name;
 
-    @XmlElement
-    private String projectUrl;
+	@XmlElement
+	private String projectUrl;
 
-    @XmlElement
-    private String projectLead;
-    
-    @XmlElement
-    private String description;
+	@XmlElement
+	private String projectLead;
 
-    // This private constructor isn't used by any code, but JAXB requires any
-    // representation class to have a no-args constructor.
-    private ProjectRepresentation()
-    {
-        id = null;
-        key = null;
-        name = null;
-        projectUrl = null;
-        projectLead = null;
-        description = null;
-    }
+	@XmlElement
+	private String description;
 
-    /**
-     * Initializes the representation's values to those in the specified
-     * {@code Project}.
-     * @param project the project to use for initialization
-     */
-    public ProjectRepresentation(Project project)
-    {
-        this.id = project.getId();
-        this.key = project.getKey();
-        this.name = project.getName();
-        this.projectUrl = project.getUrl();
-        this.projectLead = project.getLead().getDisplayName();
-        this.description = project.getDescription();
-    }
+	// This constructor isn't used by any code, but JAXB requires any
+	// representation class to have a no-args constructor.
+	public ProjectRepresentation() {
+		id = null;
+		key = null;
+		name = null;
+		projectUrl = null;
+		projectLead = null;
+		description = null;
+	}
 
+	/**
+	 * Initializes the representation's values to those in the specified
+	 * {@code Project}.
+	 * 
+	 * @param project the project to use for initialization
+	 */
+	public ProjectRepresentation(Project project) {
+		this.id = project.getId();
+		this.key = project.getKey();
+		this.name = project.getName();
+		this.projectUrl = project.getUrl();
+		this.projectLead = project.getProjectLead().getDisplayName();
+		this.description = project.getDescription();
+	}
 }

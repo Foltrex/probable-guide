@@ -64,8 +64,8 @@ public class LTIssueResource {
 	public Response getIssues(@Context HttpServletRequest request, @QueryParam("projectId") String projectId) {
 		IExtWorklogLogtimeStore iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager,
 				extendedWorklogManager);
-		Project prj = this.projectManager.getProjectObj(Long.valueOf(projectId.trim()));
-		List<Issue> issues = iExtWorklogLogtimeStore.getIssuesByProjects(prj);
+		Project project = projectManager.getProjectObj(Long.valueOf(projectId.trim()));
+		List<Issue> issues = iExtWorklogLogtimeStore.getIssuesByProjects(project);
 
 		Collections.sort(issues, new Comparator<Issue>() {
 			public int compare(Issue o1, Issue o2) {

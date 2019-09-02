@@ -42,9 +42,8 @@
         <dependency>
             <groupId>com.scn.jira</groupId>
             <artifactId>scn-worklog-plugin</artifactId>
-            <version>4.1.0</version>
+            <version>[4.1.0,4.2.0)</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

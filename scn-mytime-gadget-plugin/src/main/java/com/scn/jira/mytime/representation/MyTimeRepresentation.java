@@ -8,13 +8,12 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @XmlRootElement
 public class MyTimeRepresentation {
-	
 	@XmlElement
 	private String html;
-	
-	private MyTimeRepresentation() {
+
+	public MyTimeRepresentation() {
 	}
-	
+
 	public MyTimeRepresentation(String html) {
 		this.html = html;
 	}
