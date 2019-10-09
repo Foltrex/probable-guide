@@ -16,6 +16,7 @@
 	<name>JIRA ScienceSoft Clone Project</name>
 	<description>The plugin for cloning projects</description>
 	<packaging>atlassian-plugin</packaging>
+	<version>4.1.1</version>
 
 	<dependencies>
 		<dependency>

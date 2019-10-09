@@ -16,6 +16,7 @@
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
 	<description>The plugin provide access to custom time tracking implementation.</description>
 	<packaging>atlassian-plugin</packaging>
+	<version>4.1.1</version>
 
 	<dependencies>
 		<dependency>
@@ -69,6 +70,16 @@
 				<version>${amps.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<applications>
+						<application>
+							<applicationKey>jira-software</applicationKey>
+							<version>${jira.version}</version>
+						</application>
+						<application>
+							<applicationKey>jira-servicedesk</applicationKey>
+							<version>${jira.servicedesk.application.version}</version>
+						</application>
+					</applications>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<enableQuickReload>true</enableQuickReload>

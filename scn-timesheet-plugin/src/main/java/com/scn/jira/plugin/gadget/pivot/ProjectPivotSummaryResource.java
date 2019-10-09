@@ -55,8 +55,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 @Named
 @Path("/project-pivot-summary")
-public class ProjectPivotSummaryResource
-{
+public class ProjectPivotSummaryResource {
 	private static final Logger log = Logger.getLogger(ProjectPivotSummaryResource.class);
 
 	private final VisibilityValidator visibilityValidator;
@@ -76,13 +75,14 @@ public class ProjectPivotSummaryResource
 
 	@Autowired
 	public ProjectPivotSummaryResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-			   @ComponentImport PermissionManager permissionManager, @ComponentImport ApplicationProperties applicationProperties,
-			   @ComponentImport OutlookDateManager outlookDateManager, @ComponentImport IssueManager issueManager,
-			   @ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
-			   @ComponentImport FieldVisibilityManager fieldVisibilityManager, @ComponentImport ProjectManager projectManager,
-			   @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			   @ComponentImport ProjectRoleManager projectRoleManager, @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager)
-	{
+			@ComponentImport PermissionManager permissionManager,
+			@ComponentImport ApplicationProperties applicationProperties,
+			@ComponentImport OutlookDateManager outlookDateManager, @ComponentImport IssueManager issueManager,
+			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
+			@ComponentImport FieldVisibilityManager fieldVisibilityManager,
+			@ComponentImport ProjectManager projectManager, @ComponentImport SearchRequestManager searchRequestManager,
+			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
+			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager) {
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;
 		this.applicationProperties = applicationProperties;
@@ -98,132 +98,115 @@ public class ProjectPivotSummaryResource
 		this.fFactory = ComponentAccessor.getComponent(DateTimeFormatterFactory.class);
 		this.scnGlobalPermissionManager = globalSettingsManager;
 	}
-	
+
 	@GET
 	@AnonymousAllowed
 	@Produces({ "application/json", "application/xml" })
 	public Response getSummary(@Context HttpServletRequest request, @QueryParam("numOfWeeks") int numOfWeeks,
 			@QueryParam("reportingDay") int reportingDay, @QueryParam("projectKey") String projectKey,
-			@QueryParam("filterId") long filterId, @QueryParam("targetGroup") String targetGroupName)
-	{
+			@QueryParam("filterId") long filterId, @QueryParam("targetGroup") String targetGroupName) {
 		VelocityManager vm = ComponentAccessor.getVelocityManager();
-		try
-		{
+		try {
 			return Response
-					.ok(new TimeSheetRepresentation(vm.getBody("templates/scn/pivotgadget/", "project-pivot-summary.vm",
-							getVelocityParams(request, numOfWeeks, reportingDay, projectKey, filterId, targetGroupName))))
+					.ok(new TimeSheetRepresentation(
+							vm.getBody("templates/scn/pivotgadget/", "project-pivot-summary.vm", getVelocityParams(
+									request, numOfWeeks, reportingDay, projectKey, filterId, targetGroupName))))
 					.cacheControl(getNoCacheControl()).build();
-		}
-		catch (VelocityException e)
-		{
+		} catch (VelocityException e) {
 			e.printStackTrace();
 		}
 		return Response.serverError().build();
 	}
-	
+
 	protected Map<String, Object> getVelocityParams(HttpServletRequest request, int numOfWeeks, int reportingDay,
-			String groupName, long filterId, String targetGroup)
-	{
+			String groupName, long filterId, String targetGroup) {
 		Map<String, Object> params = getVelocityParams(numOfWeeks, reportingDay, groupName, filterId, targetGroup);
 		params.put("i18n", this.authenticationContext.getI18nHelper());
 		params.put("textutils", new TextUtils());
 		params.put("req", request);
-		VelocityRequestContext velocityRequestContext = new DefaultVelocityRequestContextFactory(this.applicationProperties)
-				.getJiraVelocityRequestContext();
+		VelocityRequestContext velocityRequestContext = new DefaultVelocityRequestContextFactory(
+				this.applicationProperties).getJiraVelocityRequestContext();
 		params.put("baseurl", velocityRequestContext.getBaseUrl());
 		params.put("requestContext", velocityRequestContext);
 		return params;
 	}
-	
+
 	protected Map<String, Object> getVelocityParams(int numOfWeeks, int reportingDay, String projectKey, long filterId,
-			String targetGroup)
-	{
+			String targetGroup) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		ApplicationUser user = this.authenticationContext.getUser();
-		
+		ApplicationUser user = this.authenticationContext.getLoggedInUser();
+
 		params.put("loggedin", Boolean.valueOf(user != null));
-		
-		if (user == null)
-		{
+
+		if (user == null) {
 			return params;
 		}
-		
+
 		I18nBean i18nBean = new I18nBean(user);
-		
+
 		Calendar[] dates = CalendarUtil.getDatesRange(reportingDay, numOfWeeks);
 		Calendar startDate = dates[0];
 		Calendar endDate = dates[1];
-		try
-		{
+		try {
 			Project project = null;
-			if ((filterId == 0L) && (projectKey != null) && (projectKey.length() != 0))
-			{
+			if ((filterId == 0L) && (projectKey != null) && (projectKey.length() != 0)) {
 				project = this.projectManager.getProjectObjByKey(projectKey);
-				if (project == null)
-				{
+				if (project == null) {
 					log.error("Can't find specified project by key: " + projectKey);
 					return params;
 				}
-				
+
 			}
-			
+
 			Pivot pivot = new Pivot(this.authenticationContext, this.outlookDateManager, this.permissionManager,
 					this.issueManager, this.searchProvider, this.fieldVisibilityManager, this.searchRequestManager,
-                    this.groupManager, this.projectRoleManager, this.scnGlobalPermissionManager);
-			
-			pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(), (project != null) ? project.getId() : null,
-					(filterId == 0L) ? null : Long.valueOf(filterId), targetGroup, false);
-			
+					this.groupManager, this.projectRoleManager, this.scnGlobalPermissionManager);
+
+			pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(),
+					(project != null) ? project.getId() : null, (filterId == 0L) ? null : Long.valueOf(filterId),
+					targetGroup, false);
+
 			DateFieldFormat dateFieldFormat = new DateFieldFormatImpl(this.fFactory);
-			
+
 			params.put("filter", pivot.filter);
 			params.put("project", project);
 			params.put("startDate", dateFieldFormat.formatDatePicker(startDate.getTime()));
 			params.put("endDate", dateFieldFormat.formatDatePicker(endDate.getTime()));
 			params.put("outlookDate", this.outlookDateManager.getOutlookDate(i18nBean.getLocale()));
-			
+
 			params.put("fieldVisibility", this.fieldVisibilityManager);
 			params.put("textUtil", new TextUtil(i18nBean));
 			params.put("workedIssues", pivot.workedIssues);
 			params.put("workedUsers", pivot.workedUsers);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return params;
 	}
-	
+
 	@GET
 	@Path("/validate")
 	@AnonymousAllowed
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response validate(@QueryParam("num_weeks") String num_weeks,
-			@QueryParam("reporting_day") String reporting_day,
-			@QueryParam("project_key") String project_key,
-			@QueryParam("filter_id") String filter_id,
-			@QueryParam("group") String group)
-	{
+			@QueryParam("reporting_day") String reporting_day, @QueryParam("project_key") String project_key,
+			@QueryParam("filter_id") String filter_id, @QueryParam("group") String group) {
 		ErrorCollection.Builder errorBuilder = ErrorCollection.Builder.newBuilder();
-		if (StringUtils.isBlank(num_weeks))
-		{
+		if (StringUtils.isBlank(num_weeks)) {
 			errorBuilder.addError("num_weeks", "scn.gadget.error.num_weeks.empty", new String[0]);
 		}
-		if (StringUtils.isBlank(filter_id))
-		{
+		if (StringUtils.isBlank(filter_id)) {
 			errorBuilder.addError("filter_id", "scn.gadget.error.filter_id.empty", new String[0]);
 		}
 		ErrorCollection errorCollection = errorBuilder.build();
-		if (!errorCollection.hasAnyErrors())
-		{
+		if (!errorCollection.hasAnyErrors()) {
 			return Response.ok().cacheControl(getNoCacheControl()).build();
 		}
 		return Response.status(400).entity(errorCollection).cacheControl(getNoCacheControl()).build();
 	}
-	
-	private CacheControl getNoCacheControl()
-	{
+
+	private CacheControl getNoCacheControl() {
 		CacheControl noCache = new CacheControl();
 		noCache.setNoCache(true);
 		return noCache;

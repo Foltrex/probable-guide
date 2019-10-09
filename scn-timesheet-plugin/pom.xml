@@ -17,6 +17,7 @@
     <name>JIRA ScienceSoft TimeSheet Plugin</name>
     <description>ScienceSoft plugin with two reports and gadget for time tracking.</description>
     <packaging>atlassian-plugin</packaging>
+    <version>4.1.1</version>
 
     <dependencies>
         <dependency>

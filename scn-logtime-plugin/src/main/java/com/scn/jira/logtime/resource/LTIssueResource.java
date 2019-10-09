@@ -91,13 +91,12 @@ public class LTIssueResource {
 		ArrayList<Long> issuesIds = new ArrayList<Long>();
 		issuesList.add("");
 		issuesIds.add(0L);
-		@SuppressWarnings("unused")
 		ApplicationUser user = authenticationContext.getLoggedInUser();
 		for (Issue issue : issues) {
-			//if (issueManager.isEditable(issue, user)) { // FIXME. Check out this condition!
+			if (issueManager.isEditable(issue, user)) {
 				issuesIds.add(issue.getId());
 				issuesList.add(TextFormatUtil.replaceHTMLSymbols(issue.getKey() + " - " + issue.getSummary()));
-			//}
+			}
 		}
 		LTMessages message = new LTMessages(issuesList, issuesIds);
 
