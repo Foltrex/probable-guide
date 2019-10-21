@@ -315,8 +315,8 @@
                     baseUrl: "__ATLASSIAN_BASE_URL__",
                     useOauth: "/rest/gadget/1.0/currentUser",                   
 					view:{
-                        onResizeAdjustHeight: true,
-                        onResizeReload: true,
+                        onResizeAdjustHeight: false,
+                        onResizeReload: false,
 						enableReload: true,
                         template: function(args) {
                             var gadget = this;

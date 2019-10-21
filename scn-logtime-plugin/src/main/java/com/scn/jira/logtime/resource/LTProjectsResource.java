@@ -2,8 +2,6 @@ package com.scn.jira.logtime.resource;
 
 import static com.scn.jira.worklog.globalsettings.GlobalSettingsManager.SCN_TIMETRACKING;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -116,7 +114,6 @@ public class LTProjectsResource {
 	@Produces({ "application/json", "application/xml" })
 	public Response getTimesheet(@Context HttpServletRequest request, @FormParam("prjList") String prjList,
 			@FormParam("usersSelected") String usersSelected, @FormParam("viewType") String viewType) {
-		Instant start = Instant.now();
 		int scnWl = ServletUtil.getIntParam(request, "scnWl", 1);
 		int extWl = ServletUtil.getIntParam(request, "extWl", 1);
 		int assignedCheck = ServletUtil.getIntParam(request, "assignedCheck", 1);
@@ -142,7 +139,6 @@ public class LTProjectsResource {
 			LOGGER.error(e.getMessage());
 			response = Response.serverError().build();
 		}
-		LOGGER.info(String.format("The request duration: %s", Duration.between(start, Instant.now()).toMillis()));
 		return response;
 	}
 
@@ -162,7 +158,7 @@ public class LTProjectsResource {
 
 		params.put("i18n", this.authenticationContext.getI18nHelper());
 		params.put("req", request);
-		
+
 		return params;
 	}
 
@@ -224,7 +220,7 @@ public class LTProjectsResource {
 				endDate);
 		params.put("userWickets", userWickets);
 		params.put("wicketPermission", wicketManager.gerUserWicketPermission(loggeduser.getKey()));
-		
+
 		boolean hasScnWLPermission = scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, loggeduser);
 		if (!hasScnWLPermission) {
 			scnWlCh = false;
@@ -260,7 +256,7 @@ public class LTProjectsResource {
 		for (Project project : projectsTest) {
 			projectRepresentations.add(new ProjectRepresentation(project));
 		}
-		
+
 		return projectRepresentations;
 	}
 
@@ -383,10 +379,10 @@ public class LTProjectsResource {
 			representations.add(ltProjectsRepresentation);
 
 		}
-		
+
 		return representations;
 	}
-	
+
 	private CacheControl getNoCacheControl() {
 		CacheControl noCache = new CacheControl();
 		noCache.setNoCache(true);
