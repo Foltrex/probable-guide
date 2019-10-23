@@ -27,11 +27,14 @@ import org.ofbiz.core.entity.GenericValue;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.AbstractIssue;
+import com.atlassian.jira.datetime.DateTimeFormatter;
+import com.atlassian.jira.datetime.DateTimeFormatterFactory;
+import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.comparator.IssueKeyComparator;
 import com.atlassian.jira.issue.comparator.UserComparator;
+import com.atlassian.jira.issue.search.DocumentWithId;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchRequest;
@@ -73,28 +76,30 @@ public class TimeSheet extends AbstractReport {
 	private final ProjectRoleManager projectRoleManager;
 	private final GroupManager groupManager;
 	private final SearchRequestManager searchRequestManager;
-	private final FieldVisibilityManager fieldVisibilityManager; 
-	
+	private final FieldVisibilityManager fieldVisibilityManager;
+	private final DateTimeFormatter formatter;
+
 	private List<WeekPortletHeader> weekDays = new ArrayList<WeekPortletHeader>();
 	private Map<Issue, List<IScnWorklog>> allWorkLogs = new Hashtable<Issue, List<IScnWorklog>>();
-    private Map<ApplicationUser, Map<Issue, Map<IScnWorklog, Long>>> weekWorkLog = new TreeMap(new UserComparator());
+	private Map<ApplicationUser, Map<Issue, Map<IScnWorklog, Long>>> weekWorkLog = new TreeMap(new UserComparator());
 
-	private Map<Issue, Map<Date,Long>> weekWorkLogShort = new TreeMap<Issue, Map<Date,Long>>(new IssueKeyComparator());
+	private Map<Issue, Map<Date, Long>> weekWorkLogShort = new TreeMap<Issue, Map<Date, Long>>(
+			new IssueKeyComparator());
 	private Map<ApplicationUser, Map<Date, Long>> userWorkLogShort = new TreeMap(new UserComparator());
 	private Map<Long, Long> weekTotalTimeSpents = new Hashtable<Long, Long>();
-	private Map<ApplicationUser, Map<Issue, Long>> userTotalTimeSpents = new Hashtable();
+	private Map<ApplicationUser, Map<Issue, Long>> userTotalTimeSpents = new Hashtable<ApplicationUser, Map<Issue, Long>>();
 	private Map<Project, Map<Date, Long>> projectTimeSpents = new Hashtable<Project, Map<Date, Long>>();
 
 	private Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents = new Hashtable<Project, Map<String, Map<Date, Long>>>();
 
 	@Autowired
-	public TimeSheet(@ComponentImport OutlookDateManager outlookDateManager, @ComponentImport PermissionManager permissionManager,
-			 @ComponentImport IssueManager issueManager, @ComponentImport SearchProvider searchProvider,
-			 @ComponentImport VisibilityValidator visibilityValidator, @ComponentImport UserManager userManager,
-			 @ComponentImport SearchRequestManager searchRequestManager, @ComponentImport GroupManager groupManager,
-			 @ComponentImport ProjectRoleManager projectRoleManager, @Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
-			 @ComponentImport FieldVisibilityManager fieldVisibilityManager)
-	{
+	public TimeSheet(@ComponentImport OutlookDateManager outlookDateManager,
+			@ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
+			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
+			@ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
+			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
+			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
+			@ComponentImport FieldVisibilityManager fieldVisibilityManager) {
 		this.outlookDateManager = outlookDateManager;
 		this.permissionManager = permissionManager;
 		this.issueManager = issueManager;
@@ -106,11 +111,13 @@ public class TimeSheet extends AbstractReport {
 		this.projectRoleManager = projectRoleManager;
 		this.scnGlobalPermissionManager = globalSettingsManager;
 		this.fieldVisibilityManager = fieldVisibilityManager;
+		this.formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class).formatter().forLoggedInUser()
+				.withSystemZone().withStyle(DateTimeStyle.DATE_PICKER);
 	}
 
 	@Override
 	public boolean showReport() {
-		final ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getUser();
+		final ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 		return this.scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, user);
 	}
 
@@ -129,10 +136,10 @@ public class TimeSheet extends AbstractReport {
 	public List<WeekPortletHeader> getWeekDays() {
 		return this.weekDays;
 	}
-	
+
 	public void getTimeSpents(ApplicationUser appUser, Date startDate, Date endDate, String targetUserName,
-			boolean excelView, String priority, String targetGroup, Long projectId, Long filterId,
-			Boolean showWeekends, Boolean showUsers, String groupByField, OutlookDate outlookDate)
+			boolean excelView, String priority, String targetGroup, Long projectId, Long filterId, Boolean showWeekends,
+			Boolean showUsers, String groupByField, OutlookDate outlookDate)
 			throws SearchException, GenericEntityException {
 
 		if (!this.scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, appUser)) {
@@ -147,10 +154,10 @@ public class TimeSheet extends AbstractReport {
 			if (filter != null) {
 
 				SearchQuery searchQuery = SearchQuery.create(filter.getQuery(), appUser);
-				SearchResults issues = this.searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
+				SearchResults<DocumentWithId> issues = this.searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
 				for (Object result : issues.getResults()) {
 					if (result instanceof Issue) {
-						filteredIssues.add(((Issue)result).getId());
+						filteredIssues.add(((Issue) result).getId());
 					}
 				}
 			}
@@ -160,7 +167,8 @@ public class TimeSheet extends AbstractReport {
 		conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
 		conditions.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
 		if (StringUtils.isNotEmpty(targetGroup)) {
-			Collection<String> usersNames = UserToNameFunction.transform(this.groupManager.getUsersInGroup(targetGroup));
+			Collection<String> usersNames = UserToNameFunction
+					.transform(this.groupManager.getUsersInGroup(targetGroup));
 			conditions.add(new EntityExpr("author", IN, usersNames));
 		} else {
 			conditions.add(new EntityExpr("author", EQUALS, targetUserName));
@@ -176,9 +184,9 @@ public class TimeSheet extends AbstractReport {
 
 			Issue issue = this.issueManager.getIssueObject(genericWorklog.getLong("issue"));
 			IScnWorklog worklog = WorklogUtil.convertToWorklog(projectRoleManager, genericWorklog, issue);
-
+			
 			boolean isValidVisibility = this.visibilityValidator.isValidVisibilityData(
-					new JiraServiceContextImpl(appUser), "worklog", worklog.getIssue(), worklog.getGroupLevel(), 
+					new JiraServiceContextImpl(appUser), "worklog", worklog.getIssue(), worklog.getGroupLevel(),
 					(worklog.getRoleLevelId() != null) ? worklog.getRoleLevelId().toString() : null);
 
 			if (!isValidVisibility) {
@@ -192,7 +200,7 @@ public class TimeSheet extends AbstractReport {
 			Project project = issue.getProjectObject();
 
 			if ((priority != null) && (priority.length() != 0)
-					&& (!issue.getPriorityObject().getName()/*getString("priority")*/.equals(priority))) {
+					&& (!issue.getPriorityObject().getName()/* getString("priority") */.equals(priority))) {
 				continue;
 			}
 
@@ -275,7 +283,8 @@ public class TimeSheet extends AbstractReport {
 
 				spent = worklog.getTimeSpent().longValue();
 				if ((showUsers != null) && (showUsers.booleanValue())) {
-					Map<Issue, Map<IScnWorklog, Long>> userWorkLog = (Map<Issue, Map<IScnWorklog, Long>>) this.weekWorkLog.get(workedUser);
+					Map<Issue, Map<IScnWorklog, Long>> userWorkLog = (Map<Issue, Map<IScnWorklog, Long>>) this.weekWorkLog
+							.get(workedUser);
 					if (userWorkLog == null) {
 						userWorkLog = new TreeMap<Issue, Map<IScnWorklog, Long>>(new IssueProjectComparator());
 						this.weekWorkLog.put(workedUser, userWorkLog);
@@ -301,10 +310,8 @@ public class TimeSheet extends AbstractReport {
 					issueTotalTimeSpents.put(issue, new Long(spent));
 				}
 			}
-
 		}
-
-		//I18nBean i18nBean = new I18nBean(remoteUser);
+		// I18nBean i18nBean = new I18nBean(remoteUser);
 
 		Calendar calendarDate = Calendar.getInstance();
 		calendarDate.setTime(startDate);
@@ -346,14 +353,15 @@ public class TimeSheet extends AbstractReport {
 		dateToWorkMap.put(dateOfTheDay, Long.valueOf(spent));
 	}
 
-	private void calculateTimesForProjectGroupedByField(String groupByFieldID, IScnWorklog worklog,
-			Issue issue, Project project, Date dateOfTheDay, OutlookDate outlookDate) {
+	private void calculateTimesForProjectGroupedByField(String groupByFieldID, IScnWorklog worklog, Issue issue,
+			Project project, Date dateOfTheDay, OutlookDate outlookDate) {
 		if (groupByFieldID == null) {
 			return;
 		}
 		String fieldValue = TextUtil.getFieldValue(groupByFieldID, issue, outlookDate);
 
-		Map<String, Map<Date, Long>> projectToFieldWorkLog = (Map<String, Map<Date, Long>>) this.projectGroupedByFieldTimeSpents.get(project);
+		Map<String, Map<Date, Long>> projectToFieldWorkLog = (Map<String, Map<Date, Long>>) this.projectGroupedByFieldTimeSpents
+				.get(project);
 
 		if (projectToFieldWorkLog == null) {
 			projectToFieldWorkLog = new Hashtable<String, Map<Date, Long>>();
@@ -377,12 +385,13 @@ public class TimeSheet extends AbstractReport {
 		fieldToTimeWorkLog.put(dateOfTheDay, new Long(spent));
 	}
 
-	public String generateReport(ProjectActionSupport action, Map<String, Object> params, boolean excelView) throws Exception {
-		ApplicationUser remoteUser = action.getLoggedInApplicationUser();
+	public String generateReport(ProjectActionSupport action, Map<String, Object> params, boolean excelView)
+			throws Exception {
+		ApplicationUser remoteUser = action.getLoggedInUser();
 		I18nBean i18nBean = new I18nBean(remoteUser);
 
-		Date endDateTmp = Pivot.getEndDate(params, i18nBean);
-		Date startDateTmp = Pivot.getStartDate(params, i18nBean, endDateTmp);
+		Date endDateTmp = Pivot.getEndDate(params, formatter);
+		Date startDateTmp = Pivot.getStartDate(params, formatter, endDateTmp);
 
 		Date endDate = new Date(endDateTmp.getYear(), endDateTmp.getMonth(), endDateTmp.getDate());
 		Date startDate = new Date(startDateTmp.getYear(), startDateTmp.getMonth(), startDateTmp.getDate());
@@ -427,8 +436,8 @@ public class TimeSheet extends AbstractReport {
 		OutlookDate outlookDate = this.outlookDateManager.getOutlookDate(i18nBean.getLocale());
 
 		if (remoteUser != null) {
-			getTimeSpents(remoteUser, startDate, endDate, targetUser.getName(), excelView, priority,
-					targetGroup, projectId, filterId, showWeekends, showUsers, groupByField, outlookDate);
+			getTimeSpents(remoteUser, startDate, endDate, targetUser.getName(), excelView, priority, targetGroup,
+					projectId, filterId, showWeekends, showUsers, groupByField, outlookDate);
 		}
 
 		Map<String, Object> velocityParams = new HashMap<String, Object>();
@@ -454,7 +463,7 @@ public class TimeSheet extends AbstractReport {
 		velocityParams.put("outlookDate", outlookDate);
 		velocityParams.put("fieldVisibility", this.fieldVisibilityManager);
 		velocityParams.put("textUtil", new TextUtil(i18nBean));
-		
+
 		return this.descriptor.getHtml((excelView) ? "excel" : "view", velocityParams);
 	}
 

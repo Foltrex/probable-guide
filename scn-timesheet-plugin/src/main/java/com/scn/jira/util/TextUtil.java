@@ -45,9 +45,6 @@ public class TextUtil {
 	private DateFormat dateFormat1;
 	private DateFormat dateFormat2;
 	
-	private TextUtil() {
-	}
-
 	public TextUtil(I18nBean i18nBean) {
 		ApplicationProperties ap = ComponentAccessor.getApplicationProperties();
 		this.hoursPerDay = new Double(ap.getDefaultBackedString("jira.timetracking.hours.per.day"))

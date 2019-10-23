@@ -109,7 +109,7 @@ public class TimeSheetResource
 		
 		int reportingDay = ServletUtil.getIntParam(request, "reportingDay", 2);
 		
-		ApplicationUser targetUser = this.authenticationContext.getUser();
+		ApplicationUser targetUser = this.authenticationContext.getLoggedInUser();
 		if ((targetUserName != null) && (targetUserName.length() != 0))
 		{
 			targetUser = ComponentAccessor.getUserManager().getUserByName(targetUserName);
@@ -146,7 +146,7 @@ public class TimeSheetResource
 	private Map<String, Object> getVelocityParams(int numOfWeeks, int reportingDay, User targetUser)
 	{
 		Map<String, Object> params = new HashMap<String, Object>();
-		ApplicationUser user = this.authenticationContext.getUser();
+		ApplicationUser user = this.authenticationContext.getLoggedInUser();
 		
 		params.put("loggedin", Boolean.valueOf(user != null));
 		

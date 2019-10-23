@@ -9,14 +9,12 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.I18nHelper;
 
-public class WeekDaysValuesGenerator
-		implements ValuesGenerator
-{
-	public Map<Long, String> getValues(Map params)
-	{
+public class WeekDaysValuesGenerator implements ValuesGenerator<Long> {
+	@SuppressWarnings("rawtypes")
+	public Map<Long, String> getValues(Map params) {
 		JiraAuthenticationContext authenticationContext = ComponentAccessor.getJiraAuthenticationContext();
 		I18nHelper i18n = authenticationContext.getI18nHelper();
-		
+
 		Map<Long, String> weekDays = new LinkedMap();
 		weekDays.put(new Long(0L), i18n.getText("com.scn.jira.util.weekdays.today"));
 		weekDays.put(new Long(2L), i18n.getText("com.scn.jira.util.weekdays.monday"));

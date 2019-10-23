@@ -23,7 +23,7 @@
 				
 				<td width=50%>$textutils.plainTextToHtml($issue.getString('summary'))</td>
 				
-				<td align="center" width=1%>$outlookDate.formatDatePicker($worklog.getStartDate())</td>
+				<td align="center" width=1%>$formatter.format($worklog.getStartDate())</td>
 				<td align="center" width=1%>
                                 #if ($worklog.getAuthorFullName())
 		                    $worklog.getAuthorFullName()</td>

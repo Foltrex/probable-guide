@@ -158,7 +158,7 @@ public class ProjectPivotSummaryResource {
 
 			}
 
-			Pivot pivot = new Pivot(this.authenticationContext, this.outlookDateManager, this.permissionManager,
+			Pivot pivot = new Pivot(this.authenticationContext, this.permissionManager,
 					this.issueManager, this.searchProvider, this.fieldVisibilityManager, this.searchRequestManager,
 					this.groupManager, this.projectRoleManager, this.scnGlobalPermissionManager);
 

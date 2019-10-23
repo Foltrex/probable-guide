@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,8 +38,8 @@ public class UserResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public Response getUsers() {
-        Collection<ApplicationUser> userList = this.userManager.getUsers();
-        ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getUser();
+        Collection<ApplicationUser> userList = this.userManager.getAllApplicationUsers();
+        ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         UserCollection userCollection = new UserCollection(convertUserToUserItem(currentUser)
                 , convertUserListToUserItems(userList));
         return Response.ok(userCollection).cacheControl(getNoCacheControl()).build();
@@ -78,7 +77,7 @@ public class UserResource {
             this.label = label;
         }
 
-        private UserItem() {
+        public UserItem() {
         }
     }
 
@@ -95,7 +94,7 @@ public class UserResource {
             this.userList = userList;
         }
 
-        private UserCollection() {
+        public UserCollection() {
         }
     }
 }
