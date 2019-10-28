@@ -90,7 +90,7 @@
             <property>
                 <key>weekends</key>
                 <name>report.timesheet.weekends.label</name>
-                <description>report.timesheet.weekends.description</description>
+                <description>scn.report.timesheet.weekends.description</description>
                 <type>checkbox</type>
                 <default>true</default>
             </property>

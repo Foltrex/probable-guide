@@ -26,6 +26,7 @@ import org.ofbiz.core.entity.GenericValue;
 
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
+import com.atlassian.jira.bc.issue.visibility.Visibilities;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
@@ -40,6 +41,7 @@ import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.issue.search.SearchRequestManager;
 import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.plugin.report.impl.AbstractReport;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
@@ -52,8 +54,6 @@ import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.ProjectActionSupport;
 import com.atlassian.jira.web.bean.I18nBean;
 import com.atlassian.jira.web.bean.PagerFilter;
-import com.atlassian.jira.web.util.OutlookDate;
-import com.atlassian.jira.web.util.OutlookDateManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.plugin.report.pivot.Pivot;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +62,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import javax.inject.Named;
 
 @Named
+@SuppressWarnings("rawtypes")
 public class TimeSheet extends AbstractReport {
 
 	private static final Logger log = Logger.getLogger(TimeSheet.class);
 
-	private final OutlookDateManager outlookDateManager;
 	private final PermissionManager permissionManager;
 	private final IssueManager issueManager;
 	private final GlobalSettingsManager scnGlobalPermissionManager;
@@ -81,10 +81,12 @@ public class TimeSheet extends AbstractReport {
 
 	private List<WeekPortletHeader> weekDays = new ArrayList<WeekPortletHeader>();
 	private Map<Issue, List<IScnWorklog>> allWorkLogs = new Hashtable<Issue, List<IScnWorklog>>();
+	@SuppressWarnings("unchecked")
 	private Map<ApplicationUser, Map<Issue, Map<IScnWorklog, Long>>> weekWorkLog = new TreeMap(new UserComparator());
-
+	@SuppressWarnings("unchecked")
 	private Map<Issue, Map<Date, Long>> weekWorkLogShort = new TreeMap<Issue, Map<Date, Long>>(
 			new IssueKeyComparator());
+	@SuppressWarnings("unchecked")
 	private Map<ApplicationUser, Map<Date, Long>> userWorkLogShort = new TreeMap(new UserComparator());
 	private Map<Long, Long> weekTotalTimeSpents = new Hashtable<Long, Long>();
 	private Map<ApplicationUser, Map<Issue, Long>> userTotalTimeSpents = new Hashtable<ApplicationUser, Map<Issue, Long>>();
@@ -93,14 +95,12 @@ public class TimeSheet extends AbstractReport {
 	private Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents = new Hashtable<Project, Map<String, Map<Date, Long>>>();
 
 	@Autowired
-	public TimeSheet(@ComponentImport OutlookDateManager outlookDateManager,
-			@ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
+	public TimeSheet(@ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
 			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
 			@ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
 			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
 			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
 			@ComponentImport FieldVisibilityManager fieldVisibilityManager) {
-		this.outlookDateManager = outlookDateManager;
 		this.permissionManager = permissionManager;
 		this.issueManager = issueManager;
 		this.userManager = userManager;
@@ -137,9 +137,10 @@ public class TimeSheet extends AbstractReport {
 		return this.weekDays;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void getTimeSpents(ApplicationUser appUser, Date startDate, Date endDate, String targetUserName,
 			boolean excelView, String priority, String targetGroup, Long projectId, Long filterId, Boolean showWeekends,
-			Boolean showUsers, String groupByField, OutlookDate outlookDate)
+			Boolean showUsers, String groupByField, DateTimeFormatter formatter)
 			throws SearchException, GenericEntityException {
 
 		if (!this.scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, appUser)) {
@@ -147,14 +148,14 @@ public class TimeSheet extends AbstractReport {
 		}
 
 		Set<Long> filteredIssues = new TreeSet<Long>();
-		Iterator<Issue> i;
 		if (filterId != null) {
 			log.info("Using filter: " + filterId);
 			SearchRequest filter = this.searchRequestManager.getSearchRequestById(appUser, filterId);
 			if (filter != null) {
 
 				SearchQuery searchQuery = SearchQuery.create(filter.getQuery(), appUser);
-				SearchResults<DocumentWithId> issues = this.searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
+				SearchResults<DocumentWithId> issues = this.searchProvider.search(searchQuery,
+						PagerFilter.getUnlimitedFilter());
 				for (Object result : issues.getResults()) {
 					if (result instanceof Issue) {
 						filteredIssues.add(((Issue) result).getId());
@@ -184,10 +185,11 @@ public class TimeSheet extends AbstractReport {
 
 			Issue issue = this.issueManager.getIssueObject(genericWorklog.getLong("issue"));
 			IScnWorklog worklog = WorklogUtil.convertToWorklog(projectRoleManager, genericWorklog, issue);
-			
+
 			boolean isValidVisibility = this.visibilityValidator.isValidVisibilityData(
-					new JiraServiceContextImpl(appUser), "worklog", worklog.getIssue(), worklog.getGroupLevel(),
-					(worklog.getRoleLevelId() != null) ? worklog.getRoleLevelId().toString() : null);
+					new JiraServiceContextImpl(appUser), "worklog", worklog.getIssue(),
+					Visibilities.fromGroupAndStrRoleId(worklog.getGroupLevel(),
+							(worklog.getRoleLevelId() != null) ? worklog.getRoleLevelId().toString() : null));
 
 			if (!isValidVisibility) {
 				continue;
@@ -199,8 +201,7 @@ public class TimeSheet extends AbstractReport {
 
 			Project project = issue.getProjectObject();
 
-			if ((priority != null) && (priority.length() != 0)
-					&& (!issue.getPriorityObject().getName()/* getString("priority") */.equals(priority))) {
+			if ((priority != null) && (priority.length() != 0) && (!issue.getPriority().getName().equals(priority))) {
 				continue;
 			}
 
@@ -226,7 +227,7 @@ public class TimeSheet extends AbstractReport {
 			Date dateOfTheDay = cal.getTime();
 			Long dateCreatedLong = new Long(cal.getTimeInMillis());
 
-			if (!this.permissionManager.hasPermission(10, issue, appUser)) {
+			if (!this.permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, appUser)) {
 				continue;
 			}
 
@@ -271,8 +272,7 @@ public class TimeSheet extends AbstractReport {
 
 				projectWorkLog.put(dateOfTheDay, new Long(spent));
 
-				calculateTimesForProjectGroupedByField(groupByField, worklog, issue, project, dateOfTheDay,
-						outlookDate);
+				calculateTimesForProjectGroupedByField(groupByField, worklog, issue, project, dateOfTheDay, formatter);
 
 				spent = worklog.getTimeSpent().longValue();
 				dateSpent = (Long) this.weekTotalTimeSpents.get(dateCreatedLong);
@@ -354,11 +354,11 @@ public class TimeSheet extends AbstractReport {
 	}
 
 	private void calculateTimesForProjectGroupedByField(String groupByFieldID, IScnWorklog worklog, Issue issue,
-			Project project, Date dateOfTheDay, OutlookDate outlookDate) {
+			Project project, Date dateOfTheDay, DateTimeFormatter formatter) {
 		if (groupByFieldID == null) {
 			return;
 		}
-		String fieldValue = TextUtil.getFieldValue(groupByFieldID, issue, outlookDate);
+		String fieldValue = TextUtil.getFieldValue(groupByFieldID, issue, formatter);
 
 		Map<String, Map<Date, Long>> projectToFieldWorkLog = (Map<String, Map<Date, Long>>) this.projectGroupedByFieldTimeSpents
 				.get(project);
@@ -390,11 +390,8 @@ public class TimeSheet extends AbstractReport {
 		ApplicationUser remoteUser = action.getLoggedInUser();
 		I18nBean i18nBean = new I18nBean(remoteUser);
 
-		Date endDateTmp = Pivot.getEndDate(params, formatter);
-		Date startDateTmp = Pivot.getStartDate(params, formatter, endDateTmp);
-
-		Date endDate = new Date(endDateTmp.getYear(), endDateTmp.getMonth(), endDateTmp.getDate());
-		Date startDate = new Date(startDateTmp.getYear(), startDateTmp.getMonth(), startDateTmp.getDate());
+		Date endDate = Pivot.getEndDate(params, formatter);
+		Date startDate = Pivot.getStartDate(params, formatter, endDate);
 
 		ApplicationUser targetUser = ParameterUtils.getUserParam(params, "targetUser");
 		String priority = ParameterUtils.getStringParam(params, "priority");
@@ -433,11 +430,9 @@ public class TimeSheet extends AbstractReport {
 			}
 		}
 
-		OutlookDate outlookDate = this.outlookDateManager.getOutlookDate(i18nBean.getLocale());
-
 		if (remoteUser != null) {
 			getTimeSpents(remoteUser, startDate, endDate, targetUser.getName(), excelView, priority, targetGroup,
-					projectId, filterId, showWeekends, showUsers, groupByField, outlookDate);
+					projectId, filterId, showWeekends, showUsers, groupByField, formatter);
 		}
 
 		Map<String, Object> velocityParams = new HashMap<String, Object>();
@@ -460,24 +455,30 @@ public class TimeSheet extends AbstractReport {
 			velocityParams.put("projectGroupedTimeSpents", this.projectGroupedByFieldTimeSpents);
 		}
 		velocityParams.put("groupByField", groupByField);
-		velocityParams.put("outlookDate", outlookDate);
+		velocityParams.put("formatter", formatter);
 		velocityParams.put("fieldVisibility", this.fieldVisibilityManager);
 		velocityParams.put("textUtil", new TextUtil(i18nBean));
 
 		return this.descriptor.getHtml((excelView) ? "excel" : "view", velocityParams);
 	}
 
+	@Override
 	public void validate(ProjectActionSupport action, Map params) {
 	}
 
+	@Override
 	public boolean isExcelViewSupported() {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
 	public String generateReportHtml(ProjectActionSupport action, Map params) throws Exception {
 		return generateReport(action, params, false);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
 	public String generateReportExcel(ProjectActionSupport action, Map params) throws Exception {
 		return generateReport(action, params, true);
 	}

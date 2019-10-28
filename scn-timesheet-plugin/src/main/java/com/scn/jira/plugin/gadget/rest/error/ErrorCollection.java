@@ -10,78 +10,71 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: nsokolova
- * Date: 11/29/11
- * Time: 4:22 AM
- * To change this template use File | Settings | File Templates.
- */
 @XmlRootElement
 public class ErrorCollection {
 
-    @XmlElement
-    private Collection<String> errorMessages = new ArrayList<String>();
+	@XmlElement
+	private Collection<String> errorMessages = new ArrayList<String>();
 
-    @XmlElement
-    private Collection<ValidationError> errors = new ArrayList<ValidationError>();
+	@XmlElement
+	private Collection<ValidationError> errors = new ArrayList<ValidationError>();
 
-    private ErrorCollection() {
-    }
+	private ErrorCollection() {
+	}
 
-    private ErrorCollection(Collection<ValidationError> errors, Collection<String> errorMessages) {
-        Assertions.notNull("errors", errors);
-        Assertions.notNull("errorMessages", errorMessages);
+	private ErrorCollection(Collection<ValidationError> errors, Collection<String> errorMessages) {
+		Assertions.notNull("errors", errors);
+		Assertions.notNull("errorMessages", errorMessages);
 
-        this.errorMessages.addAll(errorMessages);
-        this.errors.addAll(errors);
-    }
+		this.errorMessages.addAll(errorMessages);
+		this.errors.addAll(errors);
+	}
 
-    private void addValidationError(ValidationError validationError) {
-        this.errors.add(validationError);
-    }
+	private void addValidationError(ValidationError validationError) {
+		this.errors.add(validationError);
+	}
 
-    public boolean hasAnyErrors() {
-        return (!this.errorMessages.isEmpty()) || (!this.errors.isEmpty());
-    }
+	public boolean hasAnyErrors() {
+		return (!this.errorMessages.isEmpty()) || (!this.errors.isEmpty());
+	}
 
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
 
-    public boolean equals(Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
-    }
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o);
+	}
 
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 
-    public static class Builder {
-        private ErrorCollection errorCollection;
+	public static class Builder {
+		private ErrorCollection errorCollection;
 
-        public static Builder newBuilder() {
-            return new Builder(Collections.<ValidationError>emptyList(), Collections.<String>emptyList());
-        }
+		public static Builder newBuilder() {
+			return new Builder(Collections.<ValidationError>emptyList(), Collections.<String>emptyList());
+		}
 
-        Builder(Collection<ValidationError> errors, Collection<String> errorMessages) {
-            this.errorCollection = new ErrorCollection(errors, errorMessages);
-        }
+		Builder(Collection<ValidationError> errors, Collection<String> errorMessages) {
+			this.errorCollection = new ErrorCollection(errors, errorMessages);
+		}
 
-        public Builder addError(String field, String errorKey, String[] params) {
-            Assertions.notNull("field", field);
-            Assertions.notNull("errorKey", errorKey);
+		public Builder addError(String field, String errorKey, String[] params) {
+			Assertions.notNull("field", field);
+			Assertions.notNull("errorKey", errorKey);
 
-            if ((params != null) && (params.length > 0)) {
-                this.errorCollection.addValidationError(new ValidationError(field, errorKey, Arrays.asList(params)));
-            } else {
-                this.errorCollection.addValidationError(new ValidationError(field, errorKey));
-            }
-            return this;
-        }
+			if ((params != null) && (params.length > 0)) {
+				this.errorCollection.addValidationError(new ValidationError(field, errorKey, Arrays.asList(params)));
+			} else {
+				this.errorCollection.addValidationError(new ValidationError(field, errorKey));
+			}
+			return this;
+		}
 
-        public ErrorCollection build() {
-            return this.errorCollection;
-        }
-    }
+		public ErrorCollection build() {
+			return this.errorCollection;
+		}
+	}
 }

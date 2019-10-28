@@ -27,7 +27,7 @@
                             &nbsp;<font size="1">(<a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$dpc.getString($startDate)&endDate=$dpc.getString($endDate)&targetGroup=$targetGroup.name&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report&weekends=true&showUsers=false">$i18n.getText("portlet.timesheet.details")</a>)</font>
                         </td>
                         #foreach ($weekDay in $weekDays)
-                            <td align="center" width="1%" class="$weekDay.getWeekDayCSS()" title="$outlookDate.formatDMY($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</td>
+                            <td align="center" width="1%" class="$weekDay.getWeekDayCSS()" title="$formatter.format($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</td>
                         #end
                         <td align="center" width="1%">$i18n.getText("portlet.timesheet.tot")</td>
                     </tr>

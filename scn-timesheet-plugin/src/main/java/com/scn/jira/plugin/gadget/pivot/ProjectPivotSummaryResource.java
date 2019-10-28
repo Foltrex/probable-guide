@@ -22,10 +22,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.VelocityException;
 
-import com.atlassian.jira.bc.issue.util.VisibilityValidator;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
+import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchRequestManager;
@@ -41,7 +42,6 @@ import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.jira.util.velocity.VelocityRequestContext;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.bean.I18nBean;
-import com.atlassian.jira.web.util.OutlookDateManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.opensymphony.util.TextUtils;
@@ -58,11 +58,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class ProjectPivotSummaryResource {
 	private static final Logger log = Logger.getLogger(ProjectPivotSummaryResource.class);
 
-	private final VisibilityValidator visibilityValidator;
 	private final ApplicationProperties applicationProperties;
 	private final ProjectManager projectManager;
 	private final JiraAuthenticationContext authenticationContext;
-	private final OutlookDateManager outlookDateManager;
 	private final PermissionManager permissionManager;
 	private final IssueManager issueManager;
 	private final SearchProvider searchProvider;
@@ -72,13 +70,13 @@ public class ProjectPivotSummaryResource {
 	private final ProjectRoleManager projectRoleManager;
 	private final DateTimeFormatterFactory fFactory;
 	private final GlobalSettingsManager scnGlobalPermissionManager;
+	private final DateTimeFormatter formatter;
 
 	@Autowired
 	public ProjectPivotSummaryResource(@ComponentImport JiraAuthenticationContext authenticationContext,
 			@ComponentImport PermissionManager permissionManager,
-			@ComponentImport ApplicationProperties applicationProperties,
-			@ComponentImport OutlookDateManager outlookDateManager, @ComponentImport IssueManager issueManager,
-			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
+			@ComponentImport ApplicationProperties applicationProperties, @ComponentImport IssueManager issueManager,
+			@ComponentImport SearchProvider searchProvider,
 			@ComponentImport FieldVisibilityManager fieldVisibilityManager,
 			@ComponentImport ProjectManager projectManager, @ComponentImport SearchRequestManager searchRequestManager,
 			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
@@ -86,10 +84,8 @@ public class ProjectPivotSummaryResource {
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;
 		this.applicationProperties = applicationProperties;
-		this.outlookDateManager = outlookDateManager;
 		this.issueManager = issueManager;
 		this.searchProvider = searchProvider;
-		this.visibilityValidator = visibilityValidator;
 		this.fieldVisibilityManager = fieldVisibilityManager;
 		this.projectManager = projectManager;
 		this.searchRequestManager = searchRequestManager;
@@ -97,6 +93,8 @@ public class ProjectPivotSummaryResource {
 		this.projectRoleManager = projectRoleManager;
 		this.fFactory = ComponentAccessor.getComponent(DateTimeFormatterFactory.class);
 		this.scnGlobalPermissionManager = globalSettingsManager;
+		this.formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class).formatter().forLoggedInUser()
+				.withSystemZone().withStyle(DateTimeStyle.DATE_PICKER);
 	}
 
 	@GET
@@ -158,9 +156,9 @@ public class ProjectPivotSummaryResource {
 
 			}
 
-			Pivot pivot = new Pivot(this.authenticationContext, this.permissionManager,
-					this.issueManager, this.searchProvider, this.fieldVisibilityManager, this.searchRequestManager,
-					this.groupManager, this.projectRoleManager, this.scnGlobalPermissionManager);
+			Pivot pivot = new Pivot(this.authenticationContext, this.permissionManager, this.issueManager,
+					this.searchProvider, this.fieldVisibilityManager, this.searchRequestManager, this.groupManager,
+					this.projectRoleManager, this.scnGlobalPermissionManager);
 
 			pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(),
 					(project != null) ? project.getId() : null, (filterId == 0L) ? null : Long.valueOf(filterId),
@@ -172,7 +170,7 @@ public class ProjectPivotSummaryResource {
 			params.put("project", project);
 			params.put("startDate", dateFieldFormat.formatDatePicker(startDate.getTime()));
 			params.put("endDate", dateFieldFormat.formatDatePicker(endDate.getTime()));
-			params.put("outlookDate", this.outlookDateManager.getOutlookDate(i18nBean.getLocale()));
+			params.put("formatter", formatter);
 
 			params.put("fieldVisibility", this.fieldVisibilityManager);
 			params.put("textUtil", new TextUtil(i18nBean));

@@ -28,7 +28,7 @@
 				
                 #if ($groupByField)
                     <td class="colHeaderLink" width="50%">
-                    #set ($field = $textUtil.getFieldValue($groupByField, $issue, $outlookDate))
+                    #set ($field = $textUtil.getFieldValue($groupByField, $issue, $formatter))
                     #if ($field  == "NoValueForFieldOnIssue")
                         $i18n.getText("report.timesheet.groupbyfield.novalue")
                     #elseif ($field == "FieldTypeValueNotApplicableForGrouping")
@@ -39,7 +39,7 @@
                     </td>
                 #end
 
-				<td align="center" width=1%>$outlookDate.formatDatePicker($worklog.getStartDate())</td>
+				<td align="center" width=1%>$formatter.format($worklog.getStartDate())</td>
 				<td align="center" width=1%>$worklog.getAuthorFullName()</td>
 				<td align="center" width=1%>$textUtil.getHours($worklog.getTimeSpent())</td>
 				<td align="center" width=1%>$textutils.htmlEncode($worklog.getComment())</td>

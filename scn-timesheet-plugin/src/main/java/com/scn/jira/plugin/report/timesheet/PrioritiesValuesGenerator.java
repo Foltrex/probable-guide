@@ -10,18 +10,17 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.issue.priority.Priority;
 
-public class PrioritiesValuesGenerator implements ValuesGenerator
-{
-	public Map<String, Object> getValues(Map arg0)
-	{
+@SuppressWarnings("rawtypes")
+public class PrioritiesValuesGenerator implements ValuesGenerator {
+	@Override
+	public Map<String, Object> getValues(Map arg0) {
 		Map<String, Object> values = new TreeMap<String, Object>();
 		values.put("", "");
 		ConstantsManager constantsManager = ComponentAccessor.getConstantsManager();
-		
-		Collection<Priority> priorities = constantsManager.getPriorityObjects();
-		
-		for (Iterator<Priority> i = priorities.iterator(); i.hasNext();)
-		{
+
+		Collection<Priority> priorities = constantsManager.getPriorities();
+
+		for (Iterator<Priority> i = priorities.iterator(); i.hasNext();) {
 			Priority priority = (Priority) i.next();
 			values.put(priority.getId(), priority.getName());
 		}

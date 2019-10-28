@@ -13,88 +13,82 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 
-/**
- * Created by IntelliJ IDEA.
- * User: nsokolova
- * Date: 12/1/11
- * Time: 8:16 AM
- * To change this template use File | Settings | File Templates.
- */
 @Path("/user-list")
 @AnonymousAllowed
 public class UserResource {
+	private final UserSearchService userSearchService;
 
-    private final UserManager userManager;
+	public UserResource() {
+		this.userSearchService = ComponentAccessor.getUserSearchService();
+	}
 
-    public UserResource() {
-        this.userManager = ComponentAccessor.getUserManager();
-    }
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getUsers() {
+		ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+		Collection<ApplicationUser> userList = this.userSearchService
+				.findUsersAllowEmptyQuery(new JiraServiceContextImpl(currentUser), null);
+		UserCollection userCollection = new UserCollection(convertUserToUserItem(currentUser),
+				convertUserListToUserItems(userList));
+		return Response.ok(userCollection).cacheControl(getNoCacheControl()).build();
+	}
 
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    public Response getUsers() {
-        Collection<ApplicationUser> userList = this.userManager.getAllApplicationUsers();
-        ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-        UserCollection userCollection = new UserCollection(convertUserToUserItem(currentUser)
-                , convertUserListToUserItems(userList));
-        return Response.ok(userCollection).cacheControl(getNoCacheControl()).build();
-    }
+	private List<UserItem> convertUserListToUserItems(Collection<ApplicationUser> stdUserList) {
+		List<UserItem> userList = new ArrayList<UserResource.UserItem>();
+		for (ApplicationUser u : stdUserList) {
+			userList.add(convertUserToUserItem(u));
+		}
+		return userList;
+	}
 
-    private List<UserItem> convertUserListToUserItems(Collection<ApplicationUser> stdUserList) {
-        List<UserItem> userList = new ArrayList<UserResource.UserItem>();
-        for (ApplicationUser u : stdUserList) {
-            userList.add(convertUserToUserItem(u));
-        }
-        return userList;
-    }
+	private UserItem convertUserToUserItem(ApplicationUser stdUser) {
+		return new UserResource.UserItem(stdUser.getName(), stdUser.getDisplayName());
+	}
 
-    private UserItem convertUserToUserItem(ApplicationUser stdUser) {
-        return new UserResource.UserItem(stdUser.getName(), stdUser.getDisplayName());
-    }
+	private CacheControl getNoCacheControl() {
+		CacheControl noCache = new CacheControl();
+		noCache.setNoCache(true);
+		return noCache;
+	}
 
-    private CacheControl getNoCacheControl() {
-        CacheControl noCache = new CacheControl();
-        noCache.setNoCache(true);
-        return noCache;
-    }
+	@XmlRootElement
+	public static class UserItem {
 
-    @XmlRootElement
-    public static class UserItem {
+		@XmlElement
+		private String value;
 
-        @XmlElement
-        private String value;
+		@XmlElement
+		private String label;
 
-        @XmlElement
-        private String label;
+		UserItem(String value, String label) {
+			this.value = value;
+			this.label = label;
+		}
 
-        UserItem(String value, String label) {
-            this.value = value;
-            this.label = label;
-        }
+		public UserItem() {
+		}
+	}
 
-        public UserItem() {
-        }
-    }
+	@XmlRootElement
+	public static class UserCollection {
+		@XmlElement
+		private UserResource.UserItem currentUser;
 
-    @XmlRootElement
-    public static class UserCollection {
-        @XmlElement
-        private UserResource.UserItem currentUser;
+		@XmlElement
+		private List<UserResource.UserItem> userList;
 
-        @XmlElement
-        private List<UserResource.UserItem> userList;
+		public UserCollection(UserItem currentUser, List<UserItem> userList) {
+			this.currentUser = currentUser;
+			this.userList = userList;
+		}
 
-        public UserCollection(UserItem currentUser, List<UserItem> userList) {
-            this.currentUser = currentUser;
-            this.userList = userList;
-        }
-
-        public UserCollection() {
-        }
-    }
+		public UserCollection() {
+		}
+	}
 }

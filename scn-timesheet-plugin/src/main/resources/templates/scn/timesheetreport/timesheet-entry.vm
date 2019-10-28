@@ -28,7 +28,7 @@
 
     #if ($groupByField)
 	    <td nowrap width="1%" rowspan="$entries">
-	        #set ($field = $textUtil.getFieldValue($groupByField, $issue, $outlookDate))
+	        #set ($field = $textUtil.getFieldValue($groupByField, $issue, $formatter))
             #if ($field  == "NoValueForFieldOnIssue")
                 $i18n.getText("report.timesheet.groupbyfield.novalue")
             #elseif ($field == "FieldTypeValueNotApplicableForGrouping")

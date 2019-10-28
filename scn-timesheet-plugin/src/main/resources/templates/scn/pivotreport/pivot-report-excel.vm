@@ -18,7 +18,7 @@
 			<tr #if ($count % 2 == 0) class="rowNormal" #else class="rowAlternate" #end >
 				#set ($relPath = "/browse/$issue.getString('key')")
 		        <td width="1%">&nbsp;</td>
-		                <td align="center" width=1%>$issue.getIssueType().getString("name")</td>
+		        <td align="center" width=1%>$issue.getIssueType().getString("name")</td>
 				<td nowrap width=1%><font size=1><a href="$textUtil.expandUrl($req, $relPath)">$issue.getString("key")</a></font></td>
 				
 				<td width=50%>$textutils.plainTextToHtml($issue.getString('summary'))</td>
