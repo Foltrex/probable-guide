@@ -6,20 +6,17 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.ApplicationUser;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 
-public class ScnProjectSettingsCondition extends AbstractWebCondition
-{
+public class ScnProjectSettingsCondition extends AbstractWebCondition {
 	private final IScnProjectSettingsManager psManager;
-	
-	public ScnProjectSettingsCondition(IScnProjectSettingsManager psManager)
-	{
+
+	public ScnProjectSettingsCondition(IScnProjectSettingsManager psManager) {
 		this.psManager = psManager;
 	}
-	
+
 	@Override
-	public boolean shouldDisplay(ApplicationUser user, JiraHelper jHelper)
-	{
-		Project project = jHelper.getProjectObject();
-		
+	public boolean shouldDisplay(ApplicationUser user, JiraHelper jHelper) {
+		Project project = jHelper.getProject();
+
 		if (user == null || project == null)
 			return false;
 

@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +49,8 @@ public class JiraScnRestService {
 	@Inject
 	public JiraScnRestService(RemoteScnWorklogService remoteScnWorklogService,
 			IRemoteScnExtIssueService remoteScnExtIssueService, IGlobalSettingsManager settingsManager,
-			ProjectManager projectManager, IScnProjectSettingsManager projectSettingManager, GlobalPermissionManager permissionManager) {
+			ProjectManager projectManager, IScnProjectSettingsManager projectSettingManager,
+			GlobalPermissionManager permissionManager) {
 		this.remoteScnWorklogService = remoteScnWorklogService;
 		this.remoteScnExtIssueService = remoteScnExtIssueService;
 		this.settingsManager = settingsManager;
@@ -59,9 +61,25 @@ public class JiraScnRestService {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Path("/scn-worklogs")
+	public Response getScnWorklogs(@Context HttpServletRequest request, @QueryParam("ikey") List<String> issueKeys)
+			throws RemoteException {
+		User user = getUser(request);
+		Stream<RemoteScnWorklog> issueStream = Stream.of();
+		for (String issueKey : issueKeys.stream().distinct().toArray(String[]::new))
+			issueStream = Stream.concat(issueStream, Stream.of(remoteScnWorklogService.getScnWorklogs(user, issueKey)));
+		RemoteScnWorklog[] scnWorklogs = issueStream.sorted((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()))
+				.toArray(RemoteScnWorklog[]::new);
+		if (scnWorklogs.length == 0)
+			return Response.noContent().cacheControl(getNoCacheControl()).build();
+		return Response.ok(scnWorklogs).cacheControl(getNoCacheControl()).build();
+	}
+
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/scn-worklogs/{ikey}")
 	@PublicApi
-	public Response getScnWorklogs(@Context HttpServletRequest request, @PathParam("ikey") String issueKey)
+	public Response getScnWorklogsByIssue(@Context HttpServletRequest request, @PathParam("ikey") String issueKey)
 			throws RemoteException {
 		User user = getUser(request);
 		if (user == null)
@@ -70,7 +88,7 @@ public class JiraScnRestService {
 			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
 		RemoteScnWorklog[] scnWorklogs = remoteScnWorklogService.getScnWorklogs(user, issueKey);
 		if (scnWorklogs == null || scnWorklogs.length == 0)
-			return Response.ok("There are no SCN worklogs or you don't have permission to see them. ")
+			return Response.ok("There are no SCN worklogs or you don't have permission to see them. ").status(204)
 					.cacheControl(getNoCacheControl()).build();
 		return Response.ok(scnWorklogs).cacheControl(getNoCacheControl()).build();
 	}
@@ -150,9 +168,8 @@ public class JiraScnRestService {
 
 	private User getUser(HttpServletRequest request) {
 		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser().getDirectoryUser();
-		// TODO should be re-factored
 	}
-	
+
 	private ApplicationUser getApplicationUser(HttpServletRequest request) {
 		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 	}

@@ -25,7 +25,5 @@ public interface ExtendedConstantsManager
 	
 	public IssueConstant getConstantObject(String paramString1, String paramString2);
 	
-	public Collection getConstantObjects(String paramString);
-	
 	public GenericValue getConstantByName(String paramString1, String paramString2);
 }

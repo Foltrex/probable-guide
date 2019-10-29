@@ -15,9 +15,9 @@ import javax.ws.rs.core.Response.Status;
 import org.mapstruct.factory.Mappers;
 
 import com.atlassian.annotations.PublicApi;
+import com.atlassian.jira.permission.GlobalPermissionKey;
+import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.wl.BLException;
@@ -28,14 +28,15 @@ import com.scn.jira.wl.wltypes.dal.WLTypeEntity;
 @PublicApi
 public class WLTypesService {
 	private final IWLTypesManager manager;
-	private final PermissionManager permissionManager; //TODO: migrate to GlobalPermissionManager up on available
+	private final GlobalPermissionManager globalPermissionManager;
 	private final JiraAuthenticationContext authContext;
 
 	@Inject
-	public WLTypesService(IWLTypesManager manager, @ComponentImport final PermissionManager permissionManager,
+	public WLTypesService(IWLTypesManager manager,
+			@ComponentImport final GlobalPermissionManager globalPermissionManager,
 			@ComponentImport final JiraAuthenticationContext authContext) {
 		this.manager = manager;
-		this.permissionManager = permissionManager;
+		this.globalPermissionManager = globalPermissionManager;
 		this.authContext = authContext;
 	}
 
@@ -44,7 +45,7 @@ public class WLTypesService {
 	@Path("/")
 	@PublicApi
 	public Response getWLTypes() throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		WLTypeEntity[] list = manager.getAllWLTypes();
@@ -59,7 +60,7 @@ public class WLTypesService {
 	@Path("/byname/{name}")
 	@PublicApi
 	public Response getWLTypesByName(@PathParam("name") String name) throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		WLTypeEntity[] list = manager.getWLTypesByName(name);
@@ -74,7 +75,7 @@ public class WLTypesService {
 	@Path("/{id}")
 	@PublicApi
 	public Response getWLType(@PathParam("key") int id) throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		WLTypeEntity entity = manager.getWLTypeById(id);
@@ -88,8 +89,9 @@ public class WLTypesService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/")
 	@PublicApi
-	public Response createWLType(@Context HttpServletRequest request, WLTypeModel wltype) throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+	public Response createWLType(@Context HttpServletRequest request, WLTypeModel wltype)
+			throws RemoteException, SQLException {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		WLTypeEntity entity;
@@ -108,8 +110,9 @@ public class WLTypesService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/")
 	@PublicApi
-	public Response updateWLType(@Context HttpServletRequest request, WLTypeModel wltype) throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+	public Response updateWLType(@Context HttpServletRequest request, WLTypeModel wltype)
+			throws RemoteException, SQLException {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		WLTypeEntity entity;
@@ -129,7 +132,7 @@ public class WLTypesService {
 	@Path("/{id}")
 	@PublicApi
 	public Response deleteWLType(@PathParam("id") int id) throws RemoteException, SQLException {
-		if (!permissionManager.hasPermission(Permissions.ADMINISTER, authContext.getLoggedInUser())) {
+		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		manager.deleteWLType(id);
