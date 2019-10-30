@@ -11,6 +11,7 @@
 		<version>4.1.0</version>
 	</parent>
 
+	<groupId>com.scn.jira.plugin</groupId>
 	<artifactId>scn-worklog-plugin</artifactId>
 
 	<name>JIRA ScienceSoft Worklog* Plugin</name>

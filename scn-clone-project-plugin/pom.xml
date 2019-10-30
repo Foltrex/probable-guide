@@ -11,6 +11,7 @@
 		<version>4.1.0</version>
 	</parent>
 
+	<groupId>com.scn.jira.plugin</groupId>
 	<artifactId>scn-clone-project-plugin</artifactId>
 
 	<name>JIRA ScienceSoft Clone Project</name>
@@ -47,9 +48,37 @@
 				<version>${amps.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<applications>
+						<application>
+							<applicationKey>jira-software</applicationKey>
+							<version>${jira.version}</version>
+						</application>
+						<application>
+							<applicationKey>jira-servicedesk</applicationKey>
+							<version>${jira.servicedesk.application.version}</version>
+						</application>
+					</applications>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<enableQuickReload>true</enableQuickReload>
+					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<excludeDefaultDirectories>true</excludeDefaultDirectories>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+							<excludes>
+								<exclude>container/**</exclude>
+								<exclude>jira/**</exclude>
+							</excludes>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 		</plugins>

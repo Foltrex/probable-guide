@@ -11,8 +11,8 @@
 		<version>4.1.0</version>
 	</parent>
 
-	<artifactId>scn-timesheet-plugin</artifactId>
 	<groupId>com.scn.jira.plugin</groupId>
+	<artifactId>scn-timesheet-plugin</artifactId>
 
 	<name>JIRA ScienceSoft TimeSheet Plugin</name>
 	<description>ScienceSoft plugin with two reports and gadget for time tracking.</description>
