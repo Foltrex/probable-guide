@@ -11,11 +11,10 @@
 		<version>4.1.0</version>
 	</parent>
 
-	<groupId>com.scn.jira.plugin</groupId>
-	<artifactId>scn-clone-project-plugin</artifactId>
-
 	<name>JIRA ScienceSoft Clone Project</name>
 	<description>The plugin for cloning projects</description>
+
+	<artifactId>scn-clone-project-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.1</version>
 

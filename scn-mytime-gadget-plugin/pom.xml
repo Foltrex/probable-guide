@@ -11,11 +11,10 @@
 		<version>4.1.0</version>
 	</parent>
 
-	<groupId>com.scn.jira.plugin</groupId>
-	<artifactId>scn-mytime-gadget-plugin</artifactId>
-
 	<name>JIRA ScienceSoft MyTime gadget</name>
 	<description>The plugin for cloning projects</description>
+
+	<artifactId>scn-mytime-gadget-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.2</version>
 

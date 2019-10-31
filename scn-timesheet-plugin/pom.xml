@@ -11,11 +11,11 @@
 		<version>4.1.0</version>
 	</parent>
 
-	<groupId>com.scn.jira.plugin</groupId>
-	<artifactId>scn-timesheet-plugin</artifactId>
-
 	<name>JIRA ScienceSoft TimeSheet Plugin</name>
 	<description>ScienceSoft plugin with two reports and gadget for time tracking.</description>
+	
+	<groupId>com.scn.jira.plugin</groupId>
+	<artifactId>scn-timesheet-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.1</version>
 
