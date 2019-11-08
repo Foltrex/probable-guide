@@ -95,7 +95,7 @@ public abstract class BaseFilter implements Filter
 	
 	protected boolean shouldOverrideRequest(Map<String, String[]> params)
 	{
-		ApplicationUser user = authenticationContext.getUser();
+		ApplicationUser user = authenticationContext.getLoggedInUser();
 		Project project = getProject(params);
 		
 		if (project == null)
@@ -128,7 +128,7 @@ public abstract class BaseFilter implements Filter
 		if (project == null)
 			return false;
 		
-		ApplicationUser user = authenticationContext.getUser();
+		ApplicationUser user = authenticationContext.getLoggedInUser();
 		return !psManager.hasPermissionToViewWL(user, project);
 	}
 	

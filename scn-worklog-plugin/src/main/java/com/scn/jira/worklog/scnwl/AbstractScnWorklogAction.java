@@ -36,10 +36,6 @@ import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
-/**
- * Created by IntelliJ IDEA. User: Khadarovich Date: 10.08.2010 Time: 15:49:20 To change this template use File | Settings | File
- * Templates.
- */
 public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction {
 
 	private static final long serialVersionUID = -7430574077126963463L;
@@ -180,15 +176,15 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
 	public Collection<Group> getGroupLevels() {
 		Collection<Group> groups;
-		if (getLoggedInApplicationUser() == null || !commentService.isGroupVisiblityEnabled()) groups = Collections.emptyList();
-		else groups = groupManager.getGroupsForUser(getLoggedInApplicationUser());
+		if (getLoggedInUser() == null || !commentService.isGroupVisibilityEnabled()) groups = Collections.emptyList();
+		else groups = groupManager.getGroupsForUser(getLoggedInUser());
 		return groups;
 	}
 
 	public Collection<ProjectRole> getRoleLevels() {
 		Collection<ProjectRole> roleLevels;
-		if (commentService.isProjectRoleVisiblityEnabled()) roleLevels = projectRoleManager.getProjectRoles(
-				getLoggedInApplicationUser(), getIssueObject().getProjectObject());
+		if (commentService.isProjectRoleVisibilityEnabled()) roleLevels = projectRoleManager.getProjectRoles(
+				getLoggedInUser(), getIssueObject().getProjectObject());
 		else roleLevels = Collections.emptyList();
 		return roleLevels;
 	}
@@ -313,7 +309,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
 		final IScnWorklog reassignedWorklog = new ScnWorklogImpl(this.projectRoleManager, worklog.getIssue(), worklog.getId(),
 				reporter.getKey(), worklog.getComment(), worklog.getStartDate(), worklog.getGroupLevel(),
-				worklog.getRoleLevelId(), worklog.getTimeSpent(), getLoggedInApplicationUser().getKey(), worklog.getCreated(),
+				worklog.getRoleLevelId(), worklog.getTimeSpent(), getLoggedInUser().getKey(), worklog.getCreated(),
 				worklog.getUpdated(), worklog.getWorklogTypeId());
 		reassignedWorklog.setLinkedWorklog(worklog.getLinkedWorklog());
 		return reassignedWorklog;
@@ -332,7 +328,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 	}
 
 	public boolean hasPermissionToViewWL() {
-		return projectSettignsManager.hasPermissionToViewWL(getLoggedInApplicationUser(), getIssueObject().getProjectObject());
+		return projectSettignsManager.hasPermissionToViewWL(getLoggedInUser(), getIssueObject().getProjectObject());
 	}
 
 	public Collection<WorklogType> getAutoCopyWorklogTypes() {
