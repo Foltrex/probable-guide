@@ -23,7 +23,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.util.collect.MapBuilder;
-import com.atlassian.jira.web.util.HelpUtil;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -145,7 +144,6 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 		Map<String, Object> params = new HashMap<String, Object>();
 
 		params.putAll(super.getVelocityParameters(issue, field, fieldLayoutItem));
-		params.put("helpUtil", HelpUtil.getInstance());
 		params.put("scnVisible", hasPermissionToViewScnWorklog());
 
 		boolean legacyBehaviorEnabled = isLegacyBehaviorEnabled();
@@ -209,7 +207,7 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 	}
 
 	private boolean hasPermissionToViewScnWorklog() {
-		return scnPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, authenticationContext.getUser());
+		return scnPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, authenticationContext.getLoggedInUser());
 	}
 
 	private boolean isLegacyBehaviorEnabled() {
