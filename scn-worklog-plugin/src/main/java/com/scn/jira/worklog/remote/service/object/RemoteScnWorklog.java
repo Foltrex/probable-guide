@@ -6,18 +6,19 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.atlassian.jira.issue.Issue;
 import com.scn.jira.worklog.rest.util.JiraScnRestServiceUtil;
 
 @XmlRootElement(name = "scn-worklog")
-@XmlType(propOrder = { JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME, JiraScnRestServiceUtil.AUTHOR_ATTR_NAME,
-		JiraScnRestServiceUtil.UPDATE_AUTHOR_ATTR_NAME, JiraScnRestServiceUtil.COMMENT_ATTR_NAME,
-		JiraScnRestServiceUtil.CREATED_ATTR_NAME, JiraScnRestServiceUtil.UPDATED_ATTR_NAME,
-		JiraScnRestServiceUtil.START_DATE_ATTR_NAME, JiraScnRestServiceUtil.TIME_SPENT_ATTR_NAME,
-		JiraScnRestServiceUtil.TIME_SPENT_SEC_ATTR_NAME, JiraScnRestServiceUtil.ID_ATTR_NAME,
-		JiraScnRestServiceUtil.WORKLOG_TYPE_ATTR_NAME, JiraScnRestServiceUtil.GROUP_LEVEL_ATTR_NAME,
-		JiraScnRestServiceUtil.ROLE_LEVEL_ID_ATTR_NAME })
+@XmlType(propOrder = { JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME, JiraScnRestServiceUtil.ISSUE_ID_ATTR_NAME,
+		JiraScnRestServiceUtil.AUTHOR_ATTR_NAME, JiraScnRestServiceUtil.UPDATE_AUTHOR_ATTR_NAME,
+		JiraScnRestServiceUtil.COMMENT_ATTR_NAME, JiraScnRestServiceUtil.CREATED_ATTR_NAME,
+		JiraScnRestServiceUtil.UPDATED_ATTR_NAME, JiraScnRestServiceUtil.START_DATE_ATTR_NAME,
+		JiraScnRestServiceUtil.TIME_SPENT_ATTR_NAME, JiraScnRestServiceUtil.TIME_SPENT_SEC_ATTR_NAME,
+		JiraScnRestServiceUtil.ID_ATTR_NAME, JiraScnRestServiceUtil.WORKLOG_TYPE_ATTR_NAME,
+		JiraScnRestServiceUtil.GROUP_LEVEL_ATTR_NAME, JiraScnRestServiceUtil.ROLE_LEVEL_ID_ATTR_NAME })
 public class RemoteScnWorklog {
-
 	@XmlElement(name = JiraScnRestServiceUtil.ID_ATTR_NAME)
 	private String id;
 
@@ -60,12 +61,15 @@ public class RemoteScnWorklog {
 	@XmlElement(name = JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME)
 	private String issueKey;
 
+	@XmlElement(name = JiraScnRestServiceUtil.ISSUE_ID_ATTR_NAME)
+	private Long issueId;
+
 	public RemoteScnWorklog() {
 	}
 
 	public RemoteScnWorklog(String id, String comment, String groupLevel, String roleLevelId, Date startDate,
 			String timeSpent, String author, String updateAuthor, Date created, Date updated, long timeSpentInSeconds,
-			String worklogType, String issueKey) {
+			String worklogType, Issue issue) {
 		this.id = id;
 		this.comment = comment;
 		this.groupLevel = groupLevel;
@@ -78,7 +82,8 @@ public class RemoteScnWorklog {
 		this.updated = updated;
 		this.timeSpentInSeconds = timeSpentInSeconds;
 		this.worklogType = worklogType;
-		this.issueKey = issueKey;
+		this.issueKey = issue.getKey();
+		this.issueId = issue.getId();
 	}
 
 	public String getId() {
@@ -131,5 +136,9 @@ public class RemoteScnWorklog {
 
 	public String getIssueKey() {
 		return issueKey;
+	}
+
+	public Long getIssueId() {
+		return issueId;
 	}
 }

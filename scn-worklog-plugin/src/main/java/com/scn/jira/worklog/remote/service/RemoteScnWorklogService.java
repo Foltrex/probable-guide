@@ -30,9 +30,6 @@ import javax.inject.Inject;
 
 @Component
 public class RemoteScnWorklogService implements IRemoteScnWorklogService {
-	// private static final org.apache.log4j.Logger LOGGER =
-	// org.apache.log4j.Logger.getLogger(RemoteScnWorklogService.class);
-
 	private final IssueManager issueManager;
 	private final ProjectManager projectManager;
 	private final JiraAuthenticationContext authenticationContext;
@@ -60,14 +57,14 @@ public class RemoteScnWorklogService implements IRemoteScnWorklogService {
 		final RemoteScnWorklog[] remoteScnWorklogs = new RemoteScnWorklog[scnWorklogs.size()];
 		int i = 0;
 		for (final IScnWorklog scnWorklog : scnWorklogs) {
-			final RemoteScnWorklog remoteScnWorklog = convertToRemoteScnWorkLog(scnWorklog, issueKey);
+			final RemoteScnWorklog remoteScnWorklog = convertToRemoteScnWorkLog(scnWorklog, issue);
 			remoteScnWorklogs[i] = remoteScnWorklog;
 			i++;
 		}
 		return remoteScnWorklogs;
 	}
 
-	private RemoteScnWorklog convertToRemoteScnWorkLog(IScnWorklog scnWorklog, String issueKey) {
+	private RemoteScnWorklog convertToRemoteScnWorkLog(IScnWorklog scnWorklog, Issue issue) {
 		if (scnWorklog == null) {
 			return null;
 		}
@@ -81,7 +78,7 @@ public class RemoteScnWorklogService implements IRemoteScnWorklogService {
 		final RemoteScnWorklog remoteScnWorklog = new RemoteScnWorklog(id, scnWorklog.getComment(),
 				scnWorklog.getGroupLevel(), roleLevelId, scnWorklog.getStartDate(), timeSpentDuration,
 				scnWorklog.getAuthorKey(), scnWorklog.getUpdateAuthorKey(), scnWorklog.getCreated(),
-				scnWorklog.getUpdated(), timeSpentInSeconds, worklogType, issueKey);
+				scnWorklog.getUpdated(), timeSpentInSeconds, worklogType, issue);
 
 		return remoteScnWorklog;
 	}
