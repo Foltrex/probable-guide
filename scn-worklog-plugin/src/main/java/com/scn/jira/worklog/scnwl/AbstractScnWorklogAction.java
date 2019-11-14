@@ -18,8 +18,8 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.issue.comparator.UserBestNameComparator;
 import com.atlassian.jira.issue.fields.CommentVisibility;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
@@ -37,7 +37,6 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
 public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction {
-
 	private static final long serialVersionUID = -7430574077126963463L;
 	protected static final String ADJUST_ESTIMATE_AUTO = "auto";
 	protected static final String ADJUST_ESTIMATE_NEW = "new";
@@ -69,8 +68,8 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
 	public AbstractScnWorklogAction(CommentService commentService, ProjectRoleManager projectRoleManager,
 			JiraDurationUtils jiraDurationUtils, GroupManager groupManager, IScnExtendedIssueStore extIssueStore,
-			IScnWorklogService worklogService,
-			IScnProjectSettingsManager projectSettignsManager, ExtendedConstantsManager extendedConstantsManager) {
+			IScnWorklogService worklogService, IScnProjectSettingsManager projectSettignsManager,
+			ExtendedConstantsManager extendedConstantsManager) {
 		adjustEstimate = "auto";
 		this.commentService = commentService;
 		this.projectRoleManager = projectRoleManager;
@@ -83,7 +82,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 	}
 
 	public boolean shouldDisplay() {
-		return isIssueValid() /*&& hasIssuePermission("work", getIssueObject())*/
+		return isIssueValid() /* && hasIssuePermission("work", getIssueObject()) */
 				&& this.scnWorklogService.hasPermissionToView(getJiraServiceContext(), getIssueObject())
 				&& isWorkflowAllowsEdit(getIssueObject());
 	}
@@ -176,16 +175,19 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
 	public Collection<Group> getGroupLevels() {
 		Collection<Group> groups;
-		if (getLoggedInUser() == null || !commentService.isGroupVisibilityEnabled()) groups = Collections.emptyList();
-		else groups = groupManager.getGroupsForUser(getLoggedInUser());
+		if (getLoggedInUser() == null || !commentService.isGroupVisibilityEnabled())
+			groups = Collections.emptyList();
+		else
+			groups = groupManager.getGroupsForUser(getLoggedInUser());
 		return groups;
 	}
 
 	public Collection<ProjectRole> getRoleLevels() {
 		Collection<ProjectRole> roleLevels;
-		if (commentService.isProjectRoleVisibilityEnabled()) roleLevels = projectRoleManager.getProjectRoles(
-				getLoggedInUser(), getIssueObject().getProjectObject());
-		else roleLevels = Collections.emptyList();
+		if (commentService.isProjectRoleVisibilityEnabled())
+			roleLevels = projectRoleManager.getProjectRoles(getLoggedInUser(), getIssueObject().getProjectObject());
+		else
+			roleLevels = Collections.emptyList();
 		return roleLevels;
 	}
 
@@ -198,13 +200,16 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 	}
 
 	protected CommentVisibility getCommentVisibility() {
-		if (commentVisibility == null) commentVisibility = new CommentVisibility(commentLevel);
+		if (commentVisibility == null)
+			commentVisibility = new CommentVisibility(commentLevel);
 		return commentVisibility;
 	}
 
 	protected Date getParsedStartDate() {
 		try {
-			return getStartDate() != null ? getDateTimeFormatter().withStyle(DateTimeStyle.COMPLETE).parse(getStartDate()) : null;
+			return getStartDate() != null
+					? getDateTimeFormatter().withStyle(DateTimeStyle.COMPLETE).parse(getStartDate())
+					: null;
 		} catch (IllegalArgumentException e) {
 			return null;
 		} catch (UnsupportedOperationException e) {
@@ -230,23 +235,28 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 			return wlAutoCopy;
 		}
 		// if user has no access to 'WL Auto Copy' checkbox, check project settings
-		// and then if worklog type doesn't specified or worklog should be copied for the type, then return true
+		// and then if worklog type doesn't specified or worklog should be copied for
+		// the type, then return true
 		return getWorklogAutoCopyOption() && getWorklogTypeIsChecked(getWorklogType());
 	}
 
 	public boolean isWlAutoCopyChecked() {
-		if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) return isWlAutoCopy();
+		if (getJiraServiceContext().getErrorCollection().hasAnyErrors())
+			return isWlAutoCopy();
 
-		if (getWorklogAutoCopyOption()) return getWorklogTypeIsChecked(getWorklogType());
+		if (getWorklogAutoCopyOption())
+			return getWorklogTypeIsChecked(getWorklogType());
 
 		return false;
 	}
 
 	public boolean getWorklogTypeIsChecked(String wlType) {
-		if (StringUtils.isBlank(wlType)) return isUnspecifiedTypeAutoCopyEnabled();
+		if (StringUtils.isBlank(wlType))
+			return isUnspecifiedTypeAutoCopyEnabled();
 
 		for (WorklogType type : getAutoCopyWorklogTypes()) {
-			if (wlType.equals(type.getId())) return true;
+			if (wlType.equals(type.getId()))
+				return true;
 		}
 
 		return false;
@@ -275,6 +285,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 		return (getWorklogType() != null) && (getWorklogType().equals(worklogType));
 	}
 
+	@Override
 	public ProjectManager getProjectManager() {
 		return ComponentAccessor.getProjectManager();
 	}
@@ -283,13 +294,14 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 		try {
 			List<ApplicationUser> users = new ArrayList<ApplicationUser>();
 
-			users.addAll(ComponentAccessor.getPermissionSchemeManager().getUsers(new Long(Permissions.WORK_ISSUE),
+			users.addAll(ComponentAccessor.getPermissionSchemeManager().getUsers(ProjectPermissions.WORK_ON_ISSUES,
 					ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
 
-			if (CollectionUtils.isEmpty(users)) return Collections.emptyMap();
+			if (CollectionUtils.isEmpty(users))
+				return Collections.emptyMap();
 
 			Collections.sort(users, new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
-
+			@SuppressWarnings("unchecked")
 			final Map<String, String> assignableUsers = new ListOrderedMap();
 			for (ApplicationUser user : users) {
 				if (scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject())) {
@@ -307,10 +319,10 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 		assert worklog != null;
 		assert reporter != null;
 
-		final IScnWorklog reassignedWorklog = new ScnWorklogImpl(this.projectRoleManager, worklog.getIssue(), worklog.getId(),
-				reporter.getKey(), worklog.getComment(), worklog.getStartDate(), worklog.getGroupLevel(),
-				worklog.getRoleLevelId(), worklog.getTimeSpent(), getLoggedInUser().getKey(), worklog.getCreated(),
-				worklog.getUpdated(), worklog.getWorklogTypeId());
+		final IScnWorklog reassignedWorklog = new ScnWorklogImpl(this.projectRoleManager, worklog.getIssue(),
+				worklog.getId(), reporter.getKey(), worklog.getComment(), worklog.getStartDate(),
+				worklog.getGroupLevel(), worklog.getRoleLevelId(), worklog.getTimeSpent(), getLoggedInUser().getKey(),
+				worklog.getCreated(), worklog.getUpdated(), worklog.getWorklogTypeId());
 		reassignedWorklog.setLinkedWorklog(worklog.getLinkedWorklog());
 		return reassignedWorklog;
 	}
