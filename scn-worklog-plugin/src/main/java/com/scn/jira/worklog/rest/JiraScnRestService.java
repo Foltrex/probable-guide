@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -123,6 +124,22 @@ public class JiraScnRestService {
 		if (issueKey == null || issueKey.isEmpty())
 			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
 		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(user, issueKey);
+		if (scnExtIssue == null)
+			return Response.ok("There is such SCN Extended Issues or you don't have permission to see it. ")
+					.cacheControl(getNoCacheControl()).build();
+		return Response.ok(scnExtIssue).cacheControl(getNoCacheControl()).build();
+	}
+
+	@PUT
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Path("/scn-ext-issue/{ikey}")
+	public Response setScnExtendedIssue(@Context HttpServletRequest request, @PathParam("ikey") String issueKey,
+			@QueryParam("originalEstimate") Long originalEstimate) throws RemoteException {
+		ApplicationUser appUser = getApplicationUser(request);
+		// TODO. Check issue editable.
+		if (issueKey == null || issueKey.isEmpty())
+			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
+		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(appUser.getDirectoryUser(), issueKey);
 		if (scnExtIssue == null)
 			return Response.ok("There is such SCN Extended Issues or you don't have permission to see it. ")
 					.cacheControl(getNoCacheControl()).build();

@@ -70,7 +70,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 			JiraDurationUtils jiraDurationUtils, GroupManager groupManager, IScnExtendedIssueStore extIssueStore,
 			IScnWorklogService worklogService, IScnProjectSettingsManager projectSettignsManager,
 			ExtendedConstantsManager extendedConstantsManager) {
-		adjustEstimate = "auto";
+		adjustEstimate = ADJUST_ESTIMATE_AUTO;
 		this.commentService = commentService;
 		this.projectRoleManager = projectRoleManager;
 		this.jiraDurationUtils = jiraDurationUtils;

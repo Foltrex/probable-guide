@@ -22,27 +22,19 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 
-/**
- * Created by IntelliJ IDEA. User: Khadarovich Date: 05.08.2010 Time: 13:17:18
- * To change this template use File | Settings | File Templates.
- */
-@ExportAsService({ScnProjectSettingsManager.class })
+@ExportAsService({ ScnProjectSettingsManager.class })
 @Named("scnProjectSettingsManager")
 public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
-	
 	private final ProjectRoleManager projectRoleManager;
 	private final ExtendedConstantsManager ecManager;
-	
+
 	private final PropertiesManager propertiesManager;
 
-	private final String[] defaultProjectRoleNamesToViewWL = new String[] {
-			"Customer",
-			"Project Coordinator",
+	private final String[] defaultProjectRoleNamesToViewWL = new String[] { "Customer", "Project Coordinator",
 			"Project Manager" };
 
 	@Inject
-	public ScnProjectSettingsManager(ProjectRoleManager projectRoleManager,
-			ExtendedConstantsManager ecManager) {
+	public ScnProjectSettingsManager(ProjectRoleManager projectRoleManager, ExtendedConstantsManager ecManager) {
 		this.propertiesManager = ComponentAccessor.getComponent(PropertiesManager.class);
 		this.projectRoleManager = projectRoleManager;
 		this.ecManager = ecManager;
@@ -59,19 +51,18 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 
 	}
 
-	public void setWLAutoCopy(Long projectId, boolean value)
-			throws PropertyException {
+	public void setWLAutoCopy(Long projectId, boolean value) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
-		propertiesManager.getPropertySet().setString(WL_AUTO_COPY + String.valueOf(projectId),String.valueOf(value));
+		propertiesManager.getPropertySet().setString(WL_AUTO_COPY + String.valueOf(projectId), String.valueOf(value));
 	}
 
-	public boolean isUnspecifiedWLTypeAutoCopyEnabled(Long projectId)
-			throws PropertyException {
+	public boolean isUnspecifiedWLTypeAutoCopyEnabled(Long projectId) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
-		String value = propertiesManager.getPropertySet().getString(UNSPECIFIED_WORKLOG_TYPE + String.valueOf(projectId));
-		
+		String value = propertiesManager.getPropertySet()
+				.getString(UNSPECIFIED_WORKLOG_TYPE + String.valueOf(projectId));
+
 		if (value == null) {
 			return isWLAutoCopyEnabled(projectId);
 		} else {
@@ -79,8 +70,7 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 		}
 	}
 
-	public void setUnspecifiedWLTypeAutoCopyEnabled(Long projectId, String value)
-			throws PropertyException {
+	public void setUnspecifiedWLTypeAutoCopyEnabled(Long projectId, String value) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		if (value == null) {
@@ -91,14 +81,14 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 	}
 
 	@Nonnull
-	public Collection<WorklogType> getWorklogTypes(Long projectId)
-			throws PropertyException {
+	public Collection<WorklogType> getWorklogTypes(Long projectId) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		String optionValue = propertiesManager.getPropertySet().getString(WORKLOG_TYPES + String.valueOf(projectId));
-		
+
 		if (optionValue == null) {
-			return isWLAutoCopyEnabled(projectId) ? ecManager.getWorklogTypeObjects() : Collections.<WorklogType> emptyList();
+			return isWLAutoCopyEnabled(projectId) ? ecManager.getWorklogTypeObjects()
+					: Collections.<WorklogType>emptyList();
 		} else {
 			List<WorklogType> types = new ArrayList<WorklogType>();
 
@@ -113,8 +103,7 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 		}
 	}
 
-	public void setWorklogTypes(Long projectId, Collection<WorklogType> worklogTypes)
-			throws PropertyException {
+	public void setWorklogTypes(Long projectId, Collection<WorklogType> worklogTypes) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		if (worklogTypes == null) {
@@ -137,48 +126,46 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 		return (value == null) ? false : Boolean.valueOf(value);
 	}
 
-	public void setWLTypeRequired(Long projectId, boolean value)
-			throws PropertyException {
+	public void setWLTypeRequired(Long projectId, boolean value) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
-		propertiesManager.getPropertySet().setString(WL_TYPE_REQUIRED + String.valueOf(projectId),String.valueOf(value));
+		propertiesManager.getPropertySet().setString(WL_TYPE_REQUIRED + String.valueOf(projectId),
+				String.valueOf(value));
 	}
 
 	@Nullable
 	public Date getWLBlockingDate(Long projectId) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
-		
+
 		return propertiesManager.getPropertySet().getDate(WL_BLOCKING_DATE + String.valueOf(projectId));
 	}
 
-	public void setWLBlockingDate(Long projectId, Date value)
-			throws PropertyException {
+	public void setWLBlockingDate(Long projectId, Date value) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		propertiesManager.getPropertySet().setDate(WL_BLOCKING_DATE + String.valueOf(projectId), value);
 	}
-	
+
 	@Nullable
 	public Date getWLWorklogBlockingDate(Long projectId) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
-		
+
 		return propertiesManager.getPropertySet().getDate(WL_WORKLOG_BLOCKING_DATE + String.valueOf(projectId));
 	}
 
-	public void setWLWorklogBlockingDate(Long projectId, Date value) 
-			throws PropertyException {
+	public void setWLWorklogBlockingDate(Long projectId, Date value) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		propertiesManager.getPropertySet().setDate(WL_WORKLOG_BLOCKING_DATE + String.valueOf(projectId), value);
 	}
 
 	@Nonnull
-	public Collection<ProjectRole> getProjectRolesToViewWL(Long projectId)
-			throws PropertyException {
+	public Collection<ProjectRole> getProjectRolesToViewWL(Long projectId) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
-		String optionValue = propertiesManager.getPropertySet().getString(PROJECT_ROLES_TO_VIEW_WL + String.valueOf(projectId));
-		
+		String optionValue = propertiesManager.getPropertySet()
+				.getString(PROJECT_ROLES_TO_VIEW_WL + String.valueOf(projectId));
+
 		if (optionValue == null) {
 			return getDefaultRolesToViewWL();
 		} else {
@@ -195,8 +182,7 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 		}
 	}
 
-	public void setProjectRolesToViewWL(Long projectId, Collection<ProjectRole> projectRoles)
-			throws PropertyException {
+	public void setProjectRolesToViewWL(Long projectId, Collection<ProjectRole> projectRoles) throws PropertyException {
 		Assertions.notNull("projectId", projectId);
 
 		StringBuffer sb = new StringBuffer("");
@@ -208,11 +194,11 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
 			}
 		}
 
-		propertiesManager.getPropertySet().setString(PROJECT_ROLES_TO_VIEW_WL + String.valueOf(projectId), sb.toString());
+		propertiesManager.getPropertySet().setString(PROJECT_ROLES_TO_VIEW_WL + String.valueOf(projectId),
+				sb.toString());
 	}
 
-	public boolean hasPermissionToViewWL(ApplicationUser user, Project project)
-			throws PropertyException {
+	public boolean hasPermissionToViewWL(ApplicationUser user, Project project) throws PropertyException {
 		Assertions.notNull("user", user);
 		Assertions.notNull("project", project);
 

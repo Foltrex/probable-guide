@@ -41,32 +41,32 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 	private Long adjustmentAmountLong;
 
 	@Inject
-	public CreateScnWorklogAction(ProjectRoleManager projectRoleManager,
-		  GroupManager groupManager) {
-
-		super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
+	public CreateScnWorklogAction(ProjectRoleManager projectRoleManager, GroupManager groupManager) {
+		super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager,
+				ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
 				new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
-				new DefaultScnWorklogService(
-						ComponentAccessor.getComponent(VisibilityValidator.class),
-						ComponentAccessor.getApplicationProperties(),
-						projectRoleManager,
+				new DefaultScnWorklogService(ComponentAccessor.getComponent(VisibilityValidator.class),
+						ComponentAccessor.getApplicationProperties(), projectRoleManager,
 						ComponentAccessor.getIssueManager(),
 						ComponentAccessor.getComponent(TimeTrackingConfiguration.class),
 						ComponentAccessor.getGroupManager(),
-						new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()),
+						new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
 						new DefaultScnWorklogManager(
-								new OfBizScnWorklogStore(ComponentAccessor.getOfBizDelegator(), ComponentAccessor.getIssueManager(), projectRoleManager, new ExtendedWorklogManagerImpl()),
+								new OfBizScnWorklogStore(ComponentAccessor.getOfBizDelegator(),
+										ComponentAccessor.getIssueManager(), projectRoleManager,
+										new ExtendedWorklogManagerImpl()),
 								ComponentAccessor.getComponent(TimeTrackingIssueUpdater.class),
-								new ScnTimeTrackingIssueManager(new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()))
+								new ScnTimeTrackingIssueManager(
+										new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()))
 
-								),
+						),
 
 						new GlobalSettingsManager(ComponentAccessor.getGroupManager()),
 						new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
 						new ScnUserBlockingManager()
 
-				),
-				new ScnProjectSettingsManager(projectRoleManager,  new DefaultExtendedConstantsManager()), new DefaultExtendedConstantsManager());
+				), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
+				new DefaultExtendedConstantsManager());
 		this.fvManager = ComponentAccessor.getComponent(FieldVisibilityManager.class);
 	}
 
@@ -96,7 +96,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 			return;
 		}
 		CommentVisibility visibility = getCommentVisibility();
-		if ("new".equalsIgnoreCase(adjustEstimate)) {
+		if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(adjustEstimate)) {
 			IScnWorklogService.WorklogNewEstimateResult worklogNewEstimateResult = scnWorklogService
 					.validateCreateWithNewEstimate(getJiraServiceContext(), getIssueObject(), getTimeLogged(),
 							getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(),
@@ -105,23 +105,25 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 				worklog = worklogNewEstimateResult.getWorklog();
 				newEstimateLong = worklogNewEstimateResult.getNewEstimate();
 			}
-		} else if ("manual".equalsIgnoreCase(adjustEstimate)) {
+		} else if (ADJUST_ESTIMATE_MANUAL.equalsIgnoreCase(adjustEstimate)) {
 			IScnWorklogService.WorklogAdjustmentAmountResult worklogAdjustmentAmountResult = scnWorklogService
-					.validateCreateWithManuallyAdjustedEstimate(getJiraServiceContext(), getIssueObject(), getTimeLogged(),
-							getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(),
-							getAdjustmentAmount(), getWorklogType());
+					.validateCreateWithManuallyAdjustedEstimate(getJiraServiceContext(), getIssueObject(),
+							getTimeLogged(), getParsedStartDate(), getComment(), visibility.getGroupLevel(),
+							visibility.getRoleLevel(), getAdjustmentAmount(), getWorklogType());
 			if (worklogAdjustmentAmountResult != null) {
 				worklog = worklogAdjustmentAmountResult.getWorklog();
 				adjustmentAmountLong = worklogAdjustmentAmountResult.getAdjustmentAmount();
 			}
 		} else {
 			worklog = scnWorklogService.validateCreate(getJiraServiceContext(), getIssueObject(), getTimeLogged(),
-					getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(), getWorklogType());
+					getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(),
+					getWorklogType());
 		}
 
 		if (projectSettignsManager.isWLTypeRequired(getIssueObject().getProjectObject().getId())
-				&& StringUtils.isBlank(getWorklogType())) getJiraServiceContext().getErrorCollection().addError("worklogType",
-				getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+				&& StringUtils.isBlank(getWorklogType()))
+			getJiraServiceContext().getErrorCollection().addError("worklogType",
+					getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
 
 		ApplicationUser reporter = null;
 		if (!StringUtils.isBlank(getInputReporter())) {
@@ -137,19 +139,27 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 	}
 
 	protected String doExecute() throws Exception {
-		if (isTimeTrackingFieldHidden(getIssueObject())) return SECURITY_BREACH;
-		if ("auto".equalsIgnoreCase(adjustEstimate)) worklog = scnWorklogService.createAndAutoAdjustRemainingEstimate(
-				getJiraServiceContext(), worklog, true, isWlAutoCopy());
-		else if ("new".equalsIgnoreCase(adjustEstimate)) worklog = scnWorklogService.createWithNewRemainingEstimate(
-				getJiraServiceContext(), new IScnWorklogService.WorklogNewEstimateResult(worklog, newEstimateLong), true,
-				isWlAutoCopy());
-		else if ("manual".equalsIgnoreCase(adjustEstimate)) worklog = scnWorklogService.createWithManuallyAdjustedEstimate(
-				getJiraServiceContext(), new IScnWorklogService.WorklogAdjustmentAmountResult(worklog, adjustmentAmountLong),
-				true, isWlAutoCopy());
-		else worklog = scnWorklogService.createAndRetainRemainingEstimate(getJiraServiceContext(), worklog, true, isWlAutoCopy());
-		if (getHasErrorMessages()) return ERROR;
-		else if (isInlineDialogMode()) return returnComplete();
-		else return getRedirect((new StringBuilder()).append("/browse/").append(getIssue().getString("key")).toString());
+		if (isTimeTrackingFieldHidden(getIssueObject()))
+			return SECURITY_BREACH;
+		if (ADJUST_ESTIMATE_AUTO.equalsIgnoreCase(adjustEstimate))
+			worklog = scnWorklogService.createAndAutoAdjustRemainingEstimate(getJiraServiceContext(), worklog, true,
+					isWlAutoCopy());
+		else if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(adjustEstimate))
+			worklog = scnWorklogService.createWithNewRemainingEstimate(getJiraServiceContext(),
+					new IScnWorklogService.WorklogNewEstimateResult(worklog, newEstimateLong), true, isWlAutoCopy());
+		else if (ADJUST_ESTIMATE_MANUAL.equalsIgnoreCase(adjustEstimate))
+			worklog = scnWorklogService.createWithManuallyAdjustedEstimate(getJiraServiceContext(),
+					new IScnWorklogService.WorklogAdjustmentAmountResult(worklog, adjustmentAmountLong), true,
+					isWlAutoCopy());
+		else
+			worklog = scnWorklogService.createAndRetainRemainingEstimate(getJiraServiceContext(), worklog, true,
+					isWlAutoCopy());
+		if (getHasErrorMessages())
+			return ERROR;
+		else if (isInlineDialogMode())
+			return returnComplete();
+		else
+			return getRedirect((new StringBuilder()).append("/browse/").append(getIssue().getString("key")).toString());
 	}
 
 	public IScnWorklog getWorklog() {

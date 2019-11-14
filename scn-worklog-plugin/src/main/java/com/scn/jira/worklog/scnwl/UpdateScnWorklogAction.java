@@ -146,7 +146,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 
 		return getRedirect("/browse/" + getIssue().getString("key"));
 	}
-	
+
 	@Override
 	public boolean isWlAutoCopyChecked() {
 		if (getJiraServiceContext().getErrorCollection().hasAnyErrors())
