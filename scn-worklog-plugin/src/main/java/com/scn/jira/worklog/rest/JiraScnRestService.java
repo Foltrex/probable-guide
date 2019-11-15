@@ -24,12 +24,19 @@ import javax.ws.rs.core.Response.Status;
 
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
+import com.atlassian.crowd.integration.rest.entity.ErrorEntity.ErrorReason;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.opensymphony.module.propertyset.PropertyException;
+import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
+import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import com.scn.jira.worklog.remote.service.IRemoteScnExtIssueService;
@@ -46,18 +53,23 @@ public class JiraScnRestService {
 	private final ProjectManager projectManager;
 	private final IScnProjectSettingsManager projectSettingManager;
 	private final GlobalPermissionManager permissionManager;
+	private final IScnExtendedIssueStore ofBizExtIssueStore;
+	private final IssueManager issueManager;
 
 	@Inject
 	public JiraScnRestService(RemoteScnWorklogService remoteScnWorklogService,
 			IRemoteScnExtIssueService remoteScnExtIssueService, IGlobalSettingsManager settingsManager,
 			ProjectManager projectManager, IScnProjectSettingsManager projectSettingManager,
-			GlobalPermissionManager permissionManager) {
+			GlobalPermissionManager permissionManager, IScnExtendedIssueStore ofBizExtIssueStore,
+			@ComponentImport IssueManager issueManager) {
 		this.remoteScnWorklogService = remoteScnWorklogService;
 		this.remoteScnExtIssueService = remoteScnExtIssueService;
 		this.settingsManager = settingsManager;
 		this.projectManager = projectManager;
 		this.projectSettingManager = projectSettingManager;
 		this.permissionManager = permissionManager;
+		this.ofBizExtIssueStore = ofBizExtIssueStore;
+		this.issueManager = issueManager;
 	}
 
 	@GET
@@ -132,17 +144,26 @@ public class JiraScnRestService {
 
 	@PUT
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	@Path("/scn-ext-issue/{ikey}")
+	@Path("/scn-ext-issue/{ikey}/")
 	public Response setScnExtendedIssue(@Context HttpServletRequest request, @PathParam("ikey") String issueKey,
-			@QueryParam("originalEstimate") Long originalEstimate) throws RemoteException {
-		ApplicationUser appUser = getApplicationUser(request);
-		// TODO. Check issue editable.
-		if (issueKey == null || issueKey.isEmpty())
-			return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
-		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(appUser.getDirectoryUser(), issueKey);
-		if (scnExtIssue == null)
-			return Response.ok("There is such SCN Extended Issues or you don't have permission to see it. ")
+			@QueryParam("originalestimate") Long originalEstimate) throws RemoteException {
+		if (originalEstimate == null)
+			return Response.status(Status.BAD_REQUEST)
+					.entity(new ErrorEntity(ErrorReason.OPERATION_FAILED, "Param 'originalEstimate' is not found."))
 					.cacheControl(getNoCacheControl()).build();
+		ApplicationUser appUser = getApplicationUser(request);
+		Issue issue = issueManager.getIssueObject(issueKey);
+		if (issue == null || !issueManager.isEditable(issue, appUser)) {
+			return Response.status(Status.NOT_FOUND)
+					.entity(new ErrorEntity(ErrorReason.PERMISSION_DENIED,
+							"The issue is not found or you don't have permission."))
+					.cacheControl(getNoCacheControl()).build();
+		}
+		final IScnExtendedIssue extIssue = ofBizExtIssueStore.getByIssue(issue);
+		if (extIssue == null) {
+			// TODO. To be continued.
+		}
+		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(appUser.getDirectoryUser(), issueKey);
 		return Response.ok(scnExtIssue).cacheControl(getNoCacheControl()).build();
 	}
 
@@ -170,8 +191,8 @@ public class JiraScnRestService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/worklogblockingdate/{projectKey}")
 	@PublicApi
-	public Response setWorklogBlockingDate(@Context HttpServletRequest request,
-			@PathParam("projectKey") String projectKey, @QueryParam("date") String date) throws RemoteException {
+	public Response setWorklogBlockingDate(@Context HttpServletRequest request, @PathParam("pkey") String projectKey,
+			@QueryParam("date") String date) throws RemoteException {
 		if (!permissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, getApplicationUser(request)))
 			return Response.status(Status.BAD_REQUEST).entity("Don't have permission.").build();
 		try {

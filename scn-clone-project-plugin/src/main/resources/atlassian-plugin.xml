@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE project>
 <atlassian-plugin
 	key="${project.groupId}.${project.artifactId}" name="${project.name}"
 	plugins-version="2">

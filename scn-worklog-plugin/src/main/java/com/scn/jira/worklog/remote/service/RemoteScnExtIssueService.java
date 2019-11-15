@@ -12,8 +12,8 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.ApplicationUsers;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
@@ -34,8 +34,9 @@ public class RemoteScnExtIssueService implements IRemoteScnExtIssueService {
 	private final IGlobalSettingsManager scnGlobalPermissionManager;
 
 	@Inject
-	public RemoteScnExtIssueService(@ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
-                IScnExtendedIssueStore scnExtendedIssueStore, IGlobalSettingsManager scnGlobalPermissionManager) {
+	public RemoteScnExtIssueService(@ComponentImport PermissionManager permissionManager,
+			@ComponentImport IssueManager issueManager, IScnExtendedIssueStore scnExtendedIssueStore,
+			IGlobalSettingsManager scnGlobalPermissionManager) {
 		this.permissionManager = permissionManager;
 		this.issueManager = issueManager;
 		this.scnExtendedIssueStore = scnExtendedIssueStore;
@@ -84,7 +85,7 @@ public class RemoteScnExtIssueService implements IRemoteScnExtIssueService {
 			return null;
 		}
 		ApplicationUser appUser = ApplicationUsers.from(user);
-		if (!this.permissionManager.hasPermission(Permissions.BROWSE, issue, appUser)
+		if (!this.permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, appUser)
 				|| !this.scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, appUser)) {
 			throw new RemoteException("You don't have permission to view the issue " + issueKey + ".");
 		}

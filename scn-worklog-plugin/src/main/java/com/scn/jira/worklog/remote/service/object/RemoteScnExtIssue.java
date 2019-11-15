@@ -9,12 +9,16 @@ import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.rest.util.JiraScnRestServiceUtil;
 
 @XmlRootElement(name = "scn-extended-issue")
-@XmlType(propOrder = { JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME, JiraScnRestServiceUtil.TIMESPENT_ATTR_NAME,
-		JiraScnRestServiceUtil.ORIGINAL_EST_ATTR_NAME, JiraScnRestServiceUtil.ESTIMATE_LEVEL_ATTR_NAME })
+@XmlType(propOrder = { JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME, JiraScnRestServiceUtil.ISSUE_ID_ATTR_NAME,
+		JiraScnRestServiceUtil.ORIGINAL_EST_ATTR_NAME, JiraScnRestServiceUtil.ESTIMATE_LEVEL_ATTR_NAME,
+		JiraScnRestServiceUtil.TIMESPENT_ATTR_NAME })
 public class RemoteScnExtIssue {
 
 	@XmlElement(name = JiraScnRestServiceUtil.ISSUE_KEY_ATTR_NAME)
 	private String issueKey;
+
+	@XmlElement(name = JiraScnRestServiceUtil.ISSUE_ID_ATTR_NAME)
+	private Long issueId;
 
 	@XmlElement(name = JiraScnRestServiceUtil.ORIGINAL_EST_ATTR_NAME)
 	private Long originalEstimate;
@@ -29,7 +33,8 @@ public class RemoteScnExtIssue {
 		if (issue == null) {
 			return null;
 		}
-		final RemoteScnExtIssue remoteScnExtIssue = new RemoteScnExtIssue(issue.getKey(), null, null, null);
+		final RemoteScnExtIssue remoteScnExtIssue = new RemoteScnExtIssue(issue.getKey(), issue.getId(), null, null,
+				null);
 		return remoteScnExtIssue;
 	}
 
@@ -38,15 +43,17 @@ public class RemoteScnExtIssue {
 			return null;
 		}
 		final RemoteScnExtIssue remoteScnExtIssue = new RemoteScnExtIssue(scnExtIssue.getIssue().getKey(),
-				scnExtIssue.getOriginalEstimate(), scnExtIssue.getEstimate(), scnExtIssue.getTimeSpent());
+				scnExtIssue.getIssue().getId(), scnExtIssue.getOriginalEstimate(), scnExtIssue.getEstimate(),
+				scnExtIssue.getTimeSpent());
 		return remoteScnExtIssue;
 	}
 
 	public RemoteScnExtIssue() {
 	}
 
-	public RemoteScnExtIssue(String issueKey, Long originalEstimate, Long estimate, Long timeSpent) {
+	private RemoteScnExtIssue(String issueKey, Long issueId, Long originalEstimate, Long estimate, Long timeSpent) {
 		this.issueKey = issueKey;
+		this.issueId = issueId;
 		this.originalEstimate = originalEstimate;
 		this.estimate = estimate;
 		this.timeSpent = timeSpent;
@@ -54,6 +61,10 @@ public class RemoteScnExtIssue {
 
 	public String getIssueKey() {
 		return issueKey;
+	}
+
+	public Long getIssueId() {
+		return issueId;
 	}
 
 	public Long getOriginalEstimate() {
