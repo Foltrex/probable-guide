@@ -37,6 +37,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.opensymphony.module.propertyset.PropertyException;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
+import com.scn.jira.worklog.core.scnwl.ScnExtendedIssue;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import com.scn.jira.worklog.remote.service.IRemoteScnExtIssueService;
@@ -161,7 +162,16 @@ public class JiraScnRestService {
 		}
 		final IScnExtendedIssue extIssue = ofBizExtIssueStore.getByIssue(issue);
 		if (extIssue == null) {
-			// TODO. To be continued.
+			final IScnExtendedIssue newExtIssue = new ScnExtendedIssue(issue, null, originalEstimate, originalEstimate,
+					null);
+			ofBizExtIssueStore.create(newExtIssue);
+		} else {
+			final IScnExtendedIssue newExtIssue = new ScnExtendedIssue(issue, extIssue.getId(), originalEstimate,
+					extIssue.getTimeSpent() == null ? originalEstimate
+							: originalEstimate > extIssue.getTimeSpent() ? originalEstimate - extIssue.getTimeSpent()
+									: 0L,
+					extIssue.getTimeSpent());
+			ofBizExtIssueStore.update(newExtIssue);
 		}
 		RemoteScnExtIssue scnExtIssue = remoteScnExtIssueService.getScnExtIssue(appUser.getDirectoryUser(), issueKey);
 		return Response.ok(scnExtIssue).cacheControl(getNoCacheControl()).build();
