@@ -4,8 +4,8 @@ import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.util.collect.MapBuilder;
-
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+
 import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
 import org.ofbiz.core.util.UtilDateTime;
@@ -35,7 +35,7 @@ public class OfBizScnExtendedIssueStore implements IScnExtendedIssueStore {
 
 	public IScnExtendedIssue update(IScnExtendedIssue extIssue) throws DataAccessException {
 		final GenericValue extIssueGV = ofBizDelegator.findByPrimaryKey(ENTITY_EXTENDED_ISSUE, extIssue.getId()),
-				issueGV = ofBizDelegator.findById(ENTITY_ISSUE, extIssue.getId());
+				issueGV = extIssue.getIssue().getGenericValue();
 		if (extIssueGV == null) {
 			throw new DataAccessException("Could not find original scnExtendedIssue entity to update.");
 		}

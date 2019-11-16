@@ -38,9 +38,9 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 	private final IGlobalSettingsManager scnPermissionManager;
 
 	@Autowired
-	public ScnTimeTrackingType(JiraAuthenticationContext authenticationContext, @ComponentImport ApplicationProperties applicationProperties,
-							   OfBizScnExtendedIssueStore issueStore, DefaultScnWorklogManager wlManger,
-							   IGlobalSettingsManager scnPermissionManager) {
+	public ScnTimeTrackingType(JiraAuthenticationContext authenticationContext,
+			@ComponentImport ApplicationProperties applicationProperties, OfBizScnExtendedIssueStore issueStore,
+			DefaultScnWorklogManager wlManger, IGlobalSettingsManager scnPermissionManager) {
 		this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
 		this.authenticationContext = authenticationContext;
 		this.applicationProperties = applicationProperties;
@@ -61,7 +61,8 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 		String customFieldId = cfParams.getCustomField().getId();
 		for (String key : values.keySet()) {
 			if (StringUtils.isNotBlank(values.get(key)) && !isValidDuration(values.get(key)))
-				errors.addError(customFieldId + ":" + key, getI18nBean().getText("worklog.service.error.invalid.time.duration"));
+				errors.addError(customFieldId + ":" + key,
+						getI18nBean().getText("worklog.service.error.invalid.time.duration"));
 		}
 	}
 
@@ -108,7 +109,8 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 	}
 
 	@Override
-	public Map<String, String> getValueFromCustomFieldParams(CustomFieldParams cfParams) throws FieldValidationException {
+	public Map<String, String> getValueFromCustomFieldParams(CustomFieldParams cfParams)
+			throws FieldValidationException {
 		Map<String, String> values = new HashMap<String, String>();
 
 		if (cfParams.containsKey(ORIGINAL_ESTIMATE))
@@ -207,7 +209,8 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 	}
 
 	private boolean hasPermissionToViewScnWorklog() {
-		return scnPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, authenticationContext.getLoggedInUser());
+		return scnPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING,
+				authenticationContext.getLoggedInUser());
 	}
 
 	private boolean isLegacyBehaviorEnabled() {
@@ -218,7 +221,7 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 		return applicationProperties.getOption("jira.option.timetracking");
 	}
 
-	public boolean hasWorkStarted(Issue issue) {
+	private boolean hasWorkStarted(Issue issue) {
 		try {
 			return !wlManager.getByIssue(issue).isEmpty();
 		} catch (Exception e) {
