@@ -60,6 +60,7 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
 				new DefaultExtendedConstantsManager());
 	}
 
+	@Override
 	public String doDefault() throws Exception {
 		this.worklog = this.scnWorklogService.getById(getJiraServiceContext(), getWorklogId());
 		if (this.worklog == null) {
@@ -74,7 +75,8 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
 		return super.doDefault();
 	}
 
-	public void doValidation() {
+	@Override
+	protected void doValidation() {
 		if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(this.adjustEstimate)) {
 			IScnWorklogService.WorklogNewEstimateResult worklogNewEstimateResult = this.scnWorklogService
 					.validateDeleteWithNewEstimate(getJiraServiceContext(), getWorklogId(), getNewEstimate());
@@ -97,7 +99,8 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
 		}
 	}
 
-	public String doExecute() throws Exception {
+	@Override
+	protected String doExecute() throws Exception {
 		setWorklogType(this.worklog.getWorklogTypeId());
 		if (ADJUST_ESTIMATE_AUTO.equalsIgnoreCase(this.adjustEstimate)) {
 			this.scnWorklogService.deleteAndAutoAdjustRemainingEstimate(getJiraServiceContext(), this.worklog, true,
@@ -134,6 +137,7 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
 		return getWorklog() == null || getWorklog().getLinkedWorklog() == null;
 	}
 
+	@Override
 	public boolean isWlAutoCopyChecked() {
 		if (getJiraServiceContext().getErrorCollection().hasAnyErrors())
 			return isWlAutoCopy();

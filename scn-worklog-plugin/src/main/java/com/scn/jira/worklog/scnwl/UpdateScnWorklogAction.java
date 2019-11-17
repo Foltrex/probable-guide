@@ -85,7 +85,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 	}
 
 	@Override
-	public void doValidation() {
+	protected void doValidation() {
 		CommentVisibility visibility = getCommentVisibility();
 
 		if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(this.adjustEstimate)) {
@@ -123,7 +123,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 	}
 
 	@Override
-	public String doExecute() throws Exception {
+	protected String doExecute() throws Exception {
 		if (ADJUST_ESTIMATE_AUTO.equalsIgnoreCase(this.adjustEstimate)) {
 			this.scnWorklogService.updateAndAutoAdjustRemainingEstimate(getJiraServiceContext(), this.worklog, true,
 					isWlAutoCopy());

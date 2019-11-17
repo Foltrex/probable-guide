@@ -74,6 +74,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 		return fvManager.isFieldHidden("timetracking", issue);
 	}
 
+	@Override
 	public String doDefault() throws Exception {
 		if (!isIssueValid()) {
 			return ERROR;
@@ -91,6 +92,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 		}
 	}
 
+	@Override
 	protected void doValidation() {
 		if (!isIssueValid()) {
 			return;
@@ -138,6 +140,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 		}
 	}
 
+	@Override
 	protected String doExecute() throws Exception {
 		if (isTimeTrackingFieldHidden(getIssueObject()))
 			return SECURITY_BREACH;
