@@ -17,7 +17,7 @@
 	<groupId>com.scn.jira.plugin</groupId>
 	<artifactId>scn-timesheet-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.1</version>
+	<version>4.1.4</version>
 
 	<dependencies>
 		<dependency>
@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>com.scn.jira</groupId>
 			<artifactId>scn-worklog-plugin</artifactId>
-			<version>[4.1.0,4.2.0)</version>
+			<version>4.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

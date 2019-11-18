@@ -16,7 +16,7 @@
 
 	<artifactId>scn-mytime-gadget-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.2</version>
+	<version>4.1.4</version>
 
 	<dependencies>
 		<dependency>
@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>com.scn.jira</groupId>
 			<artifactId>scn-worklog-plugin</artifactId>
-			<version>[4.1.0,4.2.0)</version>
+			<version>4.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
