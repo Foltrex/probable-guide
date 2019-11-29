@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE project>
+
 <atlassian-plugin key="${atlassian.plugin.key}"
 	name="${project.name}" plugins-version="2">
 	<plugin-info>
@@ -14,35 +15,28 @@
 		<param name="atlassian-data-center-compatible">true</param>
 		<param name="plugin-type">both</param>
 	</plugin-info>
-
 	<!-- WL/WL* i18n RESOURCES -->
 	<resource type="i18n" name="i18n"
 		location="com.scn.jira.worklog.i18n" />
-
 	<!-- RESOURCES -->
 	<web-resource name="Plugin Global Resources"
 		key="global-plugin-resources">
 		<dependency>jira.webresources:jira-global</dependency>
-		<dependency>com.atlassian.gadgets.embedded:gadget-standalone-resources
-		</dependency>
+		<dependency>com.atlassian.gadgets.embedded:gadget-standalone-resources</dependency>
 		<resource name="scn-worklog-plugin.css" type="download"
 			location="/scn-worklog-plugin.css" />
 	</web-resource>
-
 	<!-- ACTIVEOBJECTS CONFIG -->
 	<ao key="ao-module" name="Plugin Active Objects">
 		<description>AO entities and upgrade tasks Configuration</description>
 		<entity>com.scn.jira.wl.wltypes.dal.WLTypeEntity</entity>
-		<upgradeTask>com.scn.jira.wl.wltypes.dal.upgrades.v1.Upgrade001
-		</upgradeTask>
+		<upgradeTask>com.scn.jira.wl.wltypes.dal.upgrades.v1.Upgrade001</upgradeTask>
 	</ao>
-
 	<!-- REST SERVICE -->
 	<rest key="rest-service" name="Plugin Global REST Service"
 		path="/scn-worklog-plugin" version="1.0">
 		<description>REST endpoint for the Plugin</description>
 	</rest>
-
 	<!-- WL/WL* GLOBAL SETTINGS -->
 	<web-section key="globalsettings-websection"
 		name="Global Settings Web Section" location="admin_plugins_menu">
@@ -65,8 +59,7 @@
 			<action
 				name="com.scn.jira.worklog.globalsettings.GlobalSettingsWebAction"
 				alias="GlobalSettingsWebAction" roles-required="admin">
-				<view name="success">/templates/scn/worklog/permissions/globalsettings.vm
-				</view>
+				<view name="success">/templates/scn/worklog/permissions/globalsettings.vm</view>
 			</action>
 		</actions>
 	</webwork1>
@@ -74,9 +67,7 @@
 		<resource name="globalsettings.js" type="download"
 			location="/templates/scn/worklog/permissions/globalsettings.js" />
 	</web-resource>
-
 	<!-- WL TYPES -->
-
 	<!-- WL TYPES OLD IMPLEMENTATION -->
 	<web-item key="worklogtypes" name="Worklog Types Link"
 		section="admin_plugins_menu/globalsettings-websection"
@@ -92,44 +83,32 @@
 			<action
 				name="com.scn.jira.worklog.types.WorklogTypesWebAction"
 				alias="ViewWorklogTypes" roles-required="admin">
-				<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm
-				</view>
+				<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm</view>
 				<command name="AddWorklogType" alias="AddWorklogType">
-					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
-					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
-					<view name="input">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
+					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm</view>
+					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm</view>
+					<view name="input">/templates/scn/worklog/type/viewworklogtypes.vm</view>
 				</command>
 				<command name="moveDown" alias="WorklogTypeDown">
-					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
-					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
+					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm</view>
+					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm</view>
 				</command>
 				<command name="moveUp" alias="WorklogTypeUp">
-					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
-					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm
-					</view>
+					<view name="success">/templates/scn/worklog/type/viewworklogtypes.vm</view>
+					<view name="error">/templates/scn/worklog/type/viewworklogtypes.vm</view>
 				</command>
 			</action>
 			<!-- Edit Worklog Types -->
 			<action name="com.scn.jira.worklog.types.EditWorklogType"
 				alias="EditWorklogType" roles-required="admin">
-				<view name="input">/templates/scn/worklog/type/editworklogtype.vm
-				</view>
-				<view name="error">/templates/scn/worklog/type/editworklogtype.vm
-				</view>
+				<view name="input">/templates/scn/worklog/type/editworklogtype.vm</view>
+				<view name="error">/templates/scn/worklog/type/editworklogtype.vm</view>
 			</action>
 			<!-- Delete Worklog Types -->
 			<action name="com.scn.jira.worklog.types.DeleteWorklogType"
 				alias="DeleteWorklogType" roles-required="admin">
-				<view name="input">/templates/scn/worklog/type/deleteworklogtype.vm
-				</view>
-				<view name="error">/templates/scn/worklog/type/deleteworklogtype.vm
-				</view>
+				<view name="input">/templates/scn/worklog/type/deleteworklogtype.vm</view>
+				<view name="error">/templates/scn/worklog/type/deleteworklogtype.vm</view>
 			</action>
 		</actions>
 	</webwork1>
@@ -140,12 +119,9 @@
 			<action
 				name="com.scn.jira.worklog.types.ExtendedViewTranslations"
 				alias="ViewTranslations" roles-required="admin">
-				<view name="success">/secure/admin/views/translations/chooseviewtranslations.jsp
-				</view>
-				<view name="input">/secure/admin/views/translations/chooseviewtranslations.jsp
-				</view>
-				<view name="error">/secure/admin/views/translations/chooseviewtranslations.jsp
-				</view>
+				<view name="success">/secure/admin/views/translations/chooseviewtranslations.jsp</view>
+				<view name="input">/secure/admin/views/translations/chooseviewtranslations.jsp</view>
+				<view name="error">/secure/admin/views/translations/chooseviewtranslations.jsp</view>
 			</action>
 			<!-- Icon Picker for AddOn -->
 			<action name="com.scn.jira.worklog.types.ExtendedIconPicker"
@@ -155,7 +131,6 @@
 			</action>
 		</actions>
 	</webwork1>
-
 	<!-- WL/WL* PROJECT SETTINGS -->
 	<webwork1 key="scn-project-settings"
 		name="ScienceSoft Project Settings">
@@ -163,12 +138,9 @@
 			<action
 				name="com.scn.jira.worklog.settings.ScnProjectSettingsAction"
 				alias="ScnProjectSettings">
-				<view name="input">/templates/scn/worklog/settings/project-settings-scn-panel.vm
-				</view>
-				<view name="error">/templates/scn/worklog/settings/project-settings-scn-panel.vm
-				</view>
-				<view name="success">/templates/scn/worklog/settings/project-settings-scn-panel.vm
-				</view>
+				<view name="input">/templates/scn/worklog/settings/project-settings-scn-panel.vm</view>
+				<view name="error">/templates/scn/worklog/settings/project-settings-scn-panel.vm</view>
+				<view name="success">/templates/scn/worklog/settings/project-settings-scn-panel.vm</view>
 			</action>
 		</actions>
 	</webwork1>
@@ -177,8 +149,7 @@
 		section="atl.jira.proj.config/projectgroup3"
 		i18n-name-key="scn.project_settings.label" weight="45">
 		<label key="scn.project_settings.label" />
-		<link linkId="scnProjectSettings">/secure/ScnProjectSettings!default.jspa?pid=$helper.project.id
-		</link>
+		<link linkId="scnProjectSettings">/secure/ScnProjectSettings!default.jspa?pid=$helper.project.id</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.HasSelectedProjectCondition" />
 		<conditions type="OR">
@@ -192,7 +163,6 @@
 		<condition
 			class="com.scn.jira.worklog.conditions.ScnGlobalPermissionCondition" />
 	</web-item>
-
 	<!-- TIMETRACKING* CUSTOM FIELD -->
 	<customfield-type
 		key="scn-timetracking-custom-field-type"
@@ -200,8 +170,7 @@
 		i18n-name-key="scn.scnworklog.customfield.timetracking.name"
 		class="com.scn.jira.worklog.customfield.ScnTimeTrackingType">
 		<description
-			key="scn.scnworklog.customfield.timetracking.descr">Allows user to Edit SCN Original*/Remaining* Estimate
-		</description>
+			key="scn.scnworklog.customfield.timetracking.descr">Allows user to Edit SCN Original*/Remaining* Estimate</description>
 		<resource type="velocity" name="edit"
 			location="/templates/scn/worklog/customfields/timetracking-scn-edit.vm" />
 	</customfield-type>
@@ -214,7 +183,6 @@
 			package="com.scn.jira.worklog.customfield"
 			key="scn-timetracking-custom-field-type" />
 	</customfield-searcher>
-
 	<!-- WL* ISSUE TAB PANELS -->
 	<issue-tabpanel key="worklog-tabpanel"
 		i18n-name-key="admin.issue.tabpanels.plugin.worklog.name"
@@ -244,7 +212,6 @@
 		<supports-ajax-load>true</supports-ajax-load>
 		<!--<condition class="NewCondition*" /> -->
 	</issue-tabpanel>
-
 	<!-- ISSUE SCREEN GRAPH PANELS, LINKS -->
 	<!-- OVERRIDE "WORK LOG" ISSUE GRAPH PANEL -->
 	<web-panel key="timetrackingmodule"
@@ -276,10 +243,8 @@
 		<label>LOG WORK</label>
 		<tooltip key="logwork.title.desc" />
 		<styleClass>issueaction-log-work aui-icon aui-icon-small
-			aui-iconfont-add issueaction-aui-icon
-		</styleClass>
-		<link linkId="log-work-link">/secure/ExtendedCreateWorklog!default.jspa?id=${issue.id}
-		</link>
+			aui-iconfont-add issueaction-aui-icon</styleClass>
+		<link linkId="log-work-link">/secure/ExtendedCreateWorklog!default.jspa?id=${issue.id}</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
 		<condition
@@ -316,8 +281,7 @@
 		<label key="logwork.title" />
 		<tooltip key="logwork.title.desc" />
 		<styleClass>icon icon-add16 issueaction-scn-log-work-icon</styleClass>
-		<link linkId="log-work-link">/secure/CreateScnWorklogAction!default.jspa?id=${issue.id}
-		</link>
+		<link linkId="log-work-link">/secure/CreateScnWorklogAction!default.jspa?id=${issue.id}</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
 		<condition
@@ -327,7 +291,6 @@
 			<param name="permission">work</param>
 		</condition>
 	</web-item>
-
 	<!-- WORKLOG OVERRIDE ACTIONS -->
 	<!--TIMETRACKING OVERRIDE OPS BAR ACTION -->
 	<web-item key="log-work2"
@@ -337,8 +300,7 @@
 		<label>LOG WORK</label>
 		<tooltip key="admin.issue.operations.plugin.log.work.name" />
 		<styleClass>issueaction-log-work</styleClass>
-		<link linkId="log-work2">/secure/ExtendedCreateWorklog!default.jspa?id=${issueId}
-		</link>
+		<link linkId="log-work2">/secure/ExtendedCreateWorklog!default.jspa?id=${issueId}</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
 		<condition
@@ -355,7 +317,6 @@
 		<condition
 			class="com.scn.jira.worklog.conditions.ScnProjectSettingsCondition" />
 	</web-item>
-
 	<webwork1 key="WorklogAction2" name="Worklog Actions"
 		class="java.lang.Object">
 		<actions>
@@ -389,15 +350,13 @@
 			</action>
 		</actions>
 	</webwork1>
-
 	<!-- TIMETRACKING* OPS BAR ACTION -->
 	<web-item key="scn-logwork-operation"
 		name="Log work* menu item" section="operations-work" weight="12">
 		<label>Log work*</label>
 		<tooltip key="admin.issue.operations.plugin.log.work.name" />
 		<styleClass>issueaction-log-work</styleClass>
-		<link linkId="scn-logwork-operation">/secure/CreateScnWorklogAction!default.jspa?id=${issueId}
-		</link>
+		<link linkId="scn-logwork-operation">/secure/CreateScnWorklogAction!default.jspa?id=${issueId}</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
 		<condition
@@ -413,7 +372,6 @@
 			<param name="field">timetracking</param>
 		</condition>
 	</web-item>
-
 	<webwork1 key="scn-worklog" name="Worklog* actions">
 		<!--<resource type="i18n" name="i18n" location="com.scn.jira.worklog.i18n"/> -->
 		<actions>
@@ -464,17 +422,14 @@
 		<url-pattern>*/AssignIssue*</url-pattern>
 		<url-pattern>*/CommentAssignIssue*</url-pattern>
 	</servlet-filter>
-
 	<!-- WORKFLOW POST FUNCTIONS -->
 	<!-- zeroed RemainingTime* post function -->
 	<workflow-function
 		key="scn-zeroed-scnremaining-time-post-function"
 		name="SCN Zeroed Remaining Time* Function"
 		class="com.scn.jira.worklog.workflow.CustomWorkflowNoInputPluginFactory">
-		<description>The post function sets remaining time* to zero.
-		</description>
-		<function-class>com.scn.jira.worklog.workflow.ZeroedScnRemainingTimePostFunction
-		</function-class>
+		<description>The post function sets remaining time* to zero.</description>
+		<function-class>com.scn.jira.worklog.workflow.ZeroedScnRemainingTimePostFunction</function-class>
 		<resource type="velocity" name="view"
 			location="templates/scn/postfunctions/scn-postfunction.vm" />
 	</workflow-function>
@@ -483,28 +438,21 @@
 		key="zeroed-remaining-time-post-function"
 		name="Zeroed Remaining Time Function"
 		class="com.scn.jira.worklog.workflow.CustomWorkflowNoInputPluginFactory">
-		<description>The post function sets remaining time to zero.
-		</description>
-		<function-class>com.scn.jira.worklog.workflow.ZeroedRemainingTimePostFunction
-		</function-class>
+		<description>The post function sets remaining time to zero.</description>
+		<function-class>com.scn.jira.worklog.workflow.ZeroedRemainingTimePostFunction</function-class>
 		<resource type="velocity" name="view"
 			location="templates/scn/postfunctions/postfunction.vm" />
 	</workflow-function>
-
 	<!-- Subtask panel -->
 	<web-panel key="view-subtasks"
 		location="atl.jira.view.issue.left.context" weight="700">
 		<context-provider
 			class="com.scn.jira.worklog.webfragment.CustomMultiContextProvider">
 			<param name="pluginKey">${project.groupId}.${project.artifactId}</param>
-			<param name="ctxProvider-1">com.atlassian.jira.plugin.webfragment.contextproviders.I18nContextProvider
-			</param>
-			<param name="ctxProvider-2">com.scn.jira.worklog.webfragment.CustomBaseUrlContextProvider
-			</param>
-			<param name="ctxProvider-3">com.scn.jira.worklog.panels.ScnSubTasksContextProvider
-			</param>
-			<param name="ctxProvider-4">com.scn.jira.worklog.webfragment.CustomXsrfTokenContextProvider
-			</param>
+			<param name="ctxProvider-1">com.atlassian.jira.plugin.webfragment.contextproviders.I18nContextProvider</param>
+			<param name="ctxProvider-2">com.scn.jira.worklog.webfragment.CustomBaseUrlContextProvider</param>
+			<param name="ctxProvider-3">com.scn.jira.worklog.panels.ScnSubTasksContextProvider</param>
+			<param name="ctxProvider-4">com.scn.jira.worklog.webfragment.CustomXsrfTokenContextProvider</param>
 		</context-provider>
 		<resource name="view" type="velocity"
 			location="templates/scn/worklog/panels/subtasks.vm" />
@@ -518,8 +466,7 @@
 				class="com.scn.jira.worklog.conditions.CustomHasSubTaskCondition" />
 			<condition
 				class="com.atlassian.jira.plugin.webfragment.conditions.IsApplicationPropertySetCondition">
-				<param name="property">jira.view.issue.show.quicksubtask.when.no.subtasks
-				</param>
+				<param name="property">jira.view.issue.show.quicksubtask.when.no.subtasks</param>
 			</condition>
 		</conditions>
 		<label key="issue.field.subtasks" />
@@ -533,8 +480,7 @@
 		<label key="viewissue.subtasks.quickcreate.addsubtask.label" />
 		<tooltip key="viewissue.subtasks.quickcreate.addsubtask.label" />
 		<styleClass>icon issueaction-create-subtask icon-add16</styleClass>
-		<link linkId="stqc_show">/secure/CreateSubTaskIssue!default.jspa?parentIssueId=${issue.id}
-		</link>
+		<link linkId="stqc_show">/secure/CreateSubTaskIssue!default.jspa?parentIssueId=${issue.id}</link>
 		<condition
 			class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition" />
 		<condition
@@ -560,12 +506,9 @@
 		<context-provider
 			class="com.atlassian.jira.plugin.webfragment.contextproviders.MultiContextProvider">
 			<param name="pluginKey">${project.groupId}.${project.artifactId}</param>
-			<param name="ctxProvider-1">com.atlassian.jira.plugin.webfragment.contextproviders.I18nContextProvider
-			</param>
-			<param name="ctxProvider-2">com.atlassian.jira.plugin.webfragment.contextproviders.BaseUrlContextProvider
-			</param>
-			<param name="ctxProvider-3">com.scn.jira.worklog.webfragment.CustomSubTasksProgressContextProvider
-			</param>
+			<param name="ctxProvider-1">com.atlassian.jira.plugin.webfragment.contextproviders.I18nContextProvider</param>
+			<param name="ctxProvider-2">com.atlassian.jira.plugin.webfragment.contextproviders.BaseUrlContextProvider</param>
+			<param name="ctxProvider-3">com.scn.jira.worklog.webfragment.CustomSubTasksProgressContextProvider</param>
 		</context-provider>
 		<resource name="view" type="velocity"
 			location="templates/scn/worklog/panels/subtasks-progress.vm" />
@@ -573,4 +516,12 @@
 			class="com.scn.jira.worklog.conditions.CustomTimeTrackingEnabledCondition"
 			invert="true" />
 	</web-panel>
+	<jql-function name="Recent Project Function"
+		i18n-name-key="recent-project-function.name"
+		key="recent-project-function"
+		class="com.scn.jira.jql.function.RecentProjectFunction">
+		<description>The Recent Project Function Plugin</description>
+		<fname>recentProjects</fname>
+		<list>true</list>
+	</jql-function>
 </atlassian-plugin>
