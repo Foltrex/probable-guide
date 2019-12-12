@@ -4,20 +4,20 @@ table, caption, tr, th, td {
     margin: 0;
     padding: 0;
     border: 0;
-   /* vertical-align: baseline;*/
+    /* vertical-align: baseline;*/
     background: transparent;
 }
 
-h5{
-	color: white;
+h5 {
+    color: white;
 }
 
- table.logtime-table td{
- 	min-width: 30px;
-	width: 30px;
- }
+table.logtime-table td {
+    min-width: 30px;
+    width: 30px;
+}
 
- 
+
 :focus {
     outline: 0;
 }
@@ -53,19 +53,20 @@ input {
 }
 
 label {
-    font-family: arial,sans-serif;
+    font-family: arial, sans-serif;
     font-size: 12px;
-	color: #444;
+    color: #444;
 }
 
 input[type="checkbox"] {
-    display:none;            
+    display: none;
 }
+
 input[type="checkbox"] + label {
-  font-family: arial,sans-serif;
-  font-size: 12px;
-  color: #444;
-  cursor: pointer;
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    color: #444;
+    cursor: pointer;
 }
 
 input[type="checkbox"] + label::before {
@@ -74,11 +75,12 @@ input[type="checkbox"] + label::before {
     height: 18px;
     width: 18px;
     margin: 0 5px 0 0;
-    background-image: url(css/images/sprite.png);
+    /*background-image: url(css/images/sprite.png);*/
     background-repeat: no-repeat;
 }
+
 input[type="checkbox"] + label::before {
-    background-position: -38px -260px;    
+    background-position: -38px -260px;
 }
 
 input[type="checkbox"]:checked + label::before {
@@ -88,151 +90,152 @@ input[type="checkbox"]:checked + label::before {
 input[type="checkbox"]:disabled + label::before {
     background-position: -152px -260px;
 }
+
 input[type="checkbox"]:checked:disabled + label::before {
     background-position: -171px -260px;
-}			
+}
 
 button.back-btn {
-    background:url(css/images/back.png) no-repeat;
-    cursor:pointer;
+    background: url(css/images/back.png) no-repeat;
+    cursor: pointer;
     width: 30px;
     height: 30px;
     border: none;
 }
 
 button.forward-btn {
-    background:url(css/images/forward.png) no-repeat;
-    cursor:pointer;
+    background: url(css/images/forward.png) no-repeat;
+    cursor: pointer;
     width: 30px;
     height: 30px;
     border: none;
 }
 
-button.close-btn{
-    background:url(css/images/close.png) no-repeat;
-    cursor:pointer;
+button.close-btn {
+    background: url(css/images/close.png) no-repeat;
+    cursor: pointer;
     width: 20px;
     height: 20px;
     border: none;
 }
 
-button.close-small-btn{
-    background:url(css/images/close-small.png) no-repeat;
-    cursor:pointer;
+button.close-small-btn {
+    background: url(css/images/close-small.png) no-repeat;
+    cursor: pointer;
     width: 10px;
     height: 10px;
     border: none;
 }
 
-button.add-btn{
-    background:url(css/images/add.png) no-repeat;
-    cursor:pointer;
+button.add-btn {
+    background: url(css/images/add.png) no-repeat;
+    cursor: pointer;
     width: 20px;
     height: 20px;
     border: none;
 }
 
 
-button.btn-view{
-	display: block;
-	width: 90px;
-	height: 30px;	
-	background: transparent;
-	background-color:transparent;
-	border: activeborder;
-	border: 0 none;
+button.btn-view {
+    display: block;
+    width: 90px;
+    height: 30px;
+    background: transparent;
+    border: activeborder;
+    border: 0 none;
     color: #0071CD;
-    cursor: pointer;   
+    cursor: pointer;
     margin: 0;
     outline: 0 none;
     overflow: visible;
     padding: 1px 5px;
     white-space: nowrap;
-	font-weight: bold;
+    font-weight: bold;
 }
 
-button.showWorklog{
-	display: block;
-	width: 120px;
-	height: 30px;		
-	background-color:#80B13F;
-	border: activeborder;
-	border: 0 none;
+button.showWorklog {
+    display: block;
+    width: 120px;
+    height: 30px;
+    background-color: #80B13F;
+    border: activeborder;
+    border: 0 none;
     color: #FFFFFF;
-    cursor: pointer;   
+    cursor: pointer;
     margin: 0;
     outline: 0 none;
     overflow: visible;
     padding: 1px 5px;
     white-space: nowrap;
-	font-weight: bold;
-	border-radius: 3px 3px 3px 3px;
+    font-weight: bold;
+    border-radius: 3px 3px 3px 3px;
 }
 
-button.addWorklog{
-	display: block;	
-	background-color:#80B13F;
-	border: activeborder;
-	border: 0 none;
+button.addWorklog {
+    display: block;
+    background-color: #80B13F;
+    border: activeborder;
+    border: 0 none;
     color: #FFFFFF;
-    cursor: pointer;   
+    cursor: pointer;
     margin: 0;
     outline: 0 none;
     overflow: visible;
     padding: 1px 5px;
     white-space: nowrap;
-	font-weight: bold;
-	border-radius: 3px 3px 3px 3px;
+    font-weight: bold;
+    border-radius: 3px 3px 3px 3px;
 }
 
 .userpickerfield.text {
     width: 250px;
-	height: 25px;
+    height: 25px;
 }
 
-#myFieldId_container.ajax_autocomplete.atlassian-autocomplete{
-	font-size: 12px;
+#myFieldId_container.ajax_autocomplete.atlassian-autocomplete {
+    font-size: 12px;
 
 }
-table.table-filter{
-width:1000px;
+
+table.table-filter {
+    width: 1000px;
 }
 
-td.filterCheck{
-	width:60px;
+td.filterCheck {
+    width: 60px;
 }
 
-td.filterCheckAssigned{
-	width:150px;
+td.filterCheckAssigned {
+    width: 150px;
 }
 
-td.filterEmployee{
-	width:100px;
-	text-align: right;
-	padding-right: 8px;
-}		
-
-td.filterUser{
-	width:225px;
-	padding-right: 30px;
+td.filterEmployee {
+    width: 100px;
+    text-align: right;
+    padding-right: 8px;
 }
 
-td.filterBackForward{
-	width:60px;
+td.filterUser {
+    width: 225px;
+    padding-right: 30px;
 }
 
-td.filterView{
-	width:150px;
-	padding-left: 20px;
+td.filterBackForward {
+    width: 60px;
+}
+
+td.filterView {
+    width: 150px;
+    padding-left: 20px;
 }
 
 
-table.logtime-table{
-	font-family: arial,sans-serif;
-	font-size: 12px;    
+table.logtime-table {
+    font-family: arial, sans-serif;
+    font-size: 12px;
     line-height: 1.4em;
     font-style: normal;
-    border-collapse:collapse;
+    border-collapse: collapse;
 }
 
 
@@ -242,240 +245,242 @@ table.logtime-table thead th {
     border-top: 1px solid #1C537E;
     color: #1C537E;
     font-size: 12px;
-    font-weight: bold;    
-	text-align: center;
+    font-weight: bold;
+    text-align: center;
 }
 
 table.logtime-table thead th.weekendCss {
     color: #B22222;
-	font-weight: normal;
-	border-top: 1px solid #FFFFFF;
+    font-weight: normal;
+    border-top: 1px solid #FFFFFF;
 }
 
 table.logtime-table thead th.workingCss {
     color: #1C537E;
-	font-weight: normal;
-	border-top: 1px solid #FFFFFF;
+    font-weight: normal;
+    border-top: 1px solid #FFFFFF;
 }
 
-table.logtime-table thead th.day-header {  
-	border-top: 1px solid #FFFFFF;
+table.logtime-table thead th.day-header {
+    border-top: 1px solid #FFFFFF;
 }
 
 
-.total-rows{  
-	background-color: #0071CD;
-	border-left: 1px solid #FFFFFF;	
+.total-rows {
+    background-color: #0071CD;
+    border-left: 1px solid #FFFFFF;
     border-right: 1px solid #FFFFFF;
     border-top: 1px solid #FFFFFF;
-	border-bottom: 1px solid #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
     color: #FFFFFF;
     font-size: 12px;
     font-weight: normal;
     padding: 3px;
-	text-align: center;
+    text-align: center;
 }
 
-.total-wicket{  
-	background-color: #BEDAF8;
-	border-left: 1px solid #FFFFFF;	
+.total-wicket {
+    background-color: #BEDAF8;
+    border-left: 1px solid #FFFFFF;
     border-right: 1px solid #FFFFFF;
     border-top: 1px solid #FFFFFF;
-	border-bottom: 1px solid #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
     color: #000000;
     font-size: 12px;
     font-weight: normal;
     padding: 3px;
-	text-align: center;
+    text-align: center;
 }
 
-.add-button{
-	background-color: #80B13F;	
+.add-button {
+    background-color: #80B13F;
     color: #FFFFFF;
     font-size: 12px;
     font-weight: normal;
     padding: 3px;
-	text-align: center;
+    text-align: center;
 }
 
-.add-button.left{
-	text-align: left;
+.add-button.left {
+    text-align: left;
 }
 
-.add-project{
-	background-color: #E3EFD3;
-	border-left: 1px solid #8EA2B7;	
+.add-project {
+    background-color: #E3EFD3;
+    border-left: 1px solid #8EA2B7;
     border-right: 1px solid #8EA2B7;
     border-top: 1px solid #8EA2B7;
-	border-bottom: 1px solid #8EA2B7;
+    border-bottom: 1px solid #8EA2B7;
     color: #000000;
     font-size: 12px;
     font-weight: normal;
     padding: 3px;
-	text-align: center;
+    text-align: center;
 }
 
-.table-row{	
-	border-left: 1px solid #8EA2B7;	
+.table-row {
+    border-left: 1px solid #8EA2B7;
     border-right: 1px solid #8EA2B7;
     border-top: 1px solid #8EA2B7;
-	border-bottom: 1px solid #8EA2B7;    
+    border-bottom: 1px solid #8EA2B7;
     font-size: 12px;
     font-weight: normal;
     padding: 3px;
-	text-align: center;
+    text-align: center;
 }
 
-.table-col{	
-	border-left: 1px solid #8EA2B7;	
+.table-col {
+    border-left: 1px solid #8EA2B7;
     border-right: 1px solid #8EA2B7;
     border-top: 1px solid #8EA2B7;
-	border-bottom: 1px solid #8EA2B7; 
-	padding: 3px;	
-	text-align: center;
+    border-bottom: 1px solid #8EA2B7;
+    padding: 3px;
+    text-align: center;
 }
 
-.table-col-project{	
-	color: #1C537E;	
+.table-col-project {
+    color: #1C537E;
     font-size: 12px;
     font-weight: bold;
 }
 
-.table-col-bold{	
-	color: #000000;	
+.table-col-bold {
+    color: #000000;
     font-size: 12px;
     font-weight: normal;
-	min-width:150px!important;
-	width:150px !important;
-	text-align: left;
-	word-break: break all;
+    min-width: 150px !important;
+    width: 150px !important;
+    text-align: left;
+    word-break: break-all;
 }
 
-.table-col-regular{	
-	color: #000000;	
-    font-size: 12px;    
-}
-.table-col.white{
-	background-color: #FFFFFF;
+.table-col-regular {
+    color: #000000;
+    font-size: 12px;
 }
 
-.table-col.grey{
-	background-color: #F4F4F4;
+.table-col.white {
+    background-color: #FFFFFF;
 }
 
-.table-col.white.weekendColor{
-	background-color: #FFF9E3;
+.table-col.grey {
+    background-color: #F4F4F4;
 }
 
-.table-col.grey.weekendColor{
-	background-color: #FFF9E3;
+.table-col.white.weekendColor {
+    background-color: #FFF9E3;
 }
 
-	
-#popUpWorklogDiv{
-			position:absolute;
-			background-color:#F5F5F5;
-			width:400px;
-			height:300px;
-			border:1px solid #8EA2B7;
-			z-index: 9002;
-	}
-
-#blanket {
-    background-color:#111;
-    opacity: 0.4;
-    *background:none;
-    position:absolute;
-    z-index: 9001;
-    top:0px;
-    left:0px;
-    width:100%;
+.table-col.grey.weekendColor {
+    background-color: #FFF9E3;
 }
 
-#popUpDiv {
-    position:absolute;
-    background-color:#CCC;
-    width:400px;
-    height:100px;
-    border:2px solid #000;
+
+#popUpWorklogDiv {
+    position: absolute;
+    background-color: #F5F5F5;
+    width: 400px;
+    height: 300px;
+    border: 1px solid #8EA2B7;
     z-index: 9002;
 }
 
-hr.horizontal_line{		
-		color:#F5F5F5;
-		size=2;
-		width =95%;
+#blanket {
+    background-color: #111;
+    opacity: 0.4;
+    *background: none;
+    position: absolute;
+    z-index: 9001;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
-.popup_label{
-	color: #444444;	
+#popUpDiv {
+    position: absolute;
+    background-color: #CCC;
+    width: 400px;
+    height: 100px;
+    border: 2px solid #000;
+    z-index: 9002;
+}
+
+hr.horizontal_line {
+    color: #F5F5F5;
+    size: 2px;
+    width: 95%;
+}
+
+.popup_label {
+    color: #444444;
     font-size: 12px;
     font-weight: bold;
 }
 
-.close_div{
-	align: right;
+.close_div {
+    align: right;
 }
 
-#pop_time{
-	width:60px;
+#pop_time {
+    width: 60px;
 }
 
-.select_pop{
-	 padding: 8px;
-	 text-align: right;
-}
-.close_pop{
-	 padding: 5 0 0 370;
+.select_pop {
+    padding: 8px;
+    text-align: right;
 }
 
-.userName{
-	font-family: Arial, Tahoma, Verdana, sans-serif;
-	font-size: 18px;
+.close_pop {
+    padding: 5px 0 0 370px;
+}
+
+.userName {
+    font-family: Arial, Tahoma, Verdana, sans-serif;
+    font-size: 18px;
     color: #1C537E;
 }
 
-button.saveUpdate{
-	display: block;
-	width: 60px;
-	height: 30px;		
-	background-color:#80B13F;
-	border: activeborder;
-	border: 0 none;
+button.saveUpdate {
+    display: block;
+    width: 60px;
+    height: 30px;
+    background-color: #80B13F;
+    border: activeborder;
+    border: 0 none;
     color: #FFFFFF;
-    cursor: pointer;   
+    cursor: pointer;
     margin: 0;
     outline: 0 none;
     overflow: visible;
     padding: 1px 5px;
     white-space: nowrap;
-	font-weight: bold;
-	border-radius: 3px 3px 3px 3px;
+    font-weight: bold;
+    border-radius: 3px 3px 3px 3px;
 }
 
-.task-select{
-	min-width:150px;
-	width:150px;
+.task-select {
+    min-width: 150px;
+    width: 150px;
 }
 
 .editble-input {
-	width: 40px;
-	min-width:40px;
-	font-size: 12px;
+    width: 40px;
+    min-width: 40px;
+    font-size: 12px;
 }
 
 .editble-button {
-	width: 10px!important;
-	min-width:10px!important;	
+    width: 10px !important;
+    min-width: 10px !important;
 }
 
-td.emptyTd{
-	width: 30px!important;
-	min-width:30px!important;
-    height:10px!important;
-    min-height:10px!important;
+td.emptyTd {
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 10px !important;
+    min-height: 10px !important;
 }
 
-.spanWrap{
-	white-space: nowrap;
+.spanWrap {
+    white-space: nowrap;
 }

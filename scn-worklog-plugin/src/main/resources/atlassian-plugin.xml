@@ -530,4 +530,12 @@
         <fname>recentProjects</fname>
         <list>true</list>
     </jql-function>
+    <jql-function name="Updated Without History Function"
+                  i18n-name-key="updated-without-history-function.name"
+                  key="updated-without-history-function"
+                  class="com.scn.jira.jql.function.UpdatedWithoutHistoryFunction">
+        <description>The Updated Without History Function Plugin</description>
+        <fname>updatedWithoutHistory</fname>
+        <list>true</list>
+    </jql-function>
 </atlassian-plugin>

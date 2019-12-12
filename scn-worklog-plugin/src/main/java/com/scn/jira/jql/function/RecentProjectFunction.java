@@ -58,4 +58,9 @@ public class RecentProjectFunction extends AbstractJqlFunction {
     public JiraDataType getDataType() {
         return JiraDataTypes.PROJECT;
     }
+
+    @Override
+    public boolean isList() {
+        return super.isList();
+    }
 }
