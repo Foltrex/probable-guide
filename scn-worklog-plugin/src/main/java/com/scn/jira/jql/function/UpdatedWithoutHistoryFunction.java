@@ -41,7 +41,7 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
         } else if (args.size() <= 2) {
             return messageSet;
         } else {
-            messageSet.addErrorMessage(this.getI18n().getText("jira.jql.function.updated.by.invalid.argument.number", this.getFunctionName()));
+            messageSet.addErrorMessage(this.getI18n().getText("updated-without-history-function.invalid.argument.number", this.getFunctionName()));
             return messageSet;
         }
     }
