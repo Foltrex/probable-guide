@@ -1,113 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE project>
+
 <atlassian-plugin key="${atlassian.plugin.key}"
-	name="${project.name}" pluginsVersion="2">
-	<!-- Contains plugin metadata. -->
-	<plugin-info>
-		<description>${project.description}</description>
-		<version>${project.version}</version>
-		<vendor name="${project.organization.name}"
-			url="${project.organization.url}" />
-		<param name="plugin-icon">images/scnLogo.png</param>
-		<param name="plugin-logo">images/scnLogo.png</param>
-		<param name="atlassian-data-center-status">compatible</param>
-		<param name="atlassian-data-center-compatible">true</param>
-		<param name="plugin-type">both</param>
-	</plugin-info>
+                  name="${project.name}" pluginsVersion="2">
+    <!-- Contains plugin metadata. -->
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}"
+                url="${project.organization.url}"/>
+        <param name="plugin-icon">images/scnLogo.png</param>
+        <param name="plugin-logo">images/scnLogo.png</param>
+        <param name="atlassian-data-center-status">compatible</param>
+        <param name="atlassian-data-center-compatible">true</param>
+        <param name="plugin-type">both</param>
+    </plugin-info>
 
-	<!-- Registers the gadget spec as a plugin module. This allows the gadget 
-		to appear in the gadget directory and also allows administrators to disable/enable 
-		the gadget. -->
-	<gadget key="logtime-gadget" name="JIRA LogTime Gadget"
-		location="gadget.xml">
-		<resource type="download"
-			name="logtime-gadget-screenshot.png"
-			location="images/logtime-gadget-screenshot.png" />
-		<resource type="download" name="logtime-gadget-thumb.png"
-			location="images/logtime-gadget-thumb.png" />
-	</gadget>
+    <!-- Registers the gadget spec as a plugin module. This allows the gadget
+        to appear in the gadget directory and also allows administrators to disable/enable
+        the gadget. -->
+    <gadget key="logtime-gadget" name="JIRA LogTime Gadget"
+            location="gadget.xml">
+        <resource type="download"
+                  name="logtime-gadget-screenshot.png"
+                  location="images/logtime-gadget-screenshot.png"/>
+        <resource type="download" name="logtime-gadget-thumb.png"
+                  location="images/logtime-gadget-thumb.png"/>
+    </gadget>
 
-	<!-- Makes the gadget Locale messages available for the gadget's use. -->
-	<web-resource key="logtime-resources">
-		<resource type="download" name="i18n/ALL_ALL.xml"
-			location="i18n/ALL_ALL.xml">
-			<param name="content-type" value="text/xml; charset=UTF-8" />
-		</resource>
+    <!-- Makes the gadget Locale messages available for the gadget's use. -->
+    <web-resource key="logtime-resources">
+        <resource type="download" name="i18n/ALL_ALL.xml"
+                  location="i18n/ALL_ALL.xml">
+            <param name="content-type" value="text/xml; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download"
-			name="js/ui.dropdownchecklist.standalone.css"
-			location="js/ui.dropdownchecklist.standalone.css">
-			<param name="content-type" value="text/css; charset=UTF-8" />
-		</resource>
+        <resource type="download"
+                  name="js/ui.dropdownchecklist.standalone.css"
+                  location="js/ui.dropdownchecklist.standalone.css">
+            <param name="content-type" value="text/css; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/scn-logtime-plugin.css"
-			location="css/scn-logtime-plugin.css">
-			<param name="content-type" value="text/css; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/scn-logtime-plugin.css"
+                  location="css/scn-logtime-plugin.css">
+            <param name="content-type" value="text/css; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download"
-			name="css/images/lite-gray-check.png"
-			location="css/images/lite-gray-check.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download"
+                  name="css/images/lite-gray-check.png"
+                  location="css/images/lite-gray-check.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/sprite.png"
-			location="css/images/sprite.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/sprite.png"
+                  location="css/images/sprite.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/back.png"
-			location="css/images/back.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/back.png"
+                  location="css/images/back.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/forward.png"
-			location="css/images/forward.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/forward.png"
+                  location="css/images/forward.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/close.png"
-			location="css/images/close.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/close.png"
+                  location="css/images/close.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/close-small.png"
-			location="css/images/close-small.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/close-small.png"
+                  location="css/images/close-small.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="css/images/add.png"
-			location="css/images/add.png">
-			<param name="content-type" value="image/png; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="css/images/add.png"
+                  location="css/images/add.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
+        </resource>
 
-		<resource type="i18n" name="i18n"
-			location="scn-logtime-plugin" />
+        <resource type="i18n" name="i18n"
+                  location="scn-logtime-plugin"/>
 
-		<resource type="download" name="js/ui.dropdownchecklist.js"
-			location="js/ui.dropdownchecklist.js">
-			<param name="content-type"
-				value="text/javascript; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="js/ui.dropdownchecklist.js"
+                  location="js/ui.dropdownchecklist.js">
+            <param name="content-type"
+                   value="text/javascript; charset=UTF-8"/>
+        </resource>
 
-		<resource type="download" name="js/scn-logtime-plugin.js"
-			location="js/scn-logtime-plugin.js">
-			<param name="content-type"
-				value="text/javascript; charset=UTF-8" />
-		</resource>
+        <resource type="download" name="js/scn-logtime-plugin.js"
+                  location="js/scn-logtime-plugin.js">
+            <param name="content-type"
+                   value="text/javascript; charset=UTF-8"/>
+        </resource>
 
-		<dependency>com.atlassian.auiplugin:ajs</dependency>
-		<dependency>com.atlassian.jira.gadgets:common</dependency>
-		<dependency>com.atlassian.jira.webresources:select-pickers
-		</dependency>
-		<dependency>com.atlassian.gadgets.publisher:ajs-gadgets</dependency>
-		<dependency>com.atlassian.jira.gadgets:g-filter-results</dependency>
-	</web-resource>
-	<!-- Automatically finds all JAX-RS resource classes in the plugin and publishes 
-		them. -->
-	<rest key="logtime-gadget-rest-resources" path="/logtime-gadget"
-		version="1.0">
-		<description>Provides the REST resource for the project list.
-		</description>
-	</rest>
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.jira.gadgets:common</dependency>
+        <dependency>com.atlassian.jira.webresources:select-pickers
+        </dependency>
+        <dependency>com.atlassian.gadgets.publisher:ajs-gadgets</dependency>
+        <dependency>com.atlassian.jira.gadgets:g-filter-results</dependency>
+    </web-resource>
+    <!-- Automatically finds all JAX-RS resource classes in the plugin and publishes
+        them. -->
+    <rest key="logtime-gadget-rest-resources" path="/logtime-gadget"
+          version="1.0">
+        <description>Provides the REST resource for the project list.
+        </description>
+    </rest>
 </atlassian-plugin>

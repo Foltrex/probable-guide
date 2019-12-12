@@ -14,44 +14,48 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
 @Scanned
 public class RecentProjectFunction extends AbstractJqlFunction {
-	@ComponentImport
-	private final UserProjectHistoryManager userProjectHistoryManager;
+    @ComponentImport
+    private final UserProjectHistoryManager userProjectHistoryManager;
 
-	public RecentProjectFunction(UserProjectHistoryManager userProjectHistoryManager) {
-		this.userProjectHistoryManager = userProjectHistoryManager;
-	}
+    public RecentProjectFunction(UserProjectHistoryManager userProjectHistoryManager) {
+        this.userProjectHistoryManager = userProjectHistoryManager;
+    }
 
-	@Override
-	public MessageSet validate(ApplicationUser searcher, FunctionOperand operand, TerminalClause terminalClause) {
-		return validateNumberOfArgs(operand, 0);
-	}
+    @Nonnull
+    @Override
+    public MessageSet validate(ApplicationUser searcher, @Nonnull FunctionOperand operand, @Nonnull TerminalClause terminalClause) {
+        return validateNumberOfArgs(operand, 0);
+    }
 
-	@Override
-	public List<QueryLiteral> getValues(QueryCreationContext queryCreationContext, FunctionOperand operand,
-			TerminalClause terminalClause) {
-		final List<QueryLiteral> literals = new LinkedList<>();
-		final List<UserHistoryItem> projects = userProjectHistoryManager
-				.getProjectHistoryWithoutPermissionChecks(queryCreationContext.getApplicationUser());
-		for (final UserHistoryItem userHistoryItem : projects) {
-			final String value = userHistoryItem.getEntityId();
-			literals.add(new QueryLiteral(operand, Long.parseLong(value)));
-		}
+    @Nonnull
+    @Override
+    public List<QueryLiteral> getValues(QueryCreationContext queryCreationContext, @Nonnull FunctionOperand operand,
+                                        @Nonnull TerminalClause terminalClause) {
+        final List<QueryLiteral> literals = new LinkedList<>();
+        final List<UserHistoryItem> projects = userProjectHistoryManager
+                .getProjectHistoryWithoutPermissionChecks(queryCreationContext.getApplicationUser());
+        for (final UserHistoryItem userHistoryItem : projects) {
+            final String value = userHistoryItem.getEntityId();
+            literals.add(new QueryLiteral(operand, Long.parseLong(value)));
+        }
 
-		return literals;
-	}
+        return literals;
+    }
 
-	@Override
-	public int getMinimumNumberOfExpectedArguments() {
-		return 0;
-	}
+    @Override
+    public int getMinimumNumberOfExpectedArguments() {
+        return 0;
+    }
 
-	@Override
-	public JiraDataType getDataType() {
-		return JiraDataTypes.PROJECT;
-	}
+    @Nonnull
+    @Override
+    public JiraDataType getDataType() {
+        return JiraDataTypes.PROJECT;
+    }
 }
