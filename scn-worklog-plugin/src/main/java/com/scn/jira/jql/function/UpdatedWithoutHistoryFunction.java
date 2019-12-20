@@ -4,10 +4,10 @@ import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypes;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
+import com.atlassian.jira.jql.util.DateRange;
 import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.plugin.jql.function.AbstractJqlFunction;
-import com.atlassian.jira.plugin.jql.function.event.UpdatedByValidationEvent;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
@@ -16,11 +16,12 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.google.common.collect.ImmutableList;
+import org.ofbiz.core.entity.*;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Scanned
 public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
@@ -36,9 +37,9 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
 
     @Nonnull
     @Override
-    public MessageSet validate(ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
+    public MessageSet validate(ApplicationUser applicationUser, @Nonnull FunctionOperand operand, @Nonnull TerminalClause terminalClause) {
         MessageSet messageSet = new MessageSetImpl();
-        List<String> args = functionOperand.getArgs();
+        List<String> args = operand.getArgs();
         if (applicationUser == null) {
             messageSet = new MessageSetImpl();
             messageSet.addErrorMessage(this.getI18n().getText("jira.jql.function.anonymous.disallowed", this.getFunctionName()));
@@ -66,8 +67,19 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
 
     @Nonnull
     @Override
-    public List<QueryLiteral> getValues(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        return Collections.emptyList();
+    public List<QueryLiteral> getValues(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand operand, @Nonnull TerminalClause terminalClause) {
+        System.out.println("Getting started!");
+        List<String> args = operand.getArgs();
+        DateRange fromDate = this.getDateArgSafely(args, 0);
+        DateRange toDate = this.getDateArgSafely(args, 1);
+        List<EntityCondition> conditions = new ArrayList<EntityCondition>();
+        conditions.add(new EntityExpr("updated", EntityOperator.GREATER_THAN_EQUAL_TO, new java.sql.Date(0)));
+//        conditions.add(new EntityExpr("updated", EntityOperator.LESS_THAN_EQUAL_TO, new java.sql.Date(9223372036854775807L)));
+        List<GenericValue> issuesGVs = ofBizDelegator.findByCondition(ENTITY_ISSUE, new EntityConditionList(conditions, EntityOperator.AND), ImmutableList.of("id"));
+        System.out.println("End query!");
+        System.out.println(issuesGVs.size());
+
+        return issuesGVs.stream().map(v -> new QueryLiteral(operand, v.getLong("id"))).collect(Collectors.toList());
     }
 
     @Override
@@ -81,12 +93,21 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
         return JiraDataTypes.ISSUE;
     }
 
-    protected boolean validateDate(MessageSet messageSet, String dateString, String i18nKey) {
+    private boolean validateDate(MessageSet messageSet, String dateString, String i18nKey) {
         if (dateString != null && dateString.length() != 0 && this.jqlDateSupport.validate(dateString)) {
             return true;
         } else {
             messageSet.addErrorMessage(this.getI18n().getText(i18nKey, this.getFunctionName()));
             return false;
         }
+    }
+
+    private DateRange getDateArgSafely(List<String> args, int index) {
+        DateRange dateRange = null;
+        if (args.size() > index) {
+            dateRange = this.jqlDateSupport.convertToDateRangeWithImpliedPrecision(args.get(index));
+        }
+
+        return dateRange;
     }
 }

@@ -74,7 +74,7 @@ public class WLTypesService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Path("/{id}")
 	@PublicApi
-	public Response getWLType(@PathParam("key") int id) throws RemoteException, SQLException {
+	public Response getWLType(@PathParam("id") int id) throws RemoteException, SQLException {
 		if (!globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, authContext.getLoggedInUser())) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
