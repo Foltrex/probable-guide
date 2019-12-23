@@ -73,11 +73,11 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
         DateRange fromDate = this.getDateArgSafely(args, 0);
         DateRange toDate = this.getDateArgSafely(args, 1);
         List<EntityCondition> conditions = new ArrayList<EntityCondition>();
-        conditions.add(new EntityExpr("updated", EntityOperator.GREATER_THAN_EQUAL_TO, new java.sql.Date(0)));
-//        conditions.add(new EntityExpr("updated", EntityOperator.LESS_THAN_EQUAL_TO, new java.sql.Date(9223372036854775807L)));
+        if (fromDate != null)
+            conditions.add(new EntityExpr("updated", EntityOperator.GREATER_THAN_EQUAL_TO, new java.sql.Date(fromDate.getLowerDate().getTime())));
+        if (toDate != null)
+            conditions.add(new EntityExpr("updated", EntityOperator.LESS_THAN_EQUAL_TO, new java.sql.Date(toDate.getUpperDate().getTime())));
         List<GenericValue> issuesGVs = ofBizDelegator.findByCondition(ENTITY_ISSUE, new EntityConditionList(conditions, EntityOperator.AND), ImmutableList.of("id"));
-        System.out.println("End query!");
-        System.out.println(issuesGVs.size());
 
         return issuesGVs.stream().map(v -> new QueryLiteral(operand, v.getLong("id"))).collect(Collectors.toList());
     }
