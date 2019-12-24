@@ -4,7 +4,6 @@ import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypes;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
-import com.atlassian.jira.jql.util.DateRange;
 import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.plugin.jql.function.AbstractJqlFunction;
@@ -20,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.ofbiz.core.entity.*;
 
 import javax.annotation.Nonnull;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,15 +68,14 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
     @Nonnull
     @Override
     public List<QueryLiteral> getValues(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand operand, @Nonnull TerminalClause terminalClause) {
-        System.out.println("Getting started!");
         List<String> args = operand.getArgs();
-        DateRange fromDate = this.getDateArgSafely(args, 0);
-        DateRange toDate = this.getDateArgSafely(args, 1);
-        List<EntityCondition> conditions = new ArrayList<EntityCondition>();
+        Date fromDate = this.getDateArgSafely(args, 0);
+        Date toDate = this.getDateArgSafely(args, 1);
+        List<EntityCondition> conditions = new ArrayList<>();
         if (fromDate != null)
-            conditions.add(new EntityExpr("updated", EntityOperator.GREATER_THAN_EQUAL_TO, new java.sql.Date(fromDate.getLowerDate().getTime())));
+            conditions.add(new EntityExpr("updated", EntityOperator.GREATER_THAN_EQUAL_TO, new Timestamp(fromDate.getTime())));
         if (toDate != null)
-            conditions.add(new EntityExpr("updated", EntityOperator.LESS_THAN_EQUAL_TO, new java.sql.Date(toDate.getUpperDate().getTime())));
+            conditions.add(new EntityExpr("updated", EntityOperator.LESS_THAN_EQUAL_TO, new Timestamp(toDate.getTime())));
         List<GenericValue> issuesGVs = ofBizDelegator.findByCondition(ENTITY_ISSUE, new EntityConditionList(conditions, EntityOperator.AND), ImmutableList.of("id"));
 
         return issuesGVs.stream().map(v -> new QueryLiteral(operand, v.getLong("id"))).collect(Collectors.toList());
@@ -102,12 +101,11 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
         }
     }
 
-    private DateRange getDateArgSafely(List<String> args, int index) {
-        DateRange dateRange = null;
+    private Date getDateArgSafely(List<String> args, int index) {
+        Date date = null;
         if (args.size() > index) {
-            dateRange = this.jqlDateSupport.convertToDateRangeWithImpliedPrecision(args.get(index));
+            date = this.jqlDateSupport.convertToDate(args.get(index));
         }
-
-        return dateRange;
+        return date;
     }
 }
