@@ -31,68 +31,65 @@ import java.util.Objects;
 @Component
 public class OverridedWorklogTabPanel extends WorklogTabPanel {
 
-    private final WorklogService worklogService;
-    private final JiraDurationUtils jiraDurationUtils;
-    private final FieldLayoutManager fieldLayoutManager;
-    private final RendererManager rendererManager;
-    private final IScnProjectSettingsManager psManager;
-    private final ExtendedWorklogManager extendedWorklogManager;
-    private final ExtendedConstantsManager extendedConstantsManager;
+	private final WorklogService worklogService;
+	private final JiraDurationUtils jiraDurationUtils;
+	private final FieldLayoutManager fieldLayoutManager;
+	private final RendererManager rendererManager;
+	private final IScnProjectSettingsManager psManager;
+	private final ExtendedWorklogManager extendedWorklogManager;
+	private final ExtendedConstantsManager extendedConstantsManager;
+	private final UserFormats userFormats;
 
-    private final UserFormats userFormats;
+	@Inject
+	public OverridedWorklogTabPanel(@ComponentImport ApplicationProperties applicationProperties,
+									IScnProjectSettingsManager scnProjectSettingsManager,
+									ExtendedWorklogManager extendedWorklogManager, ExtendedConstantsManager extendedConstantsManager) {
+		super(ComponentAccessor.getComponent(WorklogService.class), ComponentAccessor.getComponent(JiraDurationUtils.class),
+				ComponentAccessor.getComponent(FieldLayoutManager.class), ComponentAccessor.getComponent(RendererManager.class),
+				applicationProperties, ComponentAccessor.getComponent(FieldVisibilityManager.class), ComponentAccessor.getComponent(UserFormats.class));
+		this.worklogService = ComponentAccessor.getComponent(WorklogService.class);
+		this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
+		this.fieldLayoutManager = ComponentAccessor.getComponent(FieldLayoutManager.class);
+		this.rendererManager = ComponentAccessor.getComponent(RendererManager.class);
+		this.psManager = scnProjectSettingsManager;
+		this.extendedWorklogManager = extendedWorklogManager;
+		this.extendedConstantsManager = extendedConstantsManager;
+		this.userFormats = ComponentAccessor.getComponent(UserFormats.class);
+	}
 
-    @Inject
-    public OverridedWorklogTabPanel(@ComponentImport ApplicationProperties applicationProperties,
-                                    IScnProjectSettingsManager scnProjectSettingsManager,
-                                    ExtendedWorklogManager extendedWorklogManager, ExtendedConstantsManager extendedConstantsManager) {
+	@Override
+	public List<IssueAction> getActions(Issue issue, ApplicationUser remoteUser) {
+		List<IssueAction> worklogs = new ArrayList<>();
+		final JiraServiceContextImpl context = new JiraServiceContextImpl(remoteUser);
 
-        super(ComponentAccessor.getComponent(WorklogService.class), ComponentAccessor.getComponent(JiraDurationUtils.class),
-                ComponentAccessor.getComponent(FieldLayoutManager.class), ComponentAccessor.getComponent(RendererManager.class),
-                applicationProperties, ComponentAccessor.getComponent(FieldVisibilityManager.class), ComponentAccessor.getComponent(UserFormats.class));
+		boolean blocked;
+		com.scn.jira.worklog.wl.ExtendedWorklogService extWorklogService = new ExtendedWorklogService(extendedWorklogManager,
+				psManager);
 
-        this.worklogService = ComponentAccessor.getComponent(WorklogService.class);
-        this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
-        this.fieldLayoutManager = ComponentAccessor.getComponent(FieldLayoutManager.class);
-        this.rendererManager = ComponentAccessor.getComponent(RendererManager.class);
-        this.psManager = scnProjectSettingsManager;
-        this.extendedWorklogManager = extendedWorklogManager;
-        this.extendedConstantsManager = extendedConstantsManager;
-        this.userFormats = ComponentAccessor.getComponent(UserFormats.class);
-    }
+		for (Worklog worklog : worklogService.getByIssueVisibleToUser(context, issue)) {
+			blocked = extWorklogService.isDateExpired(context, worklog.getStartDate(), Objects.requireNonNull(worklog.getIssue().getProjectObject()),
+					false);
+			worklogs.add(new WorklogTabAction(descriptor, worklog, jiraDurationUtils, !blocked
+					&& worklogService.hasPermissionToUpdate(context, worklog), !blocked
+					&& worklogService.hasPermissionToDelete(context, worklog), fieldLayoutManager, rendererManager,
+					extendedWorklogManager, extendedConstantsManager, userFormats));
+		}
 
-    @Override
-    public List<IssueAction> getActions(Issue issue, ApplicationUser remoteUser) {
-        List<IssueAction> worklogs = new ArrayList<>();
-        final JiraServiceContextImpl context = new JiraServiceContextImpl(remoteUser);
+		if (worklogs.isEmpty()) {
+			worklogs.add(new GenericMessageAction(descriptor.getI18nBean().getText("viewissue.nowork")));
+		} else {
+			worklogs.sort(IssueActionComparator.COMPARATOR);
+		}
 
-        boolean blocked;
-        com.scn.jira.worklog.wl.ExtendedWorklogService extWorklogService = new ExtendedWorklogService(extendedWorklogManager,
-                psManager);
+		return worklogs;
+	}
 
-        for (Worklog worklog : worklogService.getByIssueVisibleToUser(context, issue)) {
-            blocked = extWorklogService.isDateExpired(context, worklog.getStartDate(), Objects.requireNonNull(worklog.getIssue().getProjectObject()),
-                    false);
-            worklogs.add(new WorklogTabAction(descriptor, worklog, jiraDurationUtils, !blocked
-                    && worklogService.hasPermissionToUpdate(context, worklog), !blocked
-                    && worklogService.hasPermissionToDelete(context, worklog), fieldLayoutManager, rendererManager,
-                    extendedWorklogManager, extendedConstantsManager, userFormats));
-        }
-
-        if (worklogs.isEmpty()) {
-            worklogs.add(new GenericMessageAction(descriptor.getI18nBean().getText("viewissue.nowork")));
-        } else {
-            worklogs.sort(IssueActionComparator.COMPARATOR);
-        }
-
-        return worklogs;
-    }
-
-    @Override
-    public boolean showPanel(Issue issue, ApplicationUser user) {
-        if (super.showPanel(issue, user)) {
-            return psManager.hasPermissionToViewWL(user, issue.getProjectObject());
-        } else {
-            return false;
-        }
-    }
+	@Override
+	public boolean showPanel(Issue issue, ApplicationUser user) {
+		if (super.showPanel(issue, user)) {
+			return psManager.hasPermissionToViewWL(user, issue.getProjectObject());
+		} else {
+			return false;
+		}
+	}
 }

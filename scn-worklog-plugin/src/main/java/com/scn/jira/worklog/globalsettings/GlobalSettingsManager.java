@@ -19,7 +19,7 @@ import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 
-@ExportAsService({GlobalSettingsManager.class })
+@ExportAsService({GlobalSettingsManager.class})
 @Named("globalSettingsManager")
 public class GlobalSettingsManager implements IGlobalSettingsManager {
 	// private static final Logger log = LoggerFactory.getLogger(ABC.class);
@@ -39,7 +39,7 @@ public class GlobalSettingsManager implements IGlobalSettingsManager {
 
 		String value = propertiesManager.getPropertySet().getText(SCN_TIMETRACKING);
 
-		List<String> groups = new ArrayList<String>();
+		List<String> groups = new ArrayList<>();
 		if (value != null) Collections.addAll(groups, value.split(PROPERTIES_SEPARATOR));
 		return groups;
 	}
@@ -56,13 +56,13 @@ public class GlobalSettingsManager implements IGlobalSettingsManager {
 
 	@Override
 	public void removeGroups(List<String> groupsToRemove) {
-
 		List<String> groups = getGroups();
 		groups.removeAll(groupsToRemove);
 
 		propertiesManager.getPropertySet().setText(SCN_TIMETRACKING, StringUtils.join(groups, PROPERTIES_SEPARATOR));
 	}
 
+	@Override
 	public boolean hasPermission(final String permission, ApplicationUser user) {
 		assertionIsScnPermission(permission);
 		Assertions.notNull("User", user);

@@ -6,6 +6,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
+import com.atlassian.jira.bc.issue.visibility.Visibilities;
 import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -15,7 +16,9 @@ import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
@@ -37,11 +40,12 @@ import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
-@ExportAsService({DefaultScnWorklogService.class })
+@ExportAsService({DefaultScnWorklogService.class})
 @Named("defaultScnWorklogService")
 public class DefaultScnWorklogService implements IScnWorklogService {
 
@@ -56,6 +60,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	private final DateTimeFormatterFactory dateTimeFormatterFactory;
 	private final IScnProjectSettingsManager scnProjectSettingsManager;
 	private final IScnWorklogManager scnWorklogManager;
+	private final PermissionManager permissionManager;
 	private final IGlobalSettingsManager scnGlobalPermissionManager;
 	private final IScnExtendedIssueStore extIssueStore;
 
@@ -63,12 +68,10 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 
 	@Inject
 	public DefaultScnWorklogService(@ComponentImport VisibilityValidator visibilityValidator,
-			ApplicationProperties applicationProperties, ProjectRoleManager projectRoleManager, IssueManager issueManager,
-			@ComponentImport TimeTrackingConfiguration timeTrackingConfiguration, GroupManager groupManager,
-			IScnProjectSettingsManager scnProjectSettingsManager,
-		    IScnWorklogManager worklogManager, IGlobalSettingsManager scnGlobalPermissionManager,
-			IScnExtendedIssueStore extendedIssueStore, ScnUserBlockingManager scnUserBlockingManager) {
-
+									ApplicationProperties applicationProperties, ProjectRoleManager projectRoleManager, IssueManager issueManager,
+									@ComponentImport TimeTrackingConfiguration timeTrackingConfiguration, GroupManager groupManager,
+									IScnProjectSettingsManager scnProjectSettingsManager, IScnWorklogManager worklogManager, IGlobalSettingsManager scnGlobalPermissionManager,
+									IScnExtendedIssueStore extendedIssueStore, ScnUserBlockingManager scnUserBlockingManager) {
 		this.visibilityValidator = visibilityValidator;
 		this.applicationProperties = applicationProperties;
 		this.projectRoleManager = projectRoleManager;
@@ -78,6 +81,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		this.dateTimeFormatterFactory = ComponentAccessor.getComponent(DateTimeFormatterFactory.class);
 		this.scnProjectSettingsManager = scnProjectSettingsManager;
 		this.scnWorklogManager = worklogManager;
+		this.permissionManager = ComponentAccessor.getPermissionManager();
 		this.scnGlobalPermissionManager = scnGlobalPermissionManager;
 		this.extIssueStore = extendedIssueStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
@@ -98,10 +102,10 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklogService.WorklogNewEstimateResult validateDeleteWithNewEstimate(JiraServiceContext jiraServiceContext,
-			Long worklogId, String newEstimate) {
+																					 Long worklogId, String newEstimate) {
 		IScnWorklog originalWorklog = validateDelete(jiraServiceContext, worklogId);
 		if ((originalWorklog != null) && (isValidNewEstimate(jiraServiceContext, newEstimate))) {
-			Long estimate = (newEstimate == null) ? null : new Long(getDurationForFormattedString(newEstimate));
+			Long estimate = (newEstimate == null) ? null : getDurationForFormattedString(newEstimate);
 			return new IScnWorklogService.WorklogNewEstimateResult(originalWorklog, estimate);
 		}
 		return null;
@@ -111,14 +115,13 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			JiraServiceContext jiraServiceContext, Long worklogId, String adjustmentAmount) {
 		IScnWorklog originalWorklog = validateDelete(jiraServiceContext, worklogId);
 		if ((originalWorklog != null) && (isValidAdjustmentAmount(jiraServiceContext, adjustmentAmount))) {
-			return new IScnWorklogService.WorklogAdjustmentAmountResult(originalWorklog, new Long(
-					getDurationForFormattedString(adjustmentAmount)));
+			return new IScnWorklogService.WorklogAdjustmentAmountResult(originalWorklog, getDurationForFormattedString(adjustmentAmount));
 		}
 		return null;
 	}
 
 	public boolean deleteWithNewRemainingEstimate(JiraServiceContext jiraServiceContext,
-			IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+												  IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		final Long newEstimate = worklogNewEstimate.getNewEstimate();
 		final Long newLinkedEstimate = worklogNewEstimate.getNewEstimate();
 		return delete(jiraServiceContext, worklogNewEstimate.getWorklog(), newEstimate, newLinkedEstimate, dispatchEvent,
@@ -126,8 +129,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public boolean deleteWithManuallyAdjustedEstimate(JiraServiceContext jiraServiceContext,
-			IScnWorklogService.WorklogAdjustmentAmountResult worklogAdjustmentAmountResult, boolean dispatchEvent,
-			boolean isLinkedWL) {
+													  IScnWorklogService.WorklogAdjustmentAmountResult worklogAdjustmentAmountResult, boolean dispatchEvent,
+													  boolean isLinkedWL) {
 		IScnWorklog worklog = worklogAdjustmentAmountResult.getWorklog();
 
 		final IScnExtendedIssue extIssue = extIssueStore.getByIssue(worklog.getIssue());
@@ -139,12 +142,12 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public boolean deleteAndRetainRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+													boolean dispatchEvent, boolean isLinkedWL) {
 		return delete(jiraServiceContext, worklog, null, null, dispatchEvent, isLinkedWL);
 	}
 
 	public boolean deleteAndAutoAdjustRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+														boolean dispatchEvent, boolean isLinkedWL) {
 
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
@@ -176,8 +179,9 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return delete(jiraServiceContext, worklog, newEstimate, newLinkedEstimate, dispatchEvent, isLinkedWL);
 	}
 
+	@Override
 	public IScnWorklog validateUpdate(JiraServiceContext jiraServiceContext, Long worklogId, String timeSpent, Date startDate,
-			String comment, String groupLevel, String roleLevelId, String worklogTypeId) {
+									  String comment, String groupLevel, String roleLevelId, String worklogTypeId) {
 		IScnWorklog updatedWorklog = null;
 		try {
 			final IScnWorklog originalWorklog = this.scnWorklogManager.getById(worklogId);
@@ -196,19 +200,19 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklogService.WorklogNewEstimateResult validateUpdateWithNewEstimate(JiraServiceContext jiraServiceContext,
-			Long worklogId, String timeSpent, Date startDate, String comment, String groupLevel, String roleLevelId,
-			String newEstimate, String worklogTypeId) {
+																					 Long worklogId, String timeSpent, Date startDate, String comment, String groupLevel, String roleLevelId,
+																					 String newEstimate, String worklogTypeId) {
 		IScnWorklog worklog = validateUpdate(jiraServiceContext, worklogId, timeSpent, startDate, comment, groupLevel,
 				roleLevelId, worklogTypeId);
 		if ((isValidNewEstimate(jiraServiceContext, newEstimate)) && (worklog != null)) {
-			Long estimate = (newEstimate == null) ? null : new Long(getDurationForFormattedString(newEstimate));
+			Long estimate = (newEstimate == null) ? null : getDurationForFormattedString(newEstimate);
 			return new IScnWorklogService.WorklogNewEstimateResult(worklog, estimate);
 		}
 		return null;
 	}
 
 	public IScnWorklog updateWithNewRemainingEstimate(JiraServiceContext jiraServiceContext,
-			IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+													  IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		final Long newEstimate = worklogNewEstimate.getNewEstimate();
 		final Long newLinkedEstimated = worklogNewEstimate.getNewEstimate();
 		return update(jiraServiceContext, worklogNewEstimate.getWorklog(), newEstimate, newLinkedEstimated, dispatchEvent,
@@ -216,12 +220,12 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklog updateAndRetainRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+														boolean dispatchEvent, boolean isLinkedWL) {
 		return update(jiraServiceContext, worklog, null, null, dispatchEvent, isLinkedWL);
 	}
 
 	public IScnWorklog updateAndAutoAdjustRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+															boolean dispatchEvent, boolean isLinkedWL) {
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
 		if (worklog == null) {
@@ -269,7 +273,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected boolean delete(JiraServiceContext jiraServiceContext, IScnWorklog worklog, Long newEstimate,
-			Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+							 Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
@@ -306,7 +310,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected IScnWorklog update(JiraServiceContext jiraServiceContext, IScnWorklog worklog, Long newEstimate,
-			Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+								 Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		IScnWorklog updatedWorklog = null;
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
@@ -344,8 +348,9 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return updatedWorklog;
 	}
 
+	@Override
 	public IScnWorklog validateCreate(JiraServiceContext jiraServiceContext, Issue issue, String timeSpent, Date startDate,
-			String comment, String groupLevel, String roleLevelId, String worklogTypeId) {
+									  String comment, String groupLevel, String roleLevelId, String worklogTypeId) {
 		IScnWorklog worklog = null;
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();// .getDirectoryUser();
 
@@ -359,12 +364,12 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklogService.WorklogNewEstimateResult validateCreateWithNewEstimate(JiraServiceContext jiraServiceContext,
-			Issue issue, String timeSpent, Date startDate, String comment, String groupLevel, String roleLevelId,
-			String newEstimate, String worklogTypeId) {
+																					 Issue issue, String timeSpent, Date startDate, String comment, String groupLevel, String roleLevelId,
+																					 String newEstimate, String worklogTypeId) {
 		IScnWorklog worklog = validateCreate(jiraServiceContext, issue, timeSpent, startDate, comment, groupLevel, roleLevelId,
 				worklogTypeId);
 		if ((isValidNewEstimate(jiraServiceContext, newEstimate)) && (worklog != null)) {
-			Long estimate = (newEstimate == null) ? null : new Long(getDurationForFormattedString(newEstimate));
+			Long estimate = (newEstimate == null) ? null : getDurationForFormattedString(newEstimate);
 			return new IScnWorklogService.WorklogNewEstimateResult(worklog, estimate);
 		}
 		return null;
@@ -376,15 +381,14 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		IScnWorklog worklog = validateCreate(jiraServiceContext, issue, timeSpent, startDate, comment, groupLevel, roleLevelId,
 				worklogTypeId);
 		if ((isValidAdjustmentAmount(jiraServiceContext, adjustmentAmount)) && (worklog != null)) {
-			return new IScnWorklogService.WorklogAdjustmentAmountResult(worklog, new Long(
-					getDurationForFormattedString(adjustmentAmount)));
+			return new IScnWorklogService.WorklogAdjustmentAmountResult(worklog, getDurationForFormattedString(adjustmentAmount));
 		}
 
 		return null;
 	}
 
 	public IScnWorklog createWithNewRemainingEstimate(JiraServiceContext jiraServiceContext,
-			IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+													  IScnWorklogService.WorklogNewEstimateResult worklogNewEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		final Long newEstimate = worklogNewEstimate.getNewEstimate();
 		final Long newLinkedEstimate = worklogNewEstimate.getNewEstimate();
 		return create(jiraServiceContext, worklogNewEstimate.getWorklog(), newEstimate, newLinkedEstimate, dispatchEvent,
@@ -392,8 +396,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklog createWithManuallyAdjustedEstimate(JiraServiceContext jiraServiceContext,
-			IScnWorklogService.WorklogAdjustmentAmountResult worklogAdjustmentAmountResult, boolean dispatchEvent,
-			boolean isLinkedWL) {
+														  IScnWorklogService.WorklogAdjustmentAmountResult worklogAdjustmentAmountResult, boolean dispatchEvent,
+														  boolean isLinkedWL) {
 		IScnWorklog worklog = worklogAdjustmentAmountResult.getWorklog();
 
 		final IScnExtendedIssue extIssue = extIssueStore.getByIssue(worklog.getIssue());
@@ -405,12 +409,12 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public IScnWorklog createAndRetainRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+														boolean dispatchEvent, boolean isLinkedWL) {
 		return create(jiraServiceContext, worklog, null, null, dispatchEvent, isLinkedWL);
 	}
 
 	public IScnWorklog createAndAutoAdjustRemainingEstimate(JiraServiceContext jiraServiceContext, IScnWorklog worklog,
-			boolean dispatchEvent, boolean isLinkedWL) {
+															boolean dispatchEvent, boolean isLinkedWL) {
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
 		if (worklog == null) {
@@ -479,7 +483,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			return false;
 		}
 
-		if ((!hasEditAllPermission(user, worklog.getIssue())) && (!hasEditOwnPermission(user, worklog))) {
+		if ((!hasEditAllPermission(user, worklog.getIssue())) && (!hasEditOwnPermission(user, worklog.getIssue()))) {
 			if (user != null) {
 				errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.no.edit.permission",
 						user.getDisplayName()));
@@ -490,9 +494,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			return false;
 		}
 
-		boolean isValidVisibility = this.visibilityValidator.isValidVisibilityData(new JiraServiceContextImpl(user,
-				errorCollection), "worklog", worklog.getIssue(), worklog.getGroupLevel(),
-				(worklog.getRoleLevelId() == null) ? null : worklog.getRoleLevelId().toString());
+		boolean isValidVisibility = this.visibilityValidator.isValidVisibilityData(new JiraServiceContextImpl(user, errorCollection),
+				"worklog", worklog.getIssue(), Visibilities.fromGroupAndRoleId(worklog.getGroupLevel(), worklog.getRoleLevelId()));
 
 		if (!isValidVisibility) {
 			jiraServiceContext.getErrorCollection().addErrorCollection(errorCollection);
@@ -519,7 +522,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			return false;
 		}
 
-		if (!hasDeleteAllPermission(user, worklog.getIssue()) && !hasDeleteOwnPermission(user, worklog)) {
+		if (!hasDeleteAllPermission(user, worklog.getIssue()) && !hasDeleteOwnPermission(user, worklog.getIssue())) {
 			if (user != null) {
 				errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.no.delete.permission",
 						user.getDisplayName()));
@@ -532,8 +535,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		}
 
 		boolean isValidVisibility = this.visibilityValidator.isValidVisibilityData(new JiraServiceContextImpl(user,
-				errorCollection), "worklog", worklog.getIssue(), worklog.getGroupLevel(),
-				(worklog.getRoleLevelId() == null) ? null : worklog.getRoleLevelId().toString());
+				errorCollection), "worklog", worklog.getIssue(), Visibilities.fromGroupAndRoleId(
+				worklog.getGroupLevel(), worklog.getRoleLevelId()));
 
 		if (!isValidVisibility) {
 			jiraServiceContext.getErrorCollection().addErrorCollection(errorCollection);
@@ -554,7 +557,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return scnWorklog;
 	}
 
-	public List<IScnWorklog> getByIssue(JiraServiceContext jiraServiceContext, Issue issue) {
+	public List<IScnWorklog> getByIssue(@Nonnull JiraServiceContext jiraServiceContext, Issue issue) {
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 		if (issue == null) {
 			errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.null.issue"));
@@ -571,8 +574,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return result;
 	}
 
-	public List<IScnWorklog> getByProjectBetweenDates(JiraServiceContext jiraServiceContext, Project project, Date startDate,
-			Date endDate) {
+	public List<IScnWorklog> getByProjectBetweenDates(@Nonnull JiraServiceContext jiraServiceContext, Project project, Date startDate,
+													  Date endDate) {
 		final ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 		if (project == null) {
 			errorCollection.addErrorMessage(getText(jiraServiceContext, "scn.scnworklog.service.error.null.project"));
@@ -590,12 +593,11 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public List<IScnWorklog> getByProjectVisibleToUserBetweenDates(JiraServiceContext jiraServiceContext, Project project,
-			Date startDate, Date endDate) {
-		final List<IScnWorklog> visibleWorklogs = new ArrayList<IScnWorklog>();
+																   Date startDate, Date endDate) {
+		final List<IScnWorklog> visibleWorklogs = new ArrayList<>();
 		final List<IScnWorklog> allWorklogs = getByProjectBetweenDates(jiraServiceContext, project, startDate, endDate);
 
-		for (Iterator<IScnWorklog> iterator = allWorklogs.iterator(); iterator.hasNext();) {
-			IScnWorklog worklog = (IScnWorklog) iterator.next();
+		for (IScnWorklog worklog : allWorklogs) {
 			if (hasPermissionToView(jiraServiceContext, worklog)) {
 				visibleWorklogs.add(worklog);
 			}
@@ -604,11 +606,10 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	public List<IScnWorklog> getByIssueVisibleToUser(JiraServiceContext jiraServiceContext, Issue issue) {
-		List<IScnWorklog> visibleWorklogs = new ArrayList<IScnWorklog>();
+		List<IScnWorklog> visibleWorklogs = new ArrayList<>();
 		List<IScnWorklog> allWorklogs = getByIssue(jiraServiceContext, issue);
 
-		for (Iterator<IScnWorklog> iterator = allWorklogs.iterator(); iterator.hasNext();) {
-			IScnWorklog worklog = (IScnWorklog) iterator.next();
+		for (IScnWorklog worklog : allWorklogs) {
 			if (hasPermissionToView(jiraServiceContext, worklog)) {
 				visibleWorklogs.add(worklog);
 			}
@@ -617,7 +618,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return visibleWorklogs;
 	}
 
-	public boolean hasPermissionToView(JiraServiceContext jiraServiceContext, Issue issue) {
+	public boolean hasPermissionToView(@Nonnull JiraServiceContext jiraServiceContext, Issue issue) {
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
@@ -649,7 +650,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		return hasPerm;
 	}
 
-	private boolean hasPermissionToView(JiraServiceContext jiraServiceContext, IScnWorklog worklog) {
+	private boolean hasPermissionToView(@Nonnull JiraServiceContext jiraServiceContext, IScnWorklog worklog) {
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
 		return (hasViewOwnPermission(user, worklog) || hasViewAllPermission(user, worklog.getIssue()));
 	}
@@ -663,7 +664,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	void validateUpdateOrDeletePermissionCheckParams(IScnWorklog worklog, ErrorCollection errorCollection,
-			JiraServiceContext jiraServiceContext) {
+													 JiraServiceContext jiraServiceContext) {
 		if (worklog == null) {
 			errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.worklog.null"));
 			return;
@@ -684,8 +685,6 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 
 		if (worklog.getId() == null) errorCollection.addErrorMessage(getText(jiraServiceContext,
 				"worklog.service.error.worklog.id.null"));
-
-		return;
 	}
 
 	boolean hasEditIssuePermission(User user, Issue issue) {
@@ -693,16 +692,15 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected IScnWorklog validateParamsAndCreateWorklog(JiraServiceContext jiraServiceContext, Issue issue, String author,
-			String groupLevel, String roleLevelId, String timeSpent, Date startDate, Long worklogId, String comment,
-			Date created, Date updated, String updateAuthor, Worklog linkedWorklog, String worklogTypeId) {
+														 String groupLevel, String roleLevelId, String timeSpent, Date startDate, Long worklogId, String comment,
+														 Date created, Date updated, String updateAuthor, Worklog linkedWorklog, String worklogTypeId) {
 		IScnWorklog worklog = null;
 
-		if (this.visibilityValidator.isValidVisibilityData(jiraServiceContext, "worklog", issue, groupLevel, roleLevelId)) {
+		if (this.visibilityValidator.isValidVisibilityData(jiraServiceContext, "worklog", issue, Visibilities.fromGroupAndStrRoleId(groupLevel, roleLevelId))) {
 			boolean defaultInputFieldsValidated = isValidWorklogInputFields(jiraServiceContext, issue, timeSpent, startDate);
 			if (defaultInputFieldsValidated) {
 				worklog = new ScnWorklogImpl(this.projectRoleManager, issue, worklogId, author, comment, startDate, groupLevel,
-						(TextUtils.stringSet(roleLevelId)) ? Long.valueOf(roleLevelId) : null, new Long(
-								getDurationForFormattedString(timeSpent)), updateAuthor, created, updated, worklogTypeId);
+						(TextUtils.stringSet(roleLevelId)) ? Long.valueOf(roleLevelId) : null, getDurationForFormattedString(timeSpent), updateAuthor, created, updated, worklogTypeId);
 				worklog.setLinkedWorklog(linkedWorklog);
 			}
 
@@ -712,7 +710,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected IScnWorklog create(JiraServiceContext jiraServiceContext, final IScnWorklog worklog, Long newEstimate,
-			Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
+								 Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) {
 		ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
 		ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
@@ -725,7 +723,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.issue.null"));
 			return null;
 		}
-		
+
 		boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
 		if (isBlocked(jiraServiceContext, worklog) || isWLAutoCopyBlocked) {
 			return null;
@@ -746,9 +744,9 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	public boolean isBlocked(JiraServiceContext serviceContext, IScnWorklog wl) {
 		return wl != null
 				&& (isProjectWLBlocked(serviceContext, getProjectId(wl), wl.getStartDate()) || isUserWLBlocked(serviceContext,
-						wl.getStartDate()));
+				wl.getStartDate()));
 	}
-	
+
 	public boolean isWLAutoCopyBlocked(JiraServiceContext jiraServiceContext, IScnWorklog wl) {
 		if (wl == null)
 			return false;
@@ -795,29 +793,33 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 		serviceContext.getErrorCollection().addErrorMessage(message);
 	}
 
-	private String formatDate(JiraServiceContext serviceContext, Date date) {
+	private String formatDate(@Nonnull JiraServiceContext serviceContext, Date date) {
 		Locale locale = serviceContext.getI18nBean().getLocale();
 		return dateTimeFormatterFactory.formatter().withLocale(locale).withStyle(DateTimeStyle.DATE).format(date);
 	}
 
-	private Long getProjectId(Worklog wl) {
-		return wl.getIssue().getProjectObject().getId();
+	private Long getProjectId(@Nonnull Worklog wl) {
+		return Objects.requireNonNull(wl.getIssue().getProjectObject()).getId();
 	}
 
-	protected boolean hasEditOwnPermission(ApplicationUser user, IScnWorklog worklog) {
-		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+	protected boolean hasEditOwnPermission(ApplicationUser user, Issue issue) {
+		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
+				&& permissionManager.hasPermission(ProjectPermissions.EDIT_OWN_WORKLOGS, issue, user);
 	}
 
 	protected boolean hasEditAllPermission(ApplicationUser user, Issue issue) {
-		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
+				&& permissionManager.hasPermission(ProjectPermissions.EDIT_ALL_WORKLOGS, issue, user);
 	}
 
-	protected boolean hasDeleteOwnPermission(ApplicationUser user, IScnWorklog worklog) {
-		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+	protected boolean hasDeleteOwnPermission(ApplicationUser user, Issue issue) {
+		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
+				&& permissionManager.hasPermission(ProjectPermissions.DELETE_OWN_WORKLOGS, issue, user);
 	}
 
 	protected boolean hasDeleteAllPermission(ApplicationUser user, Issue issue) {
-		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+		return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
+				&& permissionManager.hasPermission(ProjectPermissions.DELETE_ALL_WORKLOGS, issue, user);
 	}
 
 	protected boolean hasViewOwnPermission(ApplicationUser user, IScnWorklog worklog) {
@@ -837,21 +839,21 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected Long getAutoAdjustNewEstimateOnUpdate(Long timeEstimate, Long newTimeSpent, Long originalTimeSpent) {
-		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate.longValue();
-		long newTimeEstimate = oldTimeEstimate + originalTimeSpent.longValue() - newTimeSpent.longValue();
-		return new Long((newTimeEstimate < 0L) ? 0L : newTimeEstimate);
+		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate;
+		long newTimeEstimate = oldTimeEstimate + originalTimeSpent - newTimeSpent;
+		return Math.max(newTimeEstimate, 0L);
 	}
 
 	protected Long reduceEstimate(Long timeEstimate, Long amount) {
-		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate.longValue();
-		long newTimeEstimate = oldTimeEstimate - amount.longValue();
-		return new Long((newTimeEstimate < 0L) ? 0L : newTimeEstimate);
+		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate;
+		long newTimeEstimate = oldTimeEstimate - amount;
+		return Math.max(newTimeEstimate, 0L);
 	}
 
 	protected Long increaseEstimate(Long timeEstimate, Long amount) {
-		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate.longValue();
-		long newTimeEstimate = oldTimeEstimate + amount.longValue();
-		return new Long((newTimeEstimate < 0L) ? 0L : newTimeEstimate);
+		long oldTimeEstimate = (timeEstimate == null) ? 0L : timeEstimate;
+		long newTimeEstimate = oldTimeEstimate + amount;
+		return Math.max(newTimeEstimate, 0L);
 	}
 
 	protected boolean isValidNewEstimate(JiraServiceContext jiraServiceContext, String newEstimate) {
@@ -890,7 +892,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 	}
 
 	protected boolean isValidWorklogInputFields(JiraServiceContext jiraServiceContext, Issue issue, String timeSpent,
-			Date startDate) {
+												Date startDate) {
 		ErrorCollection errorCollection = new SimpleErrorCollection();
 
 		if (!TextUtils.stringSet(timeSpent)) {

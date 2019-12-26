@@ -52,7 +52,6 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 										new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()))
 
 						),
-
 						new GlobalSettingsManager(ComponentAccessor.getGroupManager()),
 						new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
 						new ScnUserBlockingManager()
@@ -73,7 +72,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 			return "securitybreach";
 		}
 
-		setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent().longValue(), getHoursPerDay().intValue(),
+		setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent(), getHoursPerDay().intValue(),
 				getDaysPerWeek().intValue()));
 		setStartDate(getFormattedStartDate(this.worklog.getStartDate()));
 		setComment(this.worklog.getComment());
