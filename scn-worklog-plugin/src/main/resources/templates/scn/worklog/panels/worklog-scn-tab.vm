@@ -15,10 +15,10 @@
         <div class="action-links">
         	<a href="${requestContext.baseUrl}/browse/$worklog.issue.key?focusedWorklogId=$worklog.id&page=com.scn.jira.scn-worklog-plugin%3Ascn-worklog-tab-panel#worklog-$worklog.id" title="$i18n.getText('viewissue.worklog.permlink.title')" class="icon icon-perma"><span>$i18n.getText('viewissue.permlink')</span></a>
             #if ($action.canEditWorklog)
-                <a id="edit_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/UpdateScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.edit')" class="icon icon-edit-sml"><span>$i18n.getText('common.words.edit')</span></a>
+                <a id="edit_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/UpdateScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.edit')" class="edit-worklog-trigger icon icon-edit-sml"><span>$i18n.getText('common.words.edit')</span></a>
             #end
             #if ($action.canDeleteWorklog)
-        		<a id="delete_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/DeleteScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.delete')" class="icon icon-delete"><span>$i18n.getText('common.words.delete')</span></a>
+        		<a id="delete_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/DeleteScnWorklogAction!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.delete')" class="delete-worklog-trigger icon icon-delete"><span>$i18n.getText('common.words.delete')</span></a>
             #end
         </div>
         <div class="action-details">#worklogDetailsBody($worklog $i18n $dateFormatter)</div>

@@ -8,22 +8,19 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 
-public class ScnGlobalPermissionCondition extends AbstractWebCondition
-{
+public class ScnGlobalPermissionCondition extends AbstractWebCondition {
     @ComponentImport
-	private final IGlobalSettingsManager gpManager;
+    private final IGlobalSettingsManager gpManager;
 
     @Inject
-    public ScnGlobalPermissionCondition(IGlobalSettingsManager gpManager)
-	{
-		this.gpManager = gpManager;
-	}
-	
-	@Override
-	public boolean shouldDisplay(ApplicationUser user, JiraHelper jHelper)
-	{
-		if(user == null) return false;
-		
-		return gpManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
-	}
+    public ScnGlobalPermissionCondition(IGlobalSettingsManager gpManager) {
+        this.gpManager = gpManager;
+    }
+
+    @Override
+    public boolean shouldDisplay(ApplicationUser user, JiraHelper jHelper) {
+        if (user == null) return false;
+
+        return gpManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+    }
 }

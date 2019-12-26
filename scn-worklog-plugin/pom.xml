@@ -75,11 +75,10 @@
 					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
-					<!--We don't use this and this makes quick reload very slow-->
 					<skipITs>true</skipITs>
 					<skipUTs>true</skipUTs>
 					<skipAllPrompts>true</skipAllPrompts>
-					<!-- This is sometimes handy to turn on for a faster jira -->
+					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
 					<skipRestDocGeneration>true</skipRestDocGeneration>
 					<skipManifestValidation>true</skipManifestValidation>
 					<buildTestPlugin>false</buildTestPlugin>

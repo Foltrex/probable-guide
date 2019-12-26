@@ -193,7 +193,6 @@
                 key="admin.issue.tabpanels.plugin.worklog.desc">Display work logs
         </description>
         <label key="viewissue.tabs.worklog">Work Log</label>
-        <label>WORK LOG</label>
         <resource type="velocity" name="view"
                   location="templates/scn/worklog/panels/worklog-tab.vm"/>
         <order>20</order>
@@ -223,7 +222,7 @@
         <resource name="view" type="velocity"
                   location="templates/scn/worklog/panels/timetracking.vm"/>
         <label key="timetracking.title"/>
-        <label>LOG WORK</label>
+        <label>Time Tracking</label>
         <condition
                 class="com.scn.jira.worklog.conditions.CustomIsFieldHiddenCondition"
                 invert="true">
@@ -283,7 +282,8 @@
               weight="2">
         <label key="logwork.title"/>
         <tooltip key="logwork.title.desc"/>
-        <styleClass>icon icon-add16 issueaction-scn-log-work-icon</styleClass>
+        <styleClass>issueaction-log-work aui-icon aui-icon-small
+            aui-iconfont-add issueaction-aui-icon</styleClass>
         <link linkId="log-work-link">/secure/CreateScnWorklogAction!default.jspa?id=${issue.id}</link>
         <condition
                 class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
