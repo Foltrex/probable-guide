@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<version>4.1.0</version>
 	</parent>
-
+	
 	<name>JIRA ScienceSoft MyTime gadget</name>
 	<description>The plugin for cloning projects</description>
-
+	
 	<artifactId>scn-mytime-gadget-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.4</version>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -57,7 +57,7 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -68,8 +68,13 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
+					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
+					<!--We don't use this and this makes quick reload very slow-->
+					<skipITs>true</skipITs>
+					<skipUTs>true</skipUTs>
+					<skipAllPrompts>true</skipAllPrompts>
 				</configuration>
 			</plugin>
 			<plugin>

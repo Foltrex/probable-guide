@@ -4,20 +4,20 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<version>4.1.0</version>
 	</parent>
-
+	
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
 	<description>The plugin provide access to custom time tracking implementation.</description>
-
+	
 	<artifactId>scn-worklog-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.4</version>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -61,7 +61,7 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -79,13 +79,13 @@
 					<skipITs>true</skipITs>
 					<skipUTs>true</skipUTs>
 					<skipAllPrompts>true</skipAllPrompts>
+					<!-- This is sometimes handy to turn on for a faster jira -->
+					<skipRestDocGeneration>true</skipRestDocGeneration>
+					<skipManifestValidation>true</skipManifestValidation>
 					<buildTestPlugin>false</buildTestPlugin>
 					<enableDevToolbox>false</enableDevToolbox>
 					<enablePde>false</enablePde>
-					<skipRestDocGeneration>true</skipRestDocGeneration>
 					<extractDependencies>false</extractDependencies>
-					<skipManifestValidation>true</skipManifestValidation>
-					<!-- This is sometimes handy to turn on for a faster jira -->
 					<systemProperties>
 						<atlassian.dev.mode>false</atlassian.dev.mode>
 					</systemProperties>
