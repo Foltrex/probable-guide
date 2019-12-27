@@ -1,8 +1,8 @@
 package com.scn.jira.logtime.resource;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
@@ -46,20 +47,13 @@ import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-/**
- * REST resource that provides a list of projects in JSON format.
- */
 @Named
 @Path("/updateScnWorklog")
 public class LTUpdateScnWorklogResource {
-	private static final Logger LOGGER = Logger.getLogger(LTUpdateScnWorklogResource.class);
-	
 	private UserManager userManager;
 	private PermissionManager permissionManager;
-	private UserUtil userUtil;
 	private JiraAuthenticationContext authenticationContext;
 	private ProjectManager projectManager;
 	private IssueManager issueManager;
@@ -67,31 +61,29 @@ public class LTUpdateScnWorklogResource {
 	private WorklogManager worklogManager;
 	private ExtendedConstantsManager extendedConstantsManager;
 	private IScnWorklogManager scnWorklogManager;
-	private ExtendedWorklogManager extendedWorklogManager;	
+	private ExtendedWorklogManager extendedWorklogManager;
 	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
 	private IScnProjectSettingsManager projectSettignsManager;
 	private IScnWorklogStore OfBizScnWorklogStore;
 	private IScnUserBlockingManager scnUserBlockingManager;
 	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
-	private IScnWorklogService scnDefaultWorklogService;
+	private IScnWorklogService scnWorklogService;
 
 	@Inject
 	public LTUpdateScnWorklogResource(@ComponentImport PermissionManager permissionManager,
-			@ComponentImport UserUtil userUtil, @ComponentImport JiraAuthenticationContext authenticationContext,
-			@ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
-			@ComponentImport ProjectRoleManager projectRoleManager,
-			@Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-			@ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-			@ComponentImport DefaultScnWorklogManager scnWorklogManager,
-			@ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
-			@ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-			@ComponentImport ScnProjectSettingsManager projectSettignsManager,
-			@ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-			@ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
-		super();
+									  @ComponentImport JiraAuthenticationContext authenticationContext,
+									  @ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
+									  @ComponentImport ProjectRoleManager projectRoleManager,
+									  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
+									  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
+									  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
+									  @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
+									  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
+									  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
+									  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
+									  @ComponentImport DefaultScnWorklogService scnWorklogService) {
 		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
-		this.userUtil = userUtil;
 		this.authenticationContext = authenticationContext;
 		this.projectManager = projectManager;
 		this.issueManager = issueManager;
@@ -103,120 +95,103 @@ public class LTUpdateScnWorklogResource {
 		this.projectSettignsManager = projectSettignsManager;
 		this.OfBizScnWorklogStore = ofBizScnWorklogStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
-		this.scnDefaultWorklogService = scnDefaultWorklogService;
+		this.scnWorklogService = scnWorklogService;
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-				worklogManager, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
+				worklogManager, projectSettignsManager, scnUserBlockingManager, scnWorklogService);
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
-		
 	}
-	
+
 	/**
 	 * Returns the list of projects browsable by the user in the specified
 	 * request.
-	 * 
-	 * @param request
-	 *            the context-injected {@code HttpServletRequest}
+	 *
+	 * @param request the context-injected {@code HttpServletRequest}
 	 * @return a {@code Response} with the marshalled projects
 	 */
 	@GET
 	@AnonymousAllowed
-	@Produces({ "application/json", "application/xml" })
+	@Produces({"application/json", "application/xml"})
 	public Response getWorklogForUpdate(@Context HttpServletRequest request, @QueryParam("complexWLId") String complexWLId,
-			@QueryParam("complexId2") String complexId2, @QueryParam("newValue") String newValue, @QueryParam("newWLType") String newWLType,
-			@QueryParam("comment") String comment) {
-		long issueId = getWlIdFromRequestParameter(complexWLId, 0).equals("") ? -1 : Integer.valueOf(getWlIdFromRequestParameter(complexWLId, 0));
-		long worklogId = getWlIdFromRequestParameter(complexWLId, 2).equals("") ? -1 : Integer.valueOf(getWlIdFromRequestParameter(complexWLId, 2));
-		String worklogTypeId = String.valueOf(getWlIdFromRequestParameter(complexWLId, 1).equals("") ? "": Integer
+										@QueryParam("complexId2") String complexId2, @QueryParam("newValue") String newValue, @QueryParam("newWLType") String newWLType,
+										@QueryParam("comment") String comment) {
+		long issueId = getWlIdFromRequestParameter(complexWLId, 0).equals("") ? -1 : Integer.parseInt(getWlIdFromRequestParameter(complexWLId, 0));
+		long worklogId = getWlIdFromRequestParameter(complexWLId, 2).equals("") ? -1 : Integer.parseInt(getWlIdFromRequestParameter(complexWLId, 2));
+		String worklogTypeId = String.valueOf(getWlIdFromRequestParameter(complexWLId, 1).equals("") ? "" : Integer
 				.valueOf(getWlIdFromRequestParameter(complexWLId, 1)));
 		String date = getWlIdFromRequestParameter(complexWLId, 3).equals("") ? "" : (getWlIdFromRequestParameter(complexWLId, 3));
 		String userCreated = getWlIdFromRequestParameter(complexWLId, 5).equals("") ? "" : (getWlIdFromRequestParameter(complexWLId, 5));
-		userCreated= userCreated!=null?userCreated.toLowerCase():"";
-		if(newValue!=null){
+		userCreated = userCreated != null ? userCreated.toLowerCase() : "";
+		if (newValue != null) {
 			newValue = newValue.trim();
 		}
-		
+
 		comment = (comment != null && !comment.equals("undefined")) ? comment : null;
 		String wlType = (newWLType != null && !newWLType.equals("undefined")) ? newWLType : worklogTypeId;
-		
-		long worklogExtId = 0;
-		if (complexId2 != null && !complexId2.equals("")) {
-			worklogExtId = getWlIdFromRequestParameter(complexId2, 2).equals("") ? 0 : Integer.valueOf(getWlIdFromRequestParameter(complexId2, 2));
-		}
-		
+
 		boolean reloadRequired = false;
 		boolean result = false;
+		boolean isValueEmplty = (newValue == null || newValue.equals("00:00") || newValue.equals("0") || newValue.equals("") || newValue.equals("0h"));
 		// Check what to do with the worklog
 		Long timeSpent = 0L;
-		if(TextFormatUtil.matchesPattern1(newValue)){
+		if (TextFormatUtil.matchesPattern1(newValue)) {
 			timeSpent = TextFormatUtil.stringToTime(newValue);
-		}else{
-			if(TextFormatUtil.matchesPattern2(newValue)){
+		} else {
+			if (TextFormatUtil.matchesPattern2(newValue)) {
 				timeSpent = TextFormatUtil.string2ToTime(newValue);
-			}else{
-				if(TextFormatUtil.matchesPattern3(newValue)){
+			} else {
+				if (TextFormatUtil.matchesPattern3(newValue)) {
 					timeSpent = TextFormatUtil.string3ToTime(newValue);
 				}
 			}
-		}	
+		}
 		Long wlId = 0L;
 		Long wlIdExt = 0L;
-		
+
 		Issue issue = this.issueManager.getIssueObject(issueId);
 		Date day = DateUtils.stringToDate(date);
-		
-		boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(issue.getProjectObject().getId(), day)
+
+		IScnWorklog scnWorklog = scnWorklogManager.getById(worklogId);
+		ApplicationUser appUser = getLoggedInUser();
+		boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day)
 				|| (iScnWorklogLogtimeStore.isWlAutoCopy(issue, wlType)
-						&& iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
-		if(isBlocked){
-			LTMessages message = new LTMessages("BLOCKED", false, false,null);
+				&& iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
+		boolean hasPermissionToDelete = !isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToDelete(new JiraServiceContextImpl(appUser), scnWorklog));
+		if (isBlocked || !hasPermissionToDelete) {
+			LTMessages message = new LTMessages("BLOCKED", false, false, null);
 			return Response.ok(message).build();
 		}
-		
+
 		if (worklogId == 0) {
-		
 			if (day != null) {
-				if (newValue != null && !newValue.equals("00:00") && !newValue.equals("0") && !newValue.equals("") && !newValue.equals("0h")) {
-					//Long timeSpent = TextFormatUtil.stringToTime(newValue);
-					if (timeSpent.longValue() != 0) {
-						if (userCreated == null) {
-							userCreated = getUser(request).getDisplayName();
-						}
+				if (!isValueEmplty) {
+					if (timeSpent != 0) {
 						Map<String, Object> resultMap = iScnWorklogLogtimeStore.createScnWorklogResultMap(issueId,
 								wlType, timeSpent, comment != null ? comment : "", userCreated, day, wlType);
-//						Map<String, Object> resultMap = createScnWorklogMap(issueId, worklogId, wlType, timeSpent,
-//								comment != null ? comment : "", userCreated, day, String.valueOf(worklogTypeId),
-//								worklogExtId);
 						result = (Boolean) resultMap.get("isAuto");
-						wlId = (Long)resultMap.get("wlId");
-						wlIdExt = (Long)resultMap.get("wlIdExt");
+						wlId = (Long) resultMap.get("wlId");
+						wlIdExt = (Long) resultMap.get("wlIdExt");
 						if (!wlType.equals(worklogTypeId)) {
 							reloadRequired = true;
 						}
 					}
 				}
 			}
-		}
-		else {
-			IScnWorklog scnWorklog = scnWorklogManager.getById(new Long(worklogId));// extendedWorklogManager.getExtWorklog(new
-																					// Long(worklogId));
-			if (scnWorklog != null) {
-				if (newValue != null && !newValue.equals("00:00") && !newValue.equals("0")&& !newValue.equals("") && !newValue.equals("0h")) {
-					result = updateScnWorklog(worklogId, wlType, timeSpent, comment);
-					if (!wlType.equals(worklogTypeId)) {
-						reloadRequired = true;
-					}
-					wlId = scnWorklog.getId();
-					Worklog ext = scnWorklog.getLinkedWorklog();
-					if (ext != null) {
-						wlIdExt = ext.getId();
-					}
+		} else if (scnWorklog != null) {
+			if (isValueEmplty) {
+				result = deleteScnWorklog(worklogId);
+			} else {
+				result = updateScnWorklog(worklogId, wlType, timeSpent, comment);
+				if (!wlType.equals(worklogTypeId)) {
+					reloadRequired = true;
 				}
-				else {
-					result = deleteScnWorklog(worklogId);
+				wlId = scnWorklog.getId();
+				Worklog ext = scnWorklog.getLinkedWorklog();
+				if (ext != null) {
+					wlIdExt = ext.getId();
 				}
 			}
 		}
-		
+
 		String complexWLIdnew = changeWlIdFromRequestParameter(complexWLId, wlId),
 				complexWLIdExtNew = changeWlIdFromRequestParameter(complexId2, wlIdExt);
 
@@ -224,7 +199,7 @@ public class LTUpdateScnWorklogResource {
 
 		return Response.ok(message).build();
 	}
-	
+
 	public String getWlIdFromRequestParameter(String identifier, int i) {
 		// TESS-1_10000_0_08-01_143
 		// 2-wlid
@@ -234,16 +209,15 @@ public class LTUpdateScnWorklogResource {
 		if (identifier != null && identifier.contains("_")) {
 			String[] arr = identifier.split("_");
 			return arr[i];
-		}
-		else {
+		} else {
 			return "";
 		}
 	}
 
-	private ApplicationUser getUser(HttpServletRequest request) {
+	private ApplicationUser getLoggedInUser() {
 		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 	}
-	
+
 	public String changeWlIdFromRequestParameter(String identifier, Long newWLId) {
 		// TESS-1_10000_0_08-01_143
 		// 2-wlid
@@ -253,61 +227,17 @@ public class LTUpdateScnWorklogResource {
 		String res = identifier;
 		if (identifier != null && identifier.contains("_")) {
 			String[] arr = identifier.split("_");
-			res = arr[0]+"_"+arr[1]+"_"+newWLId+"_"+arr[3]+"_"+arr[4]+"_"+arr[5];
+			res = arr[0] + "_" + arr[1] + "_" + newWLId + "_" + arr[3] + "_" + arr[4] + "_" + arr[5];
 		}
-		
+
 		return res;
 	}
-	
-	private boolean createScnWorklog(Long issueId, Long _worklogId, String _worklogType, Long _timeSpent, String _comment, String authorKey,
-			Date date, String worklogTypeId, long worklogExtId) {
-		boolean isAuto = false;
-		if (worklogExtId != 0) {
-			IScnWorklog scnWorklog = iScnWorklogLogtimeStore.createScnWorklogWithoutCopy(issueId, _worklogType, _timeSpent, _comment, authorKey,
-					date, worklogTypeId);
-			LOGGER.info("Worklogs should be linked as we create an scnWorklog we also need to make a link to Extworklog with id  "
-					+ worklogExtId);
-			
-			Worklog extWorklog = iExtWorklogLogtimeStore.getExtWorklogObj(worklogExtId, issueId);
-			
-			if (scnWorklog != null && extWorklog != null) {
-				iScnWorklogLogtimeStore.updateScnWorklog(scnWorklog.getId(), extWorklog);
-			}
-			
-		}
-		else {
-			isAuto = iScnWorklogLogtimeStore.createScnWorklog(issueId, _worklogType, _timeSpent, _comment, authorKey, date, worklogTypeId);
-		}
-		
-		return isAuto;
-	}
-	
-	
-	private Map<String, Object>  createScnWorklogMap(Long issueId, Long _worklogId, String _worklogType, Long _timeSpent, String _comment, String authorKey,
-			Date date, String worklogTypeId, long worklogExtId) {	
-		Map<String, Object> resultMap = new HashMap<String, Object>();
-		Long id = 0L;
-		boolean isAuto = false;
 
-		IScnWorklog scnWorklog = iScnWorklogLogtimeStore.createScnWorklogWithoutCopy(issueId, _worklogType, _timeSpent, _comment, authorKey,
-				date, worklogTypeId);
-		if(scnWorklog!=null){
-			id =scnWorklog.getId();
-		}
-
-		resultMap.put("wlId", id);
-		resultMap.put("isAuto", isAuto);
-		resultMap.put("wlIdExt", 0L);
-		
-		return resultMap;
-	}
-	
-	
 	private boolean updateScnWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) {
 		return iScnWorklogLogtimeStore.updateScnWorklog(_worklogId, _worklogType, _timeSpent, _comment);
 	}
-	
-	private boolean deleteScnWorklog(Long worklogId) {	
+
+	private boolean deleteScnWorklog(Long worklogId) {
 		return iScnWorklogLogtimeStore.deleteScnWorklogById(worklogId);
 	}
 }
