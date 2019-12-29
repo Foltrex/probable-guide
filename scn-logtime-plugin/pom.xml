@@ -74,6 +74,16 @@
 					<skipITs>true</skipITs>
 					<skipUTs>true</skipUTs>
 					<skipAllPrompts>true</skipAllPrompts>
+					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
+<!--					<skipRestDocGeneration>true</skipRestDocGeneration>-->
+<!--					<skipManifestValidation>true</skipManifestValidation>-->
+<!--					<buildTestPlugin>false</buildTestPlugin>-->
+<!--					<enableDevToolbox>false</enableDevToolbox>-->
+<!--					<enablePde>false</enablePde>-->
+<!--					<extractDependencies>false</extractDependencies>-->
+<!--					<systemProperties>-->
+<!--						<atlassian.dev.mode>false</atlassian.dev.mode>-->
+<!--					</systemProperties>-->
 				</configuration>
 			</plugin>
 			<plugin>

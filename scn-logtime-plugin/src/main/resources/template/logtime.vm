@@ -51,8 +51,6 @@
         </tr>
         <tr class="select_pop">
             <td class="select_pop">
-
-
                 <label class="popup_label"> Text:</label>
             </td>
             <td colspan="3" class="select_pop">
@@ -79,8 +77,6 @@
     <input type="hidden" value="" id="commentId">
     <input type="hidden" value="" id="dateWeekId">
     <input type="hidden" value="" id="userKeyId">
-
-
 </div>
 
 <script type="text/javascript">
@@ -120,8 +116,6 @@
                                 WL/WL*
                             </th>
 
-
-
                             #foreach ($weekRepresentation in $projectUserKey.getWeekRepresentations())
                                 <th colspan="$weekRepresentation.getDayRepresentations().size()"
                                     class="colHeaderLink day" align="center">
@@ -146,7 +140,6 @@
                         </tr>
 
                         </thead>
-
 
                         <tbody>
 
@@ -237,7 +230,6 @@
                                 </table>
                             </td>
 
-
                             <td id='$issueTypeSel' class="add-project"></td>
 
                             <td class="add-project">
@@ -293,11 +285,13 @@
                                 #set($projectSize = $project.getRowspan())
                                 #if( $project.getName() != "" )
                                     <td class="table-col-project" rowspan=$projectSize>
-                                        <a href="$req.contextPath/browse/$project.getKey()" target="_blank">$project.getName()</a>
+                                        <a href="$req.contextPath/browse/$project.getKey()"
+                                           target="_blank">$project.getName()</a>
                                     </td>
                                 #else
                                     <td class="table-col-project" rowspan=$projectSize>
-                                        <a href="$req.contextPath/browse/$project.getKey()" target="_blank">$project.getKey()</a>
+                                        <a href="$req.contextPath/browse/$project.getKey()"
+                                           target="_blank">$project.getKey()</a>
                                     </td>
                                 #end
 
@@ -315,8 +309,10 @@
                                         #end
                                     #end
                                     <td class="table-col table-col-bold" rowspan=$issueSize>
-                                    <a href="$req.contextPath/browse/$issue.getName()" style="text-decoration: none; "
-                                       title="$issue.getKey() - $issue.getName()" target="_blank">$issue.getUrlName()</a>
+                                        <a href="$req.contextPath/browse/$issue.getName()"
+                                           style="text-decoration: none; "
+                                           title="$issue.getKey() - $issue.getName()"
+                                           target="_blank">$issue.getUrlName()</a>
                                     </td>
 
                                     #set($wlLineIssueRepresentations = $issue.getWlTypes())
@@ -519,7 +515,6 @@
 
                                 #end
 
-
                             #end
 
                         </tbody>
@@ -539,18 +534,14 @@
 <input type="hidden" value="$scnWlChShow" id="scnWlChShow">
 <input type="hidden" value="$loggeduser" id="userHidden">
 
-
 <script type="text/javascript">
         #include("template/editdiv.js");
     document.getElementById('periodId').innerHTML = document.getElementById('labelPeriodHidden').value;
-    if (document.getElementById('myFieldId').value == '') {
-        var log = '$loggeduser' + ",";
-        document.getElementById('myFieldId').value = log;
+    if (document.getElementById('myFieldId').value === '') {
+        document.getElementById('myFieldId').value = '$loggeduser' + ",";
     }
-    var log = '$loggeduser' + ",";
-    document.getElementById('userHidden').value = log;
-
-    if (document.getElementById('scnWlChShow').value == "false") {
+    document.getElementById('userHidden').value = '$loggeduser' + ",";
+    if (document.getElementById('scnWlChShow').value === "false") {
         //	document.getElementById('wlsc').style.display= "none";
         document.getElementById('wlsc').style.visibility = "hidden";
     }

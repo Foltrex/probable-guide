@@ -134,10 +134,10 @@
 			<id>build-all-trunk</id>
 			<modules>
 				<module>scn-worklog-plugin</module>
-				<module>scn-mytime-gadget-plugin</module>
+<!--				<module>scn-mytime-gadget-plugin</module>-->
 				<module>scn-logtime-plugin</module>
-				<module>scn-timesheet-plugin</module>
-				<module>scn-clone-project-plugin</module>
+<!--				<module>scn-timesheet-plugin</module>-->
+<!--				<module>scn-clone-project-plugin</module>-->
 			</modules>
 		</profile>
 		<profile>

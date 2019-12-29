@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
@@ -25,6 +26,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
@@ -52,7 +54,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Named
 @Path("/updateScnWorklog")
 public class LTUpdateScnWorklogResource {
-	private UserManager userManager;
 	private PermissionManager permissionManager;
 	private JiraAuthenticationContext authenticationContext;
 	private ProjectManager projectManager;
@@ -64,7 +65,6 @@ public class LTUpdateScnWorklogResource {
 	private ExtendedWorklogManager extendedWorklogManager;
 	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
 	private IScnProjectSettingsManager projectSettignsManager;
-	private IScnWorklogStore OfBizScnWorklogStore;
 	private IScnUserBlockingManager scnUserBlockingManager;
 	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 	private IScnWorklogService scnWorklogService;
@@ -78,11 +78,9 @@ public class LTUpdateScnWorklogResource {
 									  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
 									  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
 									  @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
-									  @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
 									  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
 									  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
 									  @ComponentImport DefaultScnWorklogService scnWorklogService) {
-		this.userManager = ComponentAccessor.getUserManager();
 		this.permissionManager = permissionManager;
 		this.authenticationContext = authenticationContext;
 		this.projectManager = projectManager;
@@ -93,7 +91,6 @@ public class LTUpdateScnWorklogResource {
 		this.scnWorklogManager = scnWorklogManager;
 		this.extendedWorklogManager = extendedWorklogManager;
 		this.projectSettignsManager = projectSettignsManager;
-		this.OfBizScnWorklogStore = ofBizScnWorklogStore;
 		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnWorklogService = scnWorklogService;
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
@@ -101,13 +98,6 @@ public class LTUpdateScnWorklogResource {
 		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
 	}
 
-	/**
-	 * Returns the list of projects browsable by the user in the specified
-	 * request.
-	 *
-	 * @param request the context-injected {@code HttpServletRequest}
-	 * @return a {@code Response} with the marshalled projects
-	 */
 	@GET
 	@AnonymousAllowed
 	@Produces({"application/json", "application/xml"})
@@ -155,8 +145,10 @@ public class LTUpdateScnWorklogResource {
 		boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day)
 				|| (iScnWorklogLogtimeStore.isWlAutoCopy(issue, wlType)
 				&& iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
-		boolean hasPermissionToDelete = !isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToDelete(new JiraServiceContextImpl(appUser), scnWorklog));
-		if (isBlocked || !hasPermissionToDelete) {
+		final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
+		boolean hasPermissionToDelete = !isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog));
+		boolean hasPermissionToUpdate = isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog));
+		if (isBlocked || !hasPermissionToDelete || !hasPermissionToUpdate) {
 			LTMessages message = new LTMessages("BLOCKED", false, false, null);
 			return Response.ok(message).build();
 		}
@@ -215,7 +207,7 @@ public class LTUpdateScnWorklogResource {
 	}
 
 	private ApplicationUser getLoggedInUser() {
-		return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+		return authenticationContext.getLoggedInUser();
 	}
 
 	public String changeWlIdFromRequestParameter(String identifier, Long newWLId) {
