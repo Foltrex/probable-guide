@@ -1,9 +1,30 @@
 package com.scn.jira.logtime.resource;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import com.atlassian.jira.bc.JiraServiceContext;
+import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.worklog.Worklog;
+import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
+import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
+import com.scn.jira.logtime.util.DateUtils;
+import com.scn.jira.logtime.util.TextFormatUtil;
+import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
+import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
+import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -11,91 +32,37 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-
-import com.atlassian.jira.bc.JiraServiceContext;
-import com.atlassian.jira.bc.JiraServiceContextImpl;
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.Worklog;
-import com.atlassian.jira.issue.worklog.WorklogManager;
-import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.ApplicationUsers;
-import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.atlassian.jira.user.util.UserManager;
-import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
-import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
-import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
-import com.scn.jira.logtime.util.DateUtils;
-import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.worklog.core.scnwl.*;
-import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.IScnUserBlockingManager;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
-import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
-import com.scn.jira.worklog.scnwl.IScnWorklogService;
-
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 @Named
 @Path("/updateScnWorklog")
 public class LTUpdateScnWorklogResource {
-	private PermissionManager permissionManager;
 	private JiraAuthenticationContext authenticationContext;
-	private ProjectManager projectManager;
 	private IssueManager issueManager;
-	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
-	private ExtendedConstantsManager extendedConstantsManager;
 	private IScnWorklogManager scnWorklogManager;
-	private ExtendedWorklogManager extendedWorklogManager;
 	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-	private IScnProjectSettingsManager projectSettignsManager;
-	private IScnUserBlockingManager scnUserBlockingManager;
-	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 	private IScnWorklogService scnWorklogService;
 
 	@Inject
-	public LTUpdateScnWorklogResource(@ComponentImport PermissionManager permissionManager,
-									  @ComponentImport JiraAuthenticationContext authenticationContext,
-									  @ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
+	public LTUpdateScnWorklogResource(@ComponentImport JiraAuthenticationContext authenticationContext,
+									  @ComponentImport IssueManager issueManager,
 									  @ComponentImport ProjectRoleManager projectRoleManager,
 									  @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-									  @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
 									  @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-									  @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
 									  @ComponentImport ScnProjectSettingsManager projectSettignsManager,
 									  @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
 									  @ComponentImport DefaultScnWorklogService scnWorklogService) {
-		this.permissionManager = permissionManager;
 		this.authenticationContext = authenticationContext;
-		this.projectManager = projectManager;
 		this.issueManager = issueManager;
-		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = overridedWorklogManager;
-		this.extendedConstantsManager = defaultExtendedConstantsManager;
 		this.scnWorklogManager = scnWorklogManager;
-		this.extendedWorklogManager = extendedWorklogManager;
-		this.projectSettignsManager = projectSettignsManager;
-		this.scnUserBlockingManager = scnUserBlockingManager;
 		this.scnWorklogService = scnWorklogService;
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-				worklogManager, projectSettignsManager, scnUserBlockingManager, scnWorklogService);
-		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
+				overridedWorklogManager, projectSettignsManager, scnUserBlockingManager, scnWorklogService);
 	}
 
 	@GET
@@ -146,9 +113,9 @@ public class LTUpdateScnWorklogResource {
 				|| (iScnWorklogLogtimeStore.isWlAutoCopy(issue, wlType)
 				&& iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
 		final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
-		boolean hasPermissionToDelete = !isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog));
-		boolean hasPermissionToUpdate = isValueEmplty || (scnWorklog != null && scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog));
-		if (isBlocked || !hasPermissionToDelete || !hasPermissionToUpdate) {
+		if (isBlocked || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
+				|| (worklogId != 0 && !isValueEmplty && !scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog))
+				|| (worklogId == 0) && !isValueEmplty && !scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
 			LTMessages message = new LTMessages("BLOCKED", false, false, null);
 			return Response.ok(message).build();
 		}
@@ -169,9 +136,7 @@ public class LTUpdateScnWorklogResource {
 				}
 			}
 		} else if (scnWorklog != null) {
-			if (isValueEmplty) {
-				result = deleteScnWorklog(worklogId);
-			} else {
+			if (!isValueEmplty) {
 				result = updateScnWorklog(worklogId, wlType, timeSpent, comment);
 				if (!wlType.equals(worklogTypeId)) {
 					reloadRequired = true;
@@ -181,15 +146,15 @@ public class LTUpdateScnWorklogResource {
 				if (ext != null) {
 					wlIdExt = ext.getId();
 				}
+			} else {
+				result = deleteScnWorklog(worklogId);
 			}
 		}
-
 		String complexWLIdnew = changeWlIdFromRequestParameter(complexWLId, wlId),
 				complexWLIdExtNew = changeWlIdFromRequestParameter(complexId2, wlIdExt);
-
 		LTMessages message = new LTMessages("DONE SCN!", result, reloadRequired, complexWLIdnew, complexWLIdExtNew);
 
-		return Response.ok(message).build();
+		return Response.ok(message).cacheControl(getNoCacheControl()).build();
 	}
 
 	public String getWlIdFromRequestParameter(String identifier, int i) {
@@ -231,5 +196,12 @@ public class LTUpdateScnWorklogResource {
 
 	private boolean deleteScnWorklog(Long worklogId) {
 		return iScnWorklogLogtimeStore.deleteScnWorklogById(worklogId);
+	}
+
+	@Nonnull
+	private CacheControl getNoCacheControl() {
+		CacheControl noCache = new CacheControl();
+		noCache.setNoCache(true);
+		return noCache;
 	}
 }
