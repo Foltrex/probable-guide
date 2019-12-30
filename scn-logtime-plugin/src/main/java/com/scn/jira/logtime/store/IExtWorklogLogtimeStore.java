@@ -11,23 +11,23 @@ import com.scn.jira.worklog.core.wl.ExtWorklog;
 
 public interface IExtWorklogLogtimeStore {
 	
-	public List<ExtWorklog> getExtWorklogsByProjectBetweenDates(boolean assignedCh, Project project, Date startDate, Date endDate,String user) throws DataAccessException;
+	List<ExtWorklog> getExtWorklogsByProjectBetweenDates(boolean assignedCh, Project project, Date startDate, Date endDate, String user) throws DataAccessException;
 	
-	public List<ExtWorklog> getWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate) throws DataAccessException;
+	List<ExtWorklog> getWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate) throws DataAccessException;
 	
-	public List<ExtWorklog> getWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate, String user) throws DataAccessException;
+	List<ExtWorklog> getWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate, String user) throws DataAccessException;
 	
-	public List<Issue> getIssuesByProjects(Project project) throws DataAccessException;
+	List<Issue> getIssuesByProjects(Project project) throws DataAccessException;
 	
-	public List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) throws DataAccessException;
+	List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) throws DataAccessException;
 	
-	public boolean deleteExtWorklogById(Long worklogId) throws DataAccessException;
+	boolean deleteExtWorklogById(Long worklogId) throws DataAccessException;
 	
-	public void updateExtWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;
+	void updateExtWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;
 	
-	public Worklog createExtWorklog(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date)
+	Worklog createExtWorklog(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date)
 			throws DataAccessException;
 	
-	public Worklog getExtWorklogObj(Long _worklogId, Long issueId) throws DataAccessException;
+	Worklog getExtWorklogObj(Long _worklogId, Long issueId) throws DataAccessException;
 	
 }

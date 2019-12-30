@@ -153,7 +153,6 @@ function issueChanged(userId){
 	}
 }
 
-
 function inplace(userIdentifier,identifierSE, idetifier, isScn){	
 	if(closedEdit) {
 		closedEdit=false;	
@@ -183,8 +182,6 @@ var timepattern1 = /^\s*([0-9]*[0-9]):[0-5][0-9]\s*$/;
 var timepattern2 = /^\s*([0-9]*[0-9]w)*\s*([0-9]*[0-9]d)*\s*(([0-9]*[0-9])h)?\s*([0-5]*[0-9]m)?\s*$/;
 var timepattern3 = /^\s*([0-9]*)\s*$/;
 var timepattern4 = /^\s*([1-9]*[0-9]*)\s*$/;
-
-
 
 function closeInplace(val,idetifier){
 	document.getElementById(idetifier).innerHTML = val;
@@ -236,41 +233,46 @@ function onFunctionLost1(isScn,userIdentifier,identifierSE){
 			var url = (isScn=='true'?"/rest/logtime-gadget/1.0/updateScnWorklog.json":"/rest/logtime-gadget/1.0/updateExtWorklog.json");						
 			var cur=current_editId;
 			AJS.$.ajax({
-					  url: url,
-					  type: "GET",
-					  data: ({complexWLId : arrayCount[current_editId], complexId2: complexId2, newValue: val, newWLType: 'undefined', comment: 'undefined'  }),
-					  dataType: "json",
-					  success: function(msg){		
-						if(msg.message=="BLOCKED"){
-							alert("Unfortunately work logs are locked");
-						}else{
-							
-							if(isScn=='true'){
-								document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color="green";
-							}else{
-								document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color="green";
+				url: url,
+				type: "GET",
+				data: ({
+					complexWLId: arrayCount[current_editId],
+					complexId2: complexId2,
+					newValue: val,
+					newWLType: 'undefined',
+					comment: 'undefined'
+				}),
+				dataType: "json",
+				success: function (msg) {
+					if (msg.message == "BLOCKED") {
+						alert("Unfortunately work logs are locked");
+					} else {
+
+						if (isScn == 'true') {
+							document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color = "green";
+						} else {
+							document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+						}
+
+						if (msg.copied && identifierSE != '-1') {
+							document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
+							document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+							if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
+								arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
 							}
-							
-							if(msg.copied && identifierSE!='-1'){							
-								document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
-								document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color="green";
-								if(msg.wlIdExt!=arrayCount[arrayCountE[userIdentifier][identifierSE]]){
-									arrayCount[arrayCountE[userIdentifier][identifierSE]]=msg.wlIdExt;
-								}
-							}	
-							
-							if(msg.wlId!=arrayCount[cur]){																			
-								arrayCount[cur]=msg.wlId;
-								cur="";
-							}
-						  }
-					  }
-					});
+						}
+
+						if (msg.wlId != arrayCount[cur]) {
+							arrayCount[cur] = msg.wlId;
+							cur = "";
+						}
+					}
+				}
+			});
 		}			
 		current_editId="";
 		clicked=false;	
 }
-
 
 function addWorklog(event,userCount, identifier, addWlComment,dateWeek, userKey){
 	//when the addCells are clicked to add new worklogs
@@ -358,7 +360,6 @@ function updateWorklog1(event,selCount, identifier, isExternal, timeSpent, wltyp
 	showpopup('popUpWorklogDiv', event);
 }
 
-
 function addUpdateWorklog(){
 	if(document.getElementById('add_wl').value=='0'){
 		updateWorklogAJAX();
@@ -428,8 +429,7 @@ function updateWorklogAJAX(){
 	
 	var isExt = document.getElementById('pop_worklog_scn_ext').value;	
 	var url = (isExt!='true'?"/rest/logtime-gadget/1.0/updateScnWorklog.json":"/rest/logtime-gadget/1.0/updateExtWorklog.json");						
-	
-	
+
 	var isValidated=false;	
 		
 	if(timepattern1.test(tmpTime)  || timepattern2.test(tmpTime) || timepattern3.test(tmpTime)){
@@ -448,8 +448,7 @@ function updateWorklogAJAX(){
 		}
 		current_editId="";
 	}
-		
-		
+
 	if(isValidated){
 		var userIdentifier = document.getElementById('pop_user_identifier').value;
 		var identifierSE = document.getElementById('pop_identifier_SE').value;
@@ -530,4 +529,3 @@ function cancelWorklogAJAX(){
 	doubleckicked=false;
 	current_editId="";
 }
-
