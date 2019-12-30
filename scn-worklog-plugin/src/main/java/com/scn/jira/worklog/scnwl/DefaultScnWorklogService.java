@@ -453,7 +453,8 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 			return false;
 		}
 
-		boolean hasPerm = scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user);
+		boolean hasPerm = scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
+				&& permissionManager.hasPermission(ProjectPermissions.WORK_ON_ISSUES, issue, user);
 
 		if (!hasPerm) {
 			if (user != null) {
