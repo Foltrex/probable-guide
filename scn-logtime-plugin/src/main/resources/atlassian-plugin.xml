@@ -97,6 +97,7 @@
         </resource>
 
         <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-message</dependency>
         <dependency>com.atlassian.jira.gadgets:common</dependency>
         <dependency>com.atlassian.jira.webresources:select-pickers
         </dependency>
