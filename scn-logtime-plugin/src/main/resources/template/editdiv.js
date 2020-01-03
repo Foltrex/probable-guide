@@ -424,10 +424,12 @@ function addWorklogsToDb() {
         }),
         dataType: "json",
         success: function (msg) {
-            checkProjects(msg.message);
-            //alert("ArraySaved");
-            //projectChanged(projectId,issueTdId,worklogTypeSel, userId)
-            reloadMeClean();
+            if (msg.message === "BLOCKED") {
+                showErrorMessage("Access error", "Unfortunately work logs are locked.");
+            } else {
+                checkProjects(msg.message);
+                reloadMeClean();
+            }
         }
     });
 }

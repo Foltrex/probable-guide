@@ -16,10 +16,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.atlassian.jira.bc.JiraServiceContext;
+import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
@@ -30,24 +34,30 @@ import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
 
+import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Named
 @Path("/updateScnWorklogs")
 public class LTUpdateScnWorklogsResource {
+    private JiraAuthenticationContext authenticationContext;
     private IssueManager issueManager;
     private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+    private IScnWorklogService scnWorklogService;
 
     @Inject
-    public LTUpdateScnWorklogsResource(@ComponentImport IssueManager issueManager,
+    public LTUpdateScnWorklogsResource(@ComponentImport JiraAuthenticationContext authenticationContext,
+                                       @ComponentImport IssueManager issueManager,
                                        @ComponentImport ProjectRoleManager projectRoleManager,
                                        @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
                                        @ComponentImport ScnProjectSettingsManager projectSettignsManager,
                                        @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-                                       @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
+                                       @ComponentImport DefaultScnWorklogService scnWorklogService) {
+        this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
         this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-            overridedWorklogManager, projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
+            overridedWorklogManager, projectSettignsManager, scnUserBlockingManager, scnWorklogService);
+        this.scnWorklogService = scnWorklogService;
     }
 
     @GET
@@ -59,6 +69,13 @@ public class LTUpdateScnWorklogsResource {
             return Response.ok("NOTHING TO SAVE").build();
 
         Issue issue = issueManager.getIssueObject(Long.parseLong(issueId));
+        ApplicationUser appUser = authenticationContext.getLoggedInUser();
+        final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
+        if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
+            LTMessages message = new LTMessages("BLOCKED");
+            return Response.ok(message).build();
+        }
+
         Map<String, String> wlToCreate = wlsToSave.stream()
             .collect(Collectors.toMap(v -> getWlIdFromRequestParameter(v, 2), v -> v, (p, n) -> n)).entrySet()
             .stream().filter(e -> !getWlIdFromRequestParameter(e.getValue(), 0).isEmpty())
