@@ -11,3 +11,4 @@
 *.java eol=lf
 *.properties  eol=lf
 *.xml eol=lf
+*.soy eol=lf

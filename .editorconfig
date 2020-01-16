@@ -28,3 +28,7 @@ indent_size = 4
 [*.vm]
 indent_style = space
 indent_size = 4
+
+[*.soy]
+indent_style = space
+indent_size = 4
