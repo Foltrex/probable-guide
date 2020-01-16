@@ -75,9 +75,9 @@
 					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
-					<skipITs>true</skipITs>
-					<skipUTs>true</skipUTs>
-					<skipAllPrompts>true</skipAllPrompts>
+					<skipITs>${skipTests}</skipITs>
+					<skipUTs>${skipTests}</skipUTs>
+					<skipAllPrompts>${skipTests}</skipAllPrompts>
 					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
 <!--					<skipRestDocGeneration>true</skipRestDocGeneration>-->
 <!--					<skipManifestValidation>true</skipManifestValidation>-->
@@ -85,9 +85,10 @@
 <!--					<enableDevToolbox>false</enableDevToolbox>-->
 <!--					<enablePde>false</enablePde>-->
 <!--					<extractDependencies>false</extractDependencies>-->
-<!--					<systemProperties>-->
-<!--						<atlassian.dev.mode>false</atlassian.dev.mode>-->
-<!--					</systemProperties>-->
+					<systemProperties>
+                        <atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
+					</systemProperties>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -64,9 +64,9 @@
 					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
-					<skipITs>true</skipITs>
-					<skipUTs>true</skipUTs>
-					<skipAllPrompts>true</skipAllPrompts>
+                    <skipITs>${skipTests}</skipITs>
+                    <skipUTs>${skipTests}</skipUTs>
+                    <skipAllPrompts>${skipTests}</skipAllPrompts>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -25,31 +25,6 @@
 		<url>http://www.scnsoft.com</url>
 	</organization>
 	
-	<properties>
-		<jira.version>8.0.2</jira.version>
-		<amps.version>8.0.2</amps.version>
-		<jira.servicedesk.application.version>4.0.2</jira.servicedesk.application.version>
-		<atlassian-rest-common>5.0.1</atlassian-rest-common>
-		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
-		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
-		<atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
-		<org.mapstruct.version>1.3.0.Final</org.mapstruct.version>
-		<quick.reload.version>3.0.0</quick.reload.version>
-		
-		<jsr311-api>1.1.1</jsr311-api>
-		<jcip>1.0</jcip>
-		<mapstruct>1.3.0.Final</mapstruct>
-		<ao.version>3.0.0</ao.version>
-		<jsoup.version>1.8.3</jsoup.version>
-		<jtds.version>1.3.1</jtds.version>
-		
-		<junit>4.11</junit>
-		<!-- Maven project settings -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-	</properties>
-	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -115,7 +90,6 @@
 				<artifactId>jtds</artifactId>
 				<version>${jtds.version}</version>
 			</dependency>
-			
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
@@ -124,7 +98,34 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+    
+    <properties>
+        <jira.version>8.0.2</jira.version>
+        <amps.version>8.0.2</amps.version>
+        <jira.servicedesk.application.version>4.0.2</jira.servicedesk.application.version>
+        <atlassian-rest-common>5.0.1</atlassian-rest-common>
+        <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
+        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <org.mapstruct.version>1.3.0.Final</org.mapstruct.version>
+        <quick.reload.version>3.0.0</quick.reload.version>
+        
+        <jsr311-api>1.1.1</jsr311-api>
+        <jcip>1.0</jcip>
+        <mapstruct>1.3.0.Final</mapstruct>
+        <ao.version>3.0.0</ao.version>
+        <jsoup.version>1.8.3</jsoup.version>
+        <jtds.version>1.3.1</jtds.version>
+        
+        <junit>4.11</junit>
+        <!-- Maven project settings -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <atlassian.dev.mode>false</atlassian.dev.mode>
+        <skipTests>true</skipTests>
+    </properties>
+    
 	<profiles>
 		<profile>
 			<!-- Profile for build all trunk pursuant base line this super-pom -->
@@ -134,10 +135,10 @@
 			<id>build-all-trunk</id>
 			<modules>
 				<module>scn-worklog-plugin</module>
-<!--				<module>scn-mytime-gadget-plugin</module>-->
+				<module>scn-mytime-gadget-plugin</module>
 				<module>scn-logtime-plugin</module>
-<!--				<module>scn-timesheet-plugin</module>-->
-<!--				<module>scn-clone-project-plugin</module>-->
+				<module>scn-timesheet-plugin</module>
+				<module>scn-clone-project-plugin</module>
 			</modules>
 		</profile>
 		<profile>
