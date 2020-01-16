@@ -1,11 +1,9 @@
 function showErrorMessage(title, message) {
-    AJS.messages.error({
+    AJS.flag({
+        type: 'error',
         title: title,
-        body: '<p> %1</p>'.replace('%1', message),
-        fadeout: true,
-        delay: 1000,
-        duration: 3000,
-        closeable: true
+        close: 'auto',
+        body: message,
     });
 }
 

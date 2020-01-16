@@ -1,8 +1,7 @@
 #if ($loggedin)
 <style type="text/css">
 </style>
-<div id="aui-message-bar">
-</div>
+
 <div id="blanket" style="display:none"></div>
 <div id="popUpDiv" style="display:none">
     <input type="text" size="30" value="def" id="pop_edit">

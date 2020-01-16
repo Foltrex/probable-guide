@@ -484,10 +484,3 @@ td.emptyTd {
 .spanWrap {
     white-space: nowrap;
 }
-
-#aui-message-bar {
-    position: absolute;
-    width: 400px;
-    top: 5px;
-    right: 5px;
-}
