@@ -49,12 +49,36 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
+                    <productDataPath>${basedir}/src/test/resources/generated-test-resources.zip</productDataPath>
 					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
                     <skipITs>${skipTests}</skipITs>
                     <skipUTs>${skipTests}</skipUTs>
                     <skipAllPrompts>${skipTests}</skipAllPrompts>
+                    <systemProperties>
+                        <atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+                        <atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
+                    </systemProperties>
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jiraIT</instanceId>
+                            <version>${jira.version}</version>
+                            <productDataVersion>${jira.version}</productDataVersion>
+                        </product>
+                    </products>
+                    <testGroups>
+                        <testGroup>
+                            <id>integration</id>
+                            <productIds>
+                                <productId>jiraIT</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*Test.java</include>
+                            </includes>
+                        </testGroup>
+                    </testGroups>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -76,4 +100,13 @@
 			</plugin>
 		</plugins>
 	</build>
+    
+    <profiles>
+        <profile>
+            <id>test</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
 </project>
