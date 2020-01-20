@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class CloneProjectResourceFuncTest {
     String baseUrl;
@@ -57,10 +58,10 @@ public class CloneProjectResourceFuncTest {
         assertEquals("url", data.url, "http://newUrl.com");
         assertEquals("assignee type", data.assigneetype.longValue(), 3);
         assertEquals("category", data.category, "Atlassian");
-        assertEquals("workflowscheme", data.workflowscheme, "ATLASSUPP: Project Management Workflow Scheme");
-        assertEquals("issuetypescheme", data.issuetypescheme, "ATLASSUPP: Project Management Issue Type Scheme");
-        assertEquals("issuetypesceeenscheme", data.issuetypesceeenscheme, "ATLASSUPP: Project Management Issue Type Screen Scheme");
-        assertEquals("fieldconfigurationscheme", data.fieldconfigurationscheme, "System Default Field Configuration");
+        assertEquals("workflowscheme", data.workflowscheme, "ATLASDEV: Project Management Workflow Scheme");
+        assertEquals("issuetypescheme", data.issuetypescheme, "ATLASDEV: Project Management Issue Type Scheme");
+        assertEquals("issuetypesceeenscheme", data.issuetypesceeenscheme, "ATLASDEV: Project Management Issue Type Screen Scheme");
+        assertNull("fieldconfigurationscheme", data.fieldconfigurationscheme);
         assertEquals("permissionscheme", data.permissionscheme, "Default Permission Scheme");
         assertEquals("notificationscheme", data.notificationscheme, "Default Notification Scheme");
 
