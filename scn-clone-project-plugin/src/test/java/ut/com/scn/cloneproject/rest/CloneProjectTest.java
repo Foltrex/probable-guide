@@ -1,4 +1,4 @@
-package com.scn.cloneproject.rest;
+package ut.com.scn.cloneproject.rest;
 
 import org.junit.Test;
 import org.junit.After;
