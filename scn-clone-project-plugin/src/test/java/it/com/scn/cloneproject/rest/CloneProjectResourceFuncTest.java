@@ -9,10 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class CloneProjectResourceFuncTest {
-    String baseUrl;
+    private String baseUrl;
 
     @Before
     public void setup() {
@@ -21,7 +20,6 @@ public class CloneProjectResourceFuncTest {
 
     @After
     public void tearDown() {
-
     }
 
     @Test
@@ -61,7 +59,7 @@ public class CloneProjectResourceFuncTest {
         assertEquals("workflowscheme", data.workflowscheme, "ATLASDEV: Project Management Workflow Scheme");
         assertEquals("issuetypescheme", data.issuetypescheme, "ATLASDEV: Project Management Issue Type Scheme");
         assertEquals("issuetypesceeenscheme", data.issuetypesceeenscheme, "ATLASDEV: Project Management Issue Type Screen Scheme");
-        assertNull("fieldconfigurationscheme", data.fieldconfigurationscheme);
+        assertEquals("fieldconfigurationscheme", data.fieldconfigurationscheme, "Test field configuration scheme");
         assertEquals("permissionscheme", data.permissionscheme, "Default Permission Scheme");
         assertEquals("notificationscheme", data.notificationscheme, "Default Notification Scheme");
 
@@ -74,7 +72,8 @@ public class CloneProjectResourceFuncTest {
     @Test
     public void noAuthenticatedPOST() {
         // TMP project and other data should be pre-created according to pom/productDataPath
-        String resourceUrl = baseUrl + String.format("/rest/cloneproject/1.0/doclone?pkey=%s&pname=%s&templatekey=%s&lead=%s", "ATLASSUPP", "ATLASSUPP", "ATLASDEV", "admin");
+        String resourceUrl = baseUrl + String.format("/rest/cloneproject/1.0/doclone?pkey=%s&pname=%s&templatekey=%s&lead=%s&url=%s",
+            "ATLASSUPP", "ATLASSUPP", "ATLASDEV", "admin", "http://newUrl.com");
 
         Client client2 = Client.create();
         ClientResponse response = client2.resource(resourceUrl).post(ClientResponse.class);
@@ -84,7 +83,8 @@ public class CloneProjectResourceFuncTest {
     @Test
     public void insufficientPermissionPOST() {
         // TMP project and other data should be pre-created according to pom/productDataPath
-        String resourceUrl = baseUrl + String.format("/rest/cloneproject/1.0/doclone?pkey=%s&pname=%s&templatekey=%s&lead=%s", "ATLASSUPP", "ATLASSUPP", "ATLASDEV", "admin");
+        String resourceUrl = baseUrl + String.format("/rest/cloneproject/1.0/doclone?pkey=%s&pname=%s&templatekey=%s&lead=%s",
+            "ATLASSUPP", "ATLASSUPP", "ATLASDEV", "admin");
 
         Client client2 = Client.create();
         client2.addFilter(new HTTPBasicAuthFilter("user", "user"));
