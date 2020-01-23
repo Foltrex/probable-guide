@@ -98,7 +98,7 @@
                 <td class="filterView">
                     <div style="display: flex;">
                         <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
-                        <label id="periodId"></label>
+                        <button id="periodId" class="aui-button aui-date-picker" type="date"></button>
                         <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
                         <button id="viewButton" class="btn-view" style="margin-left:20px" onclick="changeView()">Weekly view</button>
                         <button class="showWorklog" style="margin-left:10px" onclick="reloadMeClean()">Show Work Log </button>
@@ -114,7 +114,11 @@
 		<br></br>
 
 		 <script type="text/javascript">
-			 			 
+				AJS.$(document).ready(function() {
+    				AJS.$('#periodId').datePicker({
+    					'overrideBrowserDefault': true
+    				});
+				});
 			    // Get userprefs
 			   //var prefs = new gadgets.Prefs();
 			

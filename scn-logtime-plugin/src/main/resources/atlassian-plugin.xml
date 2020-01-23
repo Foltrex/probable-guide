@@ -61,6 +61,7 @@
         </resource>
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:aui-flag</dependency>
+		<dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
         <dependency>com.atlassian.jira.gadgets:common</dependency>
         <dependency>com.atlassian.jira.webresources:select-pickers</dependency>
         <dependency>com.atlassian.gadgets.publisher:ajs-gadgets</dependency>
