@@ -348,7 +348,7 @@
                                                     #set($dayColor = $wlRep.getWlScnRepresentation().getDayColor())
 
                                                     #if( $timeSpentScn!="")
-                                                        <td class="table-col spanWrap $color $dayColor" id='$selCount'
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount"
                                                             title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlScnRepresentation().getComment()'
                                                             class="nav issuetype"
@@ -356,7 +356,7 @@
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
                                                             nowrap>$timeSpentScn</td>
                                                     #else
-                                                        <td class="table-col spanWrap $color $dayColor" id='$selCount'
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount" class="nav issuetype"
                                                             onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
@@ -365,7 +365,7 @@
 
                                                     <script type="text/javascript">
                                                         arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlScnRepresentation().getId()' + '_' + '$wlRep.getWlScnRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
-                                                        arrayCountS['$userCount']['$selCountS'] = '$selCount';
+                                                        arrayCountS['$userCount']['$selCountS'] = '_$selCount';
                                                         arrayCountComments['$selCount'] = '$wlRep.getWlScnRepresentation().getComment()';
                                                     </script>
                                                     #set($selCount = $selCount+1)
@@ -384,14 +384,14 @@
                                                     #end
 
 
-                                                    <div style="display: none;" id='$selCount'>$timeSpent</div>
+                                                    <div style="display: none;" id='_$selCount'>$timeSpent</div>
                                                     <script type="text/javascript">
                                                         arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlScnRepresentation().getId()' + '_' + '$wlRep.getWlScnRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
-                                                        arrayCountS['$userCount']['$selCountS'] = '$selCount';
+                                                        arrayCountS['$userCount']['$selCountS'] = '_$selCount';
                                                         arrayCountComments['$selCount'] = '$wlRep.getWlScnRepresentation().getComment()';
                                                     </script>
                                                     #if($extWlCheck==false || $project.getPermission()==false)
-                                                        <td class="table-col $color $dayColor" id='$selCount'
+                                                        <td class="table-col $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount"></td>
                                                     #end
                                                     #set($selCount = $selCount+1)
@@ -429,7 +429,7 @@
                                                     #set($dayColor = $wlRep.getWlExtRepresentation().getDayColor())
 
                                                     #if( $timeSpent!="")
-                                                        <td class="table-col spanWrap $color $dayColor" id='$selCount'
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount"
                                                             title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlExtRepresentation().getComment()'
                                                             class="nav issuetype"
@@ -437,7 +437,7 @@
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')"
                                                             nowrap>$timeSpent</td>
                                                     #else
-                                                        <td class="table-col spanWrap $color $dayColor" id='$selCount'
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount"
                                                             class="nav issuetype"
                                                             onDblclick="openinplace('$userCount','$selCountE','$selCount','false')"
@@ -448,7 +448,7 @@
                                                     <script type="text/javascript">
 
                                                         arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlExtRepresentation().getId()' + '_' + '$wlRep.getWlExtRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
-                                                        arrayCountE['$userCount']['$selCountE'] = '$selCount';
+                                                        arrayCountE['$userCount']['$selCountE'] = '_$selCount';
                                                         var tmpExample = arrayCount['$selCount'];
                                                         arrayCountComments['$selCount'] = '$wlRep.getWlExtRepresentation().getComment()';
 
@@ -470,11 +470,11 @@
                                                         #set($timeSpent = "")
                                                     #end
 
-                                                <div style="display: none;" id='$selCount'>$timeSpent</div>
+                                                <div style="display: none;" id='_$selCount'>$timeSpent</div>
                                                 <script type="text/javascript">
 
                                                     arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlExtRepresentation().getId()' + '_' + '$wlRep.getWlExtRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
-                                                    arrayCountE['$userCount']['$selCountE'] = '$selCount';
+                                                    arrayCountE['$userCount']['$selCountE'] = '_$selCount';
                                                     var tmpExample = arrayCount['$selCount'];
                                                     arrayCountComments['$selCount'] = '$wlRep.getWlExtRepresentation().getComment()';
 
