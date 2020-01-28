@@ -98,7 +98,7 @@
                 <td class="filterView">
                     <div style="display: flex;">
                         <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
-                        <button id="periodId" class="aui-button aui-date-picker" type="date"></button>
+                        <button id="periodId" class="aui-button aui-date-picker" type="date" onchange="changePeriod()"></button>
                         <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
                         <button id="viewButton" class="btn-view" style="margin-left:20px" onclick="changeView()">Weekly view</button>
                         <button class="showWorklog" style="margin-left:10px" onclick="reloadMeClean()">Show Work Log </button>
@@ -376,8 +376,8 @@
             	reloadMe();
             	currentPeriod=0;
 			};		
-			
-			
+
+
 			function slideForward(){
 				currentPeriod=0;	
 				
@@ -396,6 +396,15 @@
 				slideStep = document.getElementById('slideStepHidden').value;
 				
 				reloadMe();			
+			}
+
+			function changePeriod() {
+    			let periodicity = (document.getElementById('viewButton').innerHTML === 'Weekly view') ? 'month' : 'isoWeek';
+    			let diff = moment(AJS.$('#periodId').val()).startOf(periodicity).diff(moment().startOf(periodicity), (periodicity === 'month') ? 'months' : 'weeks', true);
+    			currentPeriod = 0;
+    			AJS.$('#slideStepHidden').val(diff);
+    			slideStep = diff;
+    			reloadMe();
 			}
 			
 			function customKeyUp(event,isScn,userIdentifier,identifierSE,value,idetifier){
