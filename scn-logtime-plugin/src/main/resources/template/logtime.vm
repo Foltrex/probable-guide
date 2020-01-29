@@ -62,7 +62,7 @@
             <td class="select_pop"></td>
             <td class="select_pop"></td>
             <td id="updateWL" class="select_pop">
-                <button class="saveUpdate" onclick="addUpdateWorklog()">Update</button>
+                <button id="popupUpdateButton" class="saveUpdate" onclick="addUpdateWorklog()">Update</button>
             </td>
             <td class="select_pop">
                 <button class="saveUpdate" onclick="cancelWorklogAJAX()">Cancel</button>

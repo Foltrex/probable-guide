@@ -84,6 +84,7 @@ var current_editId = "";
 var doubleckicked = false;
 var clicked = false;
 var closedEdit = false;
+const defaultTimeValue = '8h';
 
 function openinplaceSlow(userIdentifier, identifierSE, idetifier, isScn) {
     setTimeout(function () {
@@ -296,14 +297,14 @@ function addWorklog(event, userCount, identifier, addWlComment, dateWeek, userKe
 
     document.getElementById("pop_edit_worklog_id").value = identifier;
 
-    var editableCellId = document.getElementById("pop_edit_worklog_id").value;
-
-    // get value from table
-    document.getElementById("pop_time").value = document.getElementById(editableCellId).innerHTML;
+    let editableCellId = document.getElementById("pop_edit_worklog_id").value;
+    let timeSpent = document.getElementById(editableCellId).innerHTML;
+    document.getElementById("pop_time").value = (timeSpent && timeSpent !== 'h') ? timeSpent : defaultTimeValue;
+    document.getElementById("popupUpdateButton").innerText = (timeSpent && timeSpent !== 'h') ? 'Update' : 'Create';
 
     setTimeout(function () {
-        document.getElementById("pop_time").focus();
-    }, 100);
+        document.getElementById("pop_time").select();
+    });
 
     document.getElementById("textpopUp").value = document.getElementById(addWlComment).value;
 
@@ -353,11 +354,12 @@ function updateWorklog1(event, selCount, identifier, isExternal, timeSpent, wlty
     }
 
     // get value from table
-    document.getElementById("pop_time").value = timeSpent;
+    document.getElementById("pop_time").value = (timeSpent && timeSpent !== 'h') ? timeSpent : defaultTimeValue;
+    document.getElementById("popupUpdateButton").innerText = (timeSpent && timeSpent !== 'h') ? 'Update' : 'Create';
 
     setTimeout(function () {
-        document.getElementById("pop_time").focus();
-    }, 100);
+        document.getElementById("pop_time").select();
+    });
     //document.getElementById("textpopUp").value = comment;
     document.getElementById("textpopUp").value = arrayCountComments[selCount];
     document.getElementById('worklogTypeSelect').value = wltypeId;
