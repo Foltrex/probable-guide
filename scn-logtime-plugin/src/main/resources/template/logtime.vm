@@ -352,13 +352,13 @@
                                                             tabindex="$selCount"
                                                             title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlScnRepresentation().getComment()'
                                                             class="nav issuetype"
-                                                            onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
+                                                            onDblclick="openinplace('$userCount','$selCountS','_$selCount','true')"
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
                                                             nowrap>$timeSpentScn</td>
                                                     #else
                                                         <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount" class="nav issuetype"
-                                                            onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
+                                                            onDblclick="openinplace('$userCount','$selCountS','_$selCount','true')"
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
                                                             nowrap>$timeSpentScn</td>
                                                     #end
@@ -433,14 +433,14 @@
                                                             tabindex="$selCount"
                                                             title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlExtRepresentation().getComment()'
                                                             class="nav issuetype"
-                                                            onDblclick="openinplace('$userCount','$selCountE','$selCount','false')"
+                                                            onDblclick="openinplace('$userCount','$selCountE','_$selCount','false')"
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')"
                                                             nowrap>$timeSpent</td>
                                                     #else
                                                         <td class="table-col spanWrap $color $dayColor" id='_$selCount'
                                                             tabindex="$selCount"
                                                             class="nav issuetype"
-                                                            onDblclick="openinplace('$userCount','$selCountE','$selCount','false')"
+                                                            onDblclick="openinplace('$userCount','$selCountE','_$selCount','false')"
                                                             onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')"
                                                             nowrap>$timeSpent</td>
                                                     #end
