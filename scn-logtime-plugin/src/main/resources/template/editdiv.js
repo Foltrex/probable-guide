@@ -177,16 +177,15 @@ function inplace(userIdentifier, identifierSE, idetifier, isScn) {
         return;
     }
     if (current_editId != "") {
-        var val = document.getElementById(current_editId + "_inplace").value;
-        document.getElementById(current_editId).innerHTML = val;
-
+        let val = document.getElementById(current_editId + "_inplace").value;
+        document.getElementById('_' + current_editId).innerHTML = val;
     }
     current_editId = idetifier;
-    var value = document.getElementById(idetifier).innerHTML;
-    document.getElementById(idetifier).innerHTML = "<table><tr><td class=\"editble-input-td\"><input class=\"editble-input\" type=\"text\" size=\"5px\" onkeydown=\"customKeyUp(event,\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\',\'" + value + "\',\'" + idetifier + "\')\" onChange=\"onFunctionLost(\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\')\" name=\"t\" id=\"" + idetifier + "_inplace\" value=\"" + value + "\" autofocus></td><td class=\"editble-button\"><button id=\"closebtn\" onClick=\"closeInplace(\'" + value + "\',\'" + idetifier + "\')\" class=\"close-small-btn\"/></td></tr></table> ";
+    let value = document.getElementById('_' + idetifier).innerHTML;
+    document.getElementById('_' + idetifier).innerHTML = "<table><tr><td class=\"editble-input-td\"><input class=\"editble-input\" type=\"text\" size=\"5px\" onkeydown=\"customKeyUp(event,\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\',\'" + value + "\',\'" + idetifier + "\')\" onChange=\"onFunctionLost(\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\')\" name=\"t\" id=\"" + idetifier + "_inplace\" value=\"" + value + "\" autofocus></td><td class=\"editble-button\"><button id=\"closebtn\" onClick=\"closeInplace(\'" + value + "\',\'" + idetifier + "\')\" class=\"close-small-btn\"/></td></tr></table> ";
     setTimeout(function () {
-        document.getElementById(current_editId + "_inplace").focus();
-    }, 100);
+        document.getElementById(current_editId + "_inplace").select();
+    });
 
     closedEdit = false;
 }
@@ -197,7 +196,7 @@ var timepattern3 = /^\s*([0-9]*)\s*$/;
 var timepattern4 = /^\s*([1-9]*[0-9]*)\s*$/;
 
 function closeInplace(val, idetifier) {
-    document.getElementById(idetifier).innerHTML = val;
+    document.getElementById('_' + idetifier).innerHTML = val;
     current_editId = "";
     clicked = false;
     closedEdit = true;
@@ -224,15 +223,13 @@ function onFunctionLost1(isScn, userIdentifier, identifierSE) {
         isValidated = true;
     } else {
         isValidated = false;
-        document.getElementById(current_editId).style.color = "red";
+        document.getElementById('_' + current_editId).style.color = "red";
         closeInplace(val, current_editId);
         return;
     }
 
     if (isValidated == true) {
-        document.getElementById(current_editId).innerHTML = correctTime(val);
-        //document.getElementById(current_editId).style.color="red";
-        //var	current_editId_save=current_editId;
+        document.getElementById('_' + current_editId).innerHTML = correctTime(val);
         if (isScn != 'true') {
             if (document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML != "") {
                 var complexId2 = arrayCount[arrayCountS[userIdentifier][identifierSE]];
