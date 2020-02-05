@@ -93,7 +93,7 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 		this.ofBizScnWorklogStore = ofBizScnWorklogStore;
 		this.projectSettignsManager = projectSettignsManager;
 		this.scnUserBlockingManager = scnUserBlockingManager;
-		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
+		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager);
 		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
 				worklogManager, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
 		this.calendarMap = new HashMap<String, Map<String, Integer>>();

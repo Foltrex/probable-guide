@@ -185,7 +185,7 @@ function inplace(userIdentifier, identifierSE, idetifier, isScn) {
     document.getElementById('_' + idetifier).innerHTML = "<table><tr><td class=\"editble-input-td\"><input class=\"editble-input\" type=\"text\" size=\"5px\" onkeydown=\"customKeyUp(event,\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\',\'" + value + "\',\'" + idetifier + "\')\" onChange=\"onFunctionLost(\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\')\" name=\"t\" id=\"" + idetifier + "_inplace\" value=\"" + value + "\" autofocus></td><td class=\"editble-button\"><button id=\"closebtn\" onClick=\"closeInplace(\'" + value + "\',\'" + idetifier + "\')\" class=\"close-small-btn\"/></td></tr></table> ";
     setTimeout(function () {
         document.getElementById(current_editId + "_inplace").select();
-    });
+    }, 50);
 
     closedEdit = false;
 }
@@ -301,7 +301,7 @@ function addWorklog(event, userCount, identifier, addWlComment, dateWeek, userKe
 
     setTimeout(function () {
         document.getElementById("pop_time").select();
-    });
+    }, 50);
 
     document.getElementById("textpopUp").value = document.getElementById(addWlComment).value;
 
@@ -356,7 +356,7 @@ function updateWorklog1(event, selCount, identifier, isExternal, timeSpent, wlty
 
     setTimeout(function () {
         document.getElementById("pop_time").select();
-    });
+    }, 50);
     //document.getElementById("textpopUp").value = comment;
     document.getElementById("textpopUp").value = arrayCountComments[selCount];
     document.getElementById('worklogTypeSelect').value = wltypeId;
@@ -467,13 +467,9 @@ function updateWorklogAJAX() {
     if (isValidated) {
         var userIdentifier = document.getElementById('pop_user_identifier').value;
         var identifierSE = document.getElementById('pop_identifier_SE').value;
-
+        let complexId2;
         if (isExt == 'true') {
-            if (document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML != "") {
-                var complexId2 = arrayCount[arrayCountS[userIdentifier][identifierSE]];
-            } else {
-                var complexId2 = "";
-            }
+            complexId2 = "";
         } else {
             complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
         }

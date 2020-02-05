@@ -39,8 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 @Named
 @Path("/updateScnWorklogs")
-public class LTUpdateScnWorklogsResource {
-    private JiraAuthenticationContext authenticationContext;
+public class LTUpdateScnWorklogsResource extends BaseResource {
     private IssueManager issueManager;
     private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
     private IScnWorklogService scnWorklogService;
@@ -69,7 +68,7 @@ public class LTUpdateScnWorklogsResource {
             return Response.ok("NOTHING TO SAVE").build();
 
         Issue issue = issueManager.getIssueObject(Long.parseLong(issueId));
-        ApplicationUser appUser = authenticationContext.getLoggedInUser();
+        ApplicationUser appUser = getLoggedInUser();
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
         if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
             LTMessages message = new LTMessages("BLOCKED");
@@ -131,19 +130,5 @@ public class LTUpdateScnWorklogsResource {
                                   String _comment, String authorKey, Date date, String worklogTypeId) {
         iScnWorklogLogtimeStore.createScnWorklog(issueId, _worklogType, _timeSpent, _comment, authorKey, date,
             worklogTypeId);
-    }
-
-    public String getWlIdFromRequestParameter(String identifier, int i) {
-        // TESS-1_10000_0_08-01_143
-        // 2-wlid
-        // 3-date
-        // 1-wlTypeId
-        // 0-issueId
-        if (identifier != null && identifier.contains("_")) {
-            String[] arr = identifier.split("_");
-            return arr[i];
-        } else {
-            return "";
-        }
     }
 }
