@@ -1,6 +1,5 @@
 package com.scn.jira.logtime.resource;
 
-import com.atlassian.jira.bc.issue.worklog.WorklogService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
@@ -13,8 +12,6 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
 import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
@@ -24,7 +21,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -33,23 +29,19 @@ import java.util.regex.Matcher;
 
 @Named
 @Path("/getIssues")
-public class LTIssueResource {
-    private JiraAuthenticationContext authenticationContext;
+public class LTIssueResource extends BaseResource {
     private ProjectManager projectManager;
     private IssueManager issueManager;
     private WorklogManager worklogManager;
-    private ExtendedWorklogManager extendedWorklogManager;
 
     @Inject
     public LTIssueResource(@ComponentImport JiraAuthenticationContext authenticationContext,
                            @ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
-                           @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                           @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager, WorklogService worklogService) {
+                           @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager) {
         this.authenticationContext = authenticationContext;
         this.projectManager = projectManager;
         this.issueManager = issueManager;
         this.worklogManager = overridedWorklogManager;
-        this.extendedWorklogManager = extendedWorklogManager;
     }
 
     @GET
@@ -83,7 +75,7 @@ public class LTIssueResource {
         ArrayList<Long> issuesIds = new ArrayList<>();
         issuesList.add("");
         issuesIds.add(0L);
-        ApplicationUser user = authenticationContext.getLoggedInUser();
+        ApplicationUser user = getLoggedInUser();
         for (Issue issue : issues) {
             if (issueManager.isEditable(issue, user)) {
                 issuesIds.add(issue.getId());
@@ -120,11 +112,5 @@ public class LTIssueResource {
             return 0;
         }
         return 0;
-    }
-
-    private CacheControl getNoCacheControl() {
-        CacheControl noCache = new CacheControl();
-        noCache.setNoCache(true);
-        return noCache;
     }
 }

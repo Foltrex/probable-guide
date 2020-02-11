@@ -42,7 +42,6 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.*;
@@ -51,17 +50,13 @@ import java.util.stream.Stream;
 
 import static com.scn.jira.worklog.globalsettings.GlobalSettingsManager.SCN_TIMETRACKING;
 
-/**
- * REST resource that provides a list of projects in JSON format.
- */
 @Named
 @Path("/projectsobj")
-public class LTProjectsResource {
+public class LTProjectsResource extends BaseResource {
     private static final Logger LOGGER = Logger.getLogger(LTProjectsResource.class);
 
     private UserManager userManager;
     private PermissionManager permissionManager;
-    private JiraAuthenticationContext authenticationContext;
     private ProjectManager projectManager;
     private ExtendedConstantsManager extendedConstantsManager;
     private IGlobalSettingsManager scnGlobalPermissionManager;
@@ -101,10 +96,9 @@ public class LTProjectsResource {
                                  @FormParam("usersSelected") String usersSelected, @FormParam("viewType") String viewType) {
         int scnWl = ServletUtil.getIntParam(request, "scnWl", 1);
         int extWl = ServletUtil.getIntParam(request, "extWl", 1);
-        int assignedCheck = ServletUtil.getIntParam(request, "assignedCheck", 1);
 
         // Logged in user
-        ApplicationUser user = getUser(request);
+        ApplicationUser user = getLoggedInUser();
 
         List<String> selectedProjects = (prjList != null && !prjList.equals("")) ? Arrays.asList(prjList.split(","))
             : new ArrayList<>();
@@ -118,7 +112,7 @@ public class LTProjectsResource {
         try {
             response = Response
                 .ok(new LogTimeRepresentation(vm.getBody("template/", "logtime.vm", getVelocityParams(request,
-                    selectedProjects, scnWl, extWl, assignedCheck, selectedUsers, viewType))))
+                    selectedProjects, scnWl, extWl, selectedUsers, viewType))))
                 .cacheControl(getNoCacheControl()).build();
         } catch (VelocityException e) {
             LOGGER.error(e.getMessage());
@@ -127,18 +121,14 @@ public class LTProjectsResource {
         return response;
     }
 
-    private ApplicationUser getUser(HttpServletRequest request) {
-        return ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-    }
-
     private Map<String, Object> getVelocityParams(HttpServletRequest request, List<String> projectIds, int scnWlCheck,
-                                                  int extWlCheck, int assignedCheck, List<String> users, String viewType) {
+                                                  int extWlCheck, List<String> users, String viewType) {
         int currentPeriod = ServletUtil.getIntParam(request, "currentPeriod", 0);
         int currentslideStep = ServletUtil.getIntParam(request, "currentslideStep", 0);
 
-        ApplicationUser appuser = getUser(request);
+        ApplicationUser appuser = getLoggedInUser();
 
-        Map<String, Object> params = getVelocityParams(appuser, projectIds, scnWlCheck, extWlCheck, assignedCheck,
+        Map<String, Object> params = getVelocityParams(appuser, projectIds, scnWlCheck, extWlCheck,
             users, viewType, currentPeriod, currentslideStep);
 
         params.put("i18n", this.authenticationContext.getI18nHelper());
@@ -148,7 +138,7 @@ public class LTProjectsResource {
     }
 
     private Map<String, Object> getVelocityParams(ApplicationUser loggeduser, List<String> projectIds, int scnWlCheck,
-                                                  int extWlCheck, int assignedCheck, List<String> users, String viewType, int currentperiod,
+                                                  int extWlCheck, List<String> users, String viewType, int currentperiod,
                                                   int currentslideStep) {
         Date date = new Date();
 
@@ -212,7 +202,7 @@ public class LTProjectsResource {
         params.put("scnWlCheck", scnWlCh);
         params.put("extWlCheck", extWlCh);
         List<LTProjectsRepresentation> ltProjectsRepresentations = getLTProjectRepresentation(loggeduser, projectIds,
-            startDate, endDate, scnWlCh, extWlCh, false, users, calendarMap);
+            startDate, endDate, scnWlCh, extWlCh, users, calendarMap);
         ltProjectsRepresentations.sort((o1, o2) -> {
             if (o1.getUserName() != null && o2.getUserName() != null) {
                 return o1.getUserName().compareTo(o2.getUserName());
@@ -258,7 +248,7 @@ public class LTProjectsResource {
 
     private List<LTProjectsRepresentation> getLTProjectRepresentation(ApplicationUser loggedUser,
                                                                       List<String> projectIds, Date startDate, Date endDate, boolean scnWlCheck, boolean extWlCheck,
-                                                                      boolean assignedCh, List<String> users, Map<String, Map<String, Integer>> calendarMap) {
+                                                                      List<String> users, Map<String, Map<String, Integer>> calendarMap) {
         List<LTProjectsRepresentation> representations = new ArrayList<>();
         List<Long> projectIdsLong = (projectIds.size() != 0)
             ? projectIds.stream().filter(x -> x != null && !x.isEmpty()).map(x -> Long.valueOf(x.trim()))
@@ -315,7 +305,7 @@ public class LTProjectsResource {
             for (Project project : projects) {
                 LTProjectRepresentation ltProjectRepresentation = iWorklogLogtimeManager
                     .getLTProjectRepresentationBetweenDates(loggedUser, project, startDate, endDate, scnWlCheck,
-                        extWlCheck, assignedCh, userString);
+                        extWlCheck, false, userString);
 
                 for (String date : dates) {
                     Integer totalScn = totalScnList.get(date) == null ? new Integer(0) : totalScnList.get(date);
@@ -361,11 +351,5 @@ public class LTProjectsResource {
         }
 
         return representations;
-    }
-
-    private CacheControl getNoCacheControl() {
-        CacheControl noCache = new CacheControl();
-        noCache.setNoCache(true);
-        return noCache;
     }
 }
