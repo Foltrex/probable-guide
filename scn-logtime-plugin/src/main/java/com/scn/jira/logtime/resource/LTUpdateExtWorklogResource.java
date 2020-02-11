@@ -1,5 +1,6 @@
 package com.scn.jira.logtime.resource;
 
+import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.issue.worklog.WorklogInputParameters;
@@ -136,8 +137,12 @@ public class LTUpdateExtWorklogResource extends BaseResource {
         if (isBlocked || (worklogId != 0 && isValueEmplty && !worklogService.hasPermissionToDelete(serviceContext, worklog))
             || (worklogId != 0 && !isValueEmplty && !worklogService.hasPermissionToUpdate(serviceContext, worklog))
             || (worklogId == 0) && !isValueEmplty && !worklogService.hasPermissionToCreate(serviceContext, issue, false)) {
-            LTMessages message = new LTMessages("BLOCKED", false, false, null);
-            return Response.ok(message).build();
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.APPLICATION_PERMISSION_DENIED,
+                    serviceContext.getErrorCollection().getErrorMessages().stream().findFirst().orElse("Permission Denied (insufficient rights).")))
+                .status(Response.Status.FORBIDDEN)
+                .build();
         }
 
         Long wlIdExt = 0L;

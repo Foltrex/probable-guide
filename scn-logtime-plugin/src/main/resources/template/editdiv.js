@@ -253,28 +253,29 @@ function onFunctionLost1(isScn, userIdentifier, identifierSE) {
             }),
             dataType: "json",
             success: function (msg) {
-                if (msg.message === "BLOCKED") {
-                    showErrorMessage("Access error", "Unfortunately work logs are locked.");
+                if (isScn == 'true') {
+                    document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color = "green";
                 } else {
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+                }
 
-                    if (isScn == 'true') {
-                        document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color = "green";
-                    } else {
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+                if (msg.copied && identifierSE != '-1') {
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
+                        arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
                     }
+                }
 
-                    if (msg.copied && identifierSE != '-1') {
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
-                        if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
-                            arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
-                        }
-                    }
-
-                    if (msg.wlId != arrayCount[cur]) {
-                        arrayCount[cur] = msg.wlId;
-                        cur = "";
-                    }
+                if (msg.wlId != arrayCount[cur]) {
+                    arrayCount[cur] = msg.wlId;
+                    cur = "";
+                }
+            },
+            error: function ($xhr) {
+                if ($xhr.status === 403) {
+                    const data = JSON.parse($xhr.responseText);
+                    showErrorMessage(data.reason, data.message);
                 }
             }
         });
@@ -486,36 +487,37 @@ function updateWorklogAJAX() {
             }),
             dataType: "json",
             success: function (msg) {
-                if (msg.message === "BLOCKED") {
-                    showErrorMessage("Access error", "Unfortunately work logs are locked.");
+                arrayCountComments[current_editId] = replaceSymbols(commentTmp);
+                //arrayCountComments[current_editId]=commentTmp;
+                //alert(arrayCountComments[current_editId]);
+                if (isExt != 'true') {
+                    document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML = correctTime(tmpTime);
+                    document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color = "green";
+                    document.getElementById(arrayCountS[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
                 } else {
-
-                    arrayCountComments[current_editId] = replaceSymbols(commentTmp);
-                    //arrayCountComments[current_editId]=commentTmp;
-                    //alert(arrayCountComments[current_editId]);
-                    if (isExt != 'true') {
-                        document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML = correctTime(tmpTime);
-                        document.getElementById(arrayCountS[userIdentifier][identifierSE]).style.color = "green";
-                        document.getElementById(arrayCountS[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
-                    } else {
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = tmpTime;
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green"
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = tmpTime;
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green"
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
+                }
+                if (msg.copied) {
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = tmpTime;
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
+                    arrayCountComments[arrayCountE[userIdentifier][identifierSE]] = replaceSymbols(commentTmp);
+                    document.getElementById(arrayCountE[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
+                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
+                        arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
                     }
-                    if (msg.copied) {
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = tmpTime;
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
-                        arrayCountComments[arrayCountE[userIdentifier][identifierSE]] = replaceSymbols(commentTmp);
-                        document.getElementById(arrayCountE[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
-                        if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
-                            arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
-                        }
+                }
 
-                    }
-
-                    if (msg.wlId != arrayCount[current_editId]) {
-                        arrayCount[current_editId] = msg.wlId;
-                    }
+                if (msg.wlId != arrayCount[current_editId]) {
+                    arrayCount[current_editId] = msg.wlId;
+                }
+                current_editId = "";
+            },
+            error: function ($xhr) {
+                if ($xhr.status === 403) {
+                    const data = JSON.parse($xhr.responseText);
+                    showErrorMessage(data.reason, data.message);
                     current_editId = "";
                 }
             }
