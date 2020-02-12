@@ -78,6 +78,12 @@
 					<productDataVersion>${jira.version}</productDataVersion>
 					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
+					<applications>
+						<application>
+							<applicationKey>jira-software</applicationKey>
+							<version>${jira.version}</version>
+						</application>
+					</applications>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
 					<skipITs>${skipTests}</skipITs>
 					<skipUTs>${skipTests}</skipUTs>
