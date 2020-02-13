@@ -104,8 +104,6 @@ function projectAdd(projectTypeSel) {
 }
 
 function projectChanged(projectId, issueTdId, worklogTypeSel, userId, wlWlSel) {
-
-
     if (projectId == '0') {
 
         document.getElementById(worklogTypeSel).style.visibility = "hidden";
@@ -149,7 +147,6 @@ function projectChanged(projectId, issueTdId, worklogTypeSel, userId, wlWlSel) {
 }
 
 function issueChanged(userId) {
-
     var issueId = document.getElementById("issueSelect" + userId).value;
     if (issueId == '0') {
 
@@ -422,11 +419,13 @@ function addWorklogsToDb() {
         }),
         dataType: "json",
         success: function (msg) {
-            if (msg.message === "BLOCKED") {
-                showErrorMessage("Access error", "Unfortunately work logs are locked.");
-            } else {
-                checkProjects(msg.message);
-                reloadMeClean();
+            checkProjects(msg.message);
+            reloadMeClean();
+        },
+        error: function ($xhr) {
+            if ($xhr.status === 403) {
+                const data = JSON.parse($xhr.responseText);
+                showErrorMessage(data.reason, data.message);
             }
         }
     });

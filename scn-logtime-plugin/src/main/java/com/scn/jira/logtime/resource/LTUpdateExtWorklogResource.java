@@ -140,7 +140,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
             return Response.serverError()
                 .entity(new ErrorEntity(
                     ErrorEntity.ErrorReason.APPLICATION_PERMISSION_DENIED,
-                    serviceContext.getErrorCollection().getErrorMessages().stream().findFirst().orElse("Permission Denied (insufficient rights).")))
+                    serviceContext.getErrorCollection().getErrorMessages().stream().findFirst().orElse("Worklogs are blocked.")))
                 .status(Response.Status.FORBIDDEN)
                 .build();
         }

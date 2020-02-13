@@ -16,6 +16,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
@@ -71,8 +72,12 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
         ApplicationUser appUser = getLoggedInUser();
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
         if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
-            LTMessages message = new LTMessages("BLOCKED");
-            return Response.ok(message).build();
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.APPLICATION_PERMISSION_DENIED,
+                    serviceContext.getErrorCollection().getErrorMessages().stream().findFirst().orElse("Permission Denied (insufficient rights).")))
+                .status(Response.Status.FORBIDDEN)
+                .build();
         }
 
         Map<String, String> wlToCreate = wlsToSave.stream()
