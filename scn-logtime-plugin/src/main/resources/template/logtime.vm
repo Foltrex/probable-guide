@@ -200,11 +200,11 @@
                                 <td colspan="2" class="total-wicket">$wicketTotal</td>
                             </tr>
                             #end
-                            #if($projectUserKey.getUserKey()==$loggeduserKey )
+##                            #if($projectUserKey.getUserKey()==$loggeduserKey )
                             <tr class="add-project">
-                            #else
-                            <tr class="add-project" style="display:none;">
-                            #end
+##                            #else
+##                            <tr class="add-project" style="display:none;">
+##                            #end
                             <td class="add-button left">
                                 <table>
                                     <tr>
