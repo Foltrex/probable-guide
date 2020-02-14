@@ -200,31 +200,21 @@
                                 <td colspan="2" class="total-wicket">$wicketTotal</td>
                             </tr>
                             #end
-##                            #if($projectUserKey.getUserKey()==$loggeduserKey )
-                            <tr class="add-project">
-##                            #else
-##                            <tr class="add-project" style="display:none;">
-##                            #end
-                            <td class="add-button left">
+                        <tr class="add-project">
+                            <td class="add-button">
                                 <table>
                                     <tr>
+                                        #set($projectTypeSel = "projectTypeSel"+$userCount)
+                                        #set($issueTypeSel = "issueTypeSel"+$userCount)
+                                        #set($worklogTypeSel = "worklogTypeSel"+$userCount)
+                                        #set($wlWlSel = "wlWl"+$userCount)
                                         <td>
-                                            #set($projectTypeSel = "projectTypeSel"+$userCount)
-                                            #set($issueTypeSel = "issueTypeSel"+$userCount)
-                                            #set($worklogTypeSel = "worklogTypeSel"+$userCount)
-                                            #set($wlWlSel = "wlWl"+$userCount)
-                                            <button id="addbtn" class="add-btn" onclick="addWorklogsToDb()">
-                                            </button>
-                                        </td>
-                                        <td>
-
-                                            <select style="width:50px;" id='$projectTypeSel'
+                                            <select style="width:80px;" id='$projectTypeSel'
                                                     onchange="projectChanged(this.value,'$issueTypeSel','$worklogTypeSel','$userCount','$wlWlSel')">
                                                 #foreach ($prj in $projectsTest)
                                                     <option value="$prj.getId()">$prj.getName()</option>
                                                 #end
                                             </select>
-
                                         </td>
                                     </tr>
                                 </table>
@@ -264,7 +254,7 @@
                                             </button>
                                         </td>
                                         <td class="add-button">
-                                            <button class="addWorklog" onclick="addWorklogsToDb()">Add Task</button>
+                                            <button class="addWorklog" onclick="addWorklogsToDb()">Apply</button>
                                         </td>
                                     </tr>
                                 </table>
@@ -285,13 +275,21 @@
                                 #set($projectSize = $project.getRowspan())
                                 #if( $project.getName() != "" )
                                     <td class="table-col-project" rowspan=$projectSize>
-                                        <a href="$req.contextPath/browse/$project.getKey()"
-                                           target="_blank">$project.getName()</a>
+                                        $project.getName()
+                                        <a
+                                            class="aui-icon aui-icon-small aui-iconfont-add"
+                                            href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
+                                            title="Create a new issue / bug / feature request / etc ( Type 'c' )"
+                                            target="_blank"><span>Create issue</span></a>
                                     </td>
                                 #else
                                     <td class="table-col-project" rowspan=$projectSize>
-                                        <a href="$req.contextPath/browse/$project.getKey()"
-                                           target="_blank">$project.getKey()</a>
+                                        $project.getKey()
+                                        <a
+                                            class="aui-icon aui-icon-small aui-iconfont-add"
+                                            href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
+                                            title="Create a new issue / bug / feature request / etc ( Type 'c' )"
+                                            target="_blank"><span>Create issue</span></a>
                                     </td>
                                 #end
 
