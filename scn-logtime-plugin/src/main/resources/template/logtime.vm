@@ -279,7 +279,7 @@
                                         <a
                                             class="aui-icon aui-icon-small aui-iconfont-add"
                                             href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
-                                            title="Create a new issue / bug / feature request / etc ( Type 'c' )"
+                                            title="Create a new issue / bug / feature request / etc"
                                             target="_blank"><span>Create issue</span></a>
                                     </td>
                                 #else
@@ -288,7 +288,7 @@
                                         <a
                                             class="aui-icon aui-icon-small aui-iconfont-add"
                                             href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
-                                            title="Create a new issue / bug / feature request / etc ( Type 'c' )"
+                                            title="Create a new issue / bug / feature request / etc"
                                             target="_blank"><span>Create issue</span></a>
                                     </td>
                                 #end
