@@ -20,7 +20,6 @@ import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,14 +52,13 @@ public class LTUpdateScnWorklogResource extends BaseResource {
                                       @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
                                       @ComponentImport DefaultScnWorklogManager scnWorklogManager,
                                       @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                      @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
                                       @ComponentImport DefaultScnWorklogService scnWorklogService) {
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
         this.scnWorklogManager = scnWorklogManager;
         this.scnWorklogService = scnWorklogService;
         this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-            overridedWorklogManager, projectSettignsManager, scnUserBlockingManager, scnWorklogService);
+            overridedWorklogManager, projectSettignsManager, scnWorklogService);
     }
 
     @GET
@@ -107,9 +105,7 @@ public class LTUpdateScnWorklogResource extends BaseResource {
 
         IScnWorklog scnWorklog = scnWorklogManager.getById(worklogId);
         ApplicationUser appUser = getLoggedInUser();
-        boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day)
-            || (iScnWorklogLogtimeStore.isWlAutoCopy(issue, wlType)
-            && iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day)));
+        boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day));
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
         if (isBlocked || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
             || (worklogId != 0 && !isValueEmplty && !scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog))

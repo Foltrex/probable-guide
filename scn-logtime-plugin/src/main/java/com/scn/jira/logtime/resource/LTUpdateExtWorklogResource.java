@@ -24,7 +24,6 @@ import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
@@ -63,7 +62,6 @@ public class LTUpdateExtWorklogResource extends BaseResource {
                                       @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
                                       @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
                                       @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                      @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
                                       @ComponentImport DefaultScnWorklogService scnDefaultWorklogService,
                                       @ComponentImport WorklogService worklogService) {
         this.authenticationContext = authenticationContext;
@@ -73,7 +71,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
         this.projectSettignsManager = projectSettignsManager;
         this.worklogService = worklogService;
         this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager, overridedWorklogManager,
-            projectSettignsManager, scnUserBlockingManager, scnDefaultWorklogService);
+            projectSettignsManager, scnDefaultWorklogService);
     }
 
     @GET

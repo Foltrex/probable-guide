@@ -1,30 +1,5 @@
 package com.scn.jira.logtime.store;
 
-import static org.ofbiz.core.entity.EntityOperator.EQUALS;
-import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
-import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
-import static org.ofbiz.core.entity.EntityOperator.IN;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.scn.jira.logtime.util.DateUtils;
-import org.apache.commons.lang.StringUtils;
-import org.ofbiz.core.entity.EntityCondition;
-import org.ofbiz.core.entity.EntityConditionList;
-import org.ofbiz.core.entity.EntityExpr;
-import org.ofbiz.core.entity.EntityOperator;
-import org.ofbiz.core.entity.GenericValue;
-
-import com.atlassian.crowd.embedded.api.User;
-
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.exception.DataAccessException;
@@ -36,34 +11,39 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.IScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import org.apache.commons.lang.StringUtils;
+import org.ofbiz.core.entity.*;
+
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.ofbiz.core.entity.EntityOperator.*;
 
 public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 	public static final String SCN_WORKLOG_ISSUE_ENTITY = "ScnWorklogByIssueView";
-	public static final String VIEW_SCN_WORKLOG_ISSUE_ENTITY = "ViewScnWorklogByProject";
-	public static final String SCN_WORKLOG_PROJECT_ENTITY = "ScnWorklogByProjectView";
+    public static final String SCN_WORKLOG_PROJECT_ENTITY = "ScnWorklogByProjectView";
 
 	private IssueManager issueManager;
 	private ProjectRoleManager projectRoleManager;
 	private WorklogManager worklogManager;
 	private IScnProjectSettingsManager projectSettignsManager;
-	private IScnUserBlockingManager scnUserBlockingManager;
-	private IScnWorklogService scnDefaultWorklogService;
+    private IScnWorklogService scnDefaultWorklogService;
 
 	public ScnWorklogLogtimeStore(IssueManager issueManager, ProjectRoleManager projectRoleManager,
-			WorklogManager worklogManager, IScnProjectSettingsManager projectSettignsManager,
-			IScnUserBlockingManager scnUserBlockingManager, IScnWorklogService scnDefaultWorklogService) {
+                                  WorklogManager worklogManager, IScnProjectSettingsManager projectSettignsManager,
+                                  IScnWorklogService scnDefaultWorklogService) {
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;
 		this.worklogManager = worklogManager;
 		this.projectSettignsManager = projectSettignsManager;
-		this.scnUserBlockingManager = scnUserBlockingManager;
-		this.scnDefaultWorklogService = scnDefaultWorklogService;
+        this.scnDefaultWorklogService = scnDefaultWorklogService;
 	}
 
 	public List<IScnWorklog> getByProjectBetweenDates(boolean assignedCh, Project project, Date startDate, Date endDate,
@@ -79,23 +59,22 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 		List<GenericValue> worklogGVs = ComponentAccessor.getOfBizDelegator()
 				.findByCondition(SCN_WORKLOG_PROJECT_ENTITY, conditionList, null, ImmutableList.of("created ASC"));
 
-		List<Long> issueIds = new ArrayList<Long>();
+		List<Long> issueIds = new ArrayList<>();
 		for (GenericValue worklogGV : worklogGVs) {
 			issueIds.add(worklogGV.getLong("issue"));
 		}
 
 		List<Issue> issueObjects = issueManager.getIssueObjects(issueIds);
-		Map<Long, Issue> issueObjectsMap = new HashMap<Long, Issue>();
+		Map<Long, Issue> issueObjectsMap = new HashMap<>();
 
 		for (Issue issueObject : issueObjects) {
 			issueObjectsMap.put(issueObject.getId(), issueObject);
 		}
 
-		List<IScnWorklog> iScnWorklogs = new ArrayList<IScnWorklog>();
+		List<IScnWorklog> iScnWorklogs = new ArrayList<>();
 		for (GenericValue worklogGV : worklogGVs) {
 			Issue issue = issueObjectsMap.get(worklogGV.getLong("issue"));
-			if (assignedCh && issue != null && issue.getAssignee() != null && user.equals(issue.getAssignee().getName())
-					|| !assignedCh) {
+			if (!assignedCh || issue != null && issue.getAssignee() != null && user.equals(issue.getAssignee().getName())) {
 				iScnWorklogs.add(convertToWorklog(projectRoleManager, worklogGV, issue));
 			}
 		}
@@ -105,7 +84,7 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 
 	public List<IScnWorklog> getScnWorklogsByUserAndIssueBetweenDates(Issue issue, Date startDate, Date endDate,
 			String user) throws DataAccessException {
-		List<EntityCondition> conditions1 = new ArrayList<EntityCondition>();
+		List<EntityCondition> conditions1 = new ArrayList<>();
 		conditions1.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
 		conditions1.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
 		conditions1.add(new EntityExpr("issueId", EQUALS, issue.getId()));
@@ -115,21 +94,17 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 		List<GenericValue> worklogGVs = ComponentAccessor.getOfBizDelegator().findByCondition(SCN_WORKLOG_ISSUE_ENTITY,
 				conditionList, null, ImmutableList.of("created ASC"));
 
-		List<IScnWorklog> iScnWorklogs = new ArrayList<IScnWorklog>();
-		Iterator<GenericValue> worklogGVsIterator = worklogGVs.iterator();
-		while (worklogGVsIterator.hasNext()) {
-			GenericValue genericWorklog = worklogGVsIterator.next();
-
-			IScnWorklog iScnWorklog = convertToWorklog(projectRoleManager, genericWorklog, issue);
-			iScnWorklogs.add(iScnWorklog);
-
-		}
+		List<IScnWorklog> iScnWorklogs = new ArrayList<>();
+        for (GenericValue genericWorklog : worklogGVs) {
+            IScnWorklog iScnWorklog = convertToWorklog(projectRoleManager, genericWorklog, issue);
+            iScnWorklogs.add(iScnWorklog);
+        }
 		return iScnWorklogs;
 	}
 
 	public List<IScnWorklog> getScnWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate)
 			throws DataAccessException {
-		List<EntityCondition> conditions1 = new ArrayList<EntityCondition>();
+		List<EntityCondition> conditions1 = new ArrayList<>();
 		conditions1.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
 		conditions1.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
 		conditions1.add(new EntityExpr("issueId", EQUALS, issue.getId()));
@@ -138,20 +113,18 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 		List<GenericValue> worklogGVs = ComponentAccessor.getOfBizDelegator().findByCondition(SCN_WORKLOG_ISSUE_ENTITY,
 				conditionList, null, ImmutableList.of("created ASC"));
 
-		List<IScnWorklog> iScnWorklogs = new ArrayList<IScnWorklog>();
-		Iterator<GenericValue> worklogGVsIterator = worklogGVs.iterator();
-		while (worklogGVsIterator.hasNext()) {
-			GenericValue genericWorklog = worklogGVsIterator.next();
-			IScnWorklog iScnWorklog = convertToWorklog(projectRoleManager, genericWorklog, issue);
-			iScnWorklogs.add(iScnWorklog);
-		}
+		List<IScnWorklog> iScnWorklogs = new ArrayList<>();
+        for (GenericValue genericWorklog : worklogGVs) {
+            IScnWorklog iScnWorklog = convertToWorklog(projectRoleManager, genericWorklog, issue);
+            iScnWorklogs.add(iScnWorklog);
+        }
 		return iScnWorklogs;
 	}
 
 	@Override
 	public List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users,
 			Date startDate, Date endDate) throws DataAccessException {
-		List<EntityCondition> conditions = new ArrayList<EntityCondition>();
+		List<EntityCondition> conditions = new ArrayList<>();
 		conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
 		conditions.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
 		conditions.add(new EntityExpr("projectId", IN, projectIds));
@@ -166,7 +139,7 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 	public Map<String, Object> createScnWorklogResultMap(Long issueId, String _worklogType, Long _timeSpent,
 			String _comment, String authorKey, Date date, String worklogTypeId) throws DataAccessException {
 
-		Map<String, Object> resultMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<>();
 
 		IScnWorklog worklog = formScnWorklog(issueId, _timeSpent, null, _comment, authorKey, date, _worklogType);
 		boolean isAutoCopy = false;
@@ -278,7 +251,7 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 				.updateAndAutoAdjustRemainingEstimate(
 						new JiraServiceContextImpl(ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser()),
 						updateWorklog(String.valueOf(_timeSpent), scnWorklog,
-								_worklogType != null ? String.valueOf(_worklogType) : null, _comment),
+                            _worklogType, _comment),
 						true, isAutoCopy);
 		return isAutoCopy;
 
@@ -322,7 +295,7 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 		Timestamp startDateTS = gv.getTimestamp("startdate");
 		Timestamp createdTS = gv.getTimestamp("created");
 		Timestamp updatedTS = gv.getTimestamp("updated");
-		String worklogType = (gv.getString("worklogtype") == null || gv.getString("worklogtype") == "") ? "0"
+		String worklogType = (gv.getString("worklogtype") == null || gv.getString("worklogtype").equals("")) ? "0"
 				: gv.getString("worklogtype");
 		IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, gv.getLong("id"), gv.getString("author"),
 				gv.getString("body"), startDateTS != null ? new Date(startDateTS.getTime()) : null,
@@ -339,10 +312,9 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 	public IScnWorklog formScnWorklog(Long issueId, Long _timeSpent, Long id, String _comment, String authorKey,
 			Date date, String worklogTypeId) {
 		Issue issue = this.issueManager.getIssueObject(issueId);
-		IScnWorklog wl = new ScnWorklogImpl(projectRoleManager, issue, id, authorKey, _comment, date, null, null,
-				_timeSpent, worklogTypeId);
 
-		return wl;
+        return new ScnWorklogImpl(projectRoleManager, issue, id, authorKey, _comment, date, null, null,
+                _timeSpent, worklogTypeId);
 	}
 
 	public boolean isWlAutoCopy(Issue issue, String worklogTypeId) {
@@ -359,15 +331,11 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 				.getErrorCollection().hasAnyErrors())
 			return isWlAutoCopy(issue, worklogTypeId);
 
-		if (worklog != null && worklog.getLinkedWorklog() == null) {
-			return false;
-		} else {
-			return true;
-		}
+        return worklog == null || worklog.getLinkedWorklog() != null;
 	}
 
 	public boolean getWorklogTypeIsChecked(String wlType, Issue issue) {
-		if (StringUtils.isBlank(wlType) || (wlType != null && wlType.equals("0"))) {
+		if (StringUtils.isBlank(wlType) || wlType.equals("0")) {
 			return isUnspecifiedTypeAutoCopyEnabled(issue);
 		}
 
@@ -380,52 +348,26 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 	}
 
 	public Collection<WorklogType> getAutoCopyWorklogTypes(Issue issue) {
-		return projectSettignsManager.getWorklogTypes(issue.getProjectObject().getId());
+		return projectSettignsManager.getWorklogTypes(Objects.requireNonNull(issue.getProjectObject()).getId());
 	}
 
 	public boolean isUnspecifiedTypeAutoCopyEnabled(Issue issue) {
-		return projectSettignsManager.isUnspecifiedWLTypeAutoCopyEnabled(issue.getProjectObject().getId());
+		return projectSettignsManager.isUnspecifiedWLTypeAutoCopyEnabled(Objects.requireNonNull(issue.getProjectObject()).getId());
 	}
 
 	public boolean getWorklogAutoCopyOption(Issue issue) {
-		return projectSettignsManager.isWLAutoCopyEnabled(issue.getProjectObject().getId());
-	}
-
-	public boolean isBlocked(User user, IScnWorklog wl) {
-		return wl != null && (isProjectWLBlocked(getProjectId(wl), wl.getStartDate())
-				|| isUserWLBlocked(user, wl.getStartDate()));
+		return projectSettignsManager.isWLAutoCopyEnabled(Objects.requireNonNull(issue.getProjectObject()).getId());
 	}
 
 	public boolean isProjectWLBlocked(Long projectId, Date date) {
 		Date wlBlockingDate = this.projectSettignsManager.getWLBlockingDate(projectId);
 
-		if (wlBlockingDate == null || date.after(wlBlockingDate)) {
-			return false;
-		}
-
-		return true;
-	}
+        return wlBlockingDate != null && !date.after(wlBlockingDate);
+    }
 
 	public boolean isProjectWLWorklogBlocked(Long projectId, Date date) {
 		Date wlWorklogBlockingDate = this.projectSettignsManager.getWLWorklogBlockingDate(projectId);
 
-		if (wlWorklogBlockingDate == null || date.after(wlWorklogBlockingDate)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private Long getProjectId(Worklog wl) {
-		return wl.getIssue().getProjectObject().getId();
-	}
-
-	protected boolean isUserWLBlocked(User user, Date date) {
-		Date userBlockingDate = scnUserBlockingManager.getBlockingDate(user);
-
-		if (userBlockingDate == null || date.after(userBlockingDate)) {
-			return false;
-		}
-		return true;
-	}
+        return wlWorklogBlockingDate != null && !date.after(wlWorklogBlockingDate);
+    }
 }
