@@ -76,7 +76,7 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
-					<compressResources>false</compressResources>
+					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<applications>
 						<application>
@@ -88,13 +88,6 @@
 					<skipITs>${skipTests}</skipITs>
 					<skipUTs>${skipTests}</skipUTs>
 					<skipAllPrompts>${skipTests}</skipAllPrompts>
-					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
-					<!--					<skipRestDocGeneration>true</skipRestDocGeneration>-->
-					<!--					<skipManifestValidation>true</skipManifestValidation>-->
-					<!--					<buildTestPlugin>false</buildTestPlugin>-->
-					<!--					<enableDevToolbox>false</enableDevToolbox>-->
-					<!--					<enablePde>false</enablePde>-->
-					<!--					<extractDependencies>false</extractDependencies>-->
 					<systemProperties>
 						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>

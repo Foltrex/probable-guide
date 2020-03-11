@@ -68,12 +68,16 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
-					<compressResources>false</compressResources>
+					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
                     <skipITs>${skipTests}</skipITs>
                     <skipUTs>${skipTests}</skipUTs>
                     <skipAllPrompts>${skipTests}</skipAllPrompts>
+					<systemProperties>
+						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
+					</systemProperties>
 				</configuration>
 			</plugin>
 			<plugin>

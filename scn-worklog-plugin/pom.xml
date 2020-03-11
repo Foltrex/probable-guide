@@ -72,7 +72,7 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
-					<compressResources>false</compressResources>
+					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
 					<skipITs>${skipTests}</skipITs>

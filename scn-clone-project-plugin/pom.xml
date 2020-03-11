@@ -50,7 +50,7 @@
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
                     <productDataPath>${basedir}/src/test/resources/generated-test-resources.zip</productDataPath>
-					<compressResources>false</compressResources>
+					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
                     <skipITs>${skipTests}</skipITs>
