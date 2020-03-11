@@ -6,7 +6,6 @@ import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
@@ -48,8 +47,7 @@ public class LTIssueResource extends BaseResource {
     @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getIssues(@Context HttpServletRequest request, @QueryParam("projectId") String projectId) {
-        IExtWorklogLogtimeStore iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager
-        );
+        IExtWorklogLogtimeStore iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager);
         Project project = projectManager.getProjectObj(Long.valueOf(projectId.trim()));
         List<Issue> issues = iExtWorklogLogtimeStore.getIssuesByProjects(project);
 
@@ -75,12 +73,9 @@ public class LTIssueResource extends BaseResource {
         ArrayList<Long> issuesIds = new ArrayList<>();
         issuesList.add("");
         issuesIds.add(0L);
-        ApplicationUser user = getLoggedInUser();
         for (Issue issue : issues) {
-            if (issueManager.isEditable(issue, user)) {
-                issuesIds.add(issue.getId());
-                issuesList.add(TextFormatUtil.replaceHTMLSymbols(issue.getKey() + " - " + issue.getSummary()));
-            }
+            issuesIds.add(issue.getId());
+            issuesList.add(TextFormatUtil.replaceHTMLSymbols(issue.getKey() + " - " + issue.getSummary()));
         }
         LTMessages message = new LTMessages(issuesList, issuesIds);
 

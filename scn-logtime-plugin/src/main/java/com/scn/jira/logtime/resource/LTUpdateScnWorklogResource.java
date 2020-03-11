@@ -150,7 +150,11 @@ public class LTUpdateScnWorklogResource extends BaseResource {
         }
         String complexWLIdnew = changeWlIdFromRequestParameter(complexWLId, wlId),
             complexWLIdExtNew = changeWlIdFromRequestParameter(complexId2, wlIdExt);
-        LTMessages message = new LTMessages("DONE SCN!", result, reloadRequired, complexWLIdnew, complexWLIdExtNew);
+        LTMessages message = new LTMessages("DONE SCN!",
+            result && !iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(issue.getProjectObject().getId(), day),
+            reloadRequired,
+            complexWLIdnew,
+            complexWLIdExtNew);
 
         return Response.ok(message).cacheControl(getNoCacheControl()).build();
     }
