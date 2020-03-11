@@ -9,39 +9,38 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Date;
 import java.util.List;
 
-@ExportAsService({DefaultScnWorklogManager.class })
+@ExportAsService({DefaultScnWorklogManager.class})
 @Named("defaultScnWorklogManager")
 public class DefaultScnWorklogManager implements IScnWorklogManager {
-    
-	//private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(DefaultScnWorklogManager.class);
-	
-	private final OfBizScnWorklogStore worklogStore;
+    private final OfBizScnWorklogStore worklogStore;
     private final TimeTrackingIssueUpdater timeTrackingIssueUpdater;
     private final IScnTimeTrackingIssueManager scnTimeTrackingIssueManager;
+    private final IScnProjectSettingsManager scnProjectSettingsManager;
 
     @Inject
-    public DefaultScnWorklogManager(
-//    		ProjectRoleManager projectRoleManager,
-            OfBizScnWorklogStore worklogStore,
-    		@ComponentImport TimeTrackingIssueUpdater timeTrackingIssueUpdater,
-    		ScnTimeTrackingIssueManager scnTimeTrackingIssueManager) 
-    {
+    public DefaultScnWorklogManager(OfBizScnWorklogStore worklogStore,
+                                    @ComponentImport TimeTrackingIssueUpdater timeTrackingIssueUpdater,
+                                    ScnTimeTrackingIssueManager scnTimeTrackingIssueManager,
+                                    IScnProjectSettingsManager scnProjectSettingsManager) {
         this.worklogStore = worklogStore;
         this.timeTrackingIssueUpdater = timeTrackingIssueUpdater;
         this.scnTimeTrackingIssueManager = scnTimeTrackingIssueManager;
+        this.scnProjectSettingsManager = scnProjectSettingsManager;
     }
 
     public boolean delete(ApplicationUser user, IScnWorklog worklog, Long newEstimate, Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) throws DataAccessException {
         validateWorklog(worklog, false);
         final Worklog linkedWorklog = worklog.getLinkedWorklog();
         boolean result = this.worklogStore.delete(worklog.getId(), isLinkedWL);
-        if (isLinkedWL && linkedWorklog != null) {
+        boolean isWLAutoCopyBlocked = isWLAutoCopyBlocked(worklog);
+        if (isLinkedWL && linkedWorklog != null && !isWLAutoCopyBlocked) {
             // send event about created linked WL and update time tracking record
             this.timeTrackingIssueUpdater.updateIssueOnWorklogDelete(user, linkedWorklog, newLinkedEstimate, dispatchEvent);
         }
@@ -54,8 +53,8 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
     public IScnWorklog create(ApplicationUser user, IScnWorklog worklog, Long newEstimate, Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) throws DataAccessException {
         validateWorklog(worklog, true);
         final IScnWorklog newWorklog = this.worklogStore.create(worklog, isLinkedWL);
-
-        if (isLinkedWL && newWorklog.getLinkedWorklog() != null) {
+        boolean isWLAutoCopyBlocked = isWLAutoCopyBlocked(worklog);
+        if (isLinkedWL && newWorklog.getLinkedWorklog() != null && !isWLAutoCopyBlocked) {
             final Worklog newLinkedWorklog = newWorklog.getLinkedWorklog();
             // send event about created linked WL and update time tracking record
             this.timeTrackingIssueUpdater.updateIssueOnWorklogCreate(user, newLinkedWorklog, newLinkedEstimate, dispatchEvent);
@@ -67,22 +66,22 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
     }
 
     public IScnWorklog update(ApplicationUser user, IScnWorklog worklog, Long newEstimate, Long newLinkedEstimate, boolean dispatchEvent, boolean isLinkedWL) throws DataAccessException {
-    	validateWorklog(worklog, false);
+        validateWorklog(worklog, false);
         final IScnWorklog originalWorklog = getById(worklog.getId());
         if (originalWorklog == null) {
             throw new DataAccessException("Unable to find a worklog in the datastore for the provided id: '" + worklog.getId() + "'");
         }
         final Worklog originalLinkedWorklog = originalWorklog.getLinkedWorklog();
-
         IScnWorklog newWorklog = this.worklogStore.update(worklog, isLinkedWL);
-        if (isLinkedWL && originalLinkedWorklog != null) {
+        boolean isWLAutoCopyBlocked = isWLAutoCopyBlocked(worklog);
+        if (isLinkedWL && originalLinkedWorklog != null && !isWLAutoCopyBlocked) {
             // send event about created linked WL and update time tracking record
             final Long originalTimeSpent = originalLinkedWorklog.getTimeSpent();
             this.timeTrackingIssueUpdater.updateIssueOnWorklogUpdate(user, originalLinkedWorklog, newWorklog.getLinkedWorklog(),
-                    originalTimeSpent, newLinkedEstimate, dispatchEvent);
+                originalTimeSpent, newLinkedEstimate, dispatchEvent);
         }
         // update timeSpent* record
-        scnTimeTrackingIssueManager.updateIssueOnWorklogUpdate(user, originalWorklog, newWorklog, originalWorklog.getTimeSpent(), newEstimate, dispatchEvent);        
+        scnTimeTrackingIssueManager.updateIssueOnWorklogUpdate(user, originalWorklog, newWorklog, originalWorklog.getTimeSpent(), newEstimate, dispatchEvent);
 
         return newWorklog;
     }
@@ -91,14 +90,13 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
         return worklogStore.update(worklog, false);
     }
 
-
     public IScnWorklog getById(Long id) throws DataAccessException {
         return this.worklogStore.getById(id);
     }
 
     public List<IScnWorklog> getByIssue(Issue issue) throws DataAccessException {
         Assertions.notNull("issue", issue);
-        
+
         return this.worklogStore.getByIssue(issue);
     }
 
@@ -122,9 +120,9 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
     }
 
     public long getCountForWorklogsRestrictedByGroup(String groupName) throws DataAccessException {
-    	Assertions.notNull("groupName", groupName);
+        Assertions.notNull("groupName", groupName);
 
-    	return this.worklogStore.getCountForWorklogsRestrictedByGroup(groupName);
+        return this.worklogStore.getCountForWorklogsRestrictedByGroup(groupName);
     }
 
     public void validateWorklog(IScnWorklog worklog, boolean create) {
@@ -138,5 +136,13 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
 
     public List<IScnWorklog> getScnWorklogsByType(String worklogTypeId) throws DataAccessException {
         return this.worklogStore.getScnWorklogsByType(worklogTypeId);
+    }
+
+    private boolean isWLAutoCopyBlocked(IScnWorklog wl) {
+        if (wl == null)
+            return false;
+        Date wlWorklogBlockingDate = this.scnProjectSettingsManager.getWLWorklogBlockingDate(wl.getIssue().getProjectId());
+
+        return wlWorklogBlockingDate != null && !wl.getStartDate().after(wlWorklogBlockingDate);
     }
 }

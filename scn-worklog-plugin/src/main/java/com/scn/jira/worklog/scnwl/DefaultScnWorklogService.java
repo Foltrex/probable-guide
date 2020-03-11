@@ -293,8 +293,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         }
 
         IScnWorklog originalWorklog = this.scnWorklogManager.getById(worklog.getId());
-        boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
-        if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog) || isWLAutoCopyBlocked) {
+        if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog)) {
             return false;
         }
 
@@ -331,15 +330,13 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         }
 
         IScnWorklog originalWorklog = this.scnWorklogManager.getById(worklog.getId());
-        boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
-        if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog) || isWLAutoCopyBlocked) {
+        if (isBlocked(jiraServiceContext, worklog) || isBlocked(jiraServiceContext, originalWorklog)) {
             return null;
         }
 
         try {
             if (hasPermissionToUpdate(jiraServiceContext, worklog)) {
-                updatedWorklog = this.scnWorklogManager.update(user, worklog, newEstimate, newLinkedEstimate, dispatchEvent,
-                    isLinkedWL);
+                updatedWorklog = this.scnWorklogManager.update(user, worklog, newEstimate, newLinkedEstimate, dispatchEvent, isLinkedWL);
             }
         } catch (DataAccessException e) {
             jiraServiceContext.getErrorCollection().addErrorMessage(getText(jiraServiceContext, "scn.transaction.failure"));
@@ -725,8 +722,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
             return null;
         }
 
-        boolean isWLAutoCopyBlocked = isLinkedWL && isWLAutoCopyBlocked(jiraServiceContext, worklog);
-        if (isBlocked(jiraServiceContext, worklog) || isWLAutoCopyBlocked) {
+        if (isBlocked(jiraServiceContext, worklog)) {
             return null;
         }
 
@@ -746,20 +742,6 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         return wl != null
             && (isProjectWLBlocked(serviceContext, getProjectId(wl), wl.getStartDate()) || isUserWLBlocked(serviceContext,
             wl.getStartDate()));
-    }
-
-    public boolean isWLAutoCopyBlocked(JiraServiceContext jiraServiceContext, IScnWorklog wl) {
-        if (wl == null)
-            return false;
-        Date wlWorklogBlockingDate = this.scnProjectSettingsManager.getWLWorklogBlockingDate(getProjectId(wl));
-        if (wlWorklogBlockingDate == null || wl.getStartDate().after(wlWorklogBlockingDate)) {
-            return false;
-        }
-
-        addErrorMessage(jiraServiceContext, "scn.scnworklog.service.error.wl.blocking.date.on.save",
-            formatDate(jiraServiceContext, wlWorklogBlockingDate));
-
-        return true;
     }
 
     protected boolean isProjectWLBlocked(JiraServiceContext serviceContext, Long projectId, Date date) {

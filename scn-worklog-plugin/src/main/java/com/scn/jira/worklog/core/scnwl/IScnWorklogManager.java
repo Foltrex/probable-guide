@@ -8,7 +8,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import java.util.Date;
 import java.util.List;
 
-public abstract interface IScnWorklogManager {
+public interface IScnWorklogManager {
 	boolean delete(ApplicationUser paramUser, IScnWorklog paramWorklog, Long paramLong, Long newLinkedEstimate,
 			boolean paramBoolean, boolean isLinkedWL) throws DataAccessException;
 
@@ -25,13 +25,13 @@ public abstract interface IScnWorklogManager {
 	List<IScnWorklog> getByProjectBetweenDates(Project project, Date startDate, Date endDate)
 			throws DataAccessException;
 
-	public List<IScnWorklog> getByProject(Project project) throws DataAccessException;
+	List<IScnWorklog> getByProject(Project project) throws DataAccessException;
 
 	long getCountForWorklogsRestrictedByGroup(String paramString) throws DataAccessException;
 
 	int swapWorklogGroupRestriction(String paramString1, String paramString2) throws DataAccessException;
 
-	public void validateWorklog(IScnWorklog worklog, boolean create);
+	void validateWorklog(IScnWorklog worklog, boolean create);
 
 	List<IScnWorklog> getScnWorklogsByType(String worklogTypeId) throws DataAccessException;
 
