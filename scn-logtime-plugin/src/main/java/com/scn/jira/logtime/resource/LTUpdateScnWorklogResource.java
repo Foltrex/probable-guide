@@ -7,7 +7,9 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -40,10 +42,11 @@ import java.util.Objects;
 @Named
 @Path("/updateScnWorklog")
 public class LTUpdateScnWorklogResource extends BaseResource {
-    private IssueManager issueManager;
-    private IScnWorklogManager scnWorklogManager;
-    private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-    private IScnWorklogService scnWorklogService;
+    private final IssueManager issueManager;
+    private final IScnWorklogManager scnWorklogManager;
+    private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+    private final IScnWorklogService scnWorklogService;
+    private final PermissionManager permissionManager;
 
     @Inject
     public LTUpdateScnWorklogResource(@ComponentImport JiraAuthenticationContext authenticationContext,
@@ -52,13 +55,14 @@ public class LTUpdateScnWorklogResource extends BaseResource {
                                       @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
                                       @ComponentImport DefaultScnWorklogManager scnWorklogManager,
                                       @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                      @ComponentImport DefaultScnWorklogService scnWorklogService) {
+                                      @ComponentImport DefaultScnWorklogService scnWorklogService, PermissionManager permissionManager) {
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
         this.scnWorklogManager = scnWorklogManager;
         this.scnWorklogService = scnWorklogService;
         this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
             overridedWorklogManager, projectSettignsManager, scnWorklogService);
+        this.permissionManager = permissionManager;
     }
 
     @GET
@@ -104,10 +108,11 @@ public class LTUpdateScnWorklogResource extends BaseResource {
         Date day = DateUtils.stringToDate(date);
 
         IScnWorklog scnWorklog = scnWorklogManager.getById(worklogId);
-        ApplicationUser appUser = getLoggedInUser();
+        ApplicationUser user = getLoggedInUser();
         boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day));
-        final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
-        if (isBlocked || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
+        final JiraServiceContext serviceContext = new JiraServiceContextImpl(user);
+        if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
+            || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
             || (worklogId != 0 && !isValueEmplty && !scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog))
             || (worklogId == 0) && !isValueEmplty && !scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
             return Response.serverError()

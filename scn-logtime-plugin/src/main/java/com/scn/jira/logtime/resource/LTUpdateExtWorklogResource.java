@@ -12,8 +12,10 @@ import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.issue.worklog.WorklogImpl2;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -48,12 +50,13 @@ import java.util.Objects;
 public class LTUpdateExtWorklogResource extends BaseResource {
     private static final Logger LOGGER = Logger.getLogger(LTUpdateExtWorklogResource.class);
 
-    private IssueManager issueManager;
-    private WorklogManager worklogManager;
-    private ExtendedWorklogManager extendedWorklogManager;
-    private IScnProjectSettingsManager projectSettignsManager;
-    private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-    private WorklogService worklogService;
+    private final IssueManager issueManager;
+    private final WorklogManager worklogManager;
+    private final ExtendedWorklogManager extendedWorklogManager;
+    private final IScnProjectSettingsManager projectSettignsManager;
+    private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+    private final WorklogService worklogService;
+    private final PermissionManager permissionManager;
 
     @Inject
     public LTUpdateExtWorklogResource(@ComponentImport JiraAuthenticationContext authenticationContext,
@@ -63,7 +66,8 @@ public class LTUpdateExtWorklogResource extends BaseResource {
                                       @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
                                       @ComponentImport ScnProjectSettingsManager projectSettignsManager,
                                       @ComponentImport DefaultScnWorklogService scnDefaultWorklogService,
-                                      @ComponentImport WorklogService worklogService) {
+                                      @ComponentImport WorklogService worklogService,
+                                      PermissionManager permissionManager) {
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
         this.worklogManager = overridedWorklogManager;
@@ -72,6 +76,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
         this.worklogService = worklogService;
         this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager, overridedWorklogManager,
             projectSettignsManager, scnDefaultWorklogService);
+        this.permissionManager = permissionManager;
     }
 
     @GET
@@ -97,8 +102,6 @@ public class LTUpdateExtWorklogResource extends BaseResource {
 
         boolean reloadRequired = false;
 
-        @SuppressWarnings("unused")
-        boolean result = false;
         boolean isValueEmplty = (newValue == null || newValue.equals("00:00") || newValue.equals("0") || newValue.equals("") || newValue.equals("0h"));
         // Check what to do with the worklog
         Long timeSpent;
@@ -119,9 +122,9 @@ public class LTUpdateExtWorklogResource extends BaseResource {
 
         Issue issue = this.issueManager.getIssueObject(issueId);
         Project prj = issue.getProjectObject();
-        ApplicationUser appUser = getLoggedInUser();
+        ApplicationUser user = getLoggedInUser();
         if (prj != null) {
-            boolean projectPermission = projectSettignsManager.hasPermissionToViewWL(appUser, prj);
+            boolean projectPermission = projectSettignsManager.hasPermissionToViewWL(user, prj);
             if (!projectPermission) {
                 LOGGER.info("The user does not have permission to create Ext worklog");
                 LTMessages message = new LTMessages("DONE EXT!", false, false);
@@ -131,8 +134,9 @@ public class LTUpdateExtWorklogResource extends BaseResource {
         Worklog worklog = worklogManager.getById(worklogId);
         Date day = DateUtils.stringToDate(date);
         boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(Objects.requireNonNull(prj).getId(), day);
-        final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
-        if (isBlocked || (worklogId != 0 && isValueEmplty && !worklogService.hasPermissionToDelete(serviceContext, worklog))
+        final JiraServiceContext serviceContext = new JiraServiceContextImpl(user);
+        if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
+            || (worklogId != 0 && isValueEmplty && !worklogService.hasPermissionToDelete(serviceContext, worklog))
             || (worklogId != 0 && !isValueEmplty && !worklogService.hasPermissionToUpdate(serviceContext, worklog))
             || (worklogId == 0) && !isValueEmplty && !worklogService.hasPermissionToCreate(serviceContext, issue, false)) {
             return Response.serverError()
