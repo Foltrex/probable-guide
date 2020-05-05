@@ -1,26 +1,5 @@
 package com.scn.jira.plugin.gadget.timesheet;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.plugin.report.timesheet.TimeSheet;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.exception.VelocityException;
-
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -46,11 +25,29 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.opensymphony.util.TextUtils;
 import com.scn.jira.plugin.gadget.rest.error.ErrorCollection;
+import com.scn.jira.plugin.report.timesheet.TimeSheet;
 import com.scn.jira.util.CalendarUtil;
 import com.scn.jira.util.ServletUtil;
 import com.scn.jira.util.TextUtil;
+import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.exception.VelocityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @Named
 @Path("/timesheet")
@@ -66,18 +63,18 @@ public class TimeSheetResource {
 	private final ProjectRoleManager projectRoleManager;
 	private final GroupManager groupManager;
 	private final SearchRequestManager searchRequestManager;
-	private final GlobalSettingsManager scnPermissionManager;
+	private final IGlobalSettingsManager scnPermissionManager;
 	private final FieldVisibilityManager fieldVisibilityManager;
 
 	@Autowired
-	public TimeSheetResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-			@ComponentImport PermissionManager permissionManager,
-			@ComponentImport ApplicationProperties applicationProperties, @ComponentImport IssueManager issueManager,
-			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
-			@ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
-			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
-			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
-			@ComponentImport FieldVisibilityManager fieldVisibilityManager) {
+	public TimeSheetResource(JiraAuthenticationContext authenticationContext,
+			PermissionManager permissionManager,
+			ApplicationProperties applicationProperties, IssueManager issueManager,
+			SearchProvider searchProvider, VisibilityValidator visibilityValidator,
+			UserManager userManager, SearchRequestManager searchRequestManager,
+			GroupManager groupManager, ProjectRoleManager projectRoleManager,
+			IGlobalSettingsManager globalSettingsManager,
+			FieldVisibilityManager fieldVisibilityManager) {
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;
 		this.applicationProperties = applicationProperties;

@@ -37,6 +37,10 @@
 			<artifactId>atlassian-spring-scanner-annotation</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.atlassian.plugin</groupId>
+			<artifactId>atlassian-spring-scanner-runtime</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.atlassian.plugins.rest</groupId>
 			<artifactId>atlassian-rest-common</artifactId>
 		</dependency>
@@ -44,6 +48,7 @@
 			<groupId>com.scn.jira</groupId>
 			<artifactId>scn-worklog-plugin</artifactId>
 			<version>4.1.4</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -71,6 +76,20 @@
 						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
 					</systemProperties>
+					<extractDependencies>false</extractDependencies>
+					<instructions>
+						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
+						<Spring-Context>*</Spring-Context>
+						<Export-Package>
+						</Export-Package>
+						<Import-Package>
+							org.springframework.osgi.*;resolution:="optional",
+							org.eclipse.gemini.blueprint.*;resolution:="optional",
+							com.atlassian.plugin.osgi.bridge.external,
+							*;resolution:=optional
+						</Import-Package>
+					</instructions>
+					<skipManifestValidation>true</skipManifestValidation>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -86,6 +105,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<includeExclude>-com.atlassian.plugin.spring.scanner.annotation.*</includeExclude>
 					<scannedDependencies>
 						<dependency>
 							<groupId>com.atlassian.plugin</groupId>

@@ -1,29 +1,5 @@
 package com.scn.jira.plugin.report.timesheet;
 
-import static com.scn.jira.worklog.core.scnwl.IScnWorklogStore.SCN_WORKLOG_ENTITY;
-import static com.scn.jira.worklog.globalsettings.IGlobalSettingsManager.SCN_TIMETRACKING;
-import static org.ofbiz.core.entity.EntityOperator.EQUALS;
-import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
-import static org.ofbiz.core.entity.EntityOperator.IN;
-import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
-
-import java.sql.Timestamp;
-import java.util.*;
-
-import com.atlassian.jira.issue.search.SearchQuery;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.util.TextUtil;
-import com.scn.jira.util.UserToNameFunction;
-import com.scn.jira.util.WeekPortletHeader;
-import com.scn.jira.util.WorklogUtil;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.ofbiz.core.entity.EntityCondition;
-import org.ofbiz.core.entity.EntityExpr;
-import org.ofbiz.core.entity.GenericEntityException;
-import org.ofbiz.core.entity.GenericValue;
-
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
 import com.atlassian.jira.bc.issue.visibility.Visibilities;
@@ -35,12 +11,7 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.comparator.IssueKeyComparator;
 import com.atlassian.jira.issue.comparator.UserComparator;
-import com.atlassian.jira.issue.search.DocumentWithId;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
-import com.atlassian.jira.issue.search.SearchRequest;
-import com.atlassian.jira.issue.search.SearchRequestManager;
-import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.issue.search.*;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.plugin.report.impl.AbstractReport;
 import com.atlassian.jira.project.Project;
@@ -54,12 +25,30 @@ import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.ProjectActionSupport;
 import com.atlassian.jira.web.bean.I18nBean;
 import com.atlassian.jira.web.bean.PagerFilter;
-import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.plugin.report.pivot.Pivot;
+import com.scn.jira.util.TextUtil;
+import com.scn.jira.util.UserToNameFunction;
+import com.scn.jira.util.WeekPortletHeader;
+import com.scn.jira.util.WorklogUtil;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.ofbiz.core.entity.EntityCondition;
+import org.ofbiz.core.entity.EntityExpr;
+import org.ofbiz.core.entity.GenericEntityException;
+import org.ofbiz.core.entity.GenericValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Named;
+import java.sql.Timestamp;
+import java.util.*;
+
+import static com.scn.jira.worklog.core.scnwl.IScnWorklogStore.SCN_WORKLOG_ENTITY;
+import static com.scn.jira.worklog.globalsettings.IGlobalSettingsManager.SCN_TIMETRACKING;
+import static org.ofbiz.core.entity.EntityOperator.*;
 
 @Named
 @SuppressWarnings("rawtypes")
@@ -69,7 +58,7 @@ public class TimeSheet extends AbstractReport {
 
 	private final PermissionManager permissionManager;
 	private final IssueManager issueManager;
-	private final GlobalSettingsManager scnGlobalPermissionManager;
+	private final IGlobalSettingsManager scnGlobalPermissionManager;
 	private final UserManager userManager;
 	private final SearchProvider searchProvider;
 	private final VisibilityValidator visibilityValidator;
@@ -95,12 +84,12 @@ public class TimeSheet extends AbstractReport {
 	private Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents = new Hashtable<Project, Map<String, Map<Date, Long>>>();
 
 	@Autowired
-	public TimeSheet(@ComponentImport PermissionManager permissionManager, @ComponentImport IssueManager issueManager,
-			@ComponentImport SearchProvider searchProvider, @ComponentImport VisibilityValidator visibilityValidator,
-			@ComponentImport UserManager userManager, @ComponentImport SearchRequestManager searchRequestManager,
-			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
-			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager,
-			@ComponentImport FieldVisibilityManager fieldVisibilityManager) {
+	public TimeSheet(PermissionManager permissionManager, IssueManager issueManager,
+			SearchProvider searchProvider, VisibilityValidator visibilityValidator,
+			UserManager userManager, SearchRequestManager searchRequestManager,
+			GroupManager groupManager, ProjectRoleManager projectRoleManager,
+			IGlobalSettingsManager globalSettingsManager,
+			FieldVisibilityManager fieldVisibilityManager) {
 		this.permissionManager = permissionManager;
 		this.issueManager = issueManager;
 		this.userManager = userManager;

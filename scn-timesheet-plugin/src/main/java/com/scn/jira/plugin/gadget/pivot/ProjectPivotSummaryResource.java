@@ -1,27 +1,5 @@
 package com.scn.jira.plugin.gadget.pivot;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.velocity.exception.VelocityException;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.datetime.DateTimeFormatter;
@@ -36,6 +14,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.DateFieldFormat;
 import com.atlassian.jira.util.DateFieldFormatImpl;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
@@ -50,8 +29,26 @@ import com.scn.jira.plugin.gadget.timesheet.TimeSheetRepresentation;
 import com.scn.jira.plugin.report.pivot.Pivot;
 import com.scn.jira.util.CalendarUtil;
 import com.scn.jira.util.TextUtil;
+import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.velocity.exception.VelocityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @Named
 @Path("/project-pivot-summary")
@@ -69,18 +66,18 @@ public class ProjectPivotSummaryResource {
 	private final GroupManager groupManager;
 	private final ProjectRoleManager projectRoleManager;
 	private final DateTimeFormatterFactory fFactory;
-	private final GlobalSettingsManager scnGlobalPermissionManager;
+	private final IGlobalSettingsManager scnGlobalPermissionManager;
 	private final DateTimeFormatter formatter;
 
 	@Autowired
-	public ProjectPivotSummaryResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-			@ComponentImport PermissionManager permissionManager,
-			@ComponentImport ApplicationProperties applicationProperties, @ComponentImport IssueManager issueManager,
-			@ComponentImport SearchProvider searchProvider,
-			@ComponentImport FieldVisibilityManager fieldVisibilityManager,
-			@ComponentImport ProjectManager projectManager, @ComponentImport SearchRequestManager searchRequestManager,
-			@ComponentImport GroupManager groupManager, @ComponentImport ProjectRoleManager projectRoleManager,
-			@Qualifier("globalSettingsManager") GlobalSettingsManager globalSettingsManager) {
+	public ProjectPivotSummaryResource(JiraAuthenticationContext authenticationContext,
+			PermissionManager permissionManager,
+			ApplicationProperties applicationProperties, IssueManager issueManager,
+			SearchProvider searchProvider,
+			FieldVisibilityManager fieldVisibilityManager,
+			ProjectManager projectManager, SearchRequestManager searchRequestManager,
+			GroupManager groupManager, ProjectRoleManager projectRoleManager,
+			IGlobalSettingsManager globalSettingsManager) {
 		this.authenticationContext = authenticationContext;
 		this.permissionManager = permissionManager;
 		this.applicationProperties = applicationProperties;
@@ -131,10 +128,10 @@ public class ProjectPivotSummaryResource {
 
 	protected Map<String, Object> getVelocityParams(int numOfWeeks, int reportingDay, String projectKey, long filterId,
 			String targetGroup) {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		ApplicationUser user = this.authenticationContext.getLoggedInUser();
 
-		params.put("loggedin", Boolean.valueOf(user != null));
+		params.put("loggedin", user != null);
 
 		if (user == null) {
 			return params;
@@ -161,7 +158,7 @@ public class ProjectPivotSummaryResource {
 					this.projectRoleManager, this.scnGlobalPermissionManager);
 
 			pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(),
-					(project != null) ? project.getId() : null, (filterId == 0L) ? null : Long.valueOf(filterId),
+					(project != null) ? project.getId() : null, (filterId == 0L) ? null : filterId,
 					targetGroup, false);
 
 			DateFieldFormat dateFieldFormat = new DateFieldFormatImpl(this.fFactory);
