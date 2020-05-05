@@ -1,39 +1,26 @@
 package com.scn.jira.logtime.resource;
 
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.logtime.manager.IWorklogLogtimeManager;
 import com.scn.jira.logtime.manager.WicketManager;
-import com.scn.jira.logtime.manager.WorklogLogtimeManager;
 import com.scn.jira.logtime.representation.*;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.ServletUtil;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
-import com.scn.jira.worklog.core.scnwl.OfBizScnWorklogStore;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
-import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.VelocityException;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,38 +42,30 @@ import static com.scn.jira.worklog.globalsettings.GlobalSettingsManager.SCN_TIME
 public class LTProjectsResource extends BaseResource {
     private static final Logger LOGGER = Logger.getLogger(LTProjectsResource.class);
 
-    private UserManager userManager;
-    private PermissionManager permissionManager;
-    private ProjectManager projectManager;
-    private ExtendedConstantsManager extendedConstantsManager;
-    private IGlobalSettingsManager scnGlobalPermissionManager;
-    private IWorklogLogtimeManager iWorklogLogtimeManager;
-    private WicketManager wicketManager;
+    private final UserManager userManager;
+    private final PermissionManager permissionManager;
+    private final ProjectManager projectManager;
+    private final ExtendedConstantsManager extendedConstantsManager;
+    private final IGlobalSettingsManager scnGlobalPermissionManager;
+    private final IWorklogLogtimeManager iWorklogLogtimeManager;
+    private final WicketManager wicketManager;
 
     @Inject
-    public LTProjectsResource(@ComponentImport PermissionManager permissionManager,
-                              @ComponentImport JiraAuthenticationContext authenticationContext,
-                              @ComponentImport ProjectManager projectManager, @ComponentImport IssueManager issueManager,
-                              @ComponentImport ProjectRoleManager projectRoleManager,
-                              @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                              @ComponentImport DefaultExtendedConstantsManager defaultExtendedConstantsManager,
-                              @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-                              @ComponentImport OfBizScnWorklogStore ofBizScnWorklogStore,
-                              @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                              @ComponentImport ScnUserBlockingManager scnUserBlockingManager,
-                              @ComponentImport GlobalSettingsManager scnGlobalPermissionManager,
-                              @ComponentImport DefaultScnWorklogService scnDefaultWorklogService) {
+    public LTProjectsResource(PermissionManager permissionManager,
+                              JiraAuthenticationContext authenticationContext,
+                              ProjectManager projectManager,
+                              ExtendedConstantsManager defaultExtendedConstantsManager,
+                              IGlobalSettingsManager scnGlobalPermissionManager,
+                              IWorklogLogtimeManager iWorklogLogtimeManager,
+                              WicketManager wicketManager) {
+        this.wicketManager = wicketManager;
         this.userManager = ComponentAccessor.getUserManager();
         this.permissionManager = permissionManager;
         this.authenticationContext = authenticationContext;
         this.projectManager = projectManager;
         this.extendedConstantsManager = defaultExtendedConstantsManager;
         this.scnGlobalPermissionManager = scnGlobalPermissionManager;
-        this.iWorklogLogtimeManager = new WorklogLogtimeManager(userManager, projectManager, issueManager,
-            permissionManager, scnWorklogManager, projectRoleManager, overridedWorklogManager,
-            extendedConstantsManager, ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,
-            scnDefaultWorklogService);
-        this.wicketManager = new WicketManager(ComponentAccessor.getJiraAuthenticationContext().getI18nHelper());
+        this.iWorklogLogtimeManager = iWorklogLogtimeManager;
     }
 
     @POST

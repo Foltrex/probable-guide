@@ -19,25 +19,31 @@ import com.scn.jira.worklog.core.wl.WorklogType;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.ofbiz.core.entity.EntityOperator.*;
 
+@Named
 public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 	public static final String SCN_WORKLOG_ISSUE_ENTITY = "ScnWorklogByIssueView";
     public static final String SCN_WORKLOG_PROJECT_ENTITY = "ScnWorklogByProjectView";
 
-	private IssueManager issueManager;
-	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
-	private IScnProjectSettingsManager projectSettignsManager;
-    private IScnWorklogService scnDefaultWorklogService;
+	private final IssueManager issueManager;
+	private final ProjectRoleManager projectRoleManager;
+	private final WorklogManager worklogManager;
+	private final IScnProjectSettingsManager projectSettignsManager;
+    private final IScnWorklogService scnDefaultWorklogService;
 
+    @Inject
 	public ScnWorklogLogtimeStore(IssueManager issueManager, ProjectRoleManager projectRoleManager,
-                                  WorklogManager worklogManager, IScnProjectSettingsManager projectSettignsManager,
+                                  @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
+                                  IScnProjectSettingsManager projectSettignsManager,
                                   IScnWorklogService scnDefaultWorklogService) {
 		this.issueManager = issueManager;
 		this.projectRoleManager = projectRoleManager;

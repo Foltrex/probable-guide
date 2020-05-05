@@ -1,20 +1,15 @@
 package com.scn.jira.logtime.resource;
 
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
 import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,20 +28,17 @@ import java.util.regex.Matcher;
 @Path("/getIssues")
 public class LTIssueResource extends BaseResource {
     private final ProjectManager projectManager;
-    private final IssueManager issueManager;
-    private final WorklogManager worklogManager;
     private final PermissionManager permissionManager;
+    private final IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 
     @Inject
-    public LTIssueResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-                           @ComponentImport ProjectManager projectManager,
-                           @ComponentImport IssueManager issueManager,
-                           @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                           PermissionManager permissionManager) {
+    public LTIssueResource(JiraAuthenticationContext authenticationContext,
+                           ProjectManager projectManager,
+                           PermissionManager permissionManager,
+                           IExtWorklogLogtimeStore iExtWorklogLogtimeStore) {
+        this.iExtWorklogLogtimeStore = iExtWorklogLogtimeStore;
         this.authenticationContext = authenticationContext;
         this.projectManager = projectManager;
-        this.issueManager = issueManager;
-        this.worklogManager = overridedWorklogManager;
         this.permissionManager = permissionManager;
     }
 
@@ -54,7 +46,6 @@ public class LTIssueResource extends BaseResource {
     @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getIssues(@Context HttpServletRequest request, @QueryParam("projectId") String projectId) {
-        IExtWorklogLogtimeStore iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager);
         Project project = projectManager.getProjectObj(Long.valueOf(projectId.trim()));
         List<Issue> issues = iExtWorklogLogtimeStore.getIssuesByProjects(project);
 

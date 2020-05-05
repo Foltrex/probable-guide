@@ -13,24 +13,29 @@ import com.scn.jira.worklog.core.wl.ExtWorklog;
 import org.apache.log4j.Logger;
 import org.ofbiz.core.entity.*;
 import org.ofbiz.core.util.UtilMisc;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.ofbiz.core.entity.EntityOperator.*;
 
+@Named
 public class ExtWorklogLogtimeStore implements IExtWorklogLogtimeStore {
     private static final Logger LOGGER = Logger.getLogger(ExtWorklogLogtimeStore.class);
 
     public static final String EXT_WORKLOG_LOGTIME_ENTITY = "ExtWorklogByIssueView";
     public static final String EXT_WORKLOG_PROJECT_ENTITY = "ExtWorklogByProjectView";
 
-    private IssueManager issueManager;
-    private WorklogManager worklogManager;
+    private final IssueManager issueManager;
+    private final WorklogManager worklogManager;
 
-    public ExtWorklogLogtimeStore(IssueManager issueManager, WorklogManager worklogManager) {
+    @Inject
+    public ExtWorklogLogtimeStore(IssueManager issueManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager) {
         this.issueManager = issueManager;
         this.worklogManager = worklogManager;
     }

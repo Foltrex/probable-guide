@@ -6,7 +6,6 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.representation.ProjectRepresentation;
 import com.scn.jira.logtime.representation.ProjectsRepresentation;
@@ -29,8 +28,7 @@ public class ProjectsResource extends BaseResource {
     private PermissionManager permissionManager;
 
     @Inject
-    public ProjectsResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-                            @ComponentImport PermissionManager permissionManager) {
+    public ProjectsResource(JiraAuthenticationContext authenticationContext, PermissionManager permissionManager) {
         this.permissionManager = permissionManager;
         this.authenticationContext = authenticationContext;
     }

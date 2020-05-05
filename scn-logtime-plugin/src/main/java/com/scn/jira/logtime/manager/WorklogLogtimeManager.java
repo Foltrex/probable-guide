@@ -1,102 +1,52 @@
 package com.scn.jira.logtime.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueKey;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizListIterator;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.scn.jira.logtime.representation.CustomIssueDto;
-import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
+import com.scn.jira.logtime.representation.*;
 import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogStore;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.IScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.ExtWorklog;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
-import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import com.scn.jira.logtime.representation.LTIssueRepresentation;
-import com.scn.jira.logtime.representation.LTProjectRepresentation;
-import com.scn.jira.logtime.representation.WLLineIssueRepresentation;
-import com.scn.jira.logtime.representation.WLRepresentation;
-import com.scn.jira.logtime.representation.WLsRepresentation;
-import com.scn.jira.logtime.representation.WLsTypeRepresentation;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
-
 import org.apache.log4j.Logger;
-import org.ofbiz.core.entity.EntityCondition;
-import org.ofbiz.core.entity.EntityFieldMap;
-import org.ofbiz.core.entity.EntityFindOptions;
-import org.ofbiz.core.entity.EntityOperator;
-import org.ofbiz.core.entity.GenericValue;
+import org.ofbiz.core.entity.*;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.*;
+
+@Named
 public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 	private static final Logger LOGGER = Logger.getLogger(WorklogLogtimeManager.class);
-	
-	private ProjectManager projectManager;
-	private IssueManager issueManager;
-	private PermissionManager permissionManager;
-	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
-	private ExtendedConstantsManager extendedConstantsManager;
-	private ExtendedWorklogManager extendedWorklogManager;
-	
-	private IScnWorklogManager scnWorklogManager;
-	private IScnWorklogStore ofBizScnWorklogStore;
-	private IScnProjectSettingsManager projectSettignsManager;
-	private IScnUserBlockingManager scnUserBlockingManager;
-	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
-	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-	private IScnWorklogService scnDefaultWorklogService;
-	
-	private Map<String, Map<String, Integer>> calendarMap;
-	
-	public WorklogLogtimeManager(UserManager userManager, ProjectManager projectManager, IssueManager issueManager,
-			PermissionManager permissionManager, IScnWorklogManager scnWorklogManager, ProjectRoleManager projectRoleManager,
-			WorklogManager worklogManager, ExtendedConstantsManager extendedConstantsManager, IScnWorklogStore ofBizScnWorklogStore,
-			IScnProjectSettingsManager projectSettignsManager, IScnUserBlockingManager scnUserBlockingManager,IScnWorklogService scnDefaultWorklogService) {
-		this.projectManager = projectManager;
-		this.issueManager = issueManager;
-		this.permissionManager = permissionManager;
-		this.scnWorklogManager = scnWorklogManager;
-		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = worklogManager;
-		this.extendedConstantsManager = extendedConstantsManager;
-		this.ofBizScnWorklogStore = ofBizScnWorklogStore;
-		this.projectSettignsManager = projectSettignsManager;
-		this.scnUserBlockingManager = scnUserBlockingManager;
-		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager);
-		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-				worklogManager, projectSettignsManager, scnDefaultWorklogService);
-		this.calendarMap = new HashMap<String, Map<String, Integer>>();
+
+    private final ExtendedConstantsManager extendedConstantsManager;
+    private final IScnProjectSettingsManager projectSettignsManager;
+    private final IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
+	private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+
+    private Map<String, Map<String, Integer>> calendarMap;
+
+	@Inject
+	public WorklogLogtimeManager(ExtendedConstantsManager extendedConstantsManager,
+                                 IScnProjectSettingsManager projectSettignsManager,
+                                 IExtWorklogLogtimeStore iExtWorklogLogtimeStore,
+                                 IScnWorklogLogtimeStore iScnWorklogLogtimeStore) {
+        this.extendedConstantsManager = extendedConstantsManager;
+        this.projectSettignsManager = projectSettignsManager;
+        this.iExtWorklogLogtimeStore = iExtWorklogLogtimeStore;
+        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
+		this.calendarMap = new HashMap<>();
 	}
 	
 	public List<Issue> getIssuesByProjectBetweenDates(Project project) throws DataAccessException {

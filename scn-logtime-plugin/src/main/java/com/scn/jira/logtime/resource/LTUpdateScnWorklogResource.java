@@ -6,25 +6,17 @@ import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.worklog.core.scnwl.DefaultScnWorklogManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,19 +41,17 @@ public class LTUpdateScnWorklogResource extends BaseResource {
     private final PermissionManager permissionManager;
 
     @Inject
-    public LTUpdateScnWorklogResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-                                      @ComponentImport IssueManager issueManager,
-                                      @ComponentImport ProjectRoleManager projectRoleManager,
-                                      @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                                      @ComponentImport DefaultScnWorklogManager scnWorklogManager,
-                                      @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                      @ComponentImport DefaultScnWorklogService scnWorklogService, PermissionManager permissionManager) {
+    public LTUpdateScnWorklogResource(JiraAuthenticationContext authenticationContext,
+                                      IssueManager issueManager,
+                                      IScnWorklogManager scnWorklogManager,
+                                      IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
+                                      IScnWorklogService scnWorklogService,
+                                      PermissionManager permissionManager) {
+        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
         this.scnWorklogManager = scnWorklogManager;
         this.scnWorklogService = scnWorklogService;
-        this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-            overridedWorklogManager, projectSettignsManager, scnWorklogService);
         this.permissionManager = permissionManager;
     }
 

@@ -16,19 +16,14 @@ import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
-import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -59,23 +54,21 @@ public class LTUpdateExtWorklogResource extends BaseResource {
     private final PermissionManager permissionManager;
 
     @Inject
-    public LTUpdateExtWorklogResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-                                      @ComponentImport IssueManager issueManager,
-                                      @ComponentImport ProjectRoleManager projectRoleManager,
-                                      @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                                      @ComponentImport ExtendedWorklogManagerImpl extendedWorklogManager,
-                                      @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                      @ComponentImport DefaultScnWorklogService scnDefaultWorklogService,
-                                      @ComponentImport WorklogService worklogService,
+    public LTUpdateExtWorklogResource(JiraAuthenticationContext authenticationContext,
+                                      IssueManager issueManager,
+                                      @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
+                                      ExtendedWorklogManager extendedWorklogManager,
+                                      ScnProjectSettingsManager projectSettignsManager,
+                                      IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
+                                      WorklogService worklogService,
                                       PermissionManager permissionManager) {
+        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
-        this.worklogManager = overridedWorklogManager;
+        this.worklogManager = worklogManager;
         this.extendedWorklogManager = extendedWorklogManager;
         this.projectSettignsManager = projectSettignsManager;
         this.worklogService = worklogService;
-        this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager, overridedWorklogManager,
-            projectSettignsManager, scnDefaultWorklogService);
         this.permissionManager = permissionManager;
     }
 

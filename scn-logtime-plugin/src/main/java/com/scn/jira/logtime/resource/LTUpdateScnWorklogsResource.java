@@ -1,10 +1,17 @@
 package com.scn.jira.logtime.resource;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
+import com.atlassian.jira.bc.JiraServiceContext;
+import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
+import com.scn.jira.logtime.util.DateUtils;
+import com.scn.jira.logtime.util.TextFormatUtil;
+import com.scn.jira.worklog.scnwl.IScnWorklogService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,46 +22,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-
-import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
-import com.atlassian.jira.bc.JiraServiceContext;
-import com.atlassian.jira.bc.JiraServiceContextImpl;
-import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
-import com.scn.jira.logtime.util.DateUtils;
-import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.scnwl.DefaultScnWorklogService;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
-
-import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Named
 @Path("/updateScnWorklogs")
 public class LTUpdateScnWorklogsResource extends BaseResource {
-    private IssueManager issueManager;
-    private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-    private IScnWorklogService scnWorklogService;
+    private final IssueManager issueManager;
+    private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+    private final IScnWorklogService scnWorklogService;
 
     @Inject
-    public LTUpdateScnWorklogsResource(@ComponentImport JiraAuthenticationContext authenticationContext,
-                                       @ComponentImport IssueManager issueManager,
-                                       @ComponentImport ProjectRoleManager projectRoleManager,
-                                       @Qualifier("overridedWorklogManager") WorklogManager overridedWorklogManager,
-                                       @ComponentImport ScnProjectSettingsManager projectSettignsManager,
-                                       @ComponentImport DefaultScnWorklogService scnWorklogService) {
+    public LTUpdateScnWorklogsResource(JiraAuthenticationContext authenticationContext,
+                                       IssueManager issueManager,
+                                       IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
+                                       IScnWorklogService scnWorklogService) {
+        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
         this.authenticationContext = authenticationContext;
         this.issueManager = issueManager;
-        this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(issueManager, projectRoleManager,
-            overridedWorklogManager, projectSettignsManager, scnWorklogService);
         this.scnWorklogService = scnWorklogService;
     }
 
