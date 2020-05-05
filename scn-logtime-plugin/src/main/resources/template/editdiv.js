@@ -229,12 +229,12 @@ function onFunctionLost1(isScn, userIdentifier, identifierSE) {
         document.getElementById('_' + current_editId).innerHTML = correctTime(val);
         if (isScn != 'true') {
             if (document.getElementById(arrayCountS[userIdentifier][identifierSE]).innerHTML != "") {
-                var complexId2 = arrayCount[arrayCountS[userIdentifier][identifierSE]];
+                var complexId2 = arrayCount[arrayCountS[userIdentifier][identifierSE].substring(1)];
             } else {
                 var complexId2 = "";
             }
         } else {
-            var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
+            var complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)];
         }
         var url = (isScn == 'true' ? "/rest/logtime-gadget/1.0/updateScnWorklog.json" : "/rest/logtime-gadget/1.0/updateExtWorklog.json");
         var cur = current_editId;
@@ -259,8 +259,8 @@ function onFunctionLost1(isScn, userIdentifier, identifierSE) {
                 if (msg.copied && identifierSE != '-1') {
                     document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = correctTime(val);
                     document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
-                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
-                        arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
+                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)]) {
+                        arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)] = msg.wlIdExt;
                     }
                 }
 
@@ -467,11 +467,11 @@ function updateWorklogAJAX() {
     if (isValidated) {
         var userIdentifier = document.getElementById('pop_user_identifier').value;
         var identifierSE = document.getElementById('pop_identifier_SE').value;
-        let complexId2;
+        var complexId2;
         if (isExt == 'true') {
             complexId2 = "";
         } else {
-            complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE]];
+            complexId2 = arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)];
         }
 
         AJS.$.ajax({
@@ -501,10 +501,10 @@ function updateWorklogAJAX() {
                 if (msg.copied) {
                     document.getElementById(arrayCountE[userIdentifier][identifierSE]).innerHTML = tmpTime;
                     document.getElementById(arrayCountE[userIdentifier][identifierSE]).style.color = "green";
-                    arrayCountComments[arrayCountE[userIdentifier][identifierSE]] = replaceSymbols(commentTmp);
+                    arrayCountComments[arrayCountE[userIdentifier][identifierSE].substring(1)] = replaceSymbols(commentTmp);
                     document.getElementById(arrayCountE[userIdentifier][identifierSE]).title = vlTypeText + ' ' + arrayCountComments[current_editId];
-                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE]]) {
-                        arrayCount[arrayCountE[userIdentifier][identifierSE]] = msg.wlIdExt;
+                    if (msg.wlIdExt != arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)]) {
+                        arrayCount[arrayCountE[userIdentifier][identifierSE].substring(1)] = msg.wlIdExt;
                     }
                 }
 
