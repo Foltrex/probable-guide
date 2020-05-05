@@ -1,25 +1,23 @@
 package com.scn.jira.mytime;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.Path;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.servlet.http.HttpServletRequest;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * REST resource that provides a list of projects in JSON format.
@@ -30,7 +28,7 @@ public class ProjectsResource {
 	private PermissionManager permissionManager;
 
 	@Inject
-	public ProjectsResource(@ComponentImport PermissionManager permissionManager) {
+	public ProjectsResource(PermissionManager permissionManager) {
 		this.permissionManager = permissionManager;
 	}
 

@@ -1,6 +1,5 @@
 package com.scn.jira.mytime;
 
-public interface MyPluginComponent
-{
+public interface PluginComponent {
     String getName();
 }
