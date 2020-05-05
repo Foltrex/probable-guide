@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 
@@ -18,12 +19,12 @@ public class TextFormatUtil {
 	private double daysPerWeek;
 	private ResourceBundle resourceBundle;
 	private NumberFormat decimalFormat;
-	private DateFormat dateFormat1;
-	private DateFormat dateFormat2;
-	private DateFormat dateFormat3;
-	private DateFormat dateFormat4;
-	private static long SECONDS_IN_DAYS = Duration.DAY.getSeconds() / 3;
-	private static long SECONDS_IN_WEEK = SECONDS_IN_DAYS * 5;
+	private final DateFormat dateFormat1;
+	private final DateFormat dateFormat2;
+	private final DateFormat dateFormat3;
+	private final DateFormat dateFormat4;
+	private static final long SECONDS_IN_DAYS = Duration.DAY.getSeconds() / 3;
+	private static final long SECONDS_IN_WEEK = SECONDS_IN_DAYS * 5;
 
 	public TextFormatUtil() {
 		ApplicationProperties ap = ComponentAccessor.getApplicationProperties();
@@ -95,7 +96,7 @@ public class TextFormatUtil {
 		String dateString = "";
 		if (date.equals("0"))
 			return "00:00";
-		long seconds = Long.valueOf(date);
+		long seconds = Long.parseLong(date);
 		long restSeconds = seconds;
 		if (seconds >= Duration.HOUR.getSeconds()) {
 			long hours = seconds / Duration.HOUR.getSeconds();
@@ -137,8 +138,7 @@ public class TextFormatUtil {
 		String dateString = "";
 		if (date.equals("0"))
 			return "";
-		long seconds = Long.valueOf(date);
-		long restSeconds = seconds;
+        long restSeconds = Long.parseLong(date);
 
 		if (restSeconds >= SECONDS_IN_WEEK) {
 			long weeks = restSeconds / SECONDS_IN_WEEK;
@@ -185,7 +185,7 @@ public class TextFormatUtil {
 	}
 
 	public static Long string2ToTime(String timeString) {
-		Long timeLong = new Long(0);
+		long timeLong = 0L;
 		java.util.regex.Pattern p1 = java.util.regex.Pattern
 				.compile("^\\s*(([0-9]*[0-9])w)*\\s*(([0-9]*[0-9])d)*\\s*(([0-9]*[0-9])h)?\\s*(([0-5]*[0-9])m)?\\s*$");
 		Matcher m1 = p1.matcher(timeString);
@@ -205,7 +205,7 @@ public class TextFormatUtil {
 	}
 
 	public static Long string3ToTime(String timeString) {
-		Long timeLong = new Long(0);
+		long timeLong = 0L;
 		java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("^\\s*([0-9]*)\\s*$");
 		Matcher m1 = p1.matcher(timeString);
 		if (m1.find()) {
@@ -219,37 +219,26 @@ public class TextFormatUtil {
 	public static boolean matchesPattern3(String timeString) {
 		java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("^\\s*([0-9]*)\\s*$");
 		Matcher m1 = p1.matcher(timeString);
-		if (m1.matches()) {
-			return true;
-		}
-
-		return false;
-	}
+        return m1.matches();
+    }
 
 	public static boolean matchesPattern2(String timeString) {
 		java.util.regex.Pattern p1 = java.util.regex.Pattern
 				.compile("^\\s*(([0-9]*[0-9])w)*\\s*(([0-9]*[0-9])d)*\\s*(([0-9]*[0-9])h)?\\s*(([0-5]*[0-9])m)?\\s*$");
 		Matcher m1 = p1.matcher(timeString);
-		if (m1.matches()) {
-			return true;
-		}
-
-		return false;
-	}
+        return m1.matches();
+    }
 
 	public static boolean matchesPattern1(String timeString) {
 		java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("^\\s*([0-9]*[0-9]):[0-5][0-9]\\s*$");
 		Matcher m1 = p1.matcher(timeString);
-		if (m1.matches()) {
-			return true;
-		}
-		return false;
-	}
+        return m1.matches();
+    }
 
 	public static Long stringToTime(String timeString) {
-		Long timeLong = new Long(0);
+		long timeLong = 0L;
 		timeString = timeString.trim();
-		if (timeString != null && timeString.contains(":")) {
+		if (timeString.contains(":")) {
 			String[] parts = timeString.split(":");
 			timeLong = Long.parseLong(parts[0]) * Duration.HOUR.getSeconds()
 					+ Long.parseLong(parts[1]) * Duration.MINUTE.getSeconds();
@@ -259,8 +248,8 @@ public class TextFormatUtil {
 	}
 
 	public static String replaceHTMLSymbols(String stringToReplace) {
-		return stringToReplace.replaceAll("<", "").replaceAll(">", "").replaceAll("#", "").replaceAll("\'", "")
-				.replaceAll("\"", "").replaceAll("$", "").replaceAll(";", "").replaceAll("\n", " ")
+	    return Optional.ofNullable(stringToReplace).orElse("").replaceAll("<", "").replaceAll(">", "").replaceAll("#", "").replaceAll("'", "")
+				.replaceAll("\"", "").replaceAll("\\$", "").replaceAll(";", "").replaceAll("\n", " ")
 				.replaceAll("\r", " ");
 	}
 
