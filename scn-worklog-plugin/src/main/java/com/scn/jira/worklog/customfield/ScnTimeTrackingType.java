@@ -26,6 +26,9 @@ import com.atlassian.jira.util.collect.MapBuilder;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Named;
+
+@Named
 public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, String>, String> {
 	public static final String ORIGINAL_ESTIMATE = "originalEstimate";
 	public static final String REMAINING_ESTIMATE = "remainingEstimate";
@@ -39,7 +42,7 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Map<String, Str
 
 	@Autowired
 	public ScnTimeTrackingType(JiraAuthenticationContext authenticationContext,
-			@ComponentImport ApplicationProperties applicationProperties, OfBizScnExtendedIssueStore issueStore,
+			ApplicationProperties applicationProperties, OfBizScnExtendedIssueStore issueStore,
 			DefaultScnWorklogManager wlManger, IGlobalSettingsManager scnPermissionManager) {
 		this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
 		this.authenticationContext = authenticationContext;

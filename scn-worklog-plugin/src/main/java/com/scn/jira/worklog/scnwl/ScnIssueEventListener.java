@@ -20,9 +20,7 @@ public class ScnIssueEventListener implements InitializingBean, DisposableBean
 	public final IScnWorklogStore worklogStore;
 
 	@Inject
-	public ScnIssueEventListener(
-			@ComponentImport EventPublisher eventPublisher,
-			IScnWorklogStore worklogStore) {
+	public ScnIssueEventListener(EventPublisher eventPublisher, IScnWorklogStore worklogStore) {
 		this.eventPublisher = eventPublisher;
 		this.worklogStore = worklogStore;
 	}

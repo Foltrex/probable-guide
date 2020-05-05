@@ -10,7 +10,6 @@ import com.atlassian.jira.user.UserHistoryItem;
 import com.atlassian.jira.user.UserProjectHistoryManager;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 
@@ -20,7 +19,6 @@ import java.util.List;
 
 @Scanned
 public class RecentProjectFunction extends AbstractJqlFunction {
-    @ComponentImport
     private final UserProjectHistoryManager userProjectHistoryManager;
 
     public RecentProjectFunction(UserProjectHistoryManager userProjectHistoryManager) {

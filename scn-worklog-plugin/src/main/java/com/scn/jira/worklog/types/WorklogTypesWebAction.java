@@ -29,8 +29,8 @@ public class WorklogTypesWebAction extends AbstractViewConstants<WorklogType> {
 	private String statusColor;
 
 	@Inject
-	public WorklogTypesWebAction(@ComponentImport final TranslationManager translationManager,
-			@ComponentImport final OfBizDelegator ofBizDelegator) {
+	public WorklogTypesWebAction(final TranslationManager translationManager,
+			final OfBizDelegator ofBizDelegator) {
 		super(translationManager);
 
 		this.ofBizDelegator = ofBizDelegator;

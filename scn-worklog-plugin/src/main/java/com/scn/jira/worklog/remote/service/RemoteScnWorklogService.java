@@ -38,9 +38,9 @@ public class RemoteScnWorklogService implements IRemoteScnWorklogService {
 	private final ExtendedConstantsManager extendedConstantsManager;
 
 	@Inject
-	public RemoteScnWorklogService(@ComponentImport IssueManager issueManager,
-			@ComponentImport ProjectManager projectManager,
-			@ComponentImport JiraAuthenticationContext authenticationContext,
+	public RemoteScnWorklogService(IssueManager issueManager,
+			ProjectManager projectManager,
+			JiraAuthenticationContext authenticationContext,
 			IScnWorklogService defaultScnWorklogService, ExtendedConstantsManager extendedConstantsManager) {
 		this.issueManager = issueManager;
 		this.projectManager = projectManager;

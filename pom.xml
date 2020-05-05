@@ -61,7 +61,13 @@
 				<groupId>com.atlassian.plugin</groupId>
 				<artifactId>atlassian-spring-scanner-annotation</artifactId>
 				<version>${atlassian.spring.scanner.version}</version>
-				<scope>provided</scope>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.atlassian.plugin</groupId>
+				<artifactId>atlassian-spring-scanner-runtime</artifactId>
+				<version>${atlassian.spring.scanner.version}</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.jcip</groupId>
@@ -130,8 +136,8 @@
 
 	<modules>
 		<module>scn-worklog-plugin</module>
-		<module>scn-mytime-gadget-plugin</module>
 		<module>scn-logtime-plugin</module>
+		<module>scn-mytime-gadget-plugin</module>
 		<module>scn-timesheet-plugin</module>
 		<module>scn-clone-project-plugin</module>
 	</modules>

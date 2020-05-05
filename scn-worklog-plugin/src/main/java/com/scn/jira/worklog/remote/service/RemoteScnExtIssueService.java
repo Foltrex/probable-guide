@@ -1,13 +1,5 @@
 package com.scn.jira.worklog.remote.service;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
@@ -20,9 +12,14 @@ import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 import com.scn.jira.worklog.remote.service.object.RemoteScnExtIssue;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RemoteScnExtIssueService implements IRemoteScnExtIssueService {
@@ -34,8 +31,8 @@ public class RemoteScnExtIssueService implements IRemoteScnExtIssueService {
 	private final IGlobalSettingsManager scnGlobalPermissionManager;
 
 	@Inject
-	public RemoteScnExtIssueService(@ComponentImport PermissionManager permissionManager,
-			@ComponentImport IssueManager issueManager, IScnExtendedIssueStore scnExtendedIssueStore,
+	public RemoteScnExtIssueService(PermissionManager permissionManager,
+			IssueManager issueManager, IScnExtendedIssueStore scnExtendedIssueStore,
 			IGlobalSettingsManager scnGlobalPermissionManager) {
 		this.permissionManager = permissionManager;
 		this.issueManager = issueManager;

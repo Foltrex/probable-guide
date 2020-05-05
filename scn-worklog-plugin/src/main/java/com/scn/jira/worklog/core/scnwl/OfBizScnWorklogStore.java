@@ -39,8 +39,8 @@ public class OfBizScnWorklogStore implements IScnWorklogStore {
 
     @Inject
     public OfBizScnWorklogStore(OfBizDelegator ofBizDelegator,
-                                @ComponentImport IssueManager issueManager,
-                                @ComponentImport ProjectRoleManager projectRoleManager,
+                                IssueManager issueManager,
+                                ProjectRoleManager projectRoleManager,
                                 ExtendedWorklogManagerImpl extendedWorklogManager,
                                 IScnProjectSettingsManager scnProjectSettingsManager) {
         this.ofBizDelegator = ofBizDelegator;

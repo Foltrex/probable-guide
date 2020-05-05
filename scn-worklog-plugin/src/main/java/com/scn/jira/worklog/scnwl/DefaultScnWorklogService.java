@@ -29,26 +29,20 @@ import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.opensymphony.util.TextUtils;
-import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
-import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
-import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
+import com.scn.jira.worklog.core.scnwl.*;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
-
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.*;
 
-@ExportAsService({DefaultScnWorklogService.class})
-@Named("defaultScnWorklogService")
+@ExportAsService(IScnWorklogService.class)
+@Service
 public class DefaultScnWorklogService implements IScnWorklogService {
-
     private static final Logger LOGGER = Logger.getLogger(DefaultScnWorklogService.class);
 
     private final VisibilityValidator visibilityValidator;
@@ -63,13 +57,12 @@ public class DefaultScnWorklogService implements IScnWorklogService {
     private final PermissionManager permissionManager;
     private final IGlobalSettingsManager scnGlobalPermissionManager;
     private final IScnExtendedIssueStore extIssueStore;
-
-    private ScnUserBlockingManager scnUserBlockingManager;
+    private final ScnUserBlockingManager scnUserBlockingManager;
 
     @Inject
-    public DefaultScnWorklogService(@ComponentImport VisibilityValidator visibilityValidator,
+    public DefaultScnWorklogService(VisibilityValidator visibilityValidator,
                                     ApplicationProperties applicationProperties, ProjectRoleManager projectRoleManager, IssueManager issueManager,
-                                    @ComponentImport TimeTrackingConfiguration timeTrackingConfiguration, GroupManager groupManager,
+                                    TimeTrackingConfiguration timeTrackingConfiguration, GroupManager groupManager,
                                     IScnProjectSettingsManager scnProjectSettingsManager, IScnWorklogManager worklogManager, IGlobalSettingsManager scnGlobalPermissionManager,
                                     IScnExtendedIssueStore extendedIssueStore, ScnUserBlockingManager scnUserBlockingManager) {
         this.visibilityValidator = visibilityValidator;

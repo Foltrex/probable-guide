@@ -1,24 +1,16 @@
 package com.scn.jira.worklog.scnwl;
 
 import com.atlassian.jira.bc.issue.comment.CommentService;
-import com.atlassian.jira.bc.issue.util.VisibilityValidator;
-import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.util.JiraDurationUtils;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.worklog.core.scnwl.*;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named
 public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     private static final long serialVersionUID = -7662358199449964631L;
 
@@ -26,8 +18,7 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     private Long newEstimateLong;
     private Long adjustmentAmountLong;
 
-    @Inject
-    public DeleteScnWorklogAction(@ComponentImport CommentService commentService,
+    public DeleteScnWorklogAction(CommentService commentService,
                                   ProjectRoleManager projectRoleManager,
                                   GroupManager groupManager,
                                   IScnWorklogService scnWorklogService) {

@@ -11,7 +11,7 @@ import javax.inject.Named;
 public class CustomBaseUrlContextProvider extends BaseUrlContextProvider {
 
     @Inject
-    public CustomBaseUrlContextProvider(@ComponentImport VelocityRequestContextFactory requestContextFactory) {
+    public CustomBaseUrlContextProvider(VelocityRequestContextFactory requestContextFactory) {
         super(requestContextFactory);
     }
 }

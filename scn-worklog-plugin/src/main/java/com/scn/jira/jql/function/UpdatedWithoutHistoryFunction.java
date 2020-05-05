@@ -12,7 +12,6 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.google.common.collect.ImmutableList;
@@ -20,7 +19,9 @@ import org.ofbiz.core.entity.*;
 
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Scanned
@@ -29,8 +30,8 @@ public class UpdatedWithoutHistoryFunction extends AbstractJqlFunction {
     private final JqlDateSupport jqlDateSupport;
     private static final String ENTITY_ISSUE = "Issue";
 
-    public UpdatedWithoutHistoryFunction(@ComponentImport OfBizDelegator ofBizDelegator,
-                                         @ComponentImport JqlDateSupport jqlDateSupport) {
+    public UpdatedWithoutHistoryFunction(OfBizDelegator ofBizDelegator,
+                                         JqlDateSupport jqlDateSupport) {
         this.ofBizDelegator = Assertions.notNull("ofBizDelegator", ofBizDelegator);
         this.jqlDateSupport = Assertions.notNull("jqlDateSupport", jqlDateSupport);
     }

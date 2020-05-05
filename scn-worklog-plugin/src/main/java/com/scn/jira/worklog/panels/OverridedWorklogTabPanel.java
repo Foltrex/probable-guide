@@ -16,7 +16,6 @@ import com.atlassian.jira.plugin.userformat.UserFormats;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
@@ -41,7 +40,7 @@ public class OverridedWorklogTabPanel extends WorklogTabPanel {
 	private final UserFormats userFormats;
 
 	@Inject
-	public OverridedWorklogTabPanel(@ComponentImport ApplicationProperties applicationProperties,
+	public OverridedWorklogTabPanel(ApplicationProperties applicationProperties,
 									IScnProjectSettingsManager scnProjectSettingsManager,
 									ExtendedWorklogManager extendedWorklogManager, ExtendedConstantsManager extendedConstantsManager) {
 		super(ComponentAccessor.getComponent(WorklogService.class), ComponentAccessor.getComponent(JiraDurationUtils.class),

@@ -14,6 +14,7 @@ import com.atlassian.jira.util.BrowserUtils;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.DeleteWorklog;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;

@@ -1,32 +1,8 @@
 package com.scn.jira.worklog.wl;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.atlassian.core.util.DateUtils;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.lang.StringUtils;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.comment.CommentService;
-import com.atlassian.jira.bc.issue.worklog.WorklogAdjustmentAmountResult;
-import com.atlassian.jira.bc.issue.worklog.WorklogInputParametersImpl;
-import com.atlassian.jira.bc.issue.worklog.WorklogNewEstimateResult;
-import com.atlassian.jira.bc.issue.worklog.WorklogResult;
-import com.atlassian.jira.bc.issue.worklog.WorklogResultFactory;
-import com.atlassian.jira.bc.issue.worklog.WorklogService;
+import com.atlassian.jira.bc.issue.worklog.*;
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.config.FeatureManager;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.comparator.UserBestNameComparator;
@@ -45,15 +21,20 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.CreateWorklog;
 import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
-import com.atlassian.jira.web.util.OutlookDateManager;
-import com.atlassian.jira.workflow.WorkflowManager;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.core.wl.WorklogType;
-import org.ofbiz.core.entity.GenericValue;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.*;
 
 public class ExtendedCreateWorklog extends CreateWorklog {
 	private static final long serialVersionUID = -4594446887729353135L;

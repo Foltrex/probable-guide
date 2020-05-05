@@ -1,28 +1,27 @@
 package com.scn.jira.wl.wltypes.service;
 
+import com.atlassian.annotations.PublicApi;
+import com.atlassian.jira.permission.GlobalPermissionKey;
+import com.atlassian.jira.security.GlobalPermissionManager;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+import com.scn.jira.wl.BLException;
+import com.scn.jira.wl.wltypes.bl.IWLTypesManager;
+import com.scn.jira.wl.wltypes.dal.WLTypeEntity;
+import org.mapstruct.factory.Mappers;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Response.Status;
-
-import org.mapstruct.factory.Mappers;
-
-import com.atlassian.annotations.PublicApi;
-import com.atlassian.jira.permission.GlobalPermissionKey;
-import com.atlassian.jira.security.GlobalPermissionManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-import com.scn.jira.wl.BLException;
-import com.scn.jira.wl.wltypes.bl.IWLTypesManager;
-import com.scn.jira.wl.wltypes.dal.WLTypeEntity;
 
 @Path("/wltypes")
 @PublicApi
@@ -33,8 +32,8 @@ public class WLTypesService {
 
 	@Inject
 	public WLTypesService(IWLTypesManager manager,
-			@ComponentImport final GlobalPermissionManager globalPermissionManager,
-			@ComponentImport final JiraAuthenticationContext authContext) {
+			final GlobalPermissionManager globalPermissionManager,
+			final JiraAuthenticationContext authContext) {
 		this.manager = manager;
 		this.globalPermissionManager = globalPermissionManager;
 		this.authContext = authContext;

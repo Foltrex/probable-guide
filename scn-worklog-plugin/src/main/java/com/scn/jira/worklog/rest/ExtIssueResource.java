@@ -1,21 +1,5 @@
 package com.scn.jira.worklog.rest;
 
-import java.rmi.RemoteException;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
@@ -24,12 +8,21 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.scnwl.ScnExtendedIssue;
 import com.scn.jira.worklog.remote.service.IRemoteScnExtIssueService;
 import com.scn.jira.worklog.remote.service.object.RemoteScnExtIssue;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.rmi.RemoteException;
 
 @Path("/scn-ext-issue")
 public class ExtIssueResource {
@@ -39,7 +32,7 @@ public class ExtIssueResource {
 
 	@Inject
 	public ExtIssueResource(IRemoteScnExtIssueService remoteScnExtIssueService,
-			IScnExtendedIssueStore ofBizExtIssueStore, @ComponentImport IssueManager issueManager) {
+			IScnExtendedIssueStore ofBizExtIssueStore, IssueManager issueManager) {
 		this.remoteScnExtIssueService = remoteScnExtIssueService;
 		this.ofBizExtIssueStore = ofBizExtIssueStore;
 		this.issueManager = issueManager;

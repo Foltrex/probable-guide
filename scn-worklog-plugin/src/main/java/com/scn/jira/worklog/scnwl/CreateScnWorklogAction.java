@@ -1,25 +1,20 @@
 package com.scn.jira.worklog.scnwl;
 
 import com.atlassian.jira.bc.issue.comment.CommentService;
-import com.atlassian.jira.bc.issue.util.VisibilityValidator;
-import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.CommentVisibility;
-import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
-import com.scn.jira.worklog.core.scnwl.*;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
-import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import org.apache.commons.lang.StringUtils;
 
-import javax.inject.Inject;
 import java.util.Date;
 import java.util.Objects;
 
@@ -34,7 +29,6 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
     private Long newEstimateLong;
     private Long adjustmentAmountLong;
 
-    @Inject
     public CreateScnWorklogAction(ProjectRoleManager projectRoleManager,
                                   GroupManager groupManager,
                                   IScnWorklogService scnWorklogService) {
