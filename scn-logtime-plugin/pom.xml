@@ -81,6 +81,12 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
+					<pluginDependencies>
+						<pluginDependency>
+							<groupId>com.scn.jira</groupId>
+							<artifactId>scn-worklog-plugin</artifactId>
+						</pluginDependency>
+					</pluginDependencies>
 					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
