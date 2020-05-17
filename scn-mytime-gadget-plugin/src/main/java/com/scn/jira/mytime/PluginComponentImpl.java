@@ -18,8 +18,8 @@ public class PluginComponentImpl implements PluginComponent {
     private GlobalPermissionManager globalPermissionManager;
     @ComponentImport
     private JiraAuthenticationContext jiraAuthenticationContext;
-//    @ComponentImport
-//    private OverridedWorklogManager overridedWorklogManager;
+    @ComponentImport
+    private OverridedWorklogManager overridedWorklogManager;
     @ComponentImport
     private PermissionManager permissionManager;
     @ComponentImport

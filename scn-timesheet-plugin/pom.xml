@@ -86,6 +86,7 @@
 							org.springframework.osgi.*;resolution:="optional",
 							org.eclipse.gemini.blueprint.*;resolution:="optional",
 							com.atlassian.plugin.osgi.bridge.external,
+							com.scn.jira.worklog.*,
 							*;resolution:=optional
 						</Import-Package>
 					</instructions>
