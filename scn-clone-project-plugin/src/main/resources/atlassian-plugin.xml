@@ -27,9 +27,6 @@
         <resource type="download" name="images/" location="/images"/>
         <context>scn-clone-project</context>
     </web-resource>
-    <!-- import from the product container -->
-    <component-import key="applicationProperties"
-                      interface="com.atlassian.sal.api.ApplicationProperties"/>
     <rest name="Clone Project Resource"
           i18n-name-key="clone-project-resource.name"
           key="clone-project-resource" path="/cloneproject" version="1.0">

@@ -1,5 +1,6 @@
 package com.scn.cloneproject.rest;
 
+import javax.inject.Named;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,16 +20,17 @@ import com.atlassian.jira.permission.PermissionSchemeManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 
+@Named
 @Path("/project")
 public class ProjectResource {
-    private ProjectService projectService;
-    private WorkflowSchemeManager workflowSchemeManager;
-    private IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
-    private FieldLayoutManager fieldLayoutManager;
-    private PermissionSchemeManager permissionSchemeManager;
-    private NotificationSchemeManager notificationSchemeManager;
-    private IssueSecuritySchemeManager issueSecuritySchemeManager;
-    private IssueTypeSchemeManager issueTypeSchemeManager;
+    private final ProjectService projectService;
+    private final WorkflowSchemeManager workflowSchemeManager;
+    private final IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
+    private final FieldLayoutManager fieldLayoutManager;
+    private final PermissionSchemeManager permissionSchemeManager;
+    private final NotificationSchemeManager notificationSchemeManager;
+    private final IssueSecuritySchemeManager issueSecuritySchemeManager;
+    private final IssueTypeSchemeManager issueTypeSchemeManager;
 
     public ProjectResource(ProjectService projectService, WorkflowSchemeManager workflowSchemeManager,
                            IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldLayoutManager fieldLayoutManager,
@@ -90,3 +92,4 @@ public class ProjectResource {
         return "OK";
     }
 }
+

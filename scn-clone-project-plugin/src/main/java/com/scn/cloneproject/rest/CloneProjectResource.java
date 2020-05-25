@@ -2,6 +2,7 @@ package com.scn.cloneproject.rest;
 
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,18 +30,19 @@ import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 
+@Named
 @Path("/doclone")
 public class CloneProjectResource {
-    private ProjectService projectService;
-    private AvatarManager avatarManager;
-    private ProjectManager projectManager;
-    private PermissionSchemeManager permissionSchemeManager;
-    private NotificationSchemeManager notificationSchemeManager;
-    private IssueSecuritySchemeManager issueSecuritySchemeManager;
-    private WorkflowSchemeManager workflowSchemeManager;
-    private FieldLayoutManager fieldLayoutManager;
-    private IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
-    private UserManager userManager;
+    private final ProjectService projectService;
+    private final AvatarManager avatarManager;
+    private final ProjectManager projectManager;
+    private final PermissionSchemeManager permissionSchemeManager;
+    private final NotificationSchemeManager notificationSchemeManager;
+    private final IssueSecuritySchemeManager issueSecuritySchemeManager;
+    private final WorkflowSchemeManager workflowSchemeManager;
+    private final FieldLayoutManager fieldLayoutManager;
+    private final IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
+    private final UserManager userManager;
 
     public CloneProjectResource(ProjectService projectService, ProjectManager projectManager,
                                 PermissionSchemeManager permissionSchemeManager, NotificationSchemeManager notificationSchemeManager,

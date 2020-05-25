@@ -31,7 +31,15 @@
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>jsr311-api</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.atlassian.plugin</groupId>
+			<artifactId>atlassian-spring-scanner-annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugin</groupId>
+			<artifactId>atlassian-spring-scanner-runtime</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -60,7 +68,21 @@
                         <atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
                         <atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
                     </systemProperties>
-                    <products>
+					<extractDependencies>false</extractDependencies>
+					<instructions>
+						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
+						<Spring-Context>*</Spring-Context>
+						<Export-Package>
+						</Export-Package>
+						<Import-Package>
+							org.springframework.osgi.*;resolution:="optional",
+							org.eclipse.gemini.blueprint.*;resolution:="optional",
+							com.atlassian.plugin.osgi.bridge.external,
+							*;resolution:=optional
+						</Import-Package>
+					</instructions>
+					<skipManifestValidation>true</skipManifestValidation>
+					<products>
                         <product>
                             <id>jira</id>
                             <instanceId>jiraIT</instanceId>
@@ -79,6 +101,29 @@
                             </includes>
                         </testGroup>
                     </testGroups>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.atlassian.plugin</groupId>
+				<artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+				<version>${atlassian.spring.scanner.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>atlassian-spring-scanner</goal>
+						</goals>
+						<phase>process-classes</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<includeExclude>-com.atlassian.plugin.spring.scanner.annotation.*</includeExclude>
+					<scannedDependencies>
+						<dependency>
+							<groupId>com.atlassian.plugin</groupId>
+							<artifactId>atlassian-spring-scanner-external-jar</artifactId>
+						</dependency>
+					</scannedDependencies>
+					<verbose>false</verbose>
 				</configuration>
 			</plugin>
 			<plugin>
