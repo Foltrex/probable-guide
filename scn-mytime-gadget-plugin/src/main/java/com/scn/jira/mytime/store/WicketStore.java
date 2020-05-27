@@ -1,11 +1,8 @@
 package com.scn.jira.mytime.store;
 
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.util.I18nHelper;
 import com.scn.jira.mytime.util.DateUtils;
 import org.apache.log4j.Logger;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,26 +16,13 @@ import java.util.Map;
 @Named
 public class WicketStore {
     protected static Logger logger = Logger.getLogger(WicketStore.class);
-    private final I18nHelper i18nResolver;
-    private static String driverName;
-    private static String connection;
-    private static String loginTatsi;
-    private static String password;
 
-    @Inject
-    public WicketStore(JiraAuthenticationContext jiraAuthenticationContext) {
-        this.i18nResolver = jiraAuthenticationContext.getI18nHelper();
-    }
-
-    private void getDbProperties() {
-        driverName = i18nResolver.getText("mytime.gadget.driverName");
-        connection = i18nResolver.getText("mytime.gadget.connection");
-        loginTatsi = i18nResolver.getText("mytime.gadget.login");
-        password = i18nResolver.getText("mytime.gadget.password");
-    }
+    private static final  String driverName = "net.sourceforge.jtds.jdbc.Driver";
+    private static final String connection = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
+    private static final String loginTatsi = "sps-training-admin";
+    private static final String password = "06#$XPvf";
 
     public Map<String, Long> gerUserWicketTimeForthePeriod(String login, Date startDate, Date endDate) {
-        getDbProperties();
         Map<String, Long> timesMap = new HashMap<>();
 
         try {

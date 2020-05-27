@@ -1,45 +1,27 @@
 package com.scn.jira.logtime.manager;
 
-import java.sql.*;
-import java.util.*;
-import java.util.Date;
-
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.util.I18nHelper;
+import com.scn.jira.logtime.representation.WicketRepresentation;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import com.scn.jira.logtime.representation.WicketRepresentation;
 import org.apache.log4j.Logger;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import java.sql.*;
+import java.util.Date;
+import java.util.*;
 
 @Named
 public class WicketManager {
     private static final Logger LOGGER = Logger.getLogger(WicketManager.class);
 
-    private I18nHelper i18nResolver;
-    private String driverName1;
-    private String connection1;
-    private String loginTatsi1;
-    private String password1;
-
-    @Inject
-    public WicketManager(JiraAuthenticationContext jiraAuthenticationContext) {
-        this.i18nResolver = jiraAuthenticationContext.getI18nHelper();
-    }
-
-    private void getDbProperties() {
-        driverName1 = i18nResolver.getText("logtime.gadget.driverName");
-        connection1 = i18nResolver.getText("logtime.gadget.connection");
-        loginTatsi1 = i18nResolver.getText("logtime.gadget.login");
-        password1 = i18nResolver.getText("logtime.gadget.password");
-    }
+    private final static String driverName1 = "net.sourceforge.jtds.jdbc.Driver";
+    private final static String connection1 = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
+    private final static String loginTatsi1 = "sps-training-admin";
+    private final static String password1 = "06#$XPvf";
 
     public WicketRepresentation gerUserWicketTimeForthePeriod(String login, Date startDate, Date endDate) {
-        getDbProperties();
-        ArrayList<String> times = new ArrayList<String>();
-        Map<String, Long> timesMap = new HashMap<String, Long>();
+        ArrayList<String> times = new ArrayList<>();
+        Map<String, Long> timesMap = new HashMap<>();
 
         List<String> datesForList = DateUtils.getDatesList(startDate, endDate, DateUtils.formatStringDay);
         WicketRepresentation wicketRepresentation = new WicketRepresentation();
@@ -74,10 +56,6 @@ public class WicketManager {
             s.close();
             con.close();
 
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage());
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         } finally {
@@ -97,7 +75,7 @@ public class WicketManager {
 
     public Map<String, WicketRepresentation> gerUserWicketTimeForthePeriods(List<String> logins, Date startDate,
                                                                             Date endDate) {
-        Map<String, WicketRepresentation> wicketRepMap = new HashMap<String, WicketRepresentation>();
+        Map<String, WicketRepresentation> wicketRepMap = new HashMap<>();
 
         for (String login : logins) {
             login = login.trim();
@@ -110,7 +88,6 @@ public class WicketManager {
 
     public boolean gerUserWicketPermission(String login) {
         boolean result = false;
-        getDbProperties();
         try {
             Class.forName(driverName1);
             Connection con = DriverManager.getConnection(connection1, loginTatsi1, password1);
@@ -129,10 +106,6 @@ public class WicketManager {
             s.close();
             con.close();
 
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage());
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
@@ -141,7 +114,7 @@ public class WicketManager {
     }
 
     public Map<String, Map<String, Integer>> gerUsersCalendar(List<String> logins, Date startDate, Date endDate) {
-        Map<String, Map<String, Integer>> usersCalMap = new HashMap<String, Map<String, Integer>>();
+        Map<String, Map<String, Integer>> usersCalMap = new HashMap<>();
 
         for (String login : logins) {
             login = login.trim();
@@ -152,9 +125,7 @@ public class WicketManager {
     }
 
     public Map<String, Integer> gerUserCalendar(String login, Date startDate, Date endDate) {
-        getDbProperties();
-
-        Map<String, Integer> calendarMap = new HashMap<String, Integer>();
+        Map<String, Integer> calendarMap = new HashMap<>();
 
         String startDay = DateUtils.stringDate(startDate, DateUtils.formatStringDay);
         String endDay = DateUtils.stringDate(endDate, DateUtils.formatStringDay);
@@ -178,10 +149,6 @@ public class WicketManager {
                 LOGGER.error(e.getMessage());
             }
 
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage());
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
