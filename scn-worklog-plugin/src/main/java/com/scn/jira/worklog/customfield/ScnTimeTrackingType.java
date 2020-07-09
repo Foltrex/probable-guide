@@ -88,8 +88,12 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estim
     }
 
     @Override
-    public Estimate getSingularObjectFromString(String s) throws FieldValidationException {
-        return new Estimate(Long.valueOf(s), Long.valueOf(s));
+    public Estimate getSingularObjectFromString(String seconds) throws FieldValidationException {
+        return seconds.isEmpty() ? new Estimate() :
+            new Estimate(Long.valueOf(seconds),
+                Long.valueOf(seconds),
+                getFormattedDuration(Long.valueOf(seconds)),
+                getFormattedDuration(Long.valueOf(seconds)));
     }
 
     @Override
@@ -118,6 +122,35 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estim
         if (StringUtils.isNotBlank(remainingEstimate) && isNotValidDuration(remainingEstimate)) {
             errorCollection.addError(customFieldId + ":" + REMAINING_ESTIMATE, getI18nBean().getText("worklog.service.error.invalid.time.duration"));
         }
+
+        String value = (String) params.getFirstValueForNullKey();
+        if (StringUtils.isNotBlank(value) && isNotValidDuration(value)) {
+            errorCollection.addError(customFieldId, getI18nBean().getText("worklog.service.error.invalid.time.duration"));
+        }
+    }
+
+    @Override
+    public Estimate getValueFromCustomFieldParams(CustomFieldParams params) throws FieldValidationException {
+        Estimate estimate = new Estimate();
+
+        if (params.containsKey(ORIGINAL_ESTIMATE)) {
+            estimate.setOriginal(getDurationSeconds((String) params.getFirstValueForKey(ORIGINAL_ESTIMATE)));
+            estimate.setFormattedOriginal((String) params.getFirstValueForKey(ORIGINAL_ESTIMATE));
+        }
+        if (params.containsKey(REMAINING_ESTIMATE)) {
+            estimate.setRemaining(getDurationSeconds((String) params.getFirstValueForKey(REMAINING_ESTIMATE)));
+            estimate.setFormattedRemaining((String) params.getFirstValueForKey(REMAINING_ESTIMATE));
+        }
+        String value = (String) params.getFirstValueForNullKey();
+        if (value != null && !value.isEmpty()) {
+            Long seconds = Long.valueOf(value);
+            return new Estimate(seconds,
+                seconds,
+                getFormattedDuration(seconds),
+                getFormattedDuration(seconds));
+        }
+
+        return estimate;
     }
 
     @Override
@@ -157,22 +190,6 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estim
         } else {
             issueStore.update(new ScnExtendedIssue(issue, oldEstimate.getId(), originalEstimate, remainingEstimate, oldEstimate.getTimeSpent()));
         }
-    }
-
-    @Override
-    public Estimate getValueFromCustomFieldParams(CustomFieldParams params) throws FieldValidationException {
-        Estimate estimate = new Estimate();
-
-        if (params.containsKey(ORIGINAL_ESTIMATE)) {
-            estimate.setOriginal(getDurationSeconds((String) params.getFirstValueForKey(ORIGINAL_ESTIMATE)));
-            estimate.setFormattedOriginal((String) params.getFirstValueForKey(ORIGINAL_ESTIMATE));
-        }
-        if (params.containsKey(REMAINING_ESTIMATE)) {
-            estimate.setRemaining(getDurationSeconds((String) params.getFirstValueForKey(REMAINING_ESTIMATE)));
-            estimate.setFormattedRemaining((String) params.getFirstValueForKey(REMAINING_ESTIMATE));
-        }
-
-        return estimate;
     }
 
     @Override
