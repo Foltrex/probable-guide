@@ -12,6 +12,7 @@ import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.event.issue.IssueEventBundleFactory;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.RendererManager;
+import com.atlassian.jira.issue.customfields.manager.GenericConfigManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -73,6 +74,8 @@ public class PluginComponentImpl implements PluginComponent {
     private FieldVisibilityManager fieldVisibilityManager;
     @ComponentImport
     private FeatureManager featureManager;
+    @ComponentImport
+    private GenericConfigManager genericConfigManager;
     @ComponentImport
     private GlobalPermissionManager globalPermissionManager;
     @ComponentImport
