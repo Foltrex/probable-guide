@@ -153,10 +153,9 @@ public class Pivot extends AbstractReport {
                 } else {
                     Map<MyUser, Long> issueWorkLog = this.workedIssues.computeIfAbsent(issue, k -> new Hashtable<>());
                     MyUser user;
-                    if (worklog.getAuthorKey() != null) {
-                        User osuser = Objects.requireNonNull(ComponentAccessor.getUserManager().getUserByKey(worklog.getAuthorKey()))
-                            .getDirectoryUser();
-
+                    ApplicationUser appUser = ComponentAccessor.getUserManager().getUserByKey(worklog.getAuthorKey());
+                    if (worklog.getAuthorKey() != null && appUser != null) {
+                        User osuser = appUser.getDirectoryUser();
                         user = new MyUser(osuser.getName(), osuser.getDisplayName());
                     } else {
                         user = new MyUser("anonymous", "anonymous");
