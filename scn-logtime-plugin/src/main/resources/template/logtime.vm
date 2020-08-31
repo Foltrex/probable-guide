@@ -309,7 +309,6 @@
                                     <td class="table-col table-col-bold" rowspan=$issueSize>
                                         <a href="$req.contextPath/browse/$issue.getName()"
                                            style="text-decoration: none; "
-                                           title="$issue.getKey() - $issue.getName()"
                                            target="_blank">$issue.getUrlName()</a>
                                     </td>
 
@@ -545,3 +544,4 @@
     }
 </script>
 #end
+}
