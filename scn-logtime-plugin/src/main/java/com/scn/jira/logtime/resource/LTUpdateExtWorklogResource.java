@@ -95,7 +95,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
 
         boolean reloadRequired = false;
 
-        boolean isValueEmplty = (newValue == null || newValue.equals("00:00") || newValue.equals("0") || newValue.equals("") || newValue.equals("0h"));
+        boolean isValueEmplty = (newValue == null || newValue.equals("00:00") || newValue.equals("") || "^0[a-zA-Z]?$".matches(newValue));
         // Check what to do with the worklog
         Long timeSpent;
         if (TextFormatUtil.matchesPattern1(newValue)) {
