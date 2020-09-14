@@ -174,11 +174,11 @@ function inplace(userIdentifier, identifierSE, idetifier, isScn) {
         return;
     }
     if (current_editId != "") {
-        let val = document.getElementById(current_editId + "_inplace").value;
+        var val = document.getElementById(current_editId + "_inplace").value;
         document.getElementById('_' + current_editId).innerHTML = val;
     }
     current_editId = idetifier;
-    let value = document.getElementById('_' + idetifier).innerHTML;
+    var value = document.getElementById('_' + idetifier).innerHTML;
     document.getElementById('_' + idetifier).innerHTML = "<table><tr><td class=\"editble-input-td\"><input class=\"editble-input\" type=\"text\" size=\"5px\" onkeydown=\"customKeyUp(event,\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\',\'" + value + "\',\'" + idetifier + "\')\" onChange=\"onFunctionLost(\'" + isScn + "\',\'" + userIdentifier + "\',\'" + identifierSE + "\')\" name=\"t\" id=\"" + idetifier + "_inplace\" value=\"" + value + "\" autofocus></td><td class=\"editble-button\"><button id=\"closebtn\" onClick=\"closeInplace(\'" + value + "\',\'" + idetifier + "\')\" class=\"close-small-btn\"/></td></tr></table> ";
     setTimeout(function () {
         document.getElementById(current_editId + "_inplace").select();
@@ -292,8 +292,8 @@ function addWorklog(event, userCount, identifier, addWlComment, dateWeek, userKe
 
     document.getElementById("pop_edit_worklog_id").value = identifier;
 
-    let editableCellId = document.getElementById("pop_edit_worklog_id").value;
-    let timeSpent = document.getElementById(editableCellId).innerHTML;
+    var editableCellId = document.getElementById("pop_edit_worklog_id").value;
+    var timeSpent = document.getElementById(editableCellId).innerHTML;
     document.getElementById("pop_time").value = (timeSpent && timeSpent !== 'h') ? timeSpent : defaultTimeValue;
     document.getElementById("popupUpdateButton").innerText = (timeSpent && timeSpent !== 'h') ? 'Update' : 'Create';
 
