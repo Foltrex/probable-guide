@@ -238,6 +238,11 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estim
         return "";
     }
 
+    @Override
+    public boolean valuesEqual(Estimate v1, Estimate v2) {
+        return Objects.equals(v1, v2);
+    }
+
     private boolean hasPermissionToViewScnWorklog() {
         return scnPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, authenticationContext.getLoggedInUser());
     }

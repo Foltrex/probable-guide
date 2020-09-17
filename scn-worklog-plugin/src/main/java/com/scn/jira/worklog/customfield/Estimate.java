@@ -1,5 +1,7 @@
 package com.scn.jira.worklog.customfield;
 
+import java.util.Objects;
+
 public class Estimate {
     private Long original;
     private Long remaining;
@@ -55,5 +57,24 @@ public class Estimate {
 
     public boolean isEmpty() {
         return original == null && remaining == null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof Estimate) {
+            Estimate estimateObj = (Estimate) obj;
+            return Objects.equals(this.getOriginal(), estimateObj.getOriginal())
+                && Objects.equals(this.getRemaining(), estimateObj.getRemaining());
+        }
+
+        return false;
     }
 }
