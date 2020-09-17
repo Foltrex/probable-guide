@@ -27,7 +27,6 @@ import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.opensymphony.util.TextUtils;
 import com.scn.jira.worklog.core.scnwl.*;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
@@ -257,11 +256,15 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         final Long newEstimate = getAutoAdjustNewEstimateOnUpdate(extIssue == null ? null : extIssue.getEstimate(), newTimeSpent,
             originalTimeSpent);
         Long newLinkedEstimate = null;
+        final Long linkedEstimate = worklog.getIssue().getEstimate();
         if (originalWorklog.getLinkedWorklog() != null) {
             final Long originalLinkedTimeSpent = originalWorklog.getLinkedWorklog().getTimeSpent();
-            final Long linkedEstimate = worklog.getIssue().getEstimate();
-            newLinkedEstimate = getAutoAdjustNewEstimateOnUpdate(linkedEstimate, newTimeSpent, originalLinkedTimeSpent);
+            newLinkedEstimate = isLinkedWL ? getAutoAdjustNewEstimateOnUpdate(linkedEstimate, newTimeSpent, originalLinkedTimeSpent)
+                : increaseEstimate(linkedEstimate, originalLinkedTimeSpent);
+        } else if (isLinkedWL) {
+            newLinkedEstimate = reduceEstimate(linkedEstimate, worklog.getTimeSpent());
         }
+
         return update(jiraServiceContext, worklog, newEstimate, newLinkedEstimate, dispatchEvent, isLinkedWL);
     }
 

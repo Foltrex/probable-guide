@@ -78,6 +78,12 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
             final Long originalTimeSpent = originalLinkedWorklog.getTimeSpent();
             this.timeTrackingIssueUpdater.updateIssueOnWorklogUpdate(user, originalLinkedWorklog, newWorklog.getLinkedWorklog(),
                 originalTimeSpent, newLinkedEstimate, dispatchEvent);
+        } else if (originalLinkedWorklog != null && !isWLAutoCopyBlocked) {
+            this.timeTrackingIssueUpdater.updateIssueOnWorklogDelete(user, originalLinkedWorklog,
+                newLinkedEstimate, dispatchEvent);
+        } else if (isLinkedWL && !isWLAutoCopyBlocked) {
+            this.timeTrackingIssueUpdater.updateIssueOnWorklogUpdate(user, null, newWorklog.getLinkedWorklog(),
+                0L, newLinkedEstimate, dispatchEvent);
         }
         // update timeSpent* record
         scnTimeTrackingIssueManager.updateIssueOnWorklogUpdate(user, originalWorklog, newWorklog, originalWorklog.getTimeSpent(), newEstimate, dispatchEvent);
