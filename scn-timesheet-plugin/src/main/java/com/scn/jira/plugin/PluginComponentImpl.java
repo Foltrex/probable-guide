@@ -1,6 +1,7 @@
 package com.scn.jira.plugin;
 
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
+import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.search.SearchProvider;
@@ -40,6 +41,8 @@ public class PluginComponentImpl implements PluginComponent {
     private SearchProvider searchProvider;
     @ComponentImport
     private SearchRequestManager searchRequestManager;
+    @ComponentImport
+    private UserSearchService userSearchService;
     @ComponentImport
     private UserManager userManager;
     @ComponentImport
