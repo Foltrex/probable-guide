@@ -111,7 +111,7 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
-					<compressResources>${compressResources}</compressResources>
+					<compressResources>false</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g -Datlassian.plugins.enable.wait=30</jvmArgs>
 					<skipITs>${skipTests}</skipITs>
