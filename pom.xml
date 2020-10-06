@@ -115,7 +115,7 @@
 		<atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
 		<org.mapstruct.version>1.3.0.Final</org.mapstruct.version>
 		<quick.reload.version>3.0.0</quick.reload.version>
-
+		<frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
 		<jsr311-api>1.1.1</jsr311-api>
 		<jcip>1.0</jcip>
 		<mapstruct>1.3.0.Final</mapstruct>
@@ -140,6 +140,7 @@
 		<module>scn-mytime-gadget-plugin</module>
 		<module>scn-timesheet-plugin</module>
 		<module>scn-clone-project-plugin</module>
+		<module>scn-automation-plugin</module>
 	</modules>
 
 	<profiles>

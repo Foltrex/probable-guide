@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
+		<groupId>com.scn.jira</groupId>
 		<version>4.1.0</version>
 	</parent>
-	
-	<name>JIRA ScienceSoft Worklog* Plugin</name>
-	<description>The plugin provide access to custom time tracking implementation.</description>
-	
-	<artifactId>scn-worklog-plugin</artifactId>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.scn.jira.automation</groupId>
+	<artifactId>scn-automation-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.5</version>
-	
+	<version>4.1.1</version>
+
+	<name>JIRA ScienceSoft Automation Plugin</name>
+	<description>The plugin provide automation functionality.</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -36,6 +35,20 @@
 			<artifactId>jsr311-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.atlassian.activeobjects</groupId>
+			<artifactId>activeobjects-plugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.scn.jira</groupId>
+			<artifactId>scn-worklog-plugin</artifactId>
+			<version>4.1.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.atlassian.plugin</groupId>
 			<artifactId>atlassian-spring-scanner-annotation</artifactId>
 		</dependency>
@@ -44,30 +57,52 @@
 			<artifactId>atlassian-spring-scanner-runtime</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.atlassian.jira</groupId>
-			<artifactId>jira-view-issue-plugin</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.atlassian.activeobjects</groupId>
-			<artifactId>activeobjects-plugin</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-			<version>${org.mapstruct.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>${frontend-maven-plugin.version}</version>
+				<configuration>
+					<workingDirectory>src/ts</workingDirectory>
+					<nodeVersion>v12.14.1</nodeVersion>
+					<yarnVersion>v1.22.4</yarnVersion>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-yarn</goal>
+						</goals>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>yarn install</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<phase>compile</phase>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>yarn package</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<phase>compile</phase>
+						<configuration>
+							<arguments>package</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>com.atlassian.maven.plugins</groupId>
 				<artifactId>jira-maven-plugin</artifactId>
@@ -82,13 +117,8 @@
 					<skipITs>${skipTests}</skipITs>
 					<skipUTs>${skipTests}</skipUTs>
 					<skipAllPrompts>${skipTests}</skipAllPrompts>
-					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
-<!--					<skipRestDocGeneration>true</skipRestDocGeneration>-->
-<!--					<buildTestPlugin>false</buildTestPlugin>-->
-<!--					<enableDevToolbox>false</enableDevToolbox>-->
-<!--					<enablePde>false</enablePde>-->
 					<systemProperties>
-                        <atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
 					</systemProperties>
 					<extractDependencies>false</extractDependencies>
@@ -96,14 +126,16 @@
 						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
 						<Spring-Context>*</Spring-Context>
 						<Export-Package>
-							com.scn.jira.worklog.*
+							com.scn.jira.automation.api.*,
 						</Export-Package>
 						<Import-Package>
 							org.springframework.osgi.*;resolution:="optional",
 							org.eclipse.gemini.blueprint.*;resolution:="optional",
 							com.atlassian.plugin.osgi.bridge.external,
+							com.atlassian.jira.plugin.webfragment.conditions,
 							*;resolution:=optional
 						</Import-Package>
+						<Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
 					</instructions>
 					<skipManifestValidation>true</skipManifestValidation>
 				</configuration>
@@ -150,4 +182,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>
