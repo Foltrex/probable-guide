@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}"
+				  name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<!-- get most properties from pom.xml -->
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
+		<param name="plugin-icon">images/scnLogo.png</param>
+		<param name="plugin-logo">images/scnLogo.png</param>
+		<param name="atlassian-data-center-status">compatible</param>
+		<param name="atlassian-data-center-compatible">true</param>
+		<param name="plugin-type">both</param>
+	</plugin-info>
+
+	<resource type="i18n" name="i18n" location="scn-automation-plugin"/>
+
+	<webwork1 key="auto-timetracking-webwork" roles-required="admin">
+		<actions>
+			<action name="com.scn.jira.automation.impl.webaction.AutoTTAction"
+					alias="AutoTimetrackingAction">
+				<view name="success">
+					/templates/auto-timetracking-action/success.vm
+				</view>
+			</action>
+		</actions>
+	</webwork1>
+
+	<web-item key="scn-automation-mainmenu" name="Automation" section="system.top.navigation.bar"
+			  weight="200">
+		<label key="scn-automation.mainmenu-label"/>
+		<link linkId="scn-automation-mainmenu"/>
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+	</web-item>
+
+	<web-section key="scn-automation-mainsection" name="Automation Main Section" location="scn-automation-mainmenu"
+				 weight="10">
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+	</web-section>
+
+	<web-item key="auto-timetracking-key" name="Auto Timetracking"
+			  section="scn-automation-mainmenu/scn-automation-mainsection" weight="10">
+		<label key="scn-automation.auto-timetracking-label"/>
+		<link linkId="scn-automation.auto-timetracking-link">/secure/AutoTimetrackingAction.jspa</link>
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+	</web-item>
+
+	<ao key="scn-automation-ao-module" name="ScienceSoft Automation Plugin AO Module">
+		<entity>com.scn.jira.automation.impl.domain.entity.AutoTT</entity>
+	</ao>
+
+	<rest name="ScienceSoft Automation Plagin Resource"
+		  key="scn-automation-resources" path="/scn-automation" version="1.0">
+	</rest>
+
+	<servlet name="ScienceSoft Automation Plugin Debug Servlet" key="scn-automation-debug-servlet"
+			 class="com.scn.jira.automation.impl.servlet.DebugServlet">
+		<url-pattern>/automation/debug</url-pattern>
+	</servlet>
+
+</atlassian-plugin>
