@@ -1,0 +1,118 @@
+package com.scn.jira.automation.impl.domain.service;
+
+import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.ofbiz.OfBizDelegator;
+import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.google.common.collect.Lists;
+import com.scn.jira.automation.api.domain.service.JiraContextService;
+import com.scn.jira.automation.api.domain.service.WorklogContextService;
+import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
+import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
+import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.WorklogType;
+import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import org.ofbiz.core.entity.EntityCondition;
+import org.ofbiz.core.entity.EntityConditionList;
+import org.ofbiz.core.entity.EntityExpr;
+import org.ofbiz.core.entity.EntityOperator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Nonnull;
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.ofbiz.core.entity.EntityOperator.*;
+
+@Service
+@ExportAsService(WorklogContextService.class)
+public class WorklogContextServiceImpl implements WorklogContextService {
+    private final ExtendedConstantsManager extendedConstantsManager;
+    private final OfBizDelegator ofBizDelegator;
+    private final IssueManager issueManager;
+    private final ProjectRoleManager projectRoleManager;
+    private final JiraContextService jiraContextService;
+    private final IScnProjectSettingsManager projectSettingsManager;
+    private final IScnWorklogService scnDefaultWorklogService;
+
+    @Autowired
+    public WorklogContextServiceImpl(ExtendedConstantsManager extendedConstantsManager, OfBizDelegator ofBizDelegator,
+                                     IssueManager issueManager, ProjectRoleManager projectRoleManager,
+                                     JiraContextService jiraContextService, IScnProjectSettingsManager projectSettingsManager,
+                                     IScnWorklogService scnDefaultWorklogService) {
+        this.extendedConstantsManager = extendedConstantsManager;
+        this.ofBizDelegator = ofBizDelegator;
+        this.issueManager = issueManager;
+        this.projectRoleManager = projectRoleManager;
+        this.jiraContextService = jiraContextService;
+        this.projectSettingsManager = projectSettingsManager;
+        this.scnDefaultWorklogService = scnDefaultWorklogService;
+    }
+
+    @Override
+    public WorklogTypeDto getWorklogType(String id) {
+        WorklogType worklogType = extendedConstantsManager.getWorklogTypeObject(id);
+        return worklogType == null ? null : new WorklogTypeDto(worklogType.getId(), worklogType.getName());
+    }
+
+    @Override
+    public List<WorklogTypeDto> getAllWorklogTypes() {
+        Collection<WorklogType> worklogTypes = extendedConstantsManager.getWorklogTypeObjects();
+        return worklogTypes.stream()
+            .map(value -> new WorklogTypeDto(value.getId(), value.getName()))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Date> getWorkedDays(String userKey, @Nonnull Date from, @Nonnull Date to) {
+        List<EntityCondition> conditions = Lists.newArrayList();
+        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(from.getTime())));
+        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO,
+            Timestamp.valueOf(
+                to.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(1).minusNanos(1)
+            )));
+        conditions.add(new EntityExpr("author", EQUALS, userKey));
+        EntityCondition conditionList = new EntityConditionList(conditions, EntityOperator.AND);
+
+        return ofBizDelegator.findByCondition("ScnWorklog", conditionList, Lists.newArrayList("startdate", "timeworked"))
+            .stream().filter(gv -> gv.getTimestamp("startdate") != null && gv.getLong("timeworked") != null && gv.getLong("timeworked") > 0L)
+            .map(gv -> Date.from(
+                gv.getTimestamp("startdate").toLocalDateTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
+            ))
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void createWorklog(@Nonnull AutoTTDto autoTTDto, Date date, Long timeSpent) {
+        Issue issue = issueManager.getIssueObject(autoTTDto.getIssue().getId());
+        if (issue != null) {
+            IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTTDto.getUser().getKey(),
+                "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
+                timeSpent, autoTTDto.getWorklogType() == null ? "0" : autoTTDto.getWorklogType().getId());
+            boolean isAutoCopy = isWlAutoCopy(autoTTDto);
+            scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
+                new JiraServiceContextImpl(jiraContextService.getUser(autoTTDto.getUser().getKey())),
+                worklog, true, isAutoCopy);
+        }
+    }
+
+    private boolean isWlAutoCopy(@Nonnull AutoTTDto autoTTDto) {
+        return projectSettingsManager.isWLAutoCopyEnabled(autoTTDto.getProject().getId())
+            && (autoTTDto.getWorklogType() == null ?
+            projectSettingsManager.isUnspecifiedWLTypeAutoCopyEnabled(autoTTDto.getProject().getId())
+            : projectSettingsManager.getWorklogTypes(autoTTDto.getProject().getId()).stream()
+            .anyMatch(worklogType -> worklogType.getId().equals(autoTTDto.getWorklogType().getId()))
+        );
+    }
+}
