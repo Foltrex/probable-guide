@@ -47,7 +47,7 @@ export const getIssuesByProjectId = (
   projectId: number
 ): Promise<AxiosResponse> =>
   axios.get(
-    `${getBaseURL()}/rest/api/2/search?jql=project=${projectId}&fields=summary`
+    `${getBaseURL()}/rest/api/2/search?jql=project=${projectId}&fields=summary&maxResults=3000`
   );
 
 export const getAllWorklogTypes = (): Promise<AxiosResponse> =>
