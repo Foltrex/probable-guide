@@ -4,6 +4,6 @@
     <meta name="decorator" content="atl.general"/>
 </head>
 <body>
-<div id="root"></div>
+<div id="scn-index"></div>
 </body>
 </html>

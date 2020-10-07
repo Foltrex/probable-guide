@@ -2,5 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import AutoTimetracking from "./components/AutoTimeTracking";
 
-window.onload = () =>
-  ReactDOM.render(<AutoTimetracking />, document.getElementById("root"));
+if (window["AJS"]) {
+  window["AJS"].toInit(() =>
+    ReactDOM.render(<AutoTimetracking />, document.getElementById("scn-index"))
+  );
+} else {
+  ReactDOM.render(<AutoTimetracking />, document.getElementById("scn-index"));
+}
