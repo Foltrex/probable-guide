@@ -1,8 +1,9 @@
 import { Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getIssuesByProjectId } from "../../api";
 import { IssueDto, ProjectDto } from "../../models";
+import { FlagContext } from "../../services/flag/flagContext";
 import ProjectField from "./ProjectField";
 
 interface ProjectIssueFieldProps {
@@ -21,6 +22,7 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
   const [currentProject, setCurrentProject] = useState<ProjectDto>(project);
   const [currentIssue, setCurrentIssue] = useState<IssueDto>(issue);
   const [options, setOptions] = useState<IssueDto[]>([]);
+  const { addError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,7 +39,7 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
             );
           }
         })
-        .catch((error) => console.log(error));
+        .catch(({ message }) => addError(message));
     }
     return () => {
       isMounted = false;

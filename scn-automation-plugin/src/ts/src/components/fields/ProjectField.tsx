@@ -1,8 +1,9 @@
 import { Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAllProjects } from "../../api";
 import { ProjectDto } from "../../models";
+import { FlagContext } from "../../services/flag/flagContext";
 
 interface ProjectFieldProps {
   value: ProjectDto;
@@ -19,20 +20,23 @@ const ProjectField: React.FC<ProjectFieldProps> = ({
 }) => {
   const [currentValue, setCurrentValue] = useState<ProjectDto>(value);
   const [options, setOptions] = useState<ProjectDto[]>([]);
+  const { addError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
-    getAllProjects().then(({ data }) => {
-      if (isMounted) {
-        setOptions(
-          data.map((value) => ({
-            id: value.id,
-            key: value.key,
-            name: value.name,
-          }))
-        );
-      }
-    });
+    getAllProjects()
+      .then(({ data }) => {
+        if (isMounted) {
+          setOptions(
+            data.map((value) => ({
+              id: value.id,
+              key: value.key,
+              name: value.name,
+            }))
+          );
+        }
+      })
+      .catch(({ message }) => addError(message));
     return () => {
       isMounted = false;
     };

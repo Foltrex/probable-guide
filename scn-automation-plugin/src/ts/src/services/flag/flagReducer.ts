@@ -7,7 +7,6 @@ export const flagReducer: Reducer<FlagState, FlagActionType> = (
 ) => {
   switch (action.type) {
     case ADD_FLAG:
-      console.log(action.payload.id);
       return { flags: [action.payload, ...state.flags] };
     case REMOVE_FLAG:
       return { flags: state.flags.slice(1) };

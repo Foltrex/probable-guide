@@ -1,8 +1,9 @@
 import { Field } from "@atlaskit/form";
 import Select from "@atlaskit/select";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAllWorklogTypes } from "../../api";
 import { WorklogTypeDto } from "../../models";
+import { FlagContext } from "../../services/flag/flagContext";
 
 interface WorklogTypeFieldProps {
   value: WorklogTypeDto;
@@ -16,19 +17,22 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
   name,
 }) => {
   const [options, setOptions] = useState<WorklogTypeDto[]>([]);
+  const { addError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
-    getAllWorklogTypes().then(({ data }) => {
-      if (isMounted) {
-        setOptions(
-          data.map((value) => ({
-            id: value.id,
-            name: value.name,
-          }))
-        );
-      }
-    });
+    getAllWorklogTypes()
+      .then(({ data }) => {
+        if (isMounted) {
+          setOptions(
+            data.map((value) => ({
+              id: value.id,
+              name: value.name,
+            }))
+          );
+        }
+      })
+      .catch(({ message }) => addError(message));
     return () => {
       isMounted = false;
     };
