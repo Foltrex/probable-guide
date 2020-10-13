@@ -247,6 +247,16 @@
     tiny-invariant "^0.0.3"
     tslib "^2.0.0"
 
+"@atlaskit/section-message@^5.0.7":
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/section-message/-/section-message-5.0.7.tgz#9c37e24576bdb7c4de42000b3d8e5cb5617a4170"
+  integrity sha512-RO/IoUX33PwTNLiprA+0stCx5yw17OkQm09S6QN09YIxvUae5SjjcLmLIi+iNI7CGw9JZiJblp+ZeYWssLGaKw==
+  dependencies:
+    "@atlaskit/button" "^15.1.0"
+    "@atlaskit/icon" "^21.1.0"
+    "@atlaskit/theme" "^11.0.0"
+    tslib "^2.0.0"
+
 "@atlaskit/select@^13.0.5":
   version "13.0.5"
   resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-13.0.5.tgz#194847cdf23a51a90e84d0cdaffa0610fe6126fe"

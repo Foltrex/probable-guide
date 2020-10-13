@@ -72,7 +72,7 @@ module.exports = {
         proxy: {
             "/rest": {
                 target: "http://localhost:2990",
-                auth: "admin:admin",
+                auth: "akalaputs:akalaputs",
                 pathRewrite: { "^/rest": "/jira/rest" },
             },
             "/browse": {

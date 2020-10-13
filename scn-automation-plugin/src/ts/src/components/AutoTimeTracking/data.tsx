@@ -7,7 +7,7 @@ import {
   getUserAvatarURL,
   getUserProfileURL,
 } from "../../api";
-import { AutoTTDto } from "../../dto";
+import { AutoTTDto } from "../../models";
 import { HeadType, RowType } from "@atlaskit/dynamic-table/dist/cjs/types";
 import Button from "@atlaskit/button";
 import TrashIcon from "@atlaskit/icon/glyph/trash";

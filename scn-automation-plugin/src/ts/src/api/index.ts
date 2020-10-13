@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { AutoTTDto } from "../dto";
+import { AutoTTDto } from "../models";
 
 const getBaseURL = () => (window["AJS"] ? window["AJS"].params.baseURL : "");
 

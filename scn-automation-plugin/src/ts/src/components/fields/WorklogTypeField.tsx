@@ -2,7 +2,7 @@ import { Field } from "@atlaskit/form";
 import Select from "@atlaskit/select";
 import React, { useEffect, useState } from "react";
 import { getAllWorklogTypes } from "../../api";
-import { WorklogTypeDto } from "../../dto";
+import { WorklogTypeDto } from "../../models";
 
 interface WorklogTypeFieldProps {
   value: WorklogTypeDto;

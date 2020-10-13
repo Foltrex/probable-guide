@@ -1,6 +1,6 @@
 import { Field } from "@atlaskit/form";
 import React from "react";
-import { UserDto } from "../../dto";
+import { UserDto } from "../../models";
 import { AsyncSelect } from "@atlaskit/select";
 import { searchUsers } from "../../api";
 

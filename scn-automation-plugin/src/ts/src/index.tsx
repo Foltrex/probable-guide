@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import AutoTimetracking from "./components/AutoTimeTracking";
+import AutoTTContainer from "./containers/AutoTTContainer";
 
 if (window["AJS"]) {
   window["AJS"].toInit(() =>
-    ReactDOM.render(<AutoTimetracking />, document.getElementById("scn-index"))
+    ReactDOM.render(<AutoTTContainer />, document.getElementById("scn-index"))
   );
 } else {
-  ReactDOM.render(<AutoTimetracking />, document.getElementById("scn-index"));
+  ReactDOM.render(<AutoTTContainer />, document.getElementById("scn-index"));
 }

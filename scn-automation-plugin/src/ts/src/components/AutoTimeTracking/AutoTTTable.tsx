@@ -1,6 +1,6 @@
 import DynamicTable from "@atlaskit/dynamic-table";
 import { ModalTransition } from "@atlaskit/modal-dialog";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   getAllAutoTT,
   getAutoTT,
@@ -8,41 +8,54 @@ import {
   updateAutoTT,
   addAutoTT,
 } from "../../api";
-import { AutoTTDto } from "../../dto";
+import { AutoTTDto } from "../../models";
+import { FlagContext } from "../../services/flag/flagContext";
 import AutoTTCaption from "./AutoTTCaption";
 import AutoTTDialog from "./AutoTTDialog";
 import { getRows, head } from "./data";
 
 const AutoTTTable: React.FC = () => {
-  const [error, setError] = useState<{ message: string }>(null);
   const [autoTTList, setAutoTTList] = useState<AutoTTDto[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isFormOpened, setIsFormOpened] = useState<boolean>(false);
   const [formData, setFormData] = useState<AutoTTDto>({ id: null });
+  const { addSuccess, addError } = useContext(FlagContext);
 
   useEffect(() => {
     getAllAutoTT()
       .then((result) => {
         setIsLoaded(true);
         setAutoTTList(result.data);
+        addSuccess("Data is loaded");
       })
-      .catch((error) => setError(error));
+      .catch(({ message }) => {
+        setIsLoaded(true);
+        addError(message);
+      });
   }, []);
 
   const onSubmitCreate = (data: AutoTTDto) => {
-    addAutoTT(data).then((result) => {
-      setAutoTTList((prev) => [result.data, ...prev]);
-      setIsFormOpened(false);
-    });
+    addAutoTT(data)
+      .then((result) => {
+        setAutoTTList((prev) => [result.data, ...prev]);
+        setIsFormOpened(false);
+        addSuccess("Created");
+      })
+      .catch(({ message }) => addError(message));
   };
 
   const onSubmitUpdate = (data: AutoTTDto) => {
-    updateAutoTT(data).then((result) => {
-      setAutoTTList(
-        autoTTList.map((value) => (value.id === data.id ? result.data : value))
-      );
-      setIsFormOpened(false);
-    });
+    updateAutoTT(data)
+      .then((result) => {
+        setAutoTTList(
+          autoTTList.map((value) =>
+            value.id === data.id ? result.data : value
+          )
+        );
+        setIsFormOpened(false);
+        addSuccess("Updated");
+      })
+      .catch(({ message }) => addError(message));
   };
 
   const createAction = () => {
@@ -51,10 +64,12 @@ const AutoTTTable: React.FC = () => {
   };
 
   const editAction = (id: number) => {
-    getAutoTT(id).then((result) => {
-      setFormData(result.data);
-      setIsFormOpened(true);
-    });
+    getAutoTT(id)
+      .then((result) => {
+        setFormData(result.data);
+        setIsFormOpened(true);
+      })
+      .catch(({ message }) => addError(message));
   };
 
   const copyAction = (id: number) => {
@@ -75,43 +90,40 @@ const AutoTTTable: React.FC = () => {
         setAutoTTList(
           autoTTList.filter((autoTT: AutoTTDto) => autoTT.id !== id)
         );
+        addSuccess("Deleted");
       })
-      .catch((error) => console.log(error));
+      .catch(({ message }) => addError(message));
   };
 
-  if (error) {
-    return <div>{error.message}</div>;
-  } else {
-    return (
-      <>
-        <AutoTTCaption
-          caption="Auto time tracking users"
-          createAction={createAction}
-        />
-        <DynamicTable
-          emptyView={<h2>No elements</h2>}
-          isLoading={!isLoaded}
-          head={head}
-          rows={getRows(autoTTList, editAction, copyAction, deleteAction)}
-          loadingSpinnerSize="large"
-        />
-        <ModalTransition>
-          {isFormOpened && (
-            <AutoTTDialog
-              heading={
-                formData.id
-                  ? "Edit auto time tracking"
-                  : "Create auto time tracking"
-              }
-              onClose={setIsFormOpened.bind(this, false)}
-              onSubmit={formData.id ? onSubmitUpdate : onSubmitCreate}
-              data={formData}
-            />
-          )}
-        </ModalTransition>
-      </>
-    );
-  }
+  return (
+    <>
+      <AutoTTCaption
+        caption="Auto time tracking users"
+        createAction={createAction}
+      />
+      <DynamicTable
+        emptyView={<h2>No elements</h2>}
+        isLoading={!isLoaded}
+        head={head}
+        rows={getRows(autoTTList, editAction, copyAction, deleteAction)}
+        loadingSpinnerSize="large"
+      />
+      <ModalTransition>
+        {isFormOpened && (
+          <AutoTTDialog
+            heading={
+              formData.id
+                ? "Edit auto time tracking"
+                : "Create auto time tracking"
+            }
+            onClose={setIsFormOpened.bind(this, false)}
+            onSubmit={formData.id ? onSubmitUpdate : onSubmitCreate}
+            data={formData}
+          />
+        )}
+      </ModalTransition>
+    </>
+  );
 };
 
 export default AutoTTTable;

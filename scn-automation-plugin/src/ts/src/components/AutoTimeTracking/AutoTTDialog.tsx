@@ -2,7 +2,7 @@ import Form, { CheckboxField } from "@atlaskit/form";
 import React from "react";
 import ModalDialog, { ModalFooter } from "@atlaskit/modal-dialog";
 import Button from "@atlaskit/button";
-import { AutoTTDto } from "../../dto";
+import { AutoTTDto } from "../../models";
 import { Checkbox } from "@atlaskit/checkbox";
 import { IdField, ProjectIssueField, UserField } from "../fields";
 import WorklogTypeField from "../fields/WorklogTypeField";

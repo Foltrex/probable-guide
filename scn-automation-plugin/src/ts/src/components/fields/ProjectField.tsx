@@ -2,7 +2,7 @@ import { Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
 import React, { useEffect, useState } from "react";
 import { getAllProjects } from "../../api";
-import { ProjectDto } from "../../dto";
+import { ProjectDto } from "../../models";
 
 interface ProjectFieldProps {
   value: ProjectDto;
