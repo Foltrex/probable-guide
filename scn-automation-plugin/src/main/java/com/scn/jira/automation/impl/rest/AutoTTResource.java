@@ -1,7 +1,6 @@
 package com.scn.jira.automation.impl.rest;
 
 import com.scn.jira.automation.api.domain.service.AutoTTService;
-import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.validator.AutoTTValidator;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.Validator;
@@ -24,7 +23,7 @@ public class AutoTTResource {
     private final AutoTTValidator autoTTValidator;
 
     @Autowired
-    public AutoTTResource(JiraContextService jiraContextService, AutoTTService autoTTService,
+    public AutoTTResource(AutoTTService autoTTService,
                           AutoTTValidator autoTTValidator) {
         this.autoTTService = autoTTService;
         this.autoTTValidator = autoTTValidator;
@@ -32,22 +31,22 @@ public class AutoTTResource {
 
     @GET
     public Response getAll() {
-        if (autoTTValidator.isAdmin()) {
+        if (autoTTValidator.canView()) {
             return Response.ok(autoTTService.getAll().stream()
                 .sorted((o1, o2) -> o2.getUpdated().compareTo(o1.getUpdated()))
                 .collect(Collectors.toList())).build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("No view permissions.").build();
         }
     }
 
     @GET
     @Path("/{id}")
     public Response get(@PathParam("id") Long id) {
-        if (autoTTValidator.isAdmin()) {
+        if (autoTTValidator.canView()) {
             return Response.ok(autoTTService.get(id)).build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("No view permissions.").build();
         }
     }
 
@@ -61,7 +60,7 @@ public class AutoTTResource {
                 return Response.status(Response.Status.PRECONDITION_FAILED).entity(validator.getErrorMessages()).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("No create permissions.").build();
         }
     }
 
@@ -75,7 +74,7 @@ public class AutoTTResource {
                 return Response.status(Response.Status.PRECONDITION_FAILED).entity(validator.getErrorMessages()).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("No update permissions.").build();
         }
     }
 
@@ -86,7 +85,7 @@ public class AutoTTResource {
             autoTTService.remove(id);
             return Response.noContent().build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("No delete permissions").build();
         }
     }
 }

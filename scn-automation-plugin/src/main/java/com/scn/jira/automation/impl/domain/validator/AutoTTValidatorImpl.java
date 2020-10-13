@@ -1,12 +1,12 @@
 package com.scn.jira.automation.impl.domain.validator;
 
-import com.atlassian.jira.permission.GlobalPermissionKey;
-import com.atlassian.jira.security.GlobalPermissionManager;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
+import com.scn.jira.automation.api.domain.service.PermissionService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.api.domain.validator.AutoTTValidator;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
+import com.scn.jira.automation.impl.domain.dto.PermissionKey;
 import com.scn.jira.automation.impl.domain.dto.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,15 +16,15 @@ import java.util.List;
 
 @Component
 public class AutoTTValidatorImpl implements AutoTTValidator {
-    private final GlobalPermissionManager globalPermissionManager;
+    private final PermissionService permissionService;
     private final JiraContextService contextService;
     private final WorklogContextService worklogContextService;
     private final AutoTTService autoTTService;
 
     @Autowired
-    public AutoTTValidatorImpl(GlobalPermissionManager globalPermissionManager, JiraContextService contextService,
+    public AutoTTValidatorImpl(PermissionService permissionService, JiraContextService contextService,
                                WorklogContextService worklogContextService, AutoTTService autoTTService) {
-        this.globalPermissionManager = globalPermissionManager;
+        this.permissionService = permissionService;
         this.contextService = contextService;
         this.worklogContextService = worklogContextService;
         this.autoTTService = autoTTService;
@@ -75,22 +75,27 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
     }
 
     @Override
+    public boolean canView() {
+        return permissionService.hasViewPermission(contextService.getCurrentUser());
+    }
+
+    @Override
     public boolean canCreate(AutoTTDto autoTTDto) {
-        return this.isAdmin();
+        return permissionService.hasPermission(PermissionKey.CREATE, autoTTDto, contextService.getCurrentUser());
     }
 
     @Override
     public boolean canUpdate(AutoTTDto autoTTDto) {
-        return this.isAdmin();
+        return permissionService.hasPermission(PermissionKey.UPDATE, autoTTDto, contextService.getCurrentUser());
     }
 
     @Override
     public boolean canDelete(Long id) {
-        return this.isAdmin();
-    }
+        AutoTTDto autoTTDto = autoTTService.get(id);
+        if (autoTTDto == null) {
+            return false;
+        }
 
-    @Override
-    public boolean isAdmin() {
-        return globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, contextService.getCurrentUser());
+        return permissionService.hasPermission(PermissionKey.DELETE, autoTTDto, contextService.getCurrentUser());
     }
 }
