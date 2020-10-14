@@ -1,10 +1,13 @@
 package com.scn.jira.automation.impl.domain.service;
 
+import com.atlassian.core.util.InvalidDurationException;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.google.common.collect.Lists;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
@@ -45,6 +48,13 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final JiraContextService jiraContextService;
     private final IScnProjectSettingsManager projectSettingsManager;
     private final IScnWorklogService scnDefaultWorklogService;
+    private final JiraDurationUtils jiraDurationUtils;
+
+    @Override
+    public WorklogTypeDto getWorklogType(String id) {
+        WorklogType worklogType = extendedConstantsManager.getWorklogTypeObject(id);
+        return worklogType == null ? null : new WorklogTypeDto(worklogType.getId(), worklogType.getName());
+    }
 
     @Autowired
     public WorklogContextServiceImpl(ExtendedConstantsManager extendedConstantsManager, OfBizDelegator ofBizDelegator,
@@ -58,12 +68,7 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         this.jiraContextService = jiraContextService;
         this.projectSettingsManager = projectSettingsManager;
         this.scnDefaultWorklogService = scnDefaultWorklogService;
-    }
-
-    @Override
-    public WorklogTypeDto getWorklogType(String id) {
-        WorklogType worklogType = extendedConstantsManager.getWorklogTypeObject(id);
-        return worklogType == null ? null : new WorklogTypeDto(worklogType.getId(), worklogType.getName());
+        this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
     }
 
     @Override
@@ -72,6 +77,40 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         return worklogTypes.stream()
             .map(value -> new WorklogTypeDto(value.getId(), value.getName()))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getFormattedTime(Long time) {
+        return jiraDurationUtils.getShortFormattedDuration(time, jiraContextService.getLocale());
+    }
+
+    @Override
+    public Long getParsedTime(String formattedTime) {
+        try {
+            return jiraDurationUtils.parseDuration(formattedTime, jiraContextService.getLocale());
+        } catch (InvalidDurationException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean isValidFormattedTime(String formattedTime) {
+        try {
+            jiraDurationUtils.parseDuration(formattedTime, jiraContextService.getLocale());
+        } catch (InvalidDurationException e) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isBlankFormattedTime(String formattedTime) {
+        Long time = 0L;
+        try {
+            time = jiraDurationUtils.parseDuration(formattedTime, jiraContextService.getLocale());
+        } catch (InvalidDurationException ignored) {
+        }
+        return time == null || time == 0L;
     }
 
     @Override

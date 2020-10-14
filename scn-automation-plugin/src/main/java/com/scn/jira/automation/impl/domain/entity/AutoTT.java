@@ -25,6 +25,11 @@ public interface AutoTT extends Updatable {
 
     void setWorklogTypeId(String worklogTypeId);
 
+    @NotNull
+    Long getRatedTime();
+
+    void setRatedTime(Long ratedTime);
+
     boolean getActive();
 
     void setActive(boolean active);

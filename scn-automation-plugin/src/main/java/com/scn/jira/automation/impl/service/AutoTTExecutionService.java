@@ -23,7 +23,7 @@ public class AutoTTExecutionService extends AbstractService {
     private static final Logger LOGGER = Logger.getLogger(AutoTTExecutionService.class);
     public static final String DEFAULT_NAME = "Auto time tracking";
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 * * * ?";
-    private static final Long WORKED_TIME = 28800L;
+    public static final Long WORKED_TIME = 28800L;
 
     private AutoTTService autoTTService;
     private ScnBIService scnBIService;

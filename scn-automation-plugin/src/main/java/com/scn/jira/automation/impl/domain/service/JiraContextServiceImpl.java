@@ -14,6 +14,8 @@ import com.scn.jira.automation.impl.domain.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class JiraContextServiceImpl implements JiraContextService {
     private final JiraAuthenticationContext jiraAuthenticationContext;
@@ -29,6 +31,11 @@ public class JiraContextServiceImpl implements JiraContextService {
         this.userManager = userManager;
         this.projectManager = projectManager;
         this.issueManager = issueManager;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return jiraAuthenticationContext.getLocale();
     }
 
     @Override

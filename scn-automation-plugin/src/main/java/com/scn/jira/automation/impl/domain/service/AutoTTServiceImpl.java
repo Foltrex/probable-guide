@@ -64,7 +64,8 @@ public class AutoTTServiceImpl implements AutoTTService {
         AutoTT autoTT = ao.create(AutoTT.class,
             new DBParam("USER_KEY", autoTTDto.getUser().getKey()),
             new DBParam("PROJECT_ID", autoTTDto.getProject().getId()),
-            new DBParam("ISSUE_ID", autoTTDto.getIssue().getId())
+            new DBParam("ISSUE_ID", autoTTDto.getIssue().getId()),
+            new DBParam("RATED_TIME", worklogContextService.getParsedTime(autoTTDto.getRatedTime()))
         );
         this.copyDtoFields(autoTT, autoTTDto);
         autoTT.setCreated(new Timestamp(new Date().getTime()));
@@ -93,6 +94,7 @@ public class AutoTTServiceImpl implements AutoTTService {
         autoTT.setProjectId(autoTTDto.getProject().getId());
         autoTT.setIssueId(autoTTDto.getIssue().getId());
         autoTT.setWorklogTypeId(autoTTDto.getWorklogType() == null ? null : autoTTDto.getWorklogType().getId());
+        autoTT.setRatedTime(worklogContextService.getParsedTime(autoTTDto.getRatedTime()));
         autoTT.setActive(autoTTDto.isActive());
         autoTT.setUpdated(new Timestamp(new Date().getTime()));
         autoTT.setUpdateAuthorKey(contextService.getUserDto().getKey());

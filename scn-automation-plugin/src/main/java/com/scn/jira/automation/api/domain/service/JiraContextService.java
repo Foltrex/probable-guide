@@ -6,8 +6,11 @@ import com.scn.jira.automation.impl.domain.dto.ProjectDto;
 import com.scn.jira.automation.impl.domain.dto.UserDto;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 public interface JiraContextService {
+    Locale getLocale();
+
     ApplicationUser getCurrentUser();
 
     UserDto getUserDto();

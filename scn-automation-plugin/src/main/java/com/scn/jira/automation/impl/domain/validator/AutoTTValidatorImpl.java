@@ -71,6 +71,14 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
             validator.setValid(false);
         }
 
+        if (!worklogContextService.isValidFormattedTime(autoTTDto.getRatedTime())) {
+            errorMessages.add("Invalid rated time format");
+            validator.setValid(false);
+        } else if (worklogContextService.isBlankFormattedTime(autoTTDto.getRatedTime())) {
+            errorMessages.add("Rated time has to be set");
+            validator.setValid(false);
+        }
+
         return validator;
     }
 

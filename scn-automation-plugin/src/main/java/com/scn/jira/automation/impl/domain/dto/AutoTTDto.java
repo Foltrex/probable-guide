@@ -23,6 +23,8 @@ public class AutoTTDto {
     @XmlElement
     private WorklogTypeDto worklogType;
     @XmlElement
+    private String ratedTime;
+    @XmlElement
     private boolean active;
     @XmlElement
     private UserDto author;
@@ -44,6 +46,7 @@ public class AutoTTDto {
         this.setProject(contextService.getProjectDto(autoTT.getProjectId()));
         this.setIssue(contextService.getIssueDto(autoTT.getIssueId()));
         this.setWorklogType(worklogContextService.getWorklogType(autoTT.getWorklogTypeId()));
+        this.setRatedTime(worklogContextService.getFormattedTime(autoTT.getRatedTime()));
         this.setActive(autoTT.getActive());
         this.setAuthor(contextService.getUserDto(autoTT.getAuthorKey()));
         this.setUpdateAuthor(contextService.getUserDto(autoTT.getUpdateAuthorKey()));
@@ -90,6 +93,14 @@ public class AutoTTDto {
 
     public void setWorklogType(WorklogTypeDto worklogType) {
         this.worklogType = worklogType;
+    }
+
+    public String getRatedTime() {
+        return ratedTime;
+    }
+
+    public void setRatedTime(String ratedTime) {
+        this.ratedTime = ratedTime;
     }
 
     public boolean isActive() {
@@ -140,6 +151,7 @@ public class AutoTTDto {
             ", project=" + project +
             ", issue=" + issue +
             ", worklogType=" + worklogType +
+            ", ratedTime=" + ratedTime +
             ", active=" + active +
             ", author=" + author +
             ", updateAuthor=" + updateAuthor +

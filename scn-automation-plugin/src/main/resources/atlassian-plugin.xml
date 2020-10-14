@@ -48,6 +48,7 @@
 
 	<ao key="scn-automation-ao-module" name="ScienceSoft Automation Plugin AO Module">
 		<entity>com.scn.jira.automation.impl.domain.entity.AutoTT</entity>
+		<upgradeTask>com.scn.jira.automation.impl.upgrade.V1.PluginUpgradeTask01</upgradeTask>
 	</ao>
 
 	<rest name="ScienceSoft Automation Plagin Resource"
