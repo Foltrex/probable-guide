@@ -57,7 +57,7 @@ public class AutoTTResource {
             if (validator.isValid()) {
                 return Response.status(Response.Status.CREATED).entity(autoTTService.add(autoTTDto)).build();
             } else {
-                return Response.status(Response.Status.PRECONDITION_FAILED).entity(validator.getErrorMessages()).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
             }
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("No create permissions.").build();
@@ -71,7 +71,7 @@ public class AutoTTResource {
             if (validator.isValid()) {
                 return Response.ok(autoTTService.update(autoTTDto)).build();
             } else {
-                return Response.status(Response.Status.PRECONDITION_FAILED).entity(validator.getErrorMessages()).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
             }
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("No update permissions.").build();
