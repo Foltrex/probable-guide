@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import AutoTTContainer from "./containers/AutoTTContainer";
+import AutoTT from "./modules/AutoTT";
 
 if (window["AJS"]) {
   window["AJS"].toInit(() =>
-    ReactDOM.render(<AutoTTContainer />, document.getElementById("scn-index"))
+    ReactDOM.render(<AutoTT />, document.getElementById("scn-index"))
   );
 } else {
-  ReactDOM.render(<AutoTTContainer />, document.getElementById("scn-index"));
+  ReactDOM.render(<AutoTT />, document.getElementById("scn-index"));
 }

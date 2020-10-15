@@ -11,19 +11,19 @@ export const getAutoTT = (id: number): Promise<AxiosResponse> =>
     `${getBaseURL()}/rest/scn-automation/latest/autotimetracking/user/${id}`
   );
 
-export const addAutoTT = (data: AutoTTDto): Promise<AxiosResponse> =>
+export const postAutoTT = (data: AutoTTDto): Promise<AxiosResponse> =>
   axios.post(
     `${getBaseURL()}/rest/scn-automation/latest/autotimetracking/user`,
     data
   );
 
-export const updateAutoTT = (data: AutoTTDto): Promise<AxiosResponse> =>
+export const putAutoTT = (data: AutoTTDto): Promise<AxiosResponse> =>
   axios.put(
     `${getBaseURL()}/rest/scn-automation/latest/autotimetracking/user`,
     data
   );
 
-export const removeAutoTT = (id: number): Promise<AxiosResponse> =>
+export const deleteAutoTT = (id: number): Promise<AxiosResponse> =>
   axios.delete(
     `${getBaseURL()}/rest/scn-automation/latest/autotimetracking/user/${id}`
   );

@@ -1,4 +1,4 @@
-import { Field } from "@atlaskit/form";
+import { ErrorMessage, Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
 import React, { useContext, useEffect, useState } from "react";
 import { getAllProjects } from "../../api";
@@ -18,9 +18,8 @@ const ProjectField: React.FC<ProjectFieldProps> = ({
   name,
   onChange,
 }) => {
-  const [currentValue, setCurrentValue] = useState<ProjectDto>(value);
   const [options, setOptions] = useState<ProjectDto[]>([]);
-  const { addError } = useContext(FlagContext);
+  const { showError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,7 +35,7 @@ const ProjectField: React.FC<ProjectFieldProps> = ({
           );
         }
       })
-      .catch(({ message }) => addError(message));
+      .catch(({ message }) => showError(message));
     return () => {
       isMounted = false;
     };
@@ -57,29 +56,28 @@ const ProjectField: React.FC<ProjectFieldProps> = ({
     <>
       <Field<ProjectDto>
         isRequired={true}
-        isDisabled={true}
         label={label}
         name={name}
-        defaultValue={currentValue}
+        defaultValue={value}
       >
-        {({}) => <></>}
+        {({ fieldProps, error }) => (
+          <>
+            <AsyncSelect
+              {...fieldProps}
+              menuPosition={"fixed"}
+              onChange={onChange}
+              loadOptions={loadOptions}
+              className="single-select"
+              classNamePrefix="react-select"
+              getOptionLabel={(project: ProjectDto) =>
+                `${project.name} (${project.key})`
+              }
+              getOptionValue={(project: ProjectDto) => project.id.toString()}
+            />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </>
+        )}
       </Field>
-      <AsyncSelect
-        menuPosition={"fixed"}
-        value={currentValue}
-        onChange={(value: ProjectDto) => {
-          setCurrentValue(value);
-          onChange(value);
-        }}
-        loadOptions={loadOptions}
-        id={"project-select"}
-        className="single-select"
-        classNamePrefix="react-select"
-        getOptionLabel={(project: ProjectDto) =>
-          `${project.name} (${project.key})`
-        }
-        getOptionValue={(project: ProjectDto) => project.id.toString()}
-      />
     </>
   );
 };

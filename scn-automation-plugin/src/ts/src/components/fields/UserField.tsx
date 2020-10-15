@@ -1,4 +1,4 @@
-import { Field } from "@atlaskit/form";
+import { ErrorMessage, Field } from "@atlaskit/form";
 import React, { useContext } from "react";
 import { UserDto } from "../../models";
 import { AsyncSelect } from "@atlaskit/select";
@@ -12,7 +12,7 @@ interface UserFieldProps {
 }
 
 const UserField: React.FC<UserFieldProps> = ({ value, label, name }) => {
-  const { addError } = useContext(FlagContext);
+  const { showError } = useContext(FlagContext);
 
   const loadOptions = (query: string) =>
     searchUsers(query)
@@ -22,7 +22,7 @@ const UserField: React.FC<UserFieldProps> = ({ value, label, name }) => {
           name: value.displayName,
         }))
       )
-      .catch(({ message }) => addError(message));
+      .catch(({ message }) => showError(message));
 
   return (
     <Field<UserDto>
@@ -31,17 +31,19 @@ const UserField: React.FC<UserFieldProps> = ({ value, label, name }) => {
       name={name}
       defaultValue={value}
     >
-      {({ fieldProps: { id, ...rest } }) => (
-        <AsyncSelect
-          menuPosition={"fixed"}
-          loadOptions={loadOptions}
-          id={`${id}-select`}
-          className="single-select"
-          classNamePrefix="react-select"
-          getOptionLabel={(user: UserDto) => user.name}
-          getOptionValue={(user: UserDto) => user.key}
-          {...rest}
-        />
+      {({ fieldProps, error }) => (
+        <>
+          <AsyncSelect
+            {...fieldProps}
+            menuPosition={"fixed"}
+            loadOptions={loadOptions}
+            className="single-select"
+            classNamePrefix="react-select"
+            getOptionLabel={(user: UserDto) => user.name}
+            getOptionValue={(user: UserDto) => user.key}
+          />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+        </>
       )}
     </Field>
   );

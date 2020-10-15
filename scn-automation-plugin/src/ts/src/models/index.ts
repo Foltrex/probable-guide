@@ -27,6 +27,7 @@ export interface AutoTTDto {
   project?: ProjectDto;
   issue?: IssueDto;
   worklogType?: WorklogTypeDto;
+  ratedTime?: string;
   author?: UserDto;
   updateAuthor?: UserDto;
   created?: number;

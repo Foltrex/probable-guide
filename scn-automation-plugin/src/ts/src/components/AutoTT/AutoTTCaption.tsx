@@ -1,16 +1,11 @@
 import Button from "@atlaskit/button";
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+import { AutoTTContext } from "../../services/autoTT/autoTTContext";
 
-interface AutoTTCaptionProps {
-  caption: string;
-  createAction(): void;
-}
+const AutoTTCaption: React.FC = () => {
+  const { onCreate } = useContext(AutoTTContext);
 
-const AutoTTCaption: React.FC<AutoTTCaptionProps> = ({
-  caption,
-  createAction,
-}) => {
   const HeaderWrapper = styled.div`
     display: flex;
     align-items: center;
@@ -27,10 +22,10 @@ const AutoTTCaption: React.FC<AutoTTCaptionProps> = ({
   return (
     <HeaderWrapper>
       <CaptionWrapper>
-        <h1>{caption}</h1>
+        <h1>Auto time tracking users</h1>
       </CaptionWrapper>
       <ActionWrapper>
-        <Button onClick={createAction}>Add user</Button>
+        <Button onClick={onCreate}>Add user</Button>
       </ActionWrapper>
     </HeaderWrapper>
   );

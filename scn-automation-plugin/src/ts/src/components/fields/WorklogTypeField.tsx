@@ -1,4 +1,4 @@
-import { Field } from "@atlaskit/form";
+import { ErrorMessage, Field } from "@atlaskit/form";
 import Select from "@atlaskit/select";
 import React, { useContext, useEffect, useState } from "react";
 import { getAllWorklogTypes } from "../../api";
@@ -17,7 +17,7 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
   name,
 }) => {
   const [options, setOptions] = useState<WorklogTypeDto[]>([]);
-  const { addError } = useContext(FlagContext);
+  const { showError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
@@ -32,7 +32,7 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
           );
         }
       })
-      .catch(({ message }) => addError(message));
+      .catch(({ message }) => showError(message));
     return () => {
       isMounted = false;
     };
@@ -40,18 +40,21 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
 
   return (
     <Field<WorklogTypeDto> label={label} name={name} defaultValue={value}>
-      {({ fieldProps: { id, ...rest } }) => (
-        <Select
-          menuPosition={"fixed"}
-          isClearable={true}
-          options={options}
-          id={`${id}-select`}
-          className="single-select"
-          classNamePrefix="react-select"
-          getOptionLabel={(value: WorklogTypeDto) => value.name}
-          getOptionValue={(value: WorklogTypeDto) => value.id}
-          {...rest}
-        />
+      {({ fieldProps: { id, ...rest }, error }) => (
+        <>
+          <Select
+            menuPosition={"fixed"}
+            isClearable={true}
+            options={options}
+            id={`${id}-select`}
+            className="single-select"
+            classNamePrefix="react-select"
+            getOptionLabel={(value: WorklogTypeDto) => value.name}
+            getOptionValue={(value: WorklogTypeDto) => value.id}
+            {...rest}
+          />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+        </>
       )}
     </Field>
   );

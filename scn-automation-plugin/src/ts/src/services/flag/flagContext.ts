@@ -1,11 +1,9 @@
 import { createContext } from "react";
-import { FlagDto } from "../../models";
 
 type ContextProps = {
-  flags: Array<FlagDto>;
-  addSuccess: (message: string) => void;
-  addError: (message: string) => void;
-  removeFlag: () => void;
+  showSuccess: (message: string) => void;
+  showInfo: (message: string) => void;
+  showError: (message: string) => void;
 };
 
-export const FlagContext = createContext<Partial<ContextProps>>({});
+export const FlagContext = createContext<ContextProps>(null);

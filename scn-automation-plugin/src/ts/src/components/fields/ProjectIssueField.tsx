@@ -1,4 +1,4 @@
-import { Field } from "@atlaskit/form";
+import { ErrorMessage, Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
 import React, { useContext, useEffect, useState } from "react";
 import { getIssuesByProjectId } from "../../api";
@@ -22,7 +22,7 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
   const [currentProject, setCurrentProject] = useState<ProjectDto>(project);
   const [currentIssue, setCurrentIssue] = useState<IssueDto>(issue);
   const [options, setOptions] = useState<IssueDto[]>([]);
-  const { addError } = useContext(FlagContext);
+  const { showError } = useContext(FlagContext);
 
   useEffect(() => {
     let isMounted = true;
@@ -39,7 +39,7 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
             );
           }
         })
-        .catch(({ message }) => addError(message));
+        .catch(({ message }) => showError(message));
     }
     return () => {
       isMounted = false;
@@ -58,7 +58,7 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
     );
 
   const onProjectChange = (value: ProjectDto) => {
-    if (!currentProject || value.id != currentProject.id) {
+    if (!currentProject || !value || value.id != currentProject.id) {
       setCurrentIssue(null);
     }
     setCurrentProject(value);
@@ -79,20 +79,24 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
         name={name}
         defaultValue={currentIssue}
       >
-        {({}) => <></>}
+        {({ fieldProps, error }) => (
+          <>
+            <AsyncSelect
+              {...fieldProps}
+              menuPosition={"fixed"}
+              onChange={(value: IssueDto) => setCurrentIssue(value)}
+              loadOptions={loadOptions}
+              className="single-select"
+              classNamePrefix="react-select"
+              getOptionLabel={(issue: IssueDto) =>
+                `${issue.name} (${issue.key})`
+              }
+              getOptionValue={(issue: IssueDto) => issue.id.toString()}
+            />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </>
+        )}
       </Field>
-      <AsyncSelect
-        menuPosition={"fixed"}
-        isDisabled={!currentProject}
-        value={currentIssue}
-        onChange={(value: IssueDto) => setCurrentIssue(value)}
-        loadOptions={loadOptions}
-        id={`issue-select`}
-        className="single-select"
-        classNamePrefix="react-select"
-        getOptionLabel={(issue: IssueDto) => `${issue.name} (${issue.key})`}
-        getOptionValue={(issue: IssueDto) => issue.id.toString()}
-      />
     </>
   );
 };
