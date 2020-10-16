@@ -19,7 +19,15 @@
     tslib "^2.0.0"
     use-memo-one "^1.1.1"
 
-"@atlaskit/avatar@^20.0.6":
+"@atlaskit/analytics@^8.0.0":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/analytics/-/analytics-8.0.2.tgz#0448009e47239e03948687c274efc5bfc9e6647f"
+  integrity sha512-N96pzC78fxghs1p0ImoeQSB3Az0BUHSbHnRUUcAbmZ0mqgRjrrkoZqEXWD+Ew5OnjPaHWcnVdvxRMGJANfvJMw==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    prop-types "^15.5.10"
+
+"@atlaskit/avatar@^20.0.0", "@atlaskit/avatar@^20.0.6":
   version "20.0.6"
   resolved "https://registry.yarnpkg.com/@atlaskit/avatar/-/avatar-20.0.6.tgz#2293c6d319de60e9ed58a5c52ad0da6a38d07d5f"
   integrity sha512-V3V6yoCSvmBcviJeanIuMoZo2jokDGqOhI8Kfs5N5GAjrWTUwBMsOKv1P56Btt4tMO73KowOdtRt1BHKTCTXLA==
@@ -224,6 +232,21 @@
     "@atlaskit/theme" "^11.0.0"
     exenv "^1.2.2"
     tiny-invariant "^0.0.3"
+    tslib "^2.0.0"
+
+"@atlaskit/quick-search@^8.0.4":
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/@atlaskit/quick-search/-/quick-search-8.0.4.tgz#f3db48c2ad377b462be4ced019650ce221b07edc"
+  integrity sha512-Nz0EpmthNjCn4/z1i4xzyc1uQ9YCVOioRJnMbz8MylRClHdoMNTd4kWdY9r1ydaRP8TRx0B9FuMeH0IQ29olZQ==
+  dependencies:
+    "@atlaskit/analytics" "^8.0.0"
+    "@atlaskit/avatar" "^20.0.0"
+    "@atlaskit/icon" "^21.0.0"
+    "@atlaskit/item" "^12.0.0"
+    "@atlaskit/spinner" "^15.0.0"
+    "@atlaskit/theme" "^11.0.0"
+    "@babel/runtime" "^7.0.0"
+    keycode "^2.1.7"
     tslib "^2.0.0"
 
 "@atlaskit/select@^13.0.6":
@@ -4164,6 +4187,11 @@ json5@^2.1.2:
   integrity sha512-KXPvOm8K9IJKFM0bmdn8QXh7udDh1g/giieX0NLCaMnb4hEiVFqnop2ImTXCc5e0/oHz3LTqmHGtExn5hfMkOA==
   dependencies:
     minimist "^1.2.5"
+
+keycode@^2.1.7:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/keycode/-/keycode-2.2.0.tgz#3d0af56dc7b8b8e5cba8d0a97f107204eec22b04"
+  integrity sha1-PQr1bce4uOXLqNCpfxByBO7CKwQ=
 
 killable@^1.0.1:
   version "1.0.1"

@@ -11,6 +11,7 @@ import {
   fetchItemsAction,
   hideLoaderAction,
   removeItemAction,
+  searchItemsAction,
   showLoaderAction,
   updateFormAction,
   updateItemAction,
@@ -23,6 +24,7 @@ import { AutoTTDto } from "../../models";
 const AutoTTService: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(autoTTReducer, {
     items: [],
+    searchText: "",
     formData: null,
     isLoaded: true,
   });
@@ -39,10 +41,16 @@ const AutoTTService: React.FC = ({ children }) => {
     }
     dispatch(hideLoaderAction());
   };
+
+  const searchAutoTT = async (text: string): Promise<void> =>
+    dispatch(searchItemsAction(text));
+
   const updateForm = (formData: AutoTTDto): void =>
     dispatch(updateFormAction(formData));
+
   const onCreate = (): void =>
     updateForm({ id: null, ratedTime: "8h", active: true });
+
   const onEdit = async (id: number): Promise<void> => {
     try {
       const result = await getAutoTT(id);
@@ -51,14 +59,16 @@ const AutoTTService: React.FC = ({ children }) => {
       showError(error.message);
     }
   };
+
   const onCopy = async (id: number): Promise<void> => {
     try {
       const result = await getAutoTT(id);
-      updateForm(result.data);
+      updateForm({ ...result.data, id: null, user: null });
     } catch (error) {
       showError(error.message);
     }
   };
+
   const addAutoTT = async (data: AutoTTDto): Promise<void | Object> => {
     try {
       const result = await postAutoTT(data);
@@ -66,12 +76,17 @@ const AutoTTService: React.FC = ({ children }) => {
       dispatch(addItemAction(result.data));
       showSuccess("Created");
     } catch (error) {
-      showError(error.message);
+      if (error.response && error.response.status === 403) {
+        error.response.data.errorMessages.forEach((message: string) =>
+          showError(message)
+        );
+      }
       if (error.response && error.response.status === 400) {
         return error.response.data.errors;
       }
     }
   };
+
   const updateAutoTT = async (data: AutoTTDto): Promise<void | Object> => {
     try {
       const result = await putAutoTT(data);
@@ -79,18 +94,27 @@ const AutoTTService: React.FC = ({ children }) => {
       dispatch(updateItemAction(result.data));
       showSuccess("Updated");
     } catch (error) {
-      showError(error.message);
+      if (error.response && error.response.status === 403) {
+        error.response.data.errorMessages.forEach((message: string) =>
+          showError(message)
+        );
+      }
       if (error.response && error.response.status === 400) {
         return error.response.data.errors;
       }
     }
   };
+
   const removeAutoTT = async (id: number): Promise<void> => {
     try {
       await deleteAutoTT(id);
       dispatch(removeItemAction({ id }));
     } catch (error) {
-      showError(error.message);
+      if (error.response && error.response.status === 403) {
+        error.response.data.errorMessages.forEach((message: string) =>
+          showError(message)
+        );
+      }
     }
   };
 
@@ -99,6 +123,7 @@ const AutoTTService: React.FC = ({ children }) => {
       value={{
         ...state,
         fetchAutoTT,
+        searchAutoTT,
         onCreate,
         onEdit,
         onCopy,

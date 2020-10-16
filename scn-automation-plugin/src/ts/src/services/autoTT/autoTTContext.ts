@@ -4,6 +4,7 @@ import { AutoTTState } from "./types";
 
 type ContextProps = AutoTTState & {
   fetchAutoTT(): Promise<void>;
+  searchAutoTT(text: string): Promise<void>;
   onCreate(): void;
   onEdit(id: number): Promise<void>;
   onCopy(id: number): Promise<void>;

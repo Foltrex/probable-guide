@@ -9,6 +9,7 @@ import {
   UPDATE_FORM,
   UPDATE_ITEM,
   REMOVE_ITEM,
+  SEARCH_ITEMS,
 } from "./types";
 
 export const autoTTReducer: Reducer<AutoTTState, AutoTTActionType> = (
@@ -22,6 +23,8 @@ export const autoTTReducer: Reducer<AutoTTState, AutoTTActionType> = (
       return { ...state, isLoaded: true };
     case FETCH_ITEMS:
       return { ...state, items: action.payload };
+    case SEARCH_ITEMS:
+      return { ...state, searchText: action.payload };
     case ADD_ITEM:
       return { ...state, items: [action.payload, ...state.items] };
     case UPDATE_ITEM:

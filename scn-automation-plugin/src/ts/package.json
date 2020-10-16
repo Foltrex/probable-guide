@@ -35,6 +35,7 @@
     "@atlaskit/form": "^8.1.6",
     "@atlaskit/icon": "^21.1.2",
     "@atlaskit/modal-dialog": "^11.2.3",
+    "@atlaskit/quick-search": "^8.0.4",
     "@atlaskit/select": "^13.0.6",
     "@atlaskit/textfield": "^4.0.9",
     "@babel/polyfill": "^7.11.5",

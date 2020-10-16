@@ -5,6 +5,7 @@ import {
   FETCH_ITEMS,
   HIDE_LOADER,
   REMOVE_ITEM,
+  SEARCH_ITEMS,
   SHOW_LOADER,
   UPDATE_FORM,
   UPDATE_ITEM,
@@ -25,6 +26,13 @@ export function hideLoaderAction(): AutoTTActionType {
 export function fetchItemsAction(payload: AutoTTDto[]): AutoTTActionType {
   return {
     type: FETCH_ITEMS,
+    payload,
+  };
+}
+
+export function searchItemsAction(payload: string): AutoTTActionType {
+  return {
+    type: SEARCH_ITEMS,
     payload,
   };
 }

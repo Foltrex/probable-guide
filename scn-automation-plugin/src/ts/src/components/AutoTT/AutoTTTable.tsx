@@ -223,6 +223,8 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       head={getHead()}
       rows={getRows(items)}
       loadingSpinnerSize="large"
+      defaultSortOrder="DESC"
+      defaultSortKey="updated"
     />
   );
 };
