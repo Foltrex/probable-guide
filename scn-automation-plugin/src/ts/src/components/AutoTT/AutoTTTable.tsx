@@ -218,7 +218,7 @@ const AutoTTTable: React.FC<ComponentProps> = ({
 
   return (
     <DynamicTable
-      emptyView={<h2>No items</h2>}
+      emptyView={<h2>No records</h2>}
       isLoading={!isLoaded}
       head={getHead()}
       rows={getRows(items)}

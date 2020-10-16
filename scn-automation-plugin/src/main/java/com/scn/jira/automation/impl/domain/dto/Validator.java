@@ -20,6 +20,10 @@ public class Validator {
     public Validator() {
     }
 
+    public Validator(String errorMessage){
+        this.errorMessages.add(errorMessage);
+    }
+
     public boolean isValid() {
         return this.valid;
     }

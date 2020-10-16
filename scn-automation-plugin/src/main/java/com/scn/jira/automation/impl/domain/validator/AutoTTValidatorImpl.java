@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -34,59 +33,48 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
     @Override
     public Validator validate(@Nonnull AutoTTDto autoTTDto) {
         Validator validator = new Validator();
-        List<String> errorMessages = validator.getErrorMessages();
         Map<String, String> errors = validator.getErrors();
 
         if (autoTTDto.getUser() == null) {
-            errorMessages.add("User has to be set");
             errors.put("user", "User has to be set");
             validator.setValid(false);
         } else if (contextService.getUserDto(autoTTDto.getUser().getKey()) == null) {
-            errorMessages.add("Couldn't find user");
             errors.put("user", "Couldn't find user");
             validator.setValid(false);
         } else {
             AutoTTDto foundUser = autoTTService.getByUserKey(autoTTDto.getUser().getKey());
             if (foundUser != null && !foundUser.getId().equals(autoTTDto.getId())) {
-                errorMessages.add("User already exists");
                 errors.put("user", "User already exists");
                 validator.setValid(false);
             }
         }
 
         if (autoTTDto.getProject() == null) {
-            errorMessages.add("Project has to be set");
             errors.put("project", "Project has to be set");
             validator.setValid(false);
         } else if (contextService.getProjectDto(autoTTDto.getProject().getId()) == null) {
-            errorMessages.add("Couldn't find project");
             errors.put("project", "Couldn't find project");
             validator.setValid(false);
         }
 
         if (autoTTDto.getIssue() == null) {
-            errorMessages.add("Issue has to be set");
             errors.put("issue", "Issue has to be set");
             validator.setValid(false);
         } else if (contextService.getIssueDto(autoTTDto.getIssue().getId()) == null) {
-            errorMessages.add("Couldn't find issue");
             errors.put("issue", "Couldn't find issue");
             validator.setValid(false);
         }
 
         if (autoTTDto.getWorklogType() != null
             && worklogContextService.getWorklogType(autoTTDto.getWorklogType().getId()) == null) {
-            errorMessages.add("Couldn't find worklog type");
             errors.put("worklogType", "Couldn't find worklog type");
             validator.setValid(false);
         }
 
         if (!worklogContextService.isValidFormattedTime(autoTTDto.getRatedTime())) {
-            errorMessages.add("Invalid rated time format");
             errors.put("ratedTime", "Invalid rated time format");
             validator.setValid(false);
         } else if (worklogContextService.isBlankFormattedTime(autoTTDto.getRatedTime())) {
-            errorMessages.add("Rated time has to be set");
             errors.put("ratedTime", "Rated time has to be set");
             validator.setValid(false);
         }

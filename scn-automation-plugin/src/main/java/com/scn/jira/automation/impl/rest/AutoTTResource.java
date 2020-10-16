@@ -36,7 +36,8 @@ public class AutoTTResource {
                 .sorted((o1, o2) -> o2.getUpdated().compareTo(o1.getUpdated()))
                 .collect(Collectors.toList())).build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("No view permissions.").build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity(new Validator("No view permissions")).build();
         }
     }
 
@@ -46,7 +47,8 @@ public class AutoTTResource {
         if (autoTTValidator.canView()) {
             return Response.ok(autoTTService.get(id)).build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("No view permissions.").build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity(new Validator("No view permissions")).build();
         }
     }
 
@@ -60,7 +62,8 @@ public class AutoTTResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("No create permissions.").build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity(new Validator("No create permissions")).build();
         }
     }
 
@@ -74,7 +77,8 @@ public class AutoTTResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("No update permissions.").build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity(new Validator("No update permissions")).build();
         }
     }
 
@@ -85,7 +89,8 @@ public class AutoTTResource {
             autoTTService.remove(id);
             return Response.noContent().build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).entity("No delete permissions").build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity(new Validator("No delete permissions")).build();
         }
     }
 }
