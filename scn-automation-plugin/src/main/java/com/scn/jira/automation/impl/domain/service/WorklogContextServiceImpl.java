@@ -133,12 +133,13 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     }
 
     @Override
-    public void createWorklog(@Nonnull AutoTTDto autoTTDto, Date date, Long timeSpent) {
+    public void createWorklog(@Nonnull AutoTTDto autoTTDto, Date date) {
         Issue issue = issueManager.getIssueObject(autoTTDto.getIssue().getId());
-        if (issue != null) {
+        if (issue != null && !this.isBlankFormattedTime(autoTTDto.getRatedTime())) {
             IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTTDto.getUser().getKey(),
                 "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
-                timeSpent, autoTTDto.getWorklogType() == null ? "0" : autoTTDto.getWorklogType().getId());
+                this.getParsedTime(autoTTDto.getRatedTime()),
+                autoTTDto.getWorklogType() == null ? "0" : autoTTDto.getWorklogType().getId());
             boolean isAutoCopy = isWlAutoCopy(autoTTDto);
             scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
                 new JiraServiceContextImpl(jiraContextService.getUser(autoTTDto.getUser().getKey())),

@@ -25,5 +25,5 @@ public interface WorklogContextService {
 
     Set<Date> getWorkedDays(String userKey, @Nonnull Date from, @Nonnull Date to);
 
-    void createWorklog(AutoTTDto autoTTDto, Date date, Long timeSpent);
+    void createWorklog(AutoTTDto autoTTDto, Date date);
 }

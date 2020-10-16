@@ -16,7 +16,7 @@ public class PluginUpgradeTask01 implements ActiveObjectsUpgradeTask {
         ao.migrate(AutoTT.class);
         AutoTT[] autoTTList = ao.find(AutoTT.class);
         for (AutoTT record : autoTTList) {
-            record.setRatedTime(AutoTTExecutionService.WORKED_TIME/2);
+            record.setRatedTime(AutoTTExecutionService.WORKED_TIME);
             record.save();
         }
     }

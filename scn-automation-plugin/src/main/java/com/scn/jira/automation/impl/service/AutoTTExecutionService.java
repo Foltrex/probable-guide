@@ -54,7 +54,7 @@ public class AutoTTExecutionService extends AbstractService {
         Set<Date> workedDays = worklogContextService.getWorkedDays(autoTTDto.getUser().getKey(), from, to);
         userCalendar.forEach((date, dayType) -> {
             if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
-                worklogContextService.createWorklog(autoTTDto, date, WORKED_TIME);
+                worklogContextService.createWorklog(autoTTDto, date);
                 LOGGER.debug(autoTTDto + " for date: " + date);
             }
         });
