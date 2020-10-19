@@ -1,45 +1,77 @@
-import { search } from "core-js/fn/symbol";
-import React, { useContext, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AutoTTCaption from "../components/AutoTT/AutoTTCaption";
 import AutoTTForm from "../components/AutoTT/AutoTTForm";
 import AutoTTTable from "../components/AutoTT/AutoTTTable";
-import { AutoTTContext } from "../services/autoTT/autoTTContext";
+import { AutoTTDto } from "../models";
+import { useAutoTTService } from "../services/AutoTTService";
 
 const AutoTTContainer: React.FC = () => {
   const {
     items,
-    searchText,
+    item,
     isLoaded,
+    fetchAllAutoTT,
     fetchAutoTT,
-    onEdit,
-    onCopy,
-    removeAutoTT,
-  } = useContext(AutoTTContext);
+    setAutoTT,
+    createAutoTT,
+    updateAutoTT,
+    deleteAutoTT,
+  } = useAutoTTService();
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    fetchAutoTT();
+    fetchAllAutoTT();
   }, []);
+
+  const onCreate = () => {
+    setAutoTT({ id: null, ratedTime: "8h", active: true });
+  };
+
+  const onClose = () => {
+    setAutoTT(null);
+  };
+
+  const onEdit = (id: number) => {
+    fetchAutoTT(id);
+  };
+
+  const onCopy = (id: number) => {
+    fetchAutoTT(id).then((value) =>
+      setAutoTT({ ...value, id: null, user: null })
+    );
+  };
+
+  const onSubmit = (data: AutoTTDto) =>
+    data.id ? updateAutoTT(data) : createAutoTT(data);
+
+  const visibleItems = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          item.user.key.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.project.key.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.project.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.issue.key.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.issue.name.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [items, searchText]
+  );
 
   return (
     <>
-      <AutoTTCaption />
-      <AutoTTForm />
+      <AutoTTCaption
+        onCreate={onCreate}
+        searchText={searchText}
+        onSearch={(text) => setSearchText(text)}
+      />
+      <AutoTTForm data={item} onSubmit={onSubmit} onClose={onClose} />
       <AutoTTTable
-        items={items.filter(
-          (item) =>
-            item.user.key.toLowerCase().includes(searchText.toLowerCase()) ||
-            item.user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            item.project.key.toLowerCase().includes(searchText.toLowerCase()) ||
-            item.project.name
-              .toLowerCase()
-              .includes(searchText.toLowerCase()) ||
-            item.issue.key.toLowerCase().includes(searchText.toLowerCase()) ||
-            item.issue.name.toLowerCase().includes(searchText.toLowerCase())
-        )}
+        items={visibleItems}
         isLoaded={isLoaded}
         onEdit={onEdit}
         onCopy={onCopy}
-        onDelete={removeAutoTT}
+        onDelete={deleteAutoTT}
       />
     </>
   );

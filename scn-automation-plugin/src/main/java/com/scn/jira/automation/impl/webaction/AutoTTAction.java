@@ -18,7 +18,7 @@ public class AutoTTAction extends JiraWebActionSupport {
     @Override
     public String execute() throws Exception {
         pageBuilderService.assembler().resources()
-            .requireWebResource("com.scn.jira.automation.scn-automation-plugin:entrypoint-scn-index");
+            .requireWebResource("com.scn.jira.automation.scn-automation-plugin:entrypoint-autotimetracking-table");
 
         return super.execute();
     }

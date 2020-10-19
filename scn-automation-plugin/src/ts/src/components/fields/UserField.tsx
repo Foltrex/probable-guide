@@ -1,9 +1,10 @@
 import { ErrorMessage, Field } from "@atlaskit/form";
-import React, { useContext } from "react";
+import React from "react";
 import { UserDto } from "../../models";
 import { AsyncSelect } from "@atlaskit/select";
-import { searchUsers } from "../../api";
-import { FlagContext } from "../../services/flag/flagContext";
+import { request } from "../../api";
+import { useFlagService } from "../../services/FlagService";
+import Config from "../../config";
 
 interface UserFieldProps {
   value: UserDto;
@@ -12,10 +13,13 @@ interface UserFieldProps {
 }
 
 const UserField: React.FC<UserFieldProps> = ({ value, label, name }) => {
-  const { showError } = useContext(FlagContext);
+  const { showError } = useFlagService();
 
   const loadOptions = (query: string) =>
-    searchUsers(query)
+    request<{ users: any[] }>({
+      url: `${Config.JIRA_API}/user/picker?query=${query}`,
+      method: "GET",
+    })
       .then(({ data: { users } }) =>
         users.map((value: { key: string; displayName: string }) => ({
           key: value.key,

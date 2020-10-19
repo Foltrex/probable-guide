@@ -1,9 +1,10 @@
 import { ErrorMessage, Field } from "@atlaskit/form";
 import Select from "@atlaskit/select";
-import React, { useContext, useEffect, useState } from "react";
-import { getAllWorklogTypes } from "../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../api";
+import Config from "../../config";
 import { WorklogTypeDto } from "../../models";
-import { FlagContext } from "../../services/flag/flagContext";
+import { useFlagService } from "../../services/FlagService";
 
 interface WorklogTypeFieldProps {
   value: WorklogTypeDto;
@@ -17,26 +18,24 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
   name,
 }) => {
   const [options, setOptions] = useState<WorklogTypeDto[]>([]);
-  const { showError } = useContext(FlagContext);
+  const { showError } = useFlagService();
 
   useEffect(() => {
     let isMounted = true;
-    getAllWorklogTypes()
+    request<WorklogTypeDto[]>({
+      url: `${Config.API}/worklog/type`,
+      method: "GET",
+    })
       .then(({ data }) => {
         if (isMounted) {
-          setOptions(
-            data.map((value) => ({
-              id: value.id,
-              name: value.name,
-            }))
-          );
+          setOptions(data);
         }
       })
       .catch(({ message }) => showError(message));
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [value]);
 
   return (
     <Field<WorklogTypeDto> label={label} name={name} defaultValue={value}>

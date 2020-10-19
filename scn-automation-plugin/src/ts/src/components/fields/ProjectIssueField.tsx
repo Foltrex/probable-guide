@@ -1,9 +1,10 @@
 import { ErrorMessage, Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
-import React, { useContext, useEffect, useState } from "react";
-import { getIssuesByProjectId } from "../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../api";
+import Config from "../../config";
 import { IssueDto, ProjectDto } from "../../models";
-import { FlagContext } from "../../services/flag/flagContext";
+import { useFlagService } from "../../services/FlagService";
 import ProjectField from "./ProjectField";
 
 interface ProjectIssueFieldProps {
@@ -22,12 +23,14 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
   const [currentProject, setCurrentProject] = useState<ProjectDto>(project);
   const [currentIssue, setCurrentIssue] = useState<IssueDto>(issue);
   const [options, setOptions] = useState<IssueDto[]>([]);
-  const { showError } = useContext(FlagContext);
+  const { showError } = useFlagService();
 
   useEffect(() => {
     let isMounted = true;
     if (currentProject) {
-      getIssuesByProjectId(currentProject.id)
+      request<{ issues: any[] }>({
+        url: `${Config.JIRA_API}/search?jql=project=${currentProject.id}&fields=summary&maxResults=3000`,
+      })
         .then(({ data }) => {
           if (isMounted) {
             setOptions(

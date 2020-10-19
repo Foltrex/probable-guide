@@ -2,12 +2,11 @@ import { AutoTTDto } from "../../models";
 import {
   ADD_ITEM,
   AutoTTActionType,
-  FETCH_ITEMS,
   HIDE_LOADER,
   REMOVE_ITEM,
-  SEARCH_ITEMS,
+  SET_ITEM,
+  SET_ITEMS,
   SHOW_LOADER,
-  UPDATE_FORM,
   UPDATE_ITEM,
 } from "./types";
 
@@ -23,16 +22,16 @@ export function hideLoaderAction(): AutoTTActionType {
   };
 }
 
-export function fetchItemsAction(payload: AutoTTDto[]): AutoTTActionType {
+export function setItemsAction(payload: AutoTTDto[]): AutoTTActionType {
   return {
-    type: FETCH_ITEMS,
+    type: SET_ITEMS,
     payload,
   };
 }
 
-export function searchItemsAction(payload: string): AutoTTActionType {
+export function setItemAction(payload: AutoTTDto): AutoTTActionType {
   return {
-    type: SEARCH_ITEMS,
+    type: SET_ITEM,
     payload,
   };
 }
@@ -55,12 +54,5 @@ export function removeItemAction(meta: { id: number }): AutoTTActionType {
   return {
     type: REMOVE_ITEM,
     meta,
-  };
-}
-
-export function updateFormAction(payload: AutoTTDto): AutoTTActionType {
-  return {
-    type: UPDATE_FORM,
-    payload,
   };
 }

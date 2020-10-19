@@ -1,7 +1,7 @@
 import React from "react";
 import AutoTTContainer from "../containers/AutoTTContainer";
-import AutoTTService from "../services/autoTT/AutoTTService";
-import FlagService from "../services/flag/FlagService";
+import AutoTTService from "../services/AutoTTService";
+import FlagService from "../services/FlagService";
 
 const AutoTT = () => {
   return (

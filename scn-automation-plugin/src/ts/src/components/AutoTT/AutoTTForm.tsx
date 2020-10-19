@@ -5,42 +5,44 @@ import ModalDialog, {
   ModalFooter,
   ModalTransition,
 } from "@atlaskit/modal-dialog";
-import React, { useContext } from "react";
+import React from "react";
 import { AutoTTDto } from "../../models";
-import { AutoTTContext } from "../../services/autoTT/autoTTContext";
 import { IdField, ProjectIssueField, UserField } from "../fields";
 import WorklogTypeField from "../fields/WorklogTypeField";
 import Textfield from "@atlaskit/textfield";
 
-const AutoTTForm = () => {
-  const { formData, updateForm, addAutoTT, updateAutoTT } = useContext(
-    AutoTTContext
-  );
+interface ComponentProps {
+  data: AutoTTDto;
+  onSubmit(data: AutoTTDto): void | Object;
+  onClose(): void;
+}
 
+const AutoTTForm: React.FC<ComponentProps> = ({ data, onSubmit, onClose }) => {
   const footer = (props: { showKeyline?: boolean }) => (
     <ModalFooter showKeyline={props.showKeyline}>
       <span />
-      <Button appearance="primary" type="submit">
-        {formData.id ? "Update" : "Create"}
-      </Button>
+      <div>
+        <Button appearance="primary" type="submit">
+          {data.id ? "Update" : "Create"}
+        </Button>
+        <Button appearance="link" onClick={onClose}>
+          Cancel
+        </Button>
+      </div>
     </ModalFooter>
   );
 
   return (
     <ModalTransition>
-      {formData && (
+      {data && (
         <ModalDialog
           heading={
-            formData.id
-              ? "Edit auto time tracking"
-              : "Create auto time tracking"
+            data.id ? "Edit auto time tracking" : "Create auto time tracking"
           }
-          onClose={updateForm.bind(this, null)}
+          onClose={onClose}
           components={{
             Container: ({ children, className }) => (
-              <Form<AutoTTDto>
-                onSubmit={formData.id ? updateAutoTT : addAutoTT}
-              >
+              <Form<AutoTTDto> onSubmit={onSubmit}>
                 {({ formProps }) => (
                   <form {...formProps} className={className}>
                     {children}
@@ -51,19 +53,19 @@ const AutoTTForm = () => {
             Footer: footer,
           }}
         >
-          <IdField value={formData.id ? formData.id : 0} />
-          <UserField label="User" name="user" value={formData.user}></UserField>
+          <IdField value={data.id ? data.id : 0} />
+          <UserField label="User" name="user" value={data.user}></UserField>
           <ProjectIssueField
             label="Issue"
             name="issue"
-            issue={formData.issue}
-            project={formData.project}
+            issue={data.issue}
+            project={data.project}
           />
           <Field<string>
             label="Rated Time"
             name="ratedTime"
             isRequired={true}
-            defaultValue={formData.ratedTime}
+            defaultValue={data.ratedTime}
           >
             {({ fieldProps: { isRequired, ...rest }, error }) => (
               <>
@@ -76,9 +78,9 @@ const AutoTTForm = () => {
           <WorklogTypeField
             label="Worklog type"
             name="worklogType"
-            value={formData.worklogType}
+            value={data.worklogType}
           />
-          <CheckboxField name="active" defaultIsChecked={formData.active}>
+          <CheckboxField name="active" defaultIsChecked={data.active}>
             {({ fieldProps: { ...rest } }) => (
               <Checkbox {...rest} label="Active" />
             )}

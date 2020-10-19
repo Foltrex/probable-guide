@@ -1,12 +1,19 @@
 import Button from "@atlaskit/button";
-import React, { FormEvent, useContext, useRef } from "react";
+import React from "react";
 import styled from "styled-components";
-import { AutoTTContext } from "../../services/autoTT/autoTTContext";
 import { QuickSearch } from "@atlaskit/quick-search";
 
-const AutoTTCaption: React.FC = () => {
-  const { searchText, onCreate, searchAutoTT } = useContext(AutoTTContext);
+interface ComponentProps {
+  onCreate(): void;
+  onSearch(text: string): void;
+  searchText: string;
+}
 
+const AutoTTCaption: React.FC<ComponentProps> = ({
+  onCreate,
+  onSearch,
+  searchText,
+}) => {
   const HeaderWrapper = styled.div`
     padding-top: 10px;
     display: flex;
@@ -33,7 +40,7 @@ const AutoTTCaption: React.FC = () => {
           children={null}
           value={searchText}
           onSearchInput={(event) =>
-            searchAutoTT((event.target as HTMLInputElement).value)
+            onSearch((event.target as HTMLInputElement).value)
           }
         />
         <Button onClick={onCreate}>Add user</Button>

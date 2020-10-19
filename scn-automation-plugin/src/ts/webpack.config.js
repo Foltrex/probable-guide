@@ -54,7 +54,12 @@ const plugins = () => {
 module.exports = {
     context: path.resolve(__dirname, "src"),
     mode: "development",
-    entry: { "scn-index": ["@babel/polyfill", "./index.tsx"] },
+    entry: {
+        "autotimetracking-table": [
+            "@babel/polyfill",
+            "./autotimetracking-table.tsx",
+        ],
+    },
     output: {
         filename: "[name].bundle.js",
         path: isProd

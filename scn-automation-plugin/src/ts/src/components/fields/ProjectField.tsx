@@ -1,9 +1,10 @@
 import { ErrorMessage, Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
-import React, { useContext, useEffect, useState } from "react";
-import { getAllProjects } from "../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../api";
+import Config from "../../config";
 import { ProjectDto } from "../../models";
-import { FlagContext } from "../../services/flag/flagContext";
+import { useFlagService } from "../../services/FlagService";
 
 interface ProjectFieldProps {
   value: ProjectDto;
@@ -19,11 +20,11 @@ const ProjectField: React.FC<ProjectFieldProps> = ({
   onChange,
 }) => {
   const [options, setOptions] = useState<ProjectDto[]>([]);
-  const { showError } = useContext(FlagContext);
+  const { showError } = useFlagService();
 
   useEffect(() => {
     let isMounted = true;
-    getAllProjects()
+    request<any[]>({ url: `${Config.JIRA_API}/project`, method: "GET" })
       .then(({ data }) => {
         if (isMounted) {
           setOptions(

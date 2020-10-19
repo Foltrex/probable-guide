@@ -33,9 +33,3 @@ export interface AutoTTDto {
   created?: number;
   updated?: number;
 }
-
-export interface FlagDto {
-  id: number;
-  appearance: "success" | "error";
-  message: string;
-}

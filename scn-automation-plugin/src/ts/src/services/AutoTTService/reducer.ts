@@ -2,14 +2,13 @@ import { Reducer } from "react";
 import {
   AutoTTActionType,
   AutoTTState,
-  FETCH_ITEMS,
   ADD_ITEM,
   HIDE_LOADER,
   SHOW_LOADER,
-  UPDATE_FORM,
   UPDATE_ITEM,
   REMOVE_ITEM,
-  SEARCH_ITEMS,
+  SET_ITEMS,
+  SET_ITEM,
 } from "./types";
 
 export const autoTTReducer: Reducer<AutoTTState, AutoTTActionType> = (
@@ -21,10 +20,10 @@ export const autoTTReducer: Reducer<AutoTTState, AutoTTActionType> = (
       return { ...state, isLoaded: false };
     case HIDE_LOADER:
       return { ...state, isLoaded: true };
-    case FETCH_ITEMS:
+    case SET_ITEMS:
       return { ...state, items: action.payload };
-    case SEARCH_ITEMS:
-      return { ...state, searchText: action.payload };
+    case SET_ITEM:
+      return { ...state, item: action.payload };
     case ADD_ITEM:
       return { ...state, items: [action.payload, ...state.items] };
     case UPDATE_ITEM:
@@ -39,8 +38,6 @@ export const autoTTReducer: Reducer<AutoTTState, AutoTTActionType> = (
         ...state,
         items: state.items.filter((item) => item.id !== action.meta.id),
       };
-    case UPDATE_FORM:
-      return { ...state, formData: action.payload };
     default:
       return state;
   }

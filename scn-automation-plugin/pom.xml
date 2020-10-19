@@ -88,7 +88,7 @@
 						</goals>
 						<phase>compile</phase>
 						<configuration>
-							<arguments>install</arguments>
+							<arguments>install --max-old-space-size</arguments>
 						</configuration>
 					</execution>
 					<execution>
@@ -98,7 +98,7 @@
 						</goals>
 						<phase>compile</phase>
 						<configuration>
-							<arguments>package</arguments>
+							<arguments>package --max-old-space-size</arguments>
 						</configuration>
 					</execution>
 				</executions>
