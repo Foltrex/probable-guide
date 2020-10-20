@@ -2,7 +2,7 @@ import Avatar from "@atlaskit/avatar";
 import Button from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import DynamicTable from "@atlaskit/dynamic-table";
-import React, { memo, useMemo } from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
@@ -22,6 +22,15 @@ interface ComponentProps {
   onDelete(id: number): void;
 }
 
+const AvatarWrapper = styled.div`
+  margin-right: 8px;
+`;
+
+const NameWrapper = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 const AutoTTTable: React.FC<ComponentProps> = ({
   items,
   isLoaded,
@@ -29,204 +38,190 @@ const AutoTTTable: React.FC<ComponentProps> = ({
   onCopy,
   onDelete,
 }) => {
-  const data = useMemo(() => {
-    const NameWrapper = styled.span`
-      display: flex;
-      align-items: center;
-    `;
-    const AvatarWrapper = styled.div`
-      margin-right: 8px;
-    `;
-
-    return {
-      head: {
-        cells: [
-          {
-            key: "user",
-            content: "User",
-            shouldTruncate: true,
-            isSortable: true,
-            width: undefined,
-          },
-          {
-            key: "project",
-            content: "Project",
-            shouldTruncate: true,
-            isSortable: true,
-            width: undefined,
-          },
-          {
-            key: "issue",
-            content: "Issue",
-            shouldTruncate: true,
-            isSortable: true,
-            width: undefined,
-          },
-          {
-            key: "ratedtime",
-            content: "Rated Time",
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "worklogtype",
-            content: "Worklog Type",
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "createdby",
-            content: "Created by",
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "created",
-            content: "Created",
-            isSortable: true,
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "updatedby",
-            content: "Updated by",
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "updated",
-            content: "Updated",
-            isSortable: true,
-            shouldTruncate: true,
-            width: undefined,
-          },
-          {
-            key: "active",
-            content: "Active",
-            shouldTruncate: true,
-            width: undefined,
-          },
-          { key: "actions", content: "Actions", shouldTruncate: true },
-        ],
+  const head = {
+    cells: [
+      {
+        key: "user",
+        content: "User",
+        shouldTruncate: true,
+        isSortable: true,
+        width: undefined,
       },
-      rows: items.map((item) => ({
-        key: `row-${item.id}`,
-        cells: [
-          {
-            key: `user-${item.id}`,
-            content: (
-              <NameWrapper>
-                <AvatarWrapper>
-                  <Avatar
-                    src={getUserAvatarURL(item.user.key)}
-                    target="_blank"
-                    href={getUserProfileURL(item.user.key)}
-                    name={item.user.name}
-                    size="medium"
-                  />
-                </AvatarWrapper>
-                <a target="_blank" href={getUserProfileURL(item.user.key)}>
-                  {`${item.user.name} (${item.user.key})`}
-                </a>
-              </NameWrapper>
-            ),
-          },
-          {
-            key: `project-${item.id}`,
-            content: (
-              <a target="_blank" href={getProjectOrIssueURL(item.project.key)}>
-                {`${item.project.name} (${item.project.key})`}
-              </a>
-            ),
-          },
-          {
-            key: `issue-${item.id}`,
-            content: (
-              <a
-                target="_blank"
-                href={getProjectOrIssueURL(item.issue.key)}
-              >{`${item.issue.name} (${item.issue.key})`}</a>
-            ),
-          },
-          {
-            key: `ratedtime-${item.id}`,
-            content: item.ratedTime,
-          },
-          {
-            key: `worklogtype-${item.id}`,
-            content: item.worklogType ? item.worklogType.name : "",
-          },
-          {
-            key: `createdby-${item.id}`,
-            content: (
-              <a target="_blank" href={getUserProfileURL(item.author.key)}>
-                {item.author.key}
-              </a>
-            ),
-          },
-          {
-            key: `created-${item.id}`,
-            content: new Date(item.created).toLocaleDateString(),
-          },
-          {
-            key: `updatedby-${item.id}`,
-            content: (
-              <a
-                target="_blank"
-                href={getUserProfileURL(item.updateAuthor.key)}
-              >
-                {item.updateAuthor.key}
-              </a>
-            ),
-          },
-          {
-            key: `updated-${item.id}`,
-            content: new Date(item.updated).toLocaleDateString(),
-          },
+      {
+        key: "project",
+        content: "Project",
+        shouldTruncate: true,
+        isSortable: true,
+        width: undefined,
+      },
+      {
+        key: "issue",
+        content: "Issue",
+        shouldTruncate: true,
+        isSortable: true,
+        width: undefined,
+      },
+      {
+        key: "ratedtime",
+        content: "Rated Time",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "worklogtype",
+        content: "Worklog Type",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "createdby",
+        content: "Created by",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "created",
+        content: "Created",
+        isSortable: true,
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "updatedby",
+        content: "Updated by",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "updated",
+        content: "Updated",
+        isSortable: true,
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "active",
+        content: "Active",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      { key: "actions", content: "Actions", shouldTruncate: true },
+    ],
+  };
 
-          {
-            key: `active-${item.id}`,
-            content: <Checkbox isChecked={item.active} />,
-          },
-          {
-            key: `actions-${item.id}`,
-            content: (
-              <>
-                <Button
-                  onClick={onEdit.bind(this, item.id)}
-                  appearance="link"
-                  title="Edit"
-                >
-                  <EditIcon label="Edit" />
-                </Button>
-                <Button
-                  onClick={onCopy.bind(this, item.id)}
-                  appearance="link"
-                  title="Copy"
-                >
-                  <CopyIcon label="Copy" />
-                </Button>
-                <Button
-                  onClick={onDelete.bind(this, item.id)}
-                  appearance="link"
-                  title="Delete"
-                >
-                  <TrashIcon label="Delete" />
-                </Button>
-              </>
-            ),
-          },
-        ],
-      })),
-    };
-  }, [items, isLoaded]);
+  const rows = items.map((item) => ({
+    key: `row-${item.id}`,
+    cells: [
+      {
+        key: `user-${item.id}`,
+        content: (
+          <NameWrapper>
+            <AvatarWrapper>
+              <Avatar
+                src={getUserAvatarURL(item.user.key)}
+                target="_blank"
+                href={getUserProfileURL(item.user.key)}
+                name={item.user.name}
+                size="medium"
+              />
+            </AvatarWrapper>
+            <a target="_blank" href={getUserProfileURL(item.user.key)}>
+              {`${item.user.name} (${item.user.key})`}
+            </a>
+          </NameWrapper>
+        ),
+      },
+      {
+        key: `project-${item.id}`,
+        content: (
+          <a target="_blank" href={getProjectOrIssueURL(item.project.key)}>
+            {`${item.project.name} (${item.project.key})`}
+          </a>
+        ),
+      },
+      {
+        key: `issue-${item.id}`,
+        content: (
+          <a
+            target="_blank"
+            href={getProjectOrIssueURL(item.issue.key)}
+          >{`${item.issue.name} (${item.issue.key})`}</a>
+        ),
+      },
+      {
+        key: `ratedtime-${item.id}`,
+        content: item.ratedTime,
+      },
+      {
+        key: `worklogtype-${item.id}`,
+        content: item.worklogType ? item.worklogType.name : "",
+      },
+      {
+        key: `createdby-${item.id}`,
+        content: (
+          <a target="_blank" href={getUserProfileURL(item.author.key)}>
+            {item.author.key}
+          </a>
+        ),
+      },
+      {
+        key: `created-${item.id}`,
+        content: new Date(item.created).toLocaleDateString(),
+      },
+      {
+        key: `updatedby-${item.id}`,
+        content: (
+          <a target="_blank" href={getUserProfileURL(item.updateAuthor.key)}>
+            {item.updateAuthor.key}
+          </a>
+        ),
+      },
+      {
+        key: `updated-${item.id}`,
+        content: new Date(item.updated).toLocaleDateString(),
+      },
+
+      {
+        key: `active-${item.id}`,
+        content: <Checkbox isChecked={item.active} />,
+      },
+      {
+        key: `actions-${item.id}`,
+        content: (
+          <>
+            <Button
+              onClick={onEdit.bind(this, item.id)}
+              appearance="link"
+              title="Edit"
+            >
+              <EditIcon label="Edit" />
+            </Button>
+            <Button
+              onClick={onCopy.bind(this, item.id)}
+              appearance="link"
+              title="Copy"
+            >
+              <CopyIcon label="Copy" />
+            </Button>
+            <Button
+              onClick={onDelete.bind(this, item.id)}
+              appearance="link"
+              title="Delete"
+            >
+              <TrashIcon label="Delete" />
+            </Button>
+          </>
+        ),
+      },
+    ],
+  }));
 
   return (
     <DynamicTable
       emptyView={<h2>No records</h2>}
       isLoading={!isLoaded}
-      head={data.head}
-      rows={data.rows}
+      head={head}
+      rows={rows}
       loadingSpinnerSize="large"
       defaultSortOrder="DESC"
       defaultSortKey="updated"

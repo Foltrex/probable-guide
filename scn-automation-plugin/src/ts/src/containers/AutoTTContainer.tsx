@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AutoTTCaption from "../components/AutoTT/AutoTTCaption";
 import AutoTTForm from "../components/AutoTT/AutoTTForm";
 import AutoTTTable from "../components/AutoTT/AutoTTTable";

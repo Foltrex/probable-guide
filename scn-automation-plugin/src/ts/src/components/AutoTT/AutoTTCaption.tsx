@@ -32,11 +32,11 @@ const AutoTTCaption: React.FC<ComponentProps> = ({
   return (
     <HeaderWrapper>
       <CaptionWrapper>
-        <h1>Auto time tracking users</h1>
+        <h1>Auto Time-Tracking Users</h1>
       </CaptionWrapper>
       <ActionWrapper>
         <QuickSearch
-          placeholder="User, project or issue"
+          placeholder="Search..."
           children={null}
           value={searchText}
           onSearchInput={(event) =>

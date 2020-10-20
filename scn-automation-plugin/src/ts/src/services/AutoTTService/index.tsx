@@ -70,17 +70,14 @@ const AutoTTService: React.FC = ({ children }) => {
             method: "POST",
             data: data,
           });
-          dispatch(addItemAction(result.data));
           dispatch(setItemAction(null));
+          dispatch(addItemAction(result.data));
           showSuccess("Created");
         } catch (error) {
-          if (error.response && error.response.status === 403) {
-            error.response.data.errorMessages.forEach((message: string) =>
-              showError(message)
-            );
-          }
-          if (error.response && error.response.status === 400) {
+          if (error.response && error.response.status === Config.BAD_REQUEST) {
             return error.response.data.errors;
+          } else {
+            showError(error.message);
           }
         }
       },
@@ -91,17 +88,14 @@ const AutoTTService: React.FC = ({ children }) => {
             method: "PUT",
             data: data,
           });
-          dispatch(updateItemAction(result.data));
           dispatch(setItemAction(null));
+          dispatch(updateItemAction(result.data));
           showSuccess("Updated");
         } catch (error) {
-          if (error.response && error.response.status === 403) {
-            error.response.data.errorMessages.forEach((message: string) =>
-              showError(message)
-            );
-          }
-          if (error.response && error.response.status === 400) {
+          if (error.response && error.response.status === Config.BAD_REQUEST) {
             return error.response.data.errors;
+          } else {
+            showError(error.message);
           }
         }
       },
@@ -113,11 +107,7 @@ const AutoTTService: React.FC = ({ children }) => {
           });
           dispatch(removeItemAction({ id }));
         } catch (error) {
-          if (error.response && error.response.status === 403) {
-            error.response.data.errorMessages.forEach((message: string) =>
-              showError(message)
-            );
-          }
+          showError(error.message);
         }
       },
     }),
