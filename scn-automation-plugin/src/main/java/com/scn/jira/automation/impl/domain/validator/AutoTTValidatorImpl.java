@@ -83,8 +83,8 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
     }
 
     @Override
-    public boolean canView() {
-        return permissionService.hasViewPermission(contextService.getCurrentUser());
+    public boolean canRead(AutoTTDto autoTTDto) {
+        return permissionService.hasPermission(PermissionKey.READ, autoTTDto, contextService.getCurrentUser());
     }
 
     @Override

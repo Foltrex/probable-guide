@@ -31,54 +31,51 @@ public class AutoTTResource {
 
     @GET
     public Response getAll() {
-        if (autoTTValidator.canView()) {
-            return Response.ok(autoTTService.getAll().stream()
-                .sorted((o1, o2) -> o2.getUpdated().compareTo(o1.getUpdated()))
-                .collect(Collectors.toList())).build();
-        } else {
-            return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No view permissions")).build();
-        }
+        return Response.ok(autoTTService.getAll().stream()
+            .filter(autoTTValidator::canRead)
+            .sorted((o1, o2) -> o2.getUpdated().compareTo(o1.getUpdated()))
+            .collect(Collectors.toList())).build();
     }
 
     @GET
     @Path("/{id}")
     public Response get(@PathParam("id") Long id) {
-        if (autoTTValidator.canView()) {
-            return Response.ok(autoTTService.get(id)).build();
+        AutoTTDto autoTTDto = autoTTService.get(id);
+        if (autoTTValidator.canRead(autoTTDto)) {
+            return Response.ok(autoTTDto).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No view permissions")).build();
+                .entity(new Validator("No read permissions")).build();
         }
     }
 
     @POST
     public Response create(AutoTTDto autoTTDto) {
-        if (autoTTValidator.canCreate(autoTTDto)) {
-            Validator validator = autoTTValidator.validate(autoTTDto);
-            if (validator.isValid()) {
+        Validator validator = autoTTValidator.validate(autoTTDto);
+        if (validator.isValid()) {
+            if (autoTTValidator.canCreate(autoTTDto)) {
                 return Response.status(Response.Status.CREATED).entity(autoTTService.add(autoTTDto)).build();
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
+                return Response.status(Response.Status.FORBIDDEN)
+                    .entity(new Validator("No create permissions")).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No create permissions")).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
         }
     }
 
     @PUT
     public Response update(AutoTTDto autoTTDto) {
-        if (autoTTValidator.canUpdate(autoTTDto)) {
-            Validator validator = autoTTValidator.validate(autoTTDto);
-            if (validator.isValid()) {
+        Validator validator = autoTTValidator.validate(autoTTDto);
+        if (validator.isValid()) {
+            if (autoTTValidator.canUpdate(autoTTDto)) {
                 return Response.ok(autoTTService.update(autoTTDto)).build();
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
+                return Response.status(Response.Status.FORBIDDEN)
+                    .entity(new Validator("No update permissions")).build();
             }
         } else {
-            return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No update permissions")).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(validator).build();
         }
     }
 

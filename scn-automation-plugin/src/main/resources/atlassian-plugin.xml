@@ -16,7 +16,7 @@
 
 	<resource type="i18n" name="i18n" location="scn-automation-plugin"/>
 
-	<webwork1 key="auto-timetracking-webwork" roles-required="admin">
+	<webwork1 key="auto-timetracking-webwork" roles-required="use">
 		<actions>
 			<action name="com.scn.jira.automation.impl.webaction.AutoTTAction"
 					alias="AutoTimetrackingAction">
@@ -31,19 +31,19 @@
 			  weight="200">
 		<label key="scn-automation.mainmenu-label"/>
 		<link linkId="scn-automation-mainmenu"/>
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
 	</web-item>
 
 	<web-section key="scn-automation-mainsection" name="Automation Main Section" location="scn-automation-mainmenu"
 				 weight="10">
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
 	</web-section>
 
 	<web-item key="auto-timetracking-key" name="Auto Timetracking"
 			  section="scn-automation-mainmenu/scn-automation-mainsection" weight="10">
-		<label key="scn-automation.auto-timetracking-label"/>
+		<label key="scn-automation.auto-time-tracking-label"/>
 		<link linkId="scn-automation.auto-timetracking-link">/secure/AutoTimetrackingAction.jspa</link>
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition"/>
+		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
 	</web-item>
 
 	<ao key="scn-automation-ao-module" name="ScienceSoft Automation Plugin AO Module">

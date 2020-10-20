@@ -6,7 +6,7 @@ import com.scn.jira.automation.impl.domain.dto.Validator;
 public interface AutoTTValidator {
     Validator validate(AutoTTDto autoTTDto);
 
-    boolean canView();
+    boolean canRead(AutoTTDto autoTTDto);
 
     boolean canCreate(AutoTTDto autoTTDto);
 

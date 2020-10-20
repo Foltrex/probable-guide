@@ -27,7 +27,8 @@ public class PermissionServiceImpl implements PermissionService {
             case READ:
             case UPDATE:
                 return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)
-                    || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
+                    || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user)
+                    || autoTTDto.getUser().getKey().equals(user.getKey());
             case DELETE:
                 return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)
                     || (globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user)
@@ -35,11 +36,5 @@ public class PermissionServiceImpl implements PermissionService {
             default:
                 return false;
         }
-    }
-
-    @Override
-    public boolean hasViewPermission(ApplicationUser user) {
-        return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)
-            || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
     }
 }
