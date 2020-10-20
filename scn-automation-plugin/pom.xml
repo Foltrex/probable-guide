@@ -12,7 +12,7 @@
 	<groupId>com.scn.jira.automation</groupId>
 	<artifactId>scn-automation-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.1</version>
+	<version>4.1.2</version>
 
 	<name>JIRA ScienceSoft Automation Plugin</name>
 	<description>The plugin provide automation functionality.</description>
@@ -111,7 +111,7 @@
 				<configuration>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
-					<compressResources>false</compressResources>
+					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g -Datlassian.plugins.enable.wait=30</jvmArgs>
 					<skipITs>${skipTests}</skipITs>
@@ -182,5 +182,43 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<atlassian.dev.mode>true</atlassian.dev.mode>
+				<compressResources>false</compressResources>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/../plugins</outputDirectory>
+									<resources>
+										<resource>
+											<directory>target</directory>
+											<includes>
+												<include>scn-automation-plugin-${project.version}.jar</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
