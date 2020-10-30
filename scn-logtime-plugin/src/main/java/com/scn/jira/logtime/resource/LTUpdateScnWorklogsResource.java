@@ -57,6 +57,7 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
         Issue issue = issueManager.getIssueObject(Long.parseLong(issueId));
         ApplicationUser appUser = getLoggedInUser();
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
+        Long projectId = Objects.requireNonNull(issue.getProjectObject()).getId();
         if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
             return Response.serverError()
                 .entity(new ErrorEntity(
@@ -81,6 +82,16 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
 
             String worklogTypeId = String.valueOf(getWlIdFromRequestParameter(wlString, 4).equals("") ? ""
                 : Integer.valueOf(getWlIdFromRequestParameter(wlString, 4)));
+
+            boolean isValidWLType = !(iScnWorklogLogtimeStore.isWLTypeRequired(projectId) &&
+                (worklogTypeId == null || worklogTypeId.isEmpty() || worklogTypeId.equals("0")));
+            if (!isValidWLType) {
+                return Response.serverError()
+                    .entity(new ErrorEntity(
+                        ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                    .status(Response.Status.FORBIDDEN)
+                    .build();
+            }
 
             userKey = userKey != null ? userKey.toLowerCase() : "";
 

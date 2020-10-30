@@ -126,8 +126,18 @@ public class LTUpdateExtWorklogResource extends BaseResource {
         }
         Worklog worklog = worklogManager.getById(worklogId);
         Date day = DateUtils.stringToDate(date);
-        boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(Objects.requireNonNull(prj).getId(), day);
+        Long projectId = Objects.requireNonNull(prj).getId();
+        boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLWorklogBlocked(projectId, day);
+        boolean isValidWLType = !(iScnWorklogLogtimeStore.isWLTypeRequired(projectId) &&
+            (wlType == null || wlType.isEmpty() || wlType.equals("0")));
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(user);
+        if (!isValidWLType && timeSpent != 0L) {
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                .status(Response.Status.FORBIDDEN)
+                .build();
+        } else
         if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
             || (worklogId != 0 && isValueEmplty && !worklogService.hasPermissionToDelete(serviceContext, worklog))
             || (worklogId != 0 && !isValueEmplty && !worklogService.hasPermissionToUpdate(serviceContext, worklog))

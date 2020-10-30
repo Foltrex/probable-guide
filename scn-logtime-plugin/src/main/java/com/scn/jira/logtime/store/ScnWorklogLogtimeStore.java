@@ -365,15 +365,22 @@ public class ScnWorklogLogtimeStore implements IScnWorklogLogtimeStore {
 		return projectSettignsManager.isWLAutoCopyEnabled(Objects.requireNonNull(issue.getProjectObject()).getId());
 	}
 
+    @Override
 	public boolean isProjectWLBlocked(Long projectId, Date date) {
 		Date wlBlockingDate = this.projectSettignsManager.getWLBlockingDate(projectId);
 
         return wlBlockingDate != null && !date.after(wlBlockingDate);
     }
 
+    @Override
 	public boolean isProjectWLWorklogBlocked(Long projectId, Date date) {
 		Date wlWorklogBlockingDate = this.projectSettignsManager.getWLWorklogBlockingDate(projectId);
 
         return wlWorklogBlockingDate != null && !date.after(wlWorklogBlockingDate);
+    }
+
+    @Override
+    public boolean isWLTypeRequired(Long projectId) {
+        return this.projectSettignsManager.isWLTypeRequired(projectId);
     }
 }

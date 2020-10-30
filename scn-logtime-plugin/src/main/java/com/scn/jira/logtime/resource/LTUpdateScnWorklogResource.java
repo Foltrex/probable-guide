@@ -1,5 +1,6 @@
 package com.scn.jira.logtime.resource;
 
+import aQute.lib.strings.Strings;
 import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
@@ -99,9 +100,18 @@ public class LTUpdateScnWorklogResource extends BaseResource {
 
         IScnWorklog scnWorklog = scnWorklogManager.getById(worklogId);
         ApplicationUser user = getLoggedInUser();
-        boolean isBlocked = (iScnWorklogLogtimeStore.isProjectWLBlocked(Objects.requireNonNull(issue.getProjectObject()).getId(), day));
+        Long projectId = Objects.requireNonNull(issue.getProjectObject()).getId();
+        boolean isBlocked = iScnWorklogLogtimeStore.isProjectWLBlocked(projectId, day);
+        boolean isValidWLType = !(iScnWorklogLogtimeStore.isWLTypeRequired(projectId) &&
+            (wlType == null || wlType.isEmpty() || wlType.equals("0")));
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(user);
-        if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
+        if (!isValidWLType && timeSpent != 0L) {
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                .status(Response.Status.FORBIDDEN)
+                .build();
+        } else if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
             || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
             || (worklogId != 0 && !isValueEmplty && !scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog))
             || (worklogId == 0) && !isValueEmplty && !scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
