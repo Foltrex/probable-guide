@@ -103,7 +103,7 @@
         #controlFooter ($action "" false)
         
         #controlHeader($action "wlTypeRequired" $i18n.getText("scn.project_settings.wl_type_required.label") true false)
-	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end >
+	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end disabled="disabled" >
 	    #controlFooter ($action "" false)
 	                
 	    #rowClear()
