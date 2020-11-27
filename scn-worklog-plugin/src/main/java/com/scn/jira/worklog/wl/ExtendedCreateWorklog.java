@@ -79,8 +79,12 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 
 	public String doDefault() throws Exception {
 		if (!this.worklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), false)) {
-			return "securitybreach";
-		}
+            return "securitybreach";
+        }
+        WorklogType defaultWorklogType = psManager.getDefaultWorklogType(
+            Objects.requireNonNull(getIssueObject().getProjectObject()).getId()
+        );
+        this.setWorklogType(defaultWorklogType != null ? defaultWorklogType.getId() : "");
 		this.setStartDate(this.getFormattedStartDate(new Date()));
 
 		return "input";

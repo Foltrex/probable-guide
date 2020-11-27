@@ -34,7 +34,7 @@
 </head>
 <body>
     <script language="JavaScript">
-		function setWlTypeDisabled(wlAutoCopy) 
+		function setWlTypeDisabled(wlAutoCopy)
 		{
             var value = (wlAutoCopy.value == "false");
             jQuery("[name='inputWorklogTypes']").attr("disabled", value);
@@ -49,9 +49,9 @@
 	#parse("templates/scn/decorators/jiraformHeader.vm")
 	#parse("templates/scn/decorators/jiraErrorMessages.vm")
 	#parse("templates/scn/decorators/jiraformFooter.vm")
-	
+
 ## FORM
-	
+
 	#set($jiraformActionName = "$req.contextPath/secure/ScnProjectSettings.jspa")
 	#set($jiraformClass = "aui")
 	#set($jiraformTitle = "$action.getText('scn.project_settings.wl_auto_copy.section')")
@@ -72,7 +72,7 @@
         <table border="0" cellpadding="0" cellspacing="0">
         	<tr>
         		<td>
-            		<input type="checkbox" value="true" name="inputUnspecifiedWorklogType" id="inputUnspecifiedWorklogType" 
+            		<input type="checkbox" value="true" name="inputUnspecifiedWorklogType" id="inputUnspecifiedWorklogType"
             			#if ($inputWLAutoCopy == "false")
                             disabled="true"
                         #elseif ($inputUnspecifiedWorklogType)
@@ -84,7 +84,7 @@
         	</tr>
         #foreach($wlType in $action.worklogTypes)
             <tr><td>
-                <input type="checkbox" value="$wlType.id" name="inputWorklogTypes" id="inputWorklogTypes_$wlType.id"  
+                <input type="checkbox" value="$wlType.id" name="inputWorklogTypes" id="inputWorklogTypes_$wlType.id"
 					#if ($inputWLAutoCopy == "false")
                         disabled="true"
                     #end
@@ -101,11 +101,24 @@
         #end
         </table>
         #controlFooter ($action "" false)
-        
+
         #controlHeader($action "wlTypeRequired" $i18n.getText("scn.project_settings.wl_type_required.label") true false)
 	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end disabled="disabled" >
 	    #controlFooter ($action "" false)
-	                
+
+        #controlHeader($action "defaultWLType" $i18n.getText("scn.project_settings.default_wl_type.label") false false)
+            <select class="select" id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
+                <option value="" #if($action.isDefaultWorklogTypeSelected("")) selected="selected" #end>
+                    $i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
+                </option>
+                #foreach($wlType in $action.worklogTypes)
+                    <option value="$wlType.id" #if($action.isDefaultWorklogTypeSelected($wlType.id)) selected="selected" #end>
+                        $wlType.name
+                    </option>
+                #end
+            </select>
+        #controlFooter ($action "" false)
+
 	    #rowClear()
         #sectionBreak($i18n.getText("scn.project_settings.wl_blocking_date.section") $i18n.getText("scn.project_settings.wl_blocking_date.instructions"))
 
@@ -137,7 +150,7 @@
 		        #end
 		    </div>
         #controlFooter ($action "" false)
-        
+
         ## set date picker
         #set ($field_id="inputWorklogBlockingDate")
         #set ($field_name="inputWorklogBlockingDate")
@@ -166,10 +179,10 @@
 		        #end
 		    </div>
         #controlFooter ($action "" false)
-        
+
         #rowClear()
         #sectionBreak($i18n.getText("scn.project_settings.wl_project_roles.section") $i18n.getText("scn.project_settings.wl_project_roles.instructions"))
-        
+
         #controlHeader ($action "inputProjectRolesToViewWL" $i18n.getText("scn.project_settings.wl_project_roles.label") false false)
         <table border="0" cellpadding="0" cellspacing="0">
         #foreach($projRole in $action.projectRoles)
@@ -190,9 +203,9 @@
         #controlFooter ($action "" false)
 
         #rowClear()
-		
+
 		<input type="hidden" name="pid" value="$req.getParameter("pid")">
-				
+
 	#parse("templates/scn/decorators/jiraformFooter.vm")
 </body>
 </html>

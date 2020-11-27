@@ -26,9 +26,6 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 
 	final CalendarResourceIncluder calendarResourceIncluder = new CalendarResourceIncluder();
 
-	/**
-	 * List of those project roles ids where users have access to standard WL (work log)
-	 */
 	private Long[] inputProjectRolesToViewWL;
 	private String[] inputWorklogTypes;
 	private boolean inputUnspecifiedWorklogType;
@@ -36,6 +33,7 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 	private String inputWorklogBlockingDate;
 	private String inputWLAutoCopy;
 	private String inputWLTypeRequired;
+    private String inputDefaultWorklogType;
 
 	private Collection<ProjectRole> projectRoles;
 	private Collection<WorklogType> worklogTypes;
@@ -137,6 +135,14 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 		this.inputWLTypeRequired = inputWLTypeRequired;
 	}
 
+    public String getInputDefaultWorklogType() {
+        return inputDefaultWorklogType;
+    }
+
+    public void setInputDefaultWorklogType(String inputDefaultWorklogType) {
+        this.inputDefaultWorklogType = inputDefaultWorklogType;
+    }
+
 	public CalendarResourceIncluder getCalendarIncluder() {
 		return calendarResourceIncluder;
 	}
@@ -218,4 +224,8 @@ public abstract class AbstractScnProjectSettingsAction extends ViewProject {
 		}
 		return result;
 	}
+
+    public boolean isDefaultWorklogTypeSelected(String worklogType) {
+        return (getInputDefaultWorklogType() != null) && (getInputDefaultWorklogType().equals(worklogType));
+    }
 }

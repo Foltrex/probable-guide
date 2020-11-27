@@ -16,179 +16,192 @@ import com.scn.jira.worklog.core.wl.WorklogType;
  */
 public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 
-	private static final long serialVersionUID = 3458031703740979391L;
+    private static final long serialVersionUID = 3458031703740979391L;
 
-	private final IScnProjectSettingsService psService;
+    private final IScnProjectSettingsService psService;
 
-	private Long pid;
-	private Date blockingDate;
-	private Date worklogBlockingDate;
-	private boolean wlAutoCopy;
-	private boolean wlTypeRequired;
-	private Collection<ProjectRole> projectRolesToViewWL;
-	private Collection<WorklogType> wlTypes;
-	private boolean unspecifiedWLTypeOption;
+    private Long pid;
+    private Date blockingDate;
+    private Date worklogBlockingDate;
+    private boolean wlAutoCopy;
+    private boolean wlTypeRequired;
+    private String defaultWorklogType;
+    private Collection<ProjectRole> projectRolesToViewWL;
+    private Collection<WorklogType> wlTypes;
+    private boolean unspecifiedWLTypeOption;
 
-	public ScnProjectSettingsAction(ProjectRoleManager prManager, ProjectRoleManager projectRoleManager) {
-		super(prManager, new DefaultExtendedConstantsManager());
-		this.psService = new ScnProjectSettingsService(new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
-	}
+    public ScnProjectSettingsAction(ProjectRoleManager prManager, ProjectRoleManager projectRoleManager) {
+        super(prManager, new DefaultExtendedConstantsManager());
+        this.psService = new ScnProjectSettingsService(new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+    }
 
-	@Override
-	public String doDefault() throws Exception {
+    @Override
+    public String doDefault() throws Exception {
 
-		if ((!hasProjectAdminPermission()) && (!hasAdminPermission())) {
-			return "securitybreach";
-		}
+        if ((!hasProjectAdminPermission()) && (!hasAdminPermission())) {
+            return "securitybreach";
+        }
 
-		if (getProjectObject() == null) {
-			addErrorMessage(getJiraServiceContext().getI18nBean().getText("admin.errors.project.no.project.with.id"));
-			return ERROR;
-		}
+        if (getProjectObject() == null) {
+            addErrorMessage(getJiraServiceContext().getI18nBean().getText("admin.errors.project.no.project.with.id"));
+            return ERROR;
+        }
 
-		final Date blockingDate = psService.getWLBlockingDate(getJiraServiceContext(), pid);
-		final Date worklogBlockingDate = psService.getWLWorklogBlockingDate(getJiraServiceContext(), pid);
-		final boolean wlAutoCopy = psService.isWLAutoCopyEnabled(getJiraServiceContext(), pid);
-		boolean isWLTypeRequired = psService.isWLTypeRequired(getJiraServiceContext(), pid);
-		final Collection<ProjectRole> selectedProjectRoles = psService.getProjectRolesToViewWL(getJiraServiceContext(), pid);
-		final Collection<WorklogType> selectedWorklogTypes = psService.getWorklogTypes(getJiraServiceContext(), pid);
-		final boolean unspecifiedWorklogTypeOption = psService.getUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid);
+        final Date blockingDate = psService.getWLBlockingDate(getJiraServiceContext(), pid);
+        final Date worklogBlockingDate = psService.getWLWorklogBlockingDate(getJiraServiceContext(), pid);
+        final boolean wlAutoCopy = psService.isWLAutoCopyEnabled(getJiraServiceContext(), pid);
+        boolean isWLTypeRequired = psService.isWLTypeRequired(getJiraServiceContext(), pid);
+        WorklogType defaultWorklogType = psService.getDefaultWorklogType(getJiraServiceContext(), pid);
+        final Collection<ProjectRole> selectedProjectRoles = psService.getProjectRolesToViewWL(getJiraServiceContext(), pid);
+        final Collection<WorklogType> selectedWorklogTypes = psService.getWorklogTypes(getJiraServiceContext(), pid);
+        final boolean unspecifiedWorklogTypeOption = psService.getUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid);
 
-		if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
-			return ERROR;
-		} else {
-			setInputBlockingDate(blockingDate != null ? getFormattedInputBlockingDate(blockingDate) : "");
-			setInputWorklogBlockingDate(worklogBlockingDate != null ? getFormattedInputBlockingDate(worklogBlockingDate) : "");
-			setInputWLAutoCopy(String.valueOf(wlAutoCopy));
-			setInputWLTypeRequired(String.valueOf(isWLTypeRequired));
-			setInputProjectRolesToViewWL(selectedProjectRoles);
-			setInputWorklogTypes(selectedWorklogTypes);
-			setInputUnspecifiedWorklogType(unspecifiedWorklogTypeOption);
-			getHttpRequest().setAttribute(
-					"com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project", getProjectObject());
-			return INPUT;
-		}
-	}
+        if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
+            return ERROR;
+        } else {
+            setInputBlockingDate(blockingDate != null ? getFormattedInputBlockingDate(blockingDate) : "");
+            setInputWorklogBlockingDate(worklogBlockingDate != null ? getFormattedInputBlockingDate(worklogBlockingDate) : "");
+            setInputWLAutoCopy(String.valueOf(wlAutoCopy));
+            setInputWLTypeRequired(String.valueOf(isWLTypeRequired));
+            setInputDefaultWorklogType(defaultWorklogType != null ? defaultWorklogType.getId() : "");
+            setInputProjectRolesToViewWL(selectedProjectRoles);
+            setInputWorklogTypes(selectedWorklogTypes);
+            setInputUnspecifiedWorklogType(unspecifiedWorklogTypeOption);
+            getHttpRequest().setAttribute(
+                "com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project", getProjectObject());
+            return INPUT;
+        }
+    }
 
-	@Override
-	protected String doExecute() throws Exception {
+    @Override
+    protected String doExecute() throws Exception {
 
-		if ((!hasProjectAdminPermission()) && (!hasAdminPermission())) {
-			return "securitybreach";
-		}
+        if ((!hasProjectAdminPermission()) && (!hasAdminPermission())) {
+            return "securitybreach";
+        }
 
-		psService.setWLAutoCopy(getJiraServiceContext(), pid, isWlAutoCopy());
-		psService.setWLTypeRequired(getJiraServiceContext(), pid, isWLTypeRequired());
-		psService.setWLBlockingDate(getJiraServiceContext(), pid, getBlockingDate());
-		psService.setWLWorklogBlockingDate(getJiraServiceContext(), pid, getWorklogBlockingDate());
-		psService.setProjectRolesToViewWL(getJiraServiceContext(), pid, getProjectRolesToViewWL());
-		psService.setWorklogTypes(getJiraServiceContext(), pid, getWlTypes());
-		psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, getUnspecifiedWLType());
-		getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
-				getProjectObject());
+        psService.setWLAutoCopy(getJiraServiceContext(), pid, isWlAutoCopy());
+//        psService.setWLTypeRequired(getJiraServiceContext(), pid, isWLTypeRequired());
+        psService.setDefaultWorklogType(getJiraServiceContext(), pid, getDefaultWorklogType());
+        psService.setWLBlockingDate(getJiraServiceContext(), pid, getBlockingDate());
+        psService.setWLWorklogBlockingDate(getJiraServiceContext(), pid, getWorklogBlockingDate());
+        psService.setProjectRolesToViewWL(getJiraServiceContext(), pid, getProjectRolesToViewWL());
+        psService.setWorklogTypes(getJiraServiceContext(), pid, getWlTypes());
+        psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, getUnspecifiedWLType());
+        getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
+            getProjectObject());
 
-		if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
-			return ERROR;
-		} else {
-			return getRedirect("project/ViewProject.jspa?pid=" + pid);
-		}
-	}
+        if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
+            return ERROR;
+        } else {
+            return getRedirect("project/ViewProject.jspa?pid=" + pid);
+        }
+    }
 
-	@Override
-	protected void doValidation() {
-		super.doValidation();
+    @Override
+    protected void doValidation() {
+        super.doValidation();
 
-		setBlockingDate(getParsedBlockingDate());
-		setWorklogBlockingDate(getParsedWorklogBlockingDate());
-		setWlAutoCopy(Boolean.valueOf(getInputWLAutoCopy()));
-		setWLTypeRequired(Boolean.valueOf(getInputWLTypeRequired()));
-		setProjectRolesToViewWL(getSelectedProjectRolesToViewWL());
-		setWlTypes(getSelectedWorklogTypes());
-		setUnspecifiedWLType(isInputUnspecifiedWorklogType());
-		getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
-				getProjectObject());
+        setBlockingDate(getParsedBlockingDate());
+        setWorklogBlockingDate(getParsedWorklogBlockingDate());
+        setWlAutoCopy(Boolean.parseBoolean(getInputWLAutoCopy()));
+        setWLTypeRequired(Boolean.parseBoolean(getInputWLTypeRequired()));
+        setDefaultWorklogType(getInputDefaultWorklogType());
+        setProjectRolesToViewWL(getSelectedProjectRolesToViewWL());
+        setWlTypes(getSelectedWorklogTypes());
+        setUnspecifiedWLType(isInputUnspecifiedWorklogType());
+        getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
+            getProjectObject());
 
-	}
+    }
 
-	public Long getPid() {
-		return pid;
-	}
+    public Long getPid() {
+        return pid;
+    }
 
-	public void setPid(Long pid) {
-		this.pid = pid;
-	}
+    public void setPid(Long pid) {
+        this.pid = pid;
+    }
 
-	public Date getBlockingDate() {
-		return blockingDate;
-	}
-	
-	public Date getWorklogBlockingDate() {
-		return worklogBlockingDate;
-	}
+    public Date getBlockingDate() {
+        return blockingDate;
+    }
 
-	public void setBlockingDate(Date blockingDate) {
-		if (blockingDate != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(blockingDate);
-			cal.set(Calendar.HOUR, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 990);
+    public Date getWorklogBlockingDate() {
+        return worklogBlockingDate;
+    }
 
-			this.blockingDate = cal.getTime();
-		}
-	}
-	
-	public void setWorklogBlockingDate(Date worklogBlockingDate) {
-		if (worklogBlockingDate != null) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(worklogBlockingDate);
-			cal.set(Calendar.HOUR, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 990);
+    public void setBlockingDate(Date blockingDate) {
+        if (blockingDate != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(blockingDate);
+            cal.set(Calendar.HOUR, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 990);
 
-			this.worklogBlockingDate = cal.getTime();
-		}
-	}
+            this.blockingDate = cal.getTime();
+        }
+    }
 
-	public boolean isWlAutoCopy() {
-		return wlAutoCopy;
-	}
+    public void setWorklogBlockingDate(Date worklogBlockingDate) {
+        if (worklogBlockingDate != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(worklogBlockingDate);
+            cal.set(Calendar.HOUR, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 990);
 
-	public void setWlAutoCopy(boolean wlAutoCopy) {
-		this.wlAutoCopy = wlAutoCopy;
-	}
+            this.worklogBlockingDate = cal.getTime();
+        }
+    }
 
-	public boolean isWLTypeRequired() {
-		return wlTypeRequired;
-	}
+    public boolean isWlAutoCopy() {
+        return wlAutoCopy;
+    }
 
-	public void setWLTypeRequired(boolean wlTypeRequired) {
-		this.wlTypeRequired = wlTypeRequired;
-	}
+    public void setWlAutoCopy(boolean wlAutoCopy) {
+        this.wlAutoCopy = wlAutoCopy;
+    }
 
-	public Collection<ProjectRole> getProjectRolesToViewWL() {
-		return projectRolesToViewWL;
-	}
+    public boolean isWLTypeRequired() {
+        return wlTypeRequired;
+    }
 
-	public void setProjectRolesToViewWL(Collection<ProjectRole> projectRolesToViewWL) {
-		this.projectRolesToViewWL = projectRolesToViewWL;
-	}
+    public void setWLTypeRequired(boolean wlTypeRequired) {
+        this.wlTypeRequired = wlTypeRequired;
+    }
 
-	public Collection<WorklogType> getWlTypes() {
-		return wlTypes;
-	}
+    public String getDefaultWorklogType() {
+        return defaultWorklogType;
+    }
 
-	public void setWlTypes(Collection<WorklogType> wlTypes) {
-		this.wlTypes = wlTypes;
-	}
+    public void setDefaultWorklogType(String defaultWorklogType) {
+        this.defaultWorklogType = defaultWorklogType;
+    }
 
-	public boolean getUnspecifiedWLType() {
-		return this.unspecifiedWLTypeOption;
-	}
+    public Collection<ProjectRole> getProjectRolesToViewWL() {
+        return projectRolesToViewWL;
+    }
 
-	public void setUnspecifiedWLType(boolean value) {
-		this.unspecifiedWLTypeOption = value;
-	}
+    public void setProjectRolesToViewWL(Collection<ProjectRole> projectRolesToViewWL) {
+        this.projectRolesToViewWL = projectRolesToViewWL;
+    }
+
+    public Collection<WorklogType> getWlTypes() {
+        return wlTypes;
+    }
+
+    public void setWlTypes(Collection<WorklogType> wlTypes) {
+        this.wlTypes = wlTypes;
+    }
+
+    public boolean getUnspecifiedWLType() {
+        return this.unspecifiedWLTypeOption;
+    }
+
+    public void setUnspecifiedWLType(boolean value) {
+        this.unspecifiedWLTypeOption = value;
+    }
 }

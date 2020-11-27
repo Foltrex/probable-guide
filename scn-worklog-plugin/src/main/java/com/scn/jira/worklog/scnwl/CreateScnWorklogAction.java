@@ -13,6 +13,7 @@ import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.WorklogType;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -57,6 +58,10 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
         if (isTimeTrackingFieldHidden(getIssueObject())) {
             return SECURITY_BREACH;
         } else {
+            WorklogType defaultWorklogType = projectSettignsManager.getDefaultWorklogType(
+                Objects.requireNonNull(getIssueObject().getProjectObject()).getId()
+            );
+            setWorklogType(defaultWorklogType != null ? defaultWorklogType.getId() : "");
             setStartDate(getFormattedStartDate(new Date()));
             return super.doDefault();
         }

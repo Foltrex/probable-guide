@@ -8,13 +8,12 @@ import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 
 @Component
 @ExportAsService
 public class PluginLauncher implements LifecycleAware {
-    private static final Date BLOCKING_DATE = new Date(1577826000000L);
+//    private static final Date BLOCKING_DATE = new Date(1577826000000L);
     private final ProjectManager projectManager;
     private final IScnProjectSettingsManager projectSettingManager;
 
@@ -26,17 +25,15 @@ public class PluginLauncher implements LifecycleAware {
 
     @Override
     public void onStart() {
-        List<Project> projects = projectManager.getProjectObjects();
-        projects.forEach(project -> {
-            projectSettingManager.setWLTypeRequired(project.getId(), true);
-            Date currentBlockingDate = projectSettingManager.getWLBlockingDate(project.getId());
-            if (currentBlockingDate == null || currentBlockingDate.before(BLOCKING_DATE)) {
-                projectSettingManager.setWLBlockingDate(project.getId(), BLOCKING_DATE);
-            }
-        });
+        updateProjectsSettings();
     }
 
     @Override
     public void onStop() {
+    }
+
+    private void updateProjectsSettings(){
+        List<Project> projects = projectManager.getProjectObjects();
+        projects.forEach(project -> projectSettingManager.setWLTypeRequired(project.getId(), true));
     }
 }

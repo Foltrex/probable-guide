@@ -76,7 +76,7 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
 	public boolean shouldDisplay() {
 		return isIssueValid() && /*hasIssuePermission("work", getIssueObject()) &&*/ !isTimeTrackingFieldHidden(getIssueObject())
 				&& isWorkflowAllowsEdit(getIssueObject())
-				&& psManager.hasPermissionToViewWL(getLoggedInApplicationUser(), getIssueObject().getProjectObject());
+				&& psManager.hasPermissionToViewWL(getLoggedInUser(), getIssueObject().getProjectObject());
 	}
 
 	public String doDefault() throws Exception {
@@ -95,7 +95,7 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
 			return "securitybreach";
 		}
 
-		setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent().longValue(), getHoursPerDay().intValue(),
+		setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent(), getHoursPerDay().intValue(),
 				getDaysPerWeek().intValue()));
 		setStartDate(getFormattedStartDate(this.worklog.getStartDate()));
 		setComment(this.worklog.getComment());
@@ -106,7 +106,7 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
 
 	public void doValidation() {
 		if (extWorklogService.isDateExpired(getJiraServiceContext(), worklogManager.getById(getWorklogId()).getStartDate(),
-				getIssueObject().getProjectObject(), false)) return;
+            Objects.requireNonNull(getIssueObject().getProjectObject()), false)) return;
 
 		CommentVisibility visibility = getCommentVisibility();
 		WorklogInputParametersImpl.Builder paramBuilder = WorklogInputParametersImpl.builder().worklogId(getWorklogId())

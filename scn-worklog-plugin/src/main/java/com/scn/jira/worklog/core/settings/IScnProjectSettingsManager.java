@@ -6,6 +6,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.opensymphony.module.propertyset.PropertyException;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public interface IScnProjectSettingsManager {
     String WORKLOG_TYPES = "scn_wl_worklog_types_";
     String UNSPECIFIED_WORKLOG_TYPE = "scn_wl_unspecified_worklog_type_";
     String WL_TYPE_REQUIRED = "scn_wl_type_required_";
+    String DEFAULT_WL_TYPE = "scn_default_wl_type_";
 
     boolean isWLAutoCopyEnabled(Long projectId) throws PropertyException;
 
@@ -29,6 +31,10 @@ public interface IScnProjectSettingsManager {
     boolean isWLTypeRequired(Long projectId) throws PropertyException;
 
     void setWLTypeRequired(Long projectId, boolean value) throws PropertyException;
+
+    WorklogType getDefaultWorklogType(@Nonnull Long projectId) throws PropertyException;
+
+    void setDefaultWorklogType(@Nonnull Long projectId, String worklogTypeId) throws PropertyException;
 
     Date getWLBlockingDate(Long projectId) throws PropertyException;
 
