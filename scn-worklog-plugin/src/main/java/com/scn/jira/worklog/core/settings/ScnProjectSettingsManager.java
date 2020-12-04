@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ExportAsService({ScnProjectSettingsManager.class})
 @Named("scnProjectSettingsManager")
@@ -113,6 +114,29 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
             }
 
             propertiesManager.getPropertySet().setString(WORKLOG_TYPES + projectId, sb.toString());
+        }
+    }
+
+    @Override
+    public Collection<WorklogType> getExcludedWorklogTypes(@Nonnull Long projectId) throws PropertyException {
+        String value = propertiesManager.getPropertySet().getString(EXCLUDED_WORKLOG_TYPES + projectId);
+        if (StringUtils.isBlank(value)) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.stream(value.split(";"))
+                .filter(StringUtils::isNotEmpty)
+                .map(ecManager::getWorklogTypeObject)
+                .collect(Collectors.toCollection(ArrayList::new));
+        }
+    }
+
+    @Override
+    public void setExcludedWorklogTypes(@Nonnull Long projectId, Collection<WorklogType> worklogTypes) throws PropertyException {
+        if (worklogTypes == null || worklogTypes.isEmpty()) {
+            propertiesManager.getPropertySet().remove(EXCLUDED_WORKLOG_TYPES + projectId);
+        } else {
+            String value = worklogTypes.stream().map(WorklogType::getId).collect(Collectors.joining(";"));
+            propertiesManager.getPropertySet().setString(EXCLUDED_WORKLOG_TYPES + projectId, value);
         }
     }
 

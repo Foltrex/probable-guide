@@ -28,20 +28,12 @@
 	<meta name="admin.active.section" content="atl.jira.proj.config"/>
 	<meta name="admin.active.tab" content="scnProjectSettings"/>
 	$webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
-	$webResourceManager.requireResource("jira.webresources:calendar")
-	$webResourceManager.requireResource("jira.webresources:calendar-en")
-	$webResourceManager.requireResource("jira.webresources:global-static")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-select2")
+    $webResourceManager.requireResource("jira.webresources:calendar")
+    $webResourceManager.requireResource("jira.webresources:calendar-en")
+    $webResourceManager.requireResource("jira.webresources:global-static")
 </head>
 <body>
-    <script language="JavaScript">
-		function setWlTypeDisabled(wlAutoCopy)
-		{
-            var value = (wlAutoCopy.value == "false");
-            jQuery("[name='inputWorklogTypes']").attr("disabled", value);
-            jQuery('[name="inputUnspecifiedWorklogType"]').attr("disabled", value);
-		}
-	</script>
-
 ## PAGE HEADER
 
 	#set($jiraformTitle = "$i18n.getText('scn.project_settings.label')")
@@ -107,12 +99,29 @@
 	    #controlFooter ($action "" false)
 
         #controlHeader($action "defaultWLType" $i18n.getText("scn.project_settings.default_wl_type.label") false false)
-            <select class="select" id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
+            <select id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
                 <option value="" #if($action.isDefaultWorklogTypeSelected("")) selected="selected" #end>
                     $i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
                 </option>
                 #foreach($wlType in $action.worklogTypes)
                     <option value="$wlType.id" #if($action.isDefaultWorklogTypeSelected($wlType.id)) selected="selected" #end>
+                        $wlType.name
+                    </option>
+                #end
+            </select>
+        #controlFooter ($action "" false)
+
+        #controlHeader($action "excludedWorklogTypes" $i18n.getText("scn.project_settings.excluded_wl_types.label") false false)
+            <select id="inputExcludedWorklogTypes" name="inputExcludedWorklogTypes" multiple="">
+                #foreach($wlType in $action.worklogTypes)
+                    <option value="$wlType.id"
+                    #foreach($wlId in $action.inputExcludedWorklogTypes)
+                        #if($wlType.id == $wlId)
+                            selected="selected"
+                            #break
+                        #end
+                    #end
+                    >
                         $wlType.name
                     </option>
                 #end
@@ -207,5 +216,14 @@
 		<input type="hidden" name="pid" value="$req.getParameter("pid")">
 
 	#parse("templates/scn/decorators/jiraformFooter.vm")
+    <script language="JavaScript">
+        AJS.$("#inputExcludedWorklogTypes").auiSelect2();
+        AJS.$("#inputDefaultWorklogType").auiSelect2();
+        function setWlTypeDisabled(wlAutoCopy) {
+            var value = (wlAutoCopy.value == "false");
+            jQuery("[name='inputWorklogTypes']").attr("disabled", value);
+            jQuery('[name="inputUnspecifiedWorklogType"]').attr("disabled", value);
+        }
+    </script>
 </body>
 </html>

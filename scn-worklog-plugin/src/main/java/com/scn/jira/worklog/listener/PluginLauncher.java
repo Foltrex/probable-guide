@@ -25,7 +25,7 @@ public class PluginLauncher implements LifecycleAware {
 
     @Override
     public void onStart() {
-        updateProjectsSettings();
+        //updateProjectsSettings();
     }
 
     @Override

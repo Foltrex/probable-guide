@@ -1,21 +1,16 @@
 package com.scn.jira.worklog.settings;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
-/**
- * Created by IntelliJ IDEA. User: Khadarovich Date: 05.08.2010 Time: 12:27:52 To change this template use File | Settings | File
- * Templates.
- */
-public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 
+public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
     private static final long serialVersionUID = 3458031703740979391L;
 
     private final IScnProjectSettingsService psService;
@@ -28,6 +23,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
     private String defaultWorklogType;
     private Collection<ProjectRole> projectRolesToViewWL;
     private Collection<WorklogType> wlTypes;
+    private Collection<WorklogType> excludedWLTypes;
     private boolean unspecifiedWLTypeOption;
 
     public ScnProjectSettingsAction(ProjectRoleManager prManager, ProjectRoleManager projectRoleManager) {
@@ -37,7 +33,6 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 
     @Override
     public String doDefault() throws Exception {
-
         if ((!hasProjectAdminPermission()) && (!hasAdminPermission())) {
             return "securitybreach";
         }
@@ -54,6 +49,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         WorklogType defaultWorklogType = psService.getDefaultWorklogType(getJiraServiceContext(), pid);
         final Collection<ProjectRole> selectedProjectRoles = psService.getProjectRolesToViewWL(getJiraServiceContext(), pid);
         final Collection<WorklogType> selectedWorklogTypes = psService.getWorklogTypes(getJiraServiceContext(), pid);
+        final Collection<WorklogType> selectedExcludedWorklogTypes = psService.getExcludedWorklogTypes(getJiraServiceContext(), pid);
         final boolean unspecifiedWorklogTypeOption = psService.getUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid);
 
         if (getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
@@ -66,6 +62,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
             setInputDefaultWorklogType(defaultWorklogType != null ? defaultWorklogType.getId() : "");
             setInputProjectRolesToViewWL(selectedProjectRoles);
             setInputWorklogTypes(selectedWorklogTypes);
+            setInputExcludedWorklogTypes(selectedExcludedWorklogTypes);
             setInputUnspecifiedWorklogType(unspecifiedWorklogTypeOption);
             getHttpRequest().setAttribute(
                 "com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project", getProjectObject());
@@ -87,6 +84,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         psService.setWLWorklogBlockingDate(getJiraServiceContext(), pid, getWorklogBlockingDate());
         psService.setProjectRolesToViewWL(getJiraServiceContext(), pid, getProjectRolesToViewWL());
         psService.setWorklogTypes(getJiraServiceContext(), pid, getWlTypes());
+        psService.setExcludedWorklogTypes(getJiraServiceContext(), pid, getExcludedWLTypes());
         psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, getUnspecifiedWLType());
         getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
             getProjectObject());
@@ -109,6 +107,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         setDefaultWorklogType(getInputDefaultWorklogType());
         setProjectRolesToViewWL(getSelectedProjectRolesToViewWL());
         setWlTypes(getSelectedWorklogTypes());
+        setExcludedWLTypes(getSelectedExcludedWorklogTypes());
         setUnspecifiedWLType(isInputUnspecifiedWorklogType());
         getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
             getProjectObject());
@@ -195,6 +194,14 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 
     public void setWlTypes(Collection<WorklogType> wlTypes) {
         this.wlTypes = wlTypes;
+    }
+
+    public Collection<WorklogType> getExcludedWLTypes() {
+        return excludedWLTypes;
+    }
+
+    public void setExcludedWLTypes(Collection<WorklogType> excludedWLTypes) {
+        this.excludedWLTypes = excludedWLTypes;
     }
 
     public boolean getUnspecifiedWLType() {

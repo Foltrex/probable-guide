@@ -1,17 +1,5 @@
 package com.scn.jira.worklog.scnwl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.lang.StringUtils;
-
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -35,6 +23,11 @@ import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.*;
 
 public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction {
     private static final long serialVersionUID = -7430574077126963463L;
@@ -210,9 +203,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
             return getStartDate() != null
                 ? getDateTimeFormatter().withStyle(DateTimeStyle.COMPLETE).parse(getStartDate())
                 : null;
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (UnsupportedOperationException e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             return null;
         }
     }
@@ -278,7 +269,11 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
     }
 
     public Collection<WorklogType> getWorklogTypeObjects() {
-        return this.extendedConstantsManager.getWorklogTypeObjects();
+        Collection<WorklogType> worklogTypes = this.extendedConstantsManager.getWorklogTypeObjects();
+        Collection<WorklogType> excludedWorklogTypes = this.projectSettignsManager.getExcludedWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
+        excludedWorklogTypes.forEach(worklogTypes::remove);
+
+        return worklogTypes;
     }
 
     public boolean isWorklogTypeSelected(String worklogType) {
@@ -292,15 +287,13 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
     public Map<String, String> getAssignableUsers() {
         try {
-            List<ApplicationUser> users = new ArrayList<ApplicationUser>();
-
-            users.addAll(ComponentAccessor.getPermissionSchemeManager().getUsers(ProjectPermissions.WORK_ON_ISSUES,
+            List<ApplicationUser> users = new ArrayList<ApplicationUser>(ComponentAccessor.getPermissionSchemeManager().getUsers(ProjectPermissions.WORK_ON_ISSUES,
                 ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
 
             if (CollectionUtils.isEmpty(users))
                 return Collections.emptyMap();
 
-            Collections.sort(users, new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
+            users.sort(new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
             @SuppressWarnings("unchecked") final Map<String, String> assignableUsers = new ListOrderedMap();
             for (ApplicationUser user : users) {
                 if (scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject())) {
@@ -335,7 +328,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
     }
 
     public boolean getWorklogAutoCopyOption() {
-        return projectSettignsManager.isWLAutoCopyEnabled(getIssueObject().getProjectObject().getId());
+        return projectSettignsManager.isWLAutoCopyEnabled(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
 
     public boolean hasPermissionToViewWL() {
@@ -343,14 +336,14 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
     }
 
     public Collection<WorklogType> getAutoCopyWorklogTypes() {
-        return projectSettignsManager.getWorklogTypes(getIssueObject().getProjectObject().getId());
+        return projectSettignsManager.getWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
 
     public boolean isUnspecifiedTypeAutoCopyEnabled() {
-        return projectSettignsManager.isUnspecifiedWLTypeAutoCopyEnabled(getIssueObject().getProjectObject().getId());
+        return projectSettignsManager.isUnspecifiedWLTypeAutoCopyEnabled(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
 
     public boolean isWlTypeRequired() {
-        return projectSettignsManager.isWLTypeRequired(getIssueObject().getProjectObject().getId());
+        return projectSettignsManager.isWLTypeRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
 }

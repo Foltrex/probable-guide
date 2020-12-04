@@ -21,7 +21,6 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.CreateWorklog;
 import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
@@ -37,233 +36,236 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.*;
 
 public class ExtendedCreateWorklog extends CreateWorklog {
-	private static final long serialVersionUID = -4594446887729353135L;
+    private static final long serialVersionUID = -4594446887729353135L;
 
-	protected final WorklogService worklogService;
-	protected final ExtendedWorklogService extWorklogService;
-	private final WorklogManager worklogManager;
-	private final JiraAuthenticationContext authenticationContext;
-	private final CalendarResourceIncluder calendarResourceIncluder = new CalendarResourceIncluder();
-	private final ExtendedConstantsManager extendedConstantsManager;
-	private final IScnProjectSettingsManager psManager;
+    protected final WorklogService worklogService;
+    protected final ExtendedWorklogService extWorklogService;
+    private final WorklogManager worklogManager;
+    private final JiraAuthenticationContext authenticationContext;
+    private final CalendarResourceIncluder calendarResourceIncluder = new CalendarResourceIncluder();
+    private final ExtendedConstantsManager extendedConstantsManager;
+    private final IScnProjectSettingsManager psManager;
 
-	private String worklogType;
-	private String inputReporter;
-	private Worklog worklog;
-	private Long newEstimateLong;
-	private Long adjustmentAmountLong;
+    private String worklogType;
+    private String inputReporter;
+    private Worklog worklog;
+    private Long newEstimateLong;
+    private Long adjustmentAmountLong;
 
-	public ExtendedCreateWorklog(WorklogService worklogService, CommentService commentService,
-								 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
-								 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-								 RendererManager rendererManager, UserUtil userUtil,
-								 @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-								 JiraAuthenticationContext authenticationContext ) {
-		super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
-				dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
-				null, null, null, null);
+    public ExtendedCreateWorklog(WorklogService worklogService, CommentService commentService,
+                                 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
+                                 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
+                                 RendererManager rendererManager, UserUtil userUtil,
+                                 @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
+                                 JiraAuthenticationContext authenticationContext) {
+        super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
+            dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
+            null, null, null, null);
 
-		this.worklogService = worklogService;
-		this.worklogManager = worklogManager;
-		this.authenticationContext = authenticationContext;
-		this.extWorklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
-		this.extendedConstantsManager = new DefaultExtendedConstantsManager();
-		this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
-	}
+        this.worklogService = worklogService;
+        this.worklogManager = worklogManager;
+        this.authenticationContext = authenticationContext;
+        this.extWorklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+        this.extendedConstantsManager = new DefaultExtendedConstantsManager();
+        this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
+    }
 
-	public boolean shouldDisplay() {
-		return isIssueValid() && /*hasIssuePermission("work", getIssueObject()) &&*/ !isTimeTrackingFieldHidden(getIssueObject())
-				&& isWorkflowAllowsEdit(getIssueObject())
-				&& psManager.hasPermissionToViewWL(getLoggedInApplicationUser(), getIssueObject().getProjectObject());
-	}
+    public boolean shouldDisplay() {
+        return isIssueValid() && /*hasIssuePermission("work", getIssueObject()) &&*/ !isTimeTrackingFieldHidden(getIssueObject())
+            && isWorkflowAllowsEdit(getIssueObject())
+            && psManager.hasPermissionToViewWL(getLoggedInApplicationUser(), getIssueObject().getProjectObject());
+    }
 
-	public String doDefault() throws Exception {
-		if (!this.worklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), false)) {
+    public String doDefault() throws Exception {
+        if (!this.worklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), false)) {
             return "securitybreach";
         }
         WorklogType defaultWorklogType = psManager.getDefaultWorklogType(
             Objects.requireNonNull(getIssueObject().getProjectObject()).getId()
         );
         this.setWorklogType(defaultWorklogType != null ? defaultWorklogType.getId() : "");
-		this.setStartDate(this.getFormattedStartDate(new Date()));
+        this.setStartDate(this.getFormattedStartDate(new Date()));
 
-		return "input";
-	}
+        return "input";
+    }
 
-	protected String doExecute() throws Exception {
-		if (isTimeTrackingFieldHidden(getIssueObject())) {
-			return "securitybreach";
-		}
+    protected String doExecute() throws Exception {
+        if (isTimeTrackingFieldHidden(getIssueObject())) {
+            return "securitybreach";
+        }
 
-		if ("auto".equalsIgnoreCase(this.adjustEstimate)) this.worklog = this.worklogService
-				.createAndAutoAdjustRemainingEstimate(getJiraServiceContext(), WorklogResultFactory.create(this.worklog), true);
-		else if ("new".equalsIgnoreCase(this.adjustEstimate)) this.worklog = this.worklogService.createWithNewRemainingEstimate(
-				getJiraServiceContext(), WorklogResultFactory.createNewEstimate(this.worklog, this.newEstimateLong), true);
-		else if ("manual".equalsIgnoreCase(this.adjustEstimate)) this.worklog = this.worklogService
-				.createWithManuallyAdjustedEstimate(getJiraServiceContext(),
-						WorklogResultFactory.createAdjustmentAmount(this.worklog, this.adjustmentAmountLong), true);
-		else this.worklog = this.worklogService.createAndRetainRemainingEstimate(getJiraServiceContext(),
-				WorklogResultFactory.create(this.worklog), true);
+        if ("auto".equalsIgnoreCase(this.adjustEstimate)) this.worklog = this.worklogService
+            .createAndAutoAdjustRemainingEstimate(getJiraServiceContext(), WorklogResultFactory.create(this.worklog), true);
+        else if ("new".equalsIgnoreCase(this.adjustEstimate))
+            this.worklog = this.worklogService.createWithNewRemainingEstimate(
+                getJiraServiceContext(), WorklogResultFactory.createNewEstimate(this.worklog, this.newEstimateLong), true);
+        else if ("manual".equalsIgnoreCase(this.adjustEstimate)) this.worklog = this.worklogService
+            .createWithManuallyAdjustedEstimate(getJiraServiceContext(),
+                WorklogResultFactory.createAdjustmentAmount(this.worklog, this.adjustmentAmountLong), true);
+        else this.worklog = this.worklogService.createAndRetainRemainingEstimate(getJiraServiceContext(),
+                WorklogResultFactory.create(this.worklog), true);
 
-		if (getHasErrorMessages()) {
-			return "error";
-		}
+        if (getHasErrorMessages()) {
+            return "error";
+        }
 
-		if (!getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
-			this.extWorklogService.createWorklogType(getJiraServiceContext(), getWorklog(), getWorklogType());
-		}
+        if (!getJiraServiceContext().getErrorCollection().hasAnyErrors()) {
+            this.extWorklogService.createWorklogType(getJiraServiceContext(), getWorklog(), getWorklogType());
+        }
 
-		if (isInlineDialogMode()) {
-			return returnComplete();
-		}
+        if (isInlineDialogMode()) {
+            return returnComplete();
+        }
 
-		return getRedirect("/browse/" + getIssue().getString("key"));
-	}
+        return getRedirect("/browse/" + getIssue().getString("key"));
+    }
 
-	protected void doValidation() {
-		if (!isIssueValid()) return;
+    protected void doValidation() {
+        if (!isIssueValid()) return;
 
-		CommentVisibility visibility = getCommentVisibility();
-		WorklogInputParametersImpl.Builder paramBuilder = WorklogInputParametersImpl.builder().issue(getIssueObject())
-				.timeSpent(getTimeLogged()).startDate(getParsedStartDate()).comment(getComment())
-				.groupLevel(visibility.getGroupLevel()).roleLevelId(visibility.getRoleLevel());
+        CommentVisibility visibility = getCommentVisibility();
+        WorklogInputParametersImpl.Builder paramBuilder = WorklogInputParametersImpl.builder().issue(getIssueObject())
+            .timeSpent(getTimeLogged()).startDate(getParsedStartDate()).comment(getComment())
+            .groupLevel(visibility.getGroupLevel()).roleLevelId(visibility.getRoleLevel());
 
-		if ("new".equalsIgnoreCase(this.adjustEstimate))
+        if ("new".equalsIgnoreCase(this.adjustEstimate)) {
+            WorklogNewEstimateResult worklogNewEstimateResult = this.worklogService.validateCreateWithNewEstimate(
+                getJiraServiceContext(), paramBuilder.newEstimate(getNewEstimate()).buildNewEstimate());
 
-		{
-			WorklogNewEstimateResult worklogNewEstimateResult = this.worklogService.validateCreateWithNewEstimate(
-					getJiraServiceContext(), paramBuilder.newEstimate(getNewEstimate()).buildNewEstimate());
+            if (worklogNewEstimateResult != null) {
+                this.worklog = worklogNewEstimateResult.getWorklog();
+                this.newEstimateLong = worklogNewEstimateResult.getNewEstimate();
+            }
+        } else if ("manual".equalsIgnoreCase(this.adjustEstimate)) {
+            WorklogAdjustmentAmountResult worklogAdjustmentAmountResult = this.worklogService
+                .validateCreateWithManuallyAdjustedEstimate(getJiraServiceContext(),
+                    paramBuilder.adjustmentAmount(getAdjustmentAmount()).buildAdjustmentAmount());
 
-			if (worklogNewEstimateResult != null) {
-				this.worklog = worklogNewEstimateResult.getWorklog();
-				this.newEstimateLong = worklogNewEstimateResult.getNewEstimate();
-			}
-		} else if ("manual".equalsIgnoreCase(this.adjustEstimate)) {
-			WorklogAdjustmentAmountResult worklogAdjustmentAmountResult = this.worklogService
-					.validateCreateWithManuallyAdjustedEstimate(getJiraServiceContext(),
-							paramBuilder.adjustmentAmount(getAdjustmentAmount()).buildAdjustmentAmount());
+            if (worklogAdjustmentAmountResult != null) {
+                this.worklog = worklogAdjustmentAmountResult.getWorklog();
+                this.adjustmentAmountLong = worklogAdjustmentAmountResult.getAdjustmentAmount();
+            }
+        } else {
+            WorklogResult worklogResult = this.worklogService.validateCreate(getJiraServiceContext(), paramBuilder.build());
 
-			if (worklogAdjustmentAmountResult != null) {
-				this.worklog = worklogAdjustmentAmountResult.getWorklog();
-				this.adjustmentAmountLong = worklogAdjustmentAmountResult.getAdjustmentAmount();
-			}
-		} else {
-			WorklogResult worklogResult = this.worklogService.validateCreate(getJiraServiceContext(), paramBuilder.build());
+            if (worklogResult != null) {
+                this.worklog = worklogResult.getWorklog();
+            }
+        }
 
-			if (worklogResult != null) {
-				this.worklog = worklogResult.getWorklog();
-			}
-		}
+        if (psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId()) && StringUtils.isBlank(getWorklogType()))
+            getJiraServiceContext()
+                .getErrorCollection().addError("worklogType",
+                getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
 
-		if (psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId()) && StringUtils.isBlank(getWorklogType())) getJiraServiceContext()
-				.getErrorCollection().addError("worklogType",
-						getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+        if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(),
+            getIssueObject().getProjectObject(), false))
+            return;
 
-		if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(),
-				getIssueObject().getProjectObject(), false))
-			return;
+        ApplicationUser reporter = null;
+        if (!StringUtils.isBlank(getInputReporter())) {
+            reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
+        }
 
-		ApplicationUser reporter = null;
-		if (!StringUtils.isBlank(getInputReporter())) {
-			reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
-		}
+        if (reporter == null) {
+            getJiraServiceContext().getErrorCollection().addError("inputReporter",
+                getJiraServiceContext().getI18nBean().getText("logwork.reporter.error.null"));
+        } else if (this.worklog != null) this.worklog = reassignWorklog(this.worklog, reporter);
+    }
 
-		if (reporter == null) {
-			getJiraServiceContext().getErrorCollection().addError("inputReporter",
-					getJiraServiceContext().getI18nBean().getText("logwork.reporter.error.null"));
-		} else if (this.worklog != null) this.worklog = reassignWorklog(this.worklog, reporter);
-	}
+    protected Worklog reassignWorklog(Worklog worklog, ApplicationUser reporter) {
+        assert (worklog != null);
+        assert (reporter != null);
 
-	protected Worklog reassignWorklog(Worklog worklog, ApplicationUser reporter) {
-		assert (worklog != null);
-		assert (reporter != null);
+        Worklog reassignedWorklog = new WorklogImpl(this.worklogManager, worklog.getIssue(), worklog.getId(), reporter.getKey(),
+            worklog.getComment(), worklog.getStartDate(), worklog.getGroupLevel(), worklog.getRoleLevelId(),
+            worklog.getTimeSpent(), getJiraServiceContext().getLoggedInApplicationUser().getKey(), worklog.getCreated(),
+            worklog.getUpdated());
 
-		Worklog reassignedWorklog = new WorklogImpl(this.worklogManager, worklog.getIssue(), worklog.getId(), reporter.getKey(),
-				worklog.getComment(), worklog.getStartDate(), worklog.getGroupLevel(), worklog.getRoleLevelId(),
-				worklog.getTimeSpent(), getJiraServiceContext().getLoggedInApplicationUser().getKey(), worklog.getCreated(),
-				worklog.getUpdated());
+        return reassignedWorklog;
+    }
 
-		return reassignedWorklog;
-	}
+    public Map<String, String> getAssignableUsers() {
+        try {
+            List<ApplicationUser> users = Lists.newArrayList(ComponentAccessor.getPermissionSchemeManager().getUsers(
+                new Long(Permissions.WORK_ISSUE),
+                ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
 
-	public Map<String, String> getAssignableUsers() {
-		try {
-			List<ApplicationUser> users = Lists.newArrayList(ComponentAccessor.getPermissionSchemeManager().getUsers(
-					new Long(Permissions.WORK_ISSUE),
-					ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
+            if (CollectionUtils.isEmpty(users)) return Collections.emptyMap();
 
-			if (CollectionUtils.isEmpty(users)) return Collections.emptyMap();
+            users.sort(new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
 
-			Collections.sort(users, new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
+            Map<String, String> assignableUsers = new ListOrderedMap();
+            for (ApplicationUser user : users) {
+                assignableUsers.put(user.getName(), user.getDisplayName());
+            }
+            return assignableUsers;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyMap();
+        }
+    }
 
-			Map<String, String> assignableUsers = new ListOrderedMap();
-			for (Iterator<ApplicationUser> iterator = users.iterator(); iterator.hasNext();) {
-				ApplicationUser user = iterator.next();
-				assignableUsers.put(user.getName(), user.getDisplayName());
-			}
-			return assignableUsers;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyMap();
-		}
-	}
+    public String getWorklogType() {
+        if (this.worklogType == null) {
+            return "";
+        }
+        return this.worklogType;
+    }
 
-	public String getWorklogType() {
-		if (this.worklogType == null) {
-			return "";
-		}
-		return this.worklogType;
-	}
+    public void setWorklogType(String worklogType) {
+        this.worklogType = worklogType;
+    }
 
-	public void setWorklogType(String worklogType) {
-		this.worklogType = worklogType;
-	}
+    public Collection<WorklogType> getWorklogTypeObjects() {
+        Collection<WorklogType> worklogTypes = this.extendedConstantsManager.getWorklogTypeObjects();
+        Collection<WorklogType> excludedWorklogTypes = this.psManager.getExcludedWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
+        excludedWorklogTypes.forEach(worklogTypes::remove);
 
-	public Collection<WorklogType> getWorklogTypeObjects() {
-		return extendedConstantsManager.getWorklogTypeObjects();
-	}
+        return worklogTypes;
+    }
 
-	public boolean isWorklogTypeSelected(String worklogType) {
-		return (getWorklogType() != null) && (getWorklogType().equals(worklogType));
-	}
+    public boolean isWorklogTypeSelected(String worklogType) {
+        return (getWorklogType() != null) && (getWorklogType().equals(worklogType));
+    }
 
-	public CalendarResourceIncluder getCalendarIncluder() {
-		return this.calendarResourceIncluder;
-	}
+    public CalendarResourceIncluder getCalendarIncluder() {
+        return this.calendarResourceIncluder;
+    }
 
-	public boolean getHasCalendarTranslation() {
-		return this.calendarResourceIncluder.hasTranslation(this.authenticationContext.getLocale());
-	}
+    public boolean getHasCalendarTranslation() {
+        return this.calendarResourceIncluder.hasTranslation(this.authenticationContext.getLocale());
+    }
 
-	public long getCurrentTimeMillis() {
-		return System.currentTimeMillis();
-	}
+    public long getCurrentTimeMillis() {
+        return System.currentTimeMillis();
+    }
 
-	public Calendar getCurrentCalendar() {
-		return Calendar.getInstance(this.authenticationContext.getLocale());
-	}
+    public Calendar getCurrentCalendar() {
+        return Calendar.getInstance(this.authenticationContext.getLocale());
+    }
 
-	public String getModifierKey() {
-		return BrowserUtils.getModifierKey();
-	}
+    public String getModifierKey() {
+        return BrowserUtils.getModifierKey();
+    }
 
-	public String getSuperActionName() {
-		return ExtendedCreateWorklog.class.getSimpleName();
-	}
+    public String getSuperActionName() {
+        return ExtendedCreateWorklog.class.getSimpleName();
+    }
 
-	public String getInputReporter() {
-		return this.inputReporter;
-	}
+    public String getInputReporter() {
+        return this.inputReporter;
+    }
 
-	public void setInputReporter(String inputReporter) {
-		this.inputReporter = inputReporter;
-	}
+    public void setInputReporter(String inputReporter) {
+        this.inputReporter = inputReporter;
+    }
 
-	public boolean isWlTypeRequired() {
-		return psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId());
-	}
+    public boolean isWlTypeRequired() {
+        return psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId());
+    }
 
-	public Worklog getWorklog() {
-		return this.worklog;
-	}
+    public Worklog getWorklog() {
+        return this.worklog;
+    }
 }

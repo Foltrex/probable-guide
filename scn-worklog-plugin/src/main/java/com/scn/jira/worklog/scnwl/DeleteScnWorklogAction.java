@@ -5,7 +5,6 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.util.JiraDurationUtils;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
@@ -112,5 +111,4 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
 
         return this.worklog.getLinkedWorklog() != null;
     }
-
 }

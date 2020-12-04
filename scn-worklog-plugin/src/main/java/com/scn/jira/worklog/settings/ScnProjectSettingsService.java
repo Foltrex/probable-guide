@@ -66,6 +66,29 @@ public class ScnProjectSettingsService implements IScnProjectSettingsService {
         }
     }
 
+    @Override
+    public Collection<WorklogType> getExcludedWorklogTypes(JiraServiceContext srvContext, Long projectId) {
+        if (isNotValid(srvContext, projectId)) return Collections.emptyList();
+
+        try {
+            return psManager.getExcludedWorklogTypes(projectId);
+        } catch (Exception e) {
+            addErrorMessage(srvContext, "scn.transaction.failure");
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void setExcludedWorklogTypes(JiraServiceContext srvContext, Long projectId, Collection<WorklogType> worklogTypes) {
+        if (isNotValid(srvContext, projectId)) return;
+
+        try {
+            psManager.setExcludedWorklogTypes(projectId, worklogTypes);
+        } catch (Exception e) {
+            addErrorMessage(srvContext, "scn.transaction.failure");
+        }
+    }
+
     public boolean getUnspecifiedWorklogTypeOption(JiraServiceContext srvContext, Long projectId) {
         if (isNotValid(srvContext, projectId)) return false;
 

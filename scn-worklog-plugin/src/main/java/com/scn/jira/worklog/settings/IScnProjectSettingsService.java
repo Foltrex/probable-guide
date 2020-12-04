@@ -16,6 +16,10 @@ public interface IScnProjectSettingsService {
 
     void setWorklogTypes(JiraServiceContext srvContext, Long projectId, Collection<WorklogType> worklogTypes);
 
+    Collection<WorklogType> getExcludedWorklogTypes(JiraServiceContext srvContext, Long projectId);
+
+    void setExcludedWorklogTypes(JiraServiceContext srvContext, Long projectId, Collection<WorklogType> worklogTypes);
+
     boolean getUnspecifiedWorklogTypeOption(JiraServiceContext srvContext, Long projectId);
 
     void setUnspecifiedWorklogTypeOption(JiraServiceContext srvContext, Long projectId, boolean value);

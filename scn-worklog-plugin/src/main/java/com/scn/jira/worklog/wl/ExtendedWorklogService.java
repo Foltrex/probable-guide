@@ -1,25 +1,22 @@
 package com.scn.jira.worklog.wl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import com.atlassian.jira.component.ComponentAccessor;
-import org.apache.log4j.Logger;
-import org.ofbiz.core.entity.GenericValue;
-
 import com.atlassian.jira.bc.JiraServiceContext;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.worklog.Worklog;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.Project;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
+import org.apache.log4j.Logger;
+import org.ofbiz.core.entity.GenericValue;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Component
 public class ExtendedWorklogService {
