@@ -25,5 +25,11 @@ public interface JiraContextService {
     ProjectDto getProjectDto(Long id);
 
     @Nullable
+    ProjectDto getProjectDto(String key);
+
+    @Nullable
     IssueDto getIssueDto(Long id);
+
+    @Nullable
+    IssueDto getIssueDto(String key);
 }

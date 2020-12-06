@@ -2,7 +2,7 @@ import Avatar from "@atlaskit/avatar";
 import Button from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import DynamicTable from "@atlaskit/dynamic-table";
-import React, { useMemo } from "react";
+import React from "react";
 import styled from "styled-components";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";

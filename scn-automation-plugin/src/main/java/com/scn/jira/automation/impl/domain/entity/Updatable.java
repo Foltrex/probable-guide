@@ -1,7 +1,6 @@
 package com.scn.jira.automation.impl.domain.entity;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 interface Updatable extends WithId {
     String getAuthorKey();
@@ -14,9 +13,9 @@ interface Updatable extends WithId {
 
     Timestamp getCreated();
 
-    void setCreated(Date created);
+    void setCreated(Timestamp created);
 
     Timestamp getUpdated();
 
-    void setUpdated(Date updated);
+    void setUpdated(Timestamp updated);
 }

@@ -1,9 +1,12 @@
 package com.scn.jira.automation.impl.domain.dto;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueDto {
     @XmlElement
     private Long id;

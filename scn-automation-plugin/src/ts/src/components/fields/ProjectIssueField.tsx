@@ -1,6 +1,6 @@
 import { ErrorMessage, Field } from "@atlaskit/form";
 import { AsyncSelect } from "@atlaskit/select";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { request } from "../../api";
 import Config from "../../config";
 import { IssueDto, ProjectDto } from "../../models";
@@ -22,43 +22,26 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
 }) => {
   const [currentProject, setCurrentProject] = useState<ProjectDto>(project);
   const [currentIssue, setCurrentIssue] = useState<IssueDto>(issue);
-  const [options, setOptions] = useState<IssueDto[]>([]);
   const { showError } = useFlagService();
 
-  useEffect(() => {
-    let isMounted = true;
-    if (currentProject) {
-      request<{ issues: any[] }>({
-        url: `${Config.JIRA_API}/search?jql=project=${currentProject.id}&fields=summary&maxResults=3000`,
-      })
-        .then(({ data }) => {
-          if (isMounted) {
-            setOptions(
-              data.issues.map((value) => ({
-                id: value.id,
-                key: value.key,
-                name: value.fields.summary,
-              }))
-            );
-          }
-        })
-        .catch(({ message }) => showError(message));
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [currentProject]);
-
   const loadOptions = (query: string) =>
-    new Promise((resolve) =>
-      resolve(
-        options.filter(
-          (value) =>
-            value.name.toLowerCase().includes(query.toLowerCase()) ||
-            value.key.toLowerCase().includes(query.toLowerCase())
-        )
+    request<{ sections: { id: "hs" | "cs"; issues: any[] }[] }>({
+      url:
+        `${Config.JIRA_API}/issue/picker?currentJQL=project=${currentProject.id} order by lastViewed DESC` +
+        `&showSubTasks=true&showSubTaskParent=true&query=${query}`,
+      method: "GET",
+    })
+      .then(({ data }) =>
+        data.sections
+          .filter((section) => section.id === "cs")
+          .flatMap((value) => value.issues)
+          .map((value) => ({
+            key: value.key,
+            name: value.summaryText,
+            displayHtml: `${value.summary} (${value.keyHtml})`,
+          }))
       )
-    );
+      .catch(({ message }) => showError(message));
 
   const onProjectChange = (value: ProjectDto) => {
     if (!currentProject || !value || value.id != currentProject.id) {
@@ -87,14 +70,24 @@ const ProjectIssueField: React.FC<ProjectIssueFieldProps> = ({
             <AsyncSelect
               {...fieldProps}
               menuPosition={"fixed"}
-              onChange={(value: IssueDto) => setCurrentIssue(value)}
+              onChange={(value: IssueDto) =>
+                setCurrentIssue({ ...value, displayHtml: null })
+              }
               loadOptions={loadOptions}
               className="single-select"
               classNamePrefix="react-select"
-              getOptionLabel={(issue: IssueDto) =>
-                `${issue.name} (${issue.key})`
-              }
-              getOptionValue={(issue: IssueDto) => issue.id.toString()}
+              getOptionLabel={(issue) => issue.name}
+              getOptionValue={(issue) => issue.key}
+              formatOptionLabel={(issue) => (
+                <>
+                  {issue.displayHtml && (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: issue.displayHtml }}
+                    />
+                  )}
+                  {!issue.displayHtml && `${issue.name} (${issue.key})`}
+                </>
+              )}
             />
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </>

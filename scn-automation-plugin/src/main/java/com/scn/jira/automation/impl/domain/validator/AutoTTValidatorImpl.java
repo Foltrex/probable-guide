@@ -6,6 +6,7 @@ import com.scn.jira.automation.api.domain.service.PermissionService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.api.domain.validator.AutoTTValidator;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
+import com.scn.jira.automation.impl.domain.dto.IssueDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
 import com.scn.jira.automation.impl.domain.dto.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,13 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
             errors.put("issue", "Issue has to be set");
             validator.setValid(false);
         } else if (contextService.getIssueDto(autoTTDto.getIssue().getId()) == null) {
-            errors.put("issue", "Couldn't find issue");
-            validator.setValid(false);
+            IssueDto issueDto = contextService.getIssueDto(autoTTDto.getIssue().getKey());
+            if (issueDto == null) {
+                errors.put("issue", "Couldn't find issue");
+                validator.setValid(false);
+            } else {
+                autoTTDto.setIssue(issueDto);
+            }
         }
 
         if (autoTTDto.getWorklogType() != null

@@ -13,6 +13,7 @@ export interface IssueDto {
   id: number;
   key?: string;
   name?: string;
+  displayHtml?: string;
 }
 
 export interface WorklogTypeDto {

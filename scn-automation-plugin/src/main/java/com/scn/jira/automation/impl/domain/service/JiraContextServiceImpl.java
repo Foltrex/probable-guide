@@ -14,6 +14,7 @@ import com.scn.jira.automation.impl.domain.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 
 @Service
@@ -66,9 +67,23 @@ public class JiraContextServiceImpl implements JiraContextService {
         return project == null ? null : new ProjectDto(project.getId(), project.getKey(), project.getName());
     }
 
+    @Nullable
+    @Override
+    public ProjectDto getProjectDto(String key) {
+        Project project = projectManager.getProjectObjByKey(key);
+        return project == null ? null : new ProjectDto(project.getId(), project.getKey(), project.getName());
+    }
+
     @Override
     public IssueDto getIssueDto(Long id) {
         MutableIssue issue = issueManager.getIssueObject(id);
+        return issue == null ? null : new IssueDto(issue.getId(), issue.getKey(), issue.getSummary());
+    }
+
+    @Nullable
+    @Override
+    public IssueDto getIssueDto(String key) {
+        MutableIssue issue = issueManager.getIssueObject(key);
         return issue == null ? null : new IssueDto(issue.getId(), issue.getKey(), issue.getSummary());
     }
 }

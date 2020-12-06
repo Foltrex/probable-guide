@@ -4,6 +4,8 @@
     <meta name="decorator" content="atl.general"/>
 </head>
 <body>
-<div id="scn-autotimetracking-table"></div>
+<div id="scn-autotimetracking-table">
+    <h1>Error</h1>
+</div>
 </body>
 </html>
