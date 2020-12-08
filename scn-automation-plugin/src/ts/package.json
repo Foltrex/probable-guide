@@ -29,6 +29,7 @@
     "@atlaskit/avatar": "^20.0.6",
     "@atlaskit/button": "^15.0.0",
     "@atlaskit/checkbox": "^11.0.7",
+    "@atlaskit/datetime-picker": "^10.0.7",
     "@atlaskit/dropdown-menu": "^10.1.0",
     "@atlaskit/dynamic-table": "^14.1.4",
     "@atlaskit/flag": "^14.0.7",

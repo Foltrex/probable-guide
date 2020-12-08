@@ -7,6 +7,17 @@ const path = require("path");
 const isDev = process.env.NODE_ENV === "development";
 const isProd = !isDev;
 
+const entry = () =>
+    isProd
+        ? {
+              "autotimetracking-table": [
+                  "@babel/polyfill",
+                  "./autotimetracking-table.tsx",
+              ],
+              "worklog-backup": ["@babel/polyfill", "./worklog-backup.tsx"],
+          }
+        : { "worklog-backup": ["@babel/polyfill", "./worklog-backup.tsx"] };
+
 const optimization = () => {
     const config = {};
 
@@ -54,12 +65,7 @@ const plugins = () => {
 module.exports = {
     context: path.resolve(__dirname, "src"),
     mode: "development",
-    entry: {
-        "autotimetracking-table": [
-            "@babel/polyfill",
-            "./autotimetracking-table.tsx",
-        ],
-    },
+    entry: entry(),
     output: {
         filename: "[name].bundle.js",
         path: isProd
@@ -68,6 +74,16 @@ module.exports = {
     },
     resolve: {
         extensions: [".tsx", ".ts", ".jsx", ".js"],
+        alias: {
+            api: path.resolve(__dirname, "src/api"),
+            components: path.resolve(__dirname, "src/components"),
+            config: path.resolve(__dirname, "src/config"),
+            containers: path.resolve(__dirname, "src/containers"),
+            models: path.resolve(__dirname, "src/models"),
+            modules: path.resolve(__dirname, "src/modules"),
+            services: path.resolve(__dirname, "src/services"),
+            utils: path.resolve(__dirname, "src/utils"),
+        },
     },
     optimization: optimization(),
     devServer: {

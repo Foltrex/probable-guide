@@ -50,12 +50,6 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final IScnWorklogService scnDefaultWorklogService;
     private final JiraDurationUtils jiraDurationUtils;
 
-    @Override
-    public WorklogTypeDto getWorklogType(String id) {
-        WorklogType worklogType = extendedConstantsManager.getWorklogTypeObject(id);
-        return worklogType == null ? null : new WorklogTypeDto(worklogType.getId(), worklogType.getName());
-    }
-
     @Autowired
     public WorklogContextServiceImpl(ExtendedConstantsManager extendedConstantsManager, OfBizDelegator ofBizDelegator,
                                      IssueManager issueManager, ProjectRoleManager projectRoleManager,
@@ -69,6 +63,12 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         this.projectSettingsManager = projectSettingsManager;
         this.scnDefaultWorklogService = scnDefaultWorklogService;
         this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
+    }
+
+    @Override
+    public WorklogTypeDto getWorklogType(String id) {
+        WorklogType worklogType = extendedConstantsManager.getWorklogTypeObject(id);
+        return worklogType == null ? null : new WorklogTypeDto(worklogType.getId(), worklogType.getName());
     }
 
     @Override

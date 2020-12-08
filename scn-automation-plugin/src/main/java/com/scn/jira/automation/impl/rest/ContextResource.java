@@ -1,6 +1,7 @@
 package com.scn.jira.automation.impl.rest;
 
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import javax.ws.rs.ext.Provider;
 public class ContextResource {
     private final WorklogContextService worklogContextService;
 
+    @Autowired
     public ContextResource(WorklogContextService worklogContextService) {
         this.worklogContextService = worklogContextService;
     }
@@ -28,6 +30,4 @@ public class ContextResource {
     public Response getAllWorklogTypes() {
         return Response.ok(worklogContextService.getAllWorklogTypes()).build();
     }
-
-
 }

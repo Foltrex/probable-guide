@@ -1,0 +1,11 @@
+<html lang="en">
+<head>
+    <title>Worklog Backup</title>
+    <meta name="decorator" content="atl.general"/>
+</head>
+<body>
+<div id="scn-worklog-backup">
+    <h1>Error</h1>
+</div>
+</body>
+</html>
