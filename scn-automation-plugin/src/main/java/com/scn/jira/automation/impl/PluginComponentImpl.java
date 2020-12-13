@@ -1,7 +1,9 @@
 package com.scn.jira.automation.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -15,7 +17,9 @@ import com.atlassian.webresource.api.assembler.PageBuilderService;
 import com.scn.jira.automation.api.PluginComponent;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import com.scn.jira.worklog.wl.OverridedWorklogManager;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,7 +27,11 @@ public class PluginComponentImpl implements PluginComponent {
     @ComponentImport
     private ActiveObjects ao;
     @ComponentImport
+    private EventPublisher eventPublisher;
+    @ComponentImport
     private ExtendedConstantsManager extendedConstantsManager;
+    @ComponentImport
+    private ExtendedWorklogManager extendedWorklogManager;
     @ComponentImport
     private GlobalPermissionManager globalPermissionManager;
     @ComponentImport
@@ -34,6 +42,8 @@ public class PluginComponentImpl implements PluginComponent {
     private JiraAuthenticationContext jiraAuthenticationContext;
     @ComponentImport
     private OfBizDelegator ofBizDelegator;
+    @ComponentImport
+    private OverridedWorklogManager overridedWorklogManager;
     @ComponentImport
     private PageBuilderService pageBuilderService;
     @ComponentImport
@@ -48,6 +58,8 @@ public class PluginComponentImpl implements PluginComponent {
     private ServiceManager serviceManager;
     @ComponentImport
     private UserManager userManager;
+    @ComponentImport
+    private WorklogManager worklogManager;
 
     @Override
     public String getName() {

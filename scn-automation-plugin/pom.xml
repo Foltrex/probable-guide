@@ -65,45 +65,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>${frontend-maven-plugin.version}</version>
-				<configuration>
-					<workingDirectory>src/ts</workingDirectory>
-					<nodeVersion>v12.14.1</nodeVersion>
-					<yarnVersion>v1.22.4</yarnVersion>
-				</configuration>
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-yarn</goal>
-						</goals>
-						<phase>generate-resources</phase>
-					</execution>
-					<execution>
-						<id>yarn install</id>
-						<goals>
-							<goal>yarn</goal>
-						</goals>
-						<phase>compile</phase>
-						<configuration>
-							<arguments>install --max-old-space-size</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>yarn package</id>
-						<goals>
-							<goal>yarn</goal>
-						</goals>
-						<phase>compile</phase>
-						<configuration>
-							<arguments>package --max-old-space-size</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>com.atlassian.maven.plugins</groupId>
 				<artifactId>jira-maven-plugin</artifactId>
 				<version>${amps.version}</version>
@@ -192,6 +153,45 @@
 			</properties>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<version>${frontend-maven-plugin.version}</version>
+						<configuration>
+							<workingDirectory>src/ts</workingDirectory>
+							<nodeVersion>v12.14.1</nodeVersion>
+							<yarnVersion>v1.22.4</yarnVersion>
+						</configuration>
+						<executions>
+							<execution>
+								<id>install node and npm</id>
+								<goals>
+									<goal>install-node-and-yarn</goal>
+								</goals>
+								<phase>generate-resources</phase>
+							</execution>
+							<execution>
+								<id>yarn install</id>
+								<goals>
+									<goal>yarn</goal>
+								</goals>
+								<phase>compile</phase>
+								<configuration>
+									<arguments>install --max-old-space-size</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>yarn package</id>
+								<goals>
+									<goal>yarn</goal>
+								</goals>
+								<phase>compile</phase>
+								<configuration>
+									<arguments>package --max-old-space-size</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
 						<version>3.2.0</version>

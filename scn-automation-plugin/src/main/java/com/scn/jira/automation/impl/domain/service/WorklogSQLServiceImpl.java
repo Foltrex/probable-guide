@@ -2,25 +2,24 @@ package com.scn.jira.automation.impl.domain.service;
 
 import com.atlassian.jira.ofbiz.DefaultOfBizConnectionFactory;
 import com.atlassian.jira.ofbiz.OfBizConnectionFactory;
-import com.scn.jira.automation.api.domain.service.WorklogService;
+import com.scn.jira.automation.api.domain.service.WorklogSQLService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogKind;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
-public class WorklogServiceImpl implements WorklogService {
+public class WorklogSQLServiceImpl implements WorklogSQLService {
     private final OfBizConnectionFactory ofBizConnectionFactory = DefaultOfBizConnectionFactory.getInstance();
 
     @Override
-    public List<WorklogDto> getAllByProject(Long projectId) {
+    public List<WorklogDto> getAllByProject(Long projectId, Date from, Date to) {
         List<WorklogDto> result = new ArrayList<>();
         String querySQL = "select " +
             "worklog.*, " +
@@ -31,10 +30,15 @@ public class WorklogServiceImpl implements WorklogService {
             "on worklog.issueid = jiraissue.id " +
             "left join worklog_worklogtype_scn " +
             "on worklog.id = worklog_worklogtype_scn.id " +
-            "where jiraissue.project = ?";
+            "where jiraissue.project = ?" +
+            (from == null ? " and ? is null" : " and worklog.startdate >= ?") +
+            (to == null ? " and ? is null" : " and worklog.startdate <= ?");
+
         try (Connection connection = ofBizConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(querySQL)) {
             preparedStatement.setLong(1, projectId);
+            preparedStatement.setTimestamp(2, from == null ? null : getTimestampFrom(from));
+            preparedStatement.setTimestamp(3, to == null ? null : getTimestampTo(to));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     WorklogDto worklog = new WorklogDto();
@@ -51,7 +55,7 @@ public class WorklogServiceImpl implements WorklogService {
     }
 
     @Override
-    public List<WorklogDto> getAllScnByProject(Long projectId) {
+    public List<WorklogDto> getAllScnByProject(Long projectId, Date from, Date to) {
         List<WorklogDto> result = new ArrayList<>();
         String querySQL = "select " +
             "worklog_scn.*, " +
@@ -59,10 +63,15 @@ public class WorklogServiceImpl implements WorklogService {
             "from worklog_scn " +
             "left join jiraissue " +
             "on worklog_scn.issueid = jiraissue.id " +
-            "where jiraissue.project = ?";
+            "where jiraissue.project = ?" +
+            (from == null ? " and ? is null" : " and worklog_scn.startdate >= ?") +
+            (to == null ? " and ? is null" : " and worklog_scn.startdate <= ?");
+
         try (Connection connection = ofBizConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(querySQL)) {
             preparedStatement.setLong(1, projectId);
+            preparedStatement.setTimestamp(2, from == null ? null : getTimestampFrom(from));
+            preparedStatement.setTimestamp(3, to == null ? null : getTimestampTo(to));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     WorklogDto worklog = new WorklogDto();
@@ -77,6 +86,30 @@ public class WorklogServiceImpl implements WorklogService {
         }
 
         return result;
+    }
+
+    @Nonnull
+    @Override
+    public Timestamp getTimestampFrom(@Nonnull Date from) {
+        return Timestamp.from(
+            from.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant());
+    }
+
+    @Nonnull
+    @Override
+    public Timestamp getTimestampTo(@Nonnull Date to) {
+        return Timestamp.from(
+            to.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .atStartOfDay(ZoneId.systemDefault())
+                .plusDays(1)
+                .minusSeconds(1)
+                .toInstant());
     }
 
     private void copySQLFields(@Nonnull WorklogDto worklog, @Nonnull ResultSet resultSet) throws SQLException {

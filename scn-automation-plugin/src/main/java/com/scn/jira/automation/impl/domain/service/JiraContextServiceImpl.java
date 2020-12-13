@@ -2,8 +2,10 @@ package com.scn.jira.automation.impl.domain.service;
 
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
+import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
@@ -23,15 +25,17 @@ public class JiraContextServiceImpl implements JiraContextService {
     private final UserManager userManager;
     private final ProjectManager projectManager;
     private final IssueManager issueManager;
+    private final GlobalPermissionManager globalPermissionManager;
 
     @Autowired
     public JiraContextServiceImpl(JiraAuthenticationContext jiraAuthenticationContext,
                                   UserManager userManager, ProjectManager projectManager,
-                                  IssueManager issueManager) {
+                                  IssueManager issueManager, GlobalPermissionManager globalPermissionManager) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.userManager = userManager;
         this.projectManager = projectManager;
         this.issueManager = issueManager;
+        this.globalPermissionManager = globalPermissionManager;
     }
 
     @Override
@@ -59,6 +63,12 @@ public class JiraContextServiceImpl implements JiraContextService {
     @Override
     public ApplicationUser getUser(String userKey) {
         return userManager.getUserByKey(userKey);
+    }
+
+    @Override
+    public boolean isCurrentUserAdmin() {
+        return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, this.getCurrentUser())
+            || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, this.getCurrentUser());
     }
 
     @Override

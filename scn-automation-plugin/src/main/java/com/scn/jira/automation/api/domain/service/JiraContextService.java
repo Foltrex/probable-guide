@@ -21,6 +21,8 @@ public interface JiraContextService {
     @Nullable
     ApplicationUser getUser(String userKey);
 
+    boolean isCurrentUserAdmin();
+
     @Nullable
     ProjectDto getProjectDto(Long id);
 

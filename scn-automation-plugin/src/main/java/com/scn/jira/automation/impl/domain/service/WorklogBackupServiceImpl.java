@@ -2,7 +2,7 @@ package com.scn.jira.automation.impl.domain.service;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.scn.jira.automation.api.domain.service.WorklogBackupService;
-import com.scn.jira.automation.api.domain.service.WorklogService;
+import com.scn.jira.automation.api.domain.service.WorklogSQLService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.entity.ScnWorklog;
 import com.scn.jira.automation.impl.domain.entity.Worklog;
@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
-import java.sql.Timestamp;
-import java.time.ZoneId;
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,61 +20,77 @@ import java.util.stream.Stream;
 @Service
 public class WorklogBackupServiceImpl implements WorklogBackupService {
     private final ActiveObjects ao;
-    private final WorklogService worklogService;
+    private final WorklogSQLService worklogSQLService;
 
     @Autowired
-    public WorklogBackupServiceImpl(ActiveObjects ao, WorklogService worklogService) {
+    public WorklogBackupServiceImpl(ActiveObjects ao, WorklogSQLService worklogSQLService) {
         this.ao = ao;
-        this.worklogService = worklogService;
+        this.worklogSQLService = worklogSQLService;
     }
 
     @Override
-    public void makeBackup(Long projectId) {
-        this.clearWorklogBackup(projectId);
-        this.makeWorklogBackup(projectId);
-        this.clearScnWorklogBackup(projectId);
-        this.makeScnWorklogBackup(projectId);
+    public void makeBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+        this.clearWorklogBackup(projectId, from, to);
+        this.makeWorklogBackup(projectId, from, to);
+        this.clearScnWorklogBackup(projectId, from, to);
+        this.makeScnWorklogBackup(projectId, from, to);
     }
 
     @Override
-    public void restoreBackup(Long projectId) {
-        //TODO. restore from backup.
+    public void restoreBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+
     }
 
     @Override
-    public List<WorklogDto> getAllByProject(Long projectId, @Nonnull Date from, @Nonnull Date to) {
-        Worklog[] worklogs = ao.find(Worklog.class, "PROJECT_ID = ? AND START_DATE BETWEEN ? AND ?",
+    public List<WorklogDto> getAllByProject(Long projectId, @Nullable Date from, @Nullable Date to) {
+        Worklog[] worklogs = ao.find(Worklog.class, "PROJECT_ID = ?"
+                + (from == null ? " AND ? IS NULL" : " AND START_DATE >= ?")
+                + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
-            new Timestamp(from.getTime()),
-            Timestamp.valueOf(to.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(1).minusNanos(1))
+            from == null ? null : worklogSQLService.getTimestampFrom(from),
+            to == null ? null : worklogSQLService.getTimestampFrom(to)
         );
 
         return Stream.of(worklogs).map(WorklogDto::new).collect(Collectors.toList());
     }
 
     @Override
-    public List<WorklogDto> getAllScnByProject(Long projectId, @Nonnull Date from, @Nonnull Date to) {
-        ScnWorklog[] worklogs = ao.find(ScnWorklog.class, "PROJECT_ID = ? AND START_DATE BETWEEN ? AND ?",
+    public List<WorklogDto> getAllScnByProject(Long projectId, @Nullable Date from, @Nullable Date to) {
+        ScnWorklog[] scnWorklogs = ao.find(ScnWorklog.class, "PROJECT_ID = ?"
+                + (from == null ? " AND ? IS NULL" : " AND START_DATE >= ?")
+                + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
-            new Timestamp(from.getTime()),
-            Timestamp.valueOf(to.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(1).minusNanos(1))
+            from == null ? null : worklogSQLService.getTimestampFrom(from),
+            to == null ? null : worklogSQLService.getTimestampFrom(to)
         );
 
-        return Stream.of(worklogs).map(WorklogDto::new).collect(Collectors.toList());
+        return Stream.of(scnWorklogs).map(WorklogDto::new).collect(Collectors.toList());
     }
 
-    private void clearWorklogBackup(Long projectId) {
-        Worklog[] worklogs = ao.find(Worklog.class, "PROJECT_ID = ?", projectId);
+    private void clearWorklogBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+        Worklog[] worklogs = ao.find(Worklog.class, "PROJECT_ID = ?"
+                + (from == null ? " AND ? IS NULL" : " AND START_DATE >= ?")
+                + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
+            projectId,
+            from == null ? null : worklogSQLService.getTimestampFrom(from),
+            to == null ? null : worklogSQLService.getTimestampFrom(to)
+        );
         ao.delete(worklogs);
     }
 
-    private void clearScnWorklogBackup(Long projectId) {
-        ScnWorklog[] scnWorklogs = ao.find(ScnWorklog.class, "PROJECT_ID = ?", projectId);
+    private void clearScnWorklogBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+        ScnWorklog[] scnWorklogs = ao.find(ScnWorklog.class, "PROJECT_ID = ?"
+                + (from == null ? " AND ? IS NULL" : " AND START_DATE >= ?")
+                + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
+            projectId,
+            from == null ? null : worklogSQLService.getTimestampFrom(from),
+            to == null ? null : worklogSQLService.getTimestampFrom(to)
+        );
         ao.delete(scnWorklogs);
     }
 
-    private void makeWorklogBackup(Long projectId) {
-        List<WorklogDto> worklogs = worklogService.getAllByProject(projectId);
+    private void makeWorklogBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+        List<WorklogDto> worklogs = worklogSQLService.getAllByProject(projectId, from, to);
         worklogs.forEach(worklogDto -> {
             Worklog worklog = ao.create(Worklog.class,
                 new DBParam("ID", worklogDto.getId()),
@@ -86,8 +101,8 @@ public class WorklogBackupServiceImpl implements WorklogBackupService {
         });
     }
 
-    private void makeScnWorklogBackup(Long projectId) {
-        List<WorklogDto> worklogs = worklogService.getAllScnByProject(projectId);
+    private void makeScnWorklogBackup(Long projectId, @Nullable Date from, @Nullable Date to) {
+        List<WorklogDto> worklogs = worklogSQLService.getAllScnByProject(projectId, from, to);
         worklogs.forEach(worklogDto -> {
             ScnWorklog scnWorklog = ao.create(ScnWorklog.class,
                 new DBParam("ID", worklogDto.getId()),

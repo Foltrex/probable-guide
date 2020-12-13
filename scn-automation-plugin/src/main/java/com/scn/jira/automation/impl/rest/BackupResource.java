@@ -1,10 +1,6 @@
 package com.scn.jira.automation.impl.rest;
 
-import com.atlassian.jira.bc.project.ProjectService;
-import com.atlassian.jira.permission.GlobalPermissionKey;
-import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.GlobalPermissionManager;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.WorklogBackupService;
 import com.scn.jira.automation.impl.domain.dto.Validator;
@@ -20,9 +16,7 @@ import javax.ws.rs.ext.Provider;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,36 +26,29 @@ import java.util.stream.Stream;
 @Named
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
-public class BackupResource {
+public class BackupResource extends BaseResource {
     private final WorklogBackupService worklogBackupService;
-    private final GlobalPermissionManager globalPermissionManager;
-    private final JiraContextService contextService;
-    private final ProjectManager projectManager;
 
     @Autowired
     public BackupResource(WorklogBackupService worklogBackupService,
-                          GlobalPermissionManager globalPermissionManager,
                           JiraContextService contextService,
                           ProjectManager projectManager) {
+        super(contextService, projectManager);
         this.worklogBackupService = worklogBackupService;
-        this.globalPermissionManager = globalPermissionManager;
-        this.contextService = contextService;
-        this.projectManager = projectManager;
     }
 
     @POST
-    public Response getTest(@QueryParam("pid") Long pid) {
-        Project project = projectManager.getProjectObj(pid);
-        if (globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, contextService.getCurrentUser())
-            || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, contextService.getCurrentUser())
-            || (project != null && project.getLeadUserKey().equals(contextService.getCurrentUser().getKey()))
-            || contextService.getCurrentUser().getKey().equals("akalaputs")) {
-            worklogBackupService.makeBackup(pid);
-            return Response.ok().build();
-        } else {
+    public Response doBackup(@QueryParam("pid") Long pid,
+                             @QueryParam("from") String from,
+                             @QueryParam("to") String to) throws ParseException {
+        if (!this.isProjectAdministrationAllowed(pid)) {
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No permissions")).build();
+                .entity(new Validator("No permissions to backup.")).build();
         }
+        worklogBackupService.makeBackup(pid,
+            from == null ? null : this.parseDate(from),
+            to == null ? null : this.parseDate(to));
+        return Response.ok().build();
     }
 
     @GET
@@ -73,9 +60,12 @@ public class BackupResource {
         String name = String.format("%s.csv", pid);
         String fileName = System.getProperty("java.io.tmpdir") + File.separator + name;
         File fileDownload = new File(fileName);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        List<WorklogDto> worklogs = worklogBackupService.getAllByProject(pid, dateFormat.parse(from), dateFormat.parse(to));
-        List<WorklogDto> scnWorklogs = worklogBackupService.getAllScnByProject(pid, dateFormat.parse(from), dateFormat.parse(to));
+        List<WorklogDto> worklogs = worklogBackupService.getAllByProject(
+            pid, from == null ? null : this.parseDate(from), to == null ? null : this.parseDate(to)
+        );
+        List<WorklogDto> scnWorklogs = worklogBackupService.getAllScnByProject(
+            pid, from == null ? null : this.parseDate(from), to == null ? null : this.parseDate(to)
+        );
         String resultCSV = Stream.of(worklogs.stream(), scnWorklogs.stream())
             .flatMap(Function.identity())
             .map(worklog -> String.format(

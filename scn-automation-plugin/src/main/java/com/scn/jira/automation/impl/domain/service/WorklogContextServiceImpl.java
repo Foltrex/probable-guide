@@ -5,6 +5,9 @@ import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.worklog.Worklog;
+import com.atlassian.jira.issue.worklog.WorklogImpl;
+import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.util.JiraDurationUtils;
@@ -13,11 +16,13 @@ import com.google.common.collect.Lists;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
+import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import org.ofbiz.core.entity.EntityCondition;
@@ -25,6 +30,7 @@ import org.ofbiz.core.entity.EntityConditionList;
 import org.ofbiz.core.entity.EntityExpr;
 import org.ofbiz.core.entity.EntityOperator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -49,12 +55,15 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final IScnProjectSettingsManager projectSettingsManager;
     private final IScnWorklogService scnDefaultWorklogService;
     private final JiraDurationUtils jiraDurationUtils;
+    private final WorklogManager worklogManager;
+    private final ExtendedWorklogManager extendedWorklogManager;
 
     @Autowired
     public WorklogContextServiceImpl(ExtendedConstantsManager extendedConstantsManager, OfBizDelegator ofBizDelegator,
                                      IssueManager issueManager, ProjectRoleManager projectRoleManager,
                                      JiraContextService jiraContextService, IScnProjectSettingsManager projectSettingsManager,
-                                     IScnWorklogService scnDefaultWorklogService) {
+                                     IScnWorklogService scnDefaultWorklogService, ExtendedWorklogManager extendedWorklogManager,
+                                     @Qualifier("overridedWorklogManager") WorklogManager worklogManager) {
         this.extendedConstantsManager = extendedConstantsManager;
         this.ofBizDelegator = ofBizDelegator;
         this.issueManager = issueManager;
@@ -62,6 +71,8 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         this.jiraContextService = jiraContextService;
         this.projectSettingsManager = projectSettingsManager;
         this.scnDefaultWorklogService = scnDefaultWorklogService;
+        this.worklogManager = worklogManager;
+        this.extendedWorklogManager = extendedWorklogManager;
         this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
     }
 
@@ -133,7 +144,7 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     }
 
     @Override
-    public void createWorklog(@Nonnull AutoTTDto autoTTDto, Date date) {
+    public void createScnWorklog(@Nonnull AutoTTDto autoTTDto, Date date) {
         Issue issue = issueManager.getIssueObject(autoTTDto.getIssue().getId());
         if (issue != null && !this.isBlankFormattedTime(autoTTDto.getRatedTime())) {
             IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTTDto.getUser().getKey(),
@@ -144,6 +155,33 @@ public class WorklogContextServiceImpl implements WorklogContextService {
             scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
                 new JiraServiceContextImpl(jiraContextService.getUser(autoTTDto.getUser().getKey())),
                 worklog, true, isAutoCopy);
+        }
+    }
+
+    @Override
+    public void createWorklog(@Nonnull WorklogDto worklog) {
+        Issue issue = issueManager.getIssueObject(worklog.getIssueId());
+        Worklog newWorklog = new WorklogImpl(
+            worklogManager, issue, null, worklog.getAuthorKey(), worklog.getWorklogBody(),
+            worklog.getStartDate(), null, null, worklog.getTimeWorked());
+        Long oldEstimate = issue.getEstimate() == null ? 0L : issue.getEstimate();
+        Long timeSpend = worklog.getTimeWorked() == null ? 0L : worklog.getTimeWorked();
+        Long newEstimate = oldEstimate <= timeSpend ? 0L : oldEstimate - timeSpend;
+        Worklog createdWorklog = worklogManager.create(jiraContextService.getCurrentUser(), newWorklog, newEstimate, false);
+        if (createdWorklog != null) {
+            extendedWorklogManager.createExtWorklogType(createdWorklog, worklog.getWorklogTypeId());
+        }
+    }
+
+    @Override
+    public void deleteWorklogById(Long id) {
+        Worklog worklog = worklogManager.getById(id);
+        if (worklog != null) {
+            Long oldEstimate = worklog.getIssue().getEstimate() == null ? 0L : worklog.getIssue().getEstimate();
+            Long timeSpend = worklog.getTimeSpent() == null ? 0L : worklog.getTimeSpent();
+            Long newEstimate = oldEstimate + timeSpend;
+            worklogManager.delete(jiraContextService.getCurrentUser(), worklog, newEstimate, false);
+            extendedWorklogManager.deleteExtWorklogType(id);
         }
     }
 
