@@ -48,7 +48,7 @@ public class WorklogBackupServiceImpl implements WorklogBackupService {
                 + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
             from == null ? null : worklogSQLService.getTimestampFrom(from),
-            to == null ? null : worklogSQLService.getTimestampFrom(to)
+            to == null ? null : worklogSQLService.getTimestampTo(to)
         );
 
         return Stream.of(worklogs).map(WorklogDto::new).collect(Collectors.toList());
@@ -61,7 +61,7 @@ public class WorklogBackupServiceImpl implements WorklogBackupService {
                 + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
             from == null ? null : worklogSQLService.getTimestampFrom(from),
-            to == null ? null : worklogSQLService.getTimestampFrom(to)
+            to == null ? null : worklogSQLService.getTimestampTo(to)
         );
 
         return Stream.of(scnWorklogs).map(WorklogDto::new).collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class WorklogBackupServiceImpl implements WorklogBackupService {
                 + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
             from == null ? null : worklogSQLService.getTimestampFrom(from),
-            to == null ? null : worklogSQLService.getTimestampFrom(to)
+            to == null ? null : worklogSQLService.getTimestampTo(to)
         );
         ao.delete(worklogs);
     }
@@ -84,7 +84,7 @@ public class WorklogBackupServiceImpl implements WorklogBackupService {
                 + (to == null ? " AND ? IS NULL" : " AND START_DATE <= ?"),
             projectId,
             from == null ? null : worklogSQLService.getTimestampFrom(from),
-            to == null ? null : worklogSQLService.getTimestampFrom(to)
+            to == null ? null : worklogSQLService.getTimestampTo(to)
         );
         ao.delete(scnWorklogs);
     }

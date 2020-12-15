@@ -41,7 +41,7 @@ public class BackupResource extends BaseResource {
     public Response doBackup(@QueryParam("pid") Long pid,
                              @QueryParam("from") String from,
                              @QueryParam("to") String to) throws ParseException {
-        if (!this.isProjectAdministrationAllowed(pid)) {
+        if (!this.isAdministrationAllowed()) {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new Validator("No permissions to backup.")).build();
         }
