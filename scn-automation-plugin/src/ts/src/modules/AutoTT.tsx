@@ -2,6 +2,7 @@ import React from "react";
 import AutoTTContainer from "containers/AutoTTContainer";
 import AutoTTService from "services/AutoTTService";
 import FlagService from "services/FlagService";
+import ReactDOM from "react-dom";
 
 const AutoTT = () => {
   return (
@@ -13,4 +14,6 @@ const AutoTT = () => {
   );
 };
 
-export default AutoTT;
+window.addEventListener("load", () =>
+  ReactDOM.render(<AutoTT />, document.getElementById("scn-automation-root"))
+);

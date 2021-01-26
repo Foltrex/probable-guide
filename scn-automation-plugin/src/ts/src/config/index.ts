@@ -7,11 +7,6 @@ const Config = {
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
-  toInit: window["AJS"]
-    ? window["AJS"].toInit
-    : function (callback: () => void): void {
-        callback();
-      },
 };
 
 export default Config;

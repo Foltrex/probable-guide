@@ -2,7 +2,10 @@ import axios, { AxiosRequestConfig } from "axios";
 import Config from "../config";
 
 axios.defaults.headers = { "Content-Type": "application/json;charset=utf-8" };
-Config.toInit(() => (axios.defaults.baseURL = Config.baseURL()));
+window.addEventListener(
+  "load",
+  () => (axios.defaults.baseURL = Config.baseURL())
+);
 
 axios.interceptors.response.use(
   (response) => {

@@ -41,7 +41,6 @@ const AutoTTService: React.FC = ({ children }) => {
             method: "GET",
           });
           dispatch(setItemsAction(result.data));
-          showInfo("Data is loaded");
         } catch (error) {
           showError(error.message);
         }

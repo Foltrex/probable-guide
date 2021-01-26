@@ -12,11 +12,14 @@ const entry = () =>
         ? {
               "autotimetracking-table": [
                   "@babel/polyfill",
-                  "./autotimetracking-table.tsx",
+                  "./modules/AutoTT.tsx",
               ],
-              "worklog-backup": ["@babel/polyfill", "./worklog-backup.tsx"],
+              "worklog-backup": [
+                  "@babel/polyfill",
+                  "./modules/WorklogBackup.tsx",
+              ],
           }
-        : { "worklog-backup": ["@babel/polyfill", "./worklog-backup.tsx"] };
+        : { index: ["@babel/polyfill", "./index.tsx"] };
 
 const optimization = () => {
     const config = {};
