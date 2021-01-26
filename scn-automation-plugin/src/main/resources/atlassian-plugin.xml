@@ -61,7 +61,7 @@
 			  section="scn-automation-mainmenu/scn-automation-mainsection" weight="20">
 		<label key="scn-automation.worklog-backup-label"/>
 		<link linkId="scn-automation.worklog-backup-link">/secure/WorklogBackupAction.jspa</link>
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
+		<condition class="com.scn.jira.automation.impl.condition.UserIsAdminCondition"/>
 	</web-item>
 
 	<ao key="scn-automation-ao-module" name="ScienceSoft Automation Plugin AO Module">

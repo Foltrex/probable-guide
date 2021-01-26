@@ -23,6 +23,8 @@ public interface JiraContextService {
 
     boolean isCurrentUserAdmin();
 
+    boolean isCurrentUserSystemAdmin();
+
     @Nullable
     ProjectDto getProjectDto(Long id);
 

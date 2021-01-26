@@ -26,8 +26,7 @@ public abstract class BaseResource {
     }
 
     protected boolean isAdministrationAllowed() {
-        return contextService.isCurrentUserAdmin()
-            || contextService.getCurrentUser().getKey().equals("akalaputs");
+        return contextService.isCurrentUserAdmin();
     }
 
     protected Date parseDate(String date) throws ParseException {

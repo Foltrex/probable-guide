@@ -1,8 +1,7 @@
 package com.scn.jira.automation.impl.domain.service;
 
-import com.atlassian.jira.permission.GlobalPermissionKey;
-import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
+import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.PermissionService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
@@ -13,11 +12,11 @@ import javax.annotation.Nonnull;
 
 @Service
 public class PermissionServiceImpl implements PermissionService {
-    private final GlobalPermissionManager globalPermissionManager;
+    private final JiraContextService jiraContextService;
 
     @Autowired
-    public PermissionServiceImpl(GlobalPermissionManager globalPermissionManager) {
-        this.globalPermissionManager = globalPermissionManager;
+    public PermissionServiceImpl(JiraContextService jiraContextService) {
+        this.jiraContextService = jiraContextService;
     }
 
     @Override
@@ -26,12 +25,11 @@ public class PermissionServiceImpl implements PermissionService {
             case CREATE:
             case READ:
             case UPDATE:
-                return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)
-                    || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user)
+                return jiraContextService.isCurrentUserAdmin()
                     || autoTTDto.getUser().getKey().equals(user.getKey());
             case DELETE:
-                return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)
-                    || (globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user)
+                return jiraContextService.isCurrentUserSystemAdmin()
+                    || (jiraContextService.isCurrentUserAdmin()
                     && autoTTDto.getAuthor().getKey().equals(user.getKey()));
             default:
                 return false;
