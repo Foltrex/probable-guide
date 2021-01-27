@@ -1,0 +1,17 @@
+.ab-items {
+    width: auto;
+    overflow: auto;
+}
+
+.ab-drag-container {
+    width: auto;
+}
+
+.selectGroup {
+    width: auto;
+    overflow-x: auto;
+}
+
+.field-wrapper .select2-container{
+    max-width: 250px;
+}

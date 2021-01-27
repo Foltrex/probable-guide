@@ -27,6 +27,7 @@
 	<meta name="application-base-url" content="$applicationProperties.baseUrl">
 	<meta name="admin.active.section" content="atl.jira.proj.config"/>
 	<meta name="admin.active.tab" content="scnProjectSettings"/>
+    $webResourceManager.requireResource("com.scn.jira.scn-worklog-plugin:scn-worklog-resources")
 	$webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
     $webResourceManager.requireResource("com.atlassian.auiplugin:aui-select2")
     $webResourceManager.requireResource("jira.webresources:calendar")
@@ -99,33 +100,37 @@
 	    #controlFooter ($action "" false)
 
         #controlHeader($action "defaultWLType" $i18n.getText("scn.project_settings.default_wl_type.label") false false)
-            <select id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
-                <option value="" #if($action.isDefaultWorklogTypeSelected("")) selected="selected" #end>
-                    $i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
-                </option>
-                #foreach($wlType in $action.worklogTypes)
-                    <option value="$wlType.id" #if($action.isDefaultWorklogTypeSelected($wlType.id)) selected="selected" #end>
-                        $wlType.name
+            <div class="field-wrapper">
+                <select id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
+                    <option value="" #if($action.isDefaultWorklogTypeSelected("")) selected="selected" #end>
+                        $i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
                     </option>
-                #end
-            </select>
+                    #foreach($wlType in $action.worklogTypes)
+                        <option value="$wlType.id" #if($action.isDefaultWorklogTypeSelected($wlType.id)) selected="selected" #end>
+                            $wlType.name
+                        </option>
+                    #end
+                </select>
+            </div>
         #controlFooter ($action "" false)
 
         #controlHeader($action "excludedWorklogTypes" $i18n.getText("scn.project_settings.excluded_wl_types.label") false false)
-            <select id="inputExcludedWorklogTypes" name="inputExcludedWorklogTypes" multiple="">
-                #foreach($wlType in $action.worklogTypes)
-                    <option value="$wlType.id"
-                    #foreach($wlId in $action.inputExcludedWorklogTypes)
-                        #if($wlType.id == $wlId)
-                            selected="selected"
-                            #break
-                        #end
+            <div class="field-wrapper">
+                <select id="inputExcludedWorklogTypes" name="inputExcludedWorklogTypes" multiple="">
+                    #foreach($wlType in $action.worklogTypes)
+                        <option value="$wlType.id"
+                            #foreach($wlId in $action.inputExcludedWorklogTypes)
+                                #if($wlType.id == $wlId)
+                                selected="selected"
+                                    #break
+                                #end
+                            #end
+                        >
+                            $wlType.name
+                        </option>
                     #end
-                    >
-                        $wlType.name
-                    </option>
-                #end
-            </select>
+                </select>
+            </div>
         #controlFooter ($action "" false)
 
 	    #rowClear()
