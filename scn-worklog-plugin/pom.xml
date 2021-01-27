@@ -4,20 +4,20 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<version>4.1.0</version>
 	</parent>
-	
+
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
 	<description>The plugin provide access to custom time tracking implementation.</description>
-	
+
 	<artifactId>scn-worklog-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
 	<version>4.1.5</version>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -65,7 +65,7 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -82,13 +82,8 @@
 					<skipITs>${skipTests}</skipITs>
 					<skipUTs>${skipTests}</skipUTs>
 					<skipAllPrompts>${skipTests}</skipAllPrompts>
-					<!-- This is sometimes handy to turn on for a faster jira and quick reload-->
-<!--					<skipRestDocGeneration>true</skipRestDocGeneration>-->
-<!--					<buildTestPlugin>false</buildTestPlugin>-->
-<!--					<enableDevToolbox>false</enableDevToolbox>-->
-<!--					<enablePde>false</enablePde>-->
 					<systemProperties>
-                        <atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
 					</systemProperties>
 					<extractDependencies>false</extractDependencies>
@@ -150,4 +145,42 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<atlassian.dev.mode>true</atlassian.dev.mode>
+				<compressResources>true</compressResources>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>${maven-resources-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/../plugins</outputDirectory>
+									<resources>
+										<resource>
+											<directory>target</directory>
+											<includes>
+												<include>scn-worklog-plugin-${project.version}.jar</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
