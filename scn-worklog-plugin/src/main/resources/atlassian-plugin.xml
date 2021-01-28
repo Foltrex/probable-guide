@@ -22,7 +22,7 @@
 				  key="scn-worklog-resources">
 		<dependency>jira.webresources:jira-global</dependency>
 		<dependency>com.atlassian.gadgets.embedded:gadget-standalone-resources</dependency>
-		<resource type="download" name="css\scn-worklog-plugin.css" location="css\scn-worklog-plugin.css">
+		<resource type="download" name="css/scn-worklog-plugin.css" location="css/scn-worklog-plugin.css">
 			<param name="content-type" value="text/css; charset=UTF-8"/>
 		</resource>
 	</web-resource>
