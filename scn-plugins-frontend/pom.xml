@@ -12,7 +12,7 @@
 	<artifactId>scn-plugins-frontend</artifactId>
 	<packaging>pom</packaging>
 
-	<name>JIRA ScienceSoft Plugins' Frontend</name>
+	<name>JIRA ScienceSoft Plugins Frontend</name>
 	<description>Frontend for JIRA ScienceSoft Plugins</description>
 
 	<build>
@@ -66,7 +66,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/../scn-automation-plugin/src/main/resources</outputDirectory>
+							<outputDirectory>${basedir}/../scn-automation-plugin/target/classes</outputDirectory>
 							<resources>
 								<resource>
 									<directory>target/scn-automation-plugin</directory>

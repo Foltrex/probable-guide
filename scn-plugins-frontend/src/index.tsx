@@ -1,1 +1,1 @@
-import {} from "modules/AutoTT";
+import {} from "modules/scn-automation-plugin/AutoTT";
