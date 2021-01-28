@@ -13,5 +13,5 @@ scn-automation-plugin/target/
 node_modules/
 scn-automation-plugin/src/main/resources/build/
 scn-automation-plugin/src/main/resources/META-INF/plugin-descriptors/
-/scn-automation-plugin/src/ts/node/
-/scn-automation-plugin/src/ts/build/
+/scn-plugins-frontend/node/
+/scn-plugins-frontend/target/

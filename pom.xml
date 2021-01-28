@@ -136,6 +136,7 @@
 	</properties>
 
 	<modules>
+		<module>scn-plugins-frontend</module>
 		<module>scn-worklog-plugin</module>
 		<module>scn-logtime-plugin</module>
 		<module>scn-mytime-gadget-plugin</module>

@@ -33,6 +33,7 @@ const optimization = () => {
 
 const plugins = () => {
     const base = [];
+    base.push(new CleanWebpackPlugin());
     if (isProd) {
         base.push(
             new WrmPlugin({
@@ -41,7 +42,8 @@ const plugins = () => {
                 watch: true,
                 xmlDescriptors: path.resolve(
                     __dirname,
-                    "../main/resources",
+                    "target",
+                    "scn-automation-plugin",
                     "META-INF",
                     "plugin-descriptors",
                     "wr-defs.xml"
@@ -60,7 +62,6 @@ const plugins = () => {
             })
         );
     }
-    base.push(new CleanWebpackPlugin());
 
     return base;
 };
@@ -72,8 +73,8 @@ module.exports = {
     output: {
         filename: "[name].bundle.js",
         path: isProd
-            ? path.resolve(__dirname, "../main/resources/build/js")
-            : path.resolve(__dirname, "build"),
+            ? path.resolve(__dirname, "target/scn-automation-plugin/build/js")
+            : path.resolve(__dirname, "target"),
     },
     resolve: {
         extensions: [".tsx", ".ts", ".jsx", ".js"],
