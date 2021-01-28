@@ -3,7 +3,9 @@ package com.scn.jira.worklog.types;
 import java.util.Collection;
 
 import com.atlassian.jira.bulkedit.operation.BulkMoveOperation;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
+import com.atlassian.jira.config.IssueTypeSchemeService;
 import com.atlassian.jira.config.LocaleManager;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -23,6 +25,7 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.types.translation.ExtendedTranslationManager;
 import com.scn.jira.worklog.types.translation.ScnViewTranslations;
 
+
 public class ExtendedViewTranslations extends ViewTranslations {
 	private static final long serialVersionUID = 3592917550021702454L;
 
@@ -37,14 +40,14 @@ public class ExtendedViewTranslations extends ViewTranslations {
 			ApplicationProperties applicationProperties, SearchProvider searchProvider, TranslationManager translationManager,
 			ConstantsManager constantsManager, JiraAuthenticationContext authenticationContext, IssueManager issueManager,
 			LocaleManager localeManager, ExtendedConstantsManager extendedConstantsManager,
-			IssueEventBundleFactory issueEventBundleFactory, BeanFactory beanFactory, BulkMoveOperation bulkMoveOperation) {
+			IssueEventBundleFactory issueEventBundleFactory, BeanFactory beanFactory, BulkMoveOperation bulkMoveOperation, IssueTypeSchemeService issueTypeSchemeService) {
 		super(configSchemeManager, issueTypeSchemeManager, fieldManager, optionSetManager, new IssueTypeManageableOption(
 				constantsManager, subTaskManager, applicationProperties, authenticationContext), bulkMoveOperation,
 		// new BulkMoveOperationImpl(
 		// ComponentAccessor.getWorkflowManager(), ComponentAccessor.getProjectManager(), fieldManager,
 		// ComponentAccessor.getIssueFactory(), issueManager, ComponentAccessor.getIssueEventManager(),
 		// new BulkEditBeanSessionHelper(), ComponentAccessor.getAttachmentManager(), issueEventBundleFactory),
-				searchProvider, translationManager, constantsManager, authenticationContext, issueManager, localeManager);
+				translationManager, constantsManager, authenticationContext, issueManager, localeManager, issueTypeSchemeService);
 
 		this.extendedConstantsManager = extendedConstantsManager;
 		this.beanFactory = beanFactory;

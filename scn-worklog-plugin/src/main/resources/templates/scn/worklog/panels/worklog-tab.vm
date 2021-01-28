@@ -16,10 +16,10 @@
         <div class="action-links">
             <a href="${requestContext.baseUrl}/browse/$worklog.issue.key?focusedWorklogId=$worklog.id&page=com.atlassian.jira.plugin.system.issuetabpanels%3Aworklog-tabpanel#worklog-$worklog.id" title="$i18n.getText('viewissue.worklog.permlink.title')" class="icon icon-perma"><span>$i18n.getText('viewissue.permlink')</span></a>
             #if ($action.canEditWorklog)
-                <a id="edit_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/UpdateWorklog2!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.edit')" class="edit-worklog-trigger"><span class="icon-default aui-icon aui-icon-small aui-iconfont-edit">$i18n.getText('common.words.edit')</span></a>
+                <a id="edit_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/UpdateWorklog!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.edit')" class="edit-worklog-trigger"><span class="icon-default aui-icon aui-icon-small aui-iconfont-edit">$i18n.getText('common.words.edit')</span></a>
             #end
             #if ($action.canDeleteWorklog)
-                <a id="delete_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/DeleteWorklog2!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.delete')" class="delete-worklog-trigger"><span class="icon-default aui-icon aui-icon-small aui-iconfont-delete">$i18n.getText('common.words.delete')</span></a>
+                <a id="delete_worklog_${worklog.id}" href="${requestContext.baseUrl}/secure/DeleteWorklog!default.jspa?id=${worklog.issue.id}&worklogId=${worklog.id}" title="$i18n.getText('common.words.delete')" class="delete-worklog-trigger"><span class="icon-default aui-icon aui-icon-small aui-iconfont-delete">$i18n.getText('common.words.delete')</span></a>
             #end
         </div>
         <div class="action-details">#worklogDetailsBody($worklog $i18n $dateFormatter)</div>

@@ -3,7 +3,7 @@
 
 ## Description
 
-Plugins for Jira 7.13.1
+Plugins for Jira 8.0.2
 
 Old plugins are stored in the repository:
 https://stash.scnsoft.com/projects/JWL/repos/sciencesoft.jwl

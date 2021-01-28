@@ -9,21 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.scn.jira.logtime.representation.DayRepresentation;
 import com.scn.jira.logtime.representation.WeekRepresentation;
 
 public class DateUtils {
-	protected static Logger logger = Logger.getLogger(DateUtils.class);
-	
 	public static String formatStringDay = "yyyy-MM-dd";
 	public static String formatStringDate = "dd-MM-yyyy";
 	public static String formatStringDateDb = "yyyyMMdd";
 	public static String monthlyFormatStringDate = "MMMM yyyy";
 	
 	public static List<String> getDatesList(Date startDate, Date endDate) {
-		
 		List<String> dates = new ArrayList<String>();
 		
 		Date date = startDate;
@@ -34,8 +29,7 @@ public class DateUtils {
 		return dates;
 	}
 	
-	public static List<String> getDatesList(Date startDate, Date endDate, String format) {
-		
+	public static List<String> getDatesList(Date startDate, Date endDate, String format) {	
 		List<String> dates = new ArrayList<String>();
 		
 		Date date = startDate;
@@ -135,8 +129,7 @@ public class DateUtils {
 		return df.format(cal.getTime());
 	}
 	
-	public static String formSlidePeriod(Date startDate, Date endDate, String type) {
-		
+	public static String formSlidePeriod(Date startDate, Date endDate, String type) {	
 		String period = "";
 		
 		if (type == null || type.equals("Weekly view")) {
@@ -185,37 +178,26 @@ public class DateUtils {
 	}
 	
 	public static String string1ToString2(String day) {
-		//System.out.println("Day BEFORE "+  day);
-		Date date = null;
 		if (day != null && !day.equals("")) {
-				
 				String[] dates = day.toString().split("-");
-				
 				return dates[2]+"-"+dates[1]+"-"+dates[0];
-			
 		}
 		return day;
 	}
-	
-	
-	
-	
-	public static List<Date> getDatesListDate(Date startDate, Date endDate) {
 		
+	public static List<Date> getDatesListDate(Date startDate, Date endDate) {	
 		List<Date> dates = new ArrayList<Date>();
 		
 		Date date = startDate;
 		while (date.before(endDate)) {
 			dates.add(date);
-			System.out.print(DateUtils.shortStringDate(date));
 			date = DateUtils.getStartDate(1, date);
 		}
 		
 		return dates;
 	}
 	
-	public static List<String> getStringListDate(Date startDate, Date endDate) {
-		
+	public static List<String> getStringListDate(Date startDate, Date endDate) {	
 		List<String> dates = new ArrayList<String>();
 		
 		Date date = startDate;
@@ -227,8 +209,7 @@ public class DateUtils {
 		return dates;
 	}
 	
-	public static Map<String, List<DayRepresentation>> getWeekMap(List<java.util.Date> datesWeek) {
-		
+	public static Map<String, List<DayRepresentation>> getWeekMap(List<java.util.Date> datesWeek) {	
 		Map<String, List<DayRepresentation>> weeksMap = new HashMap<String, List<DayRepresentation>>();
 		for (Date date : datesWeek) {
 			Calendar cal = Calendar.getInstance();
@@ -272,10 +253,7 @@ public class DateUtils {
 		return isWorking;
 	}
 	
-	
-	
 	public static List<WeekRepresentation> getWeekRepresentationList(List<java.util.Date> datesWeek, Map<String, Integer> userMap) {
-		
 		List<WeekRepresentation> weekRepresentations = new ArrayList<WeekRepresentation>();
 		
 		int weekRem = 0;
@@ -371,5 +349,4 @@ public class DateUtils {
 		
 		return cal.getTime();
 	}
-	
 }

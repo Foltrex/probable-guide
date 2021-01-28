@@ -1,19 +1,16 @@
 package com.scn.jira.worklog.globalsettings;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.PropertiesManager;
-import org.apache.commons.collections.CollectionUtils;
-
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.GlobalPermissionGroupAssociationUtil;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import org.apache.commons.collections.CollectionUtils;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GlobalSettingsWebAction extends JiraWebActionSupport {
 	private final GroupManager groupManager;
@@ -22,7 +19,7 @@ public class GlobalSettingsWebAction extends JiraWebActionSupport {
 	private List<String> wlGroups;
 
     @Inject
-	public GlobalSettingsWebAction(@ComponentImport final GroupManager groupManager) {
+	public GlobalSettingsWebAction(final GroupManager groupManager) {
 		this.groupManager = groupManager;
 	}
 

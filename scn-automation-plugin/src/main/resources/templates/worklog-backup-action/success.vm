@@ -1,0 +1,9 @@
+<html lang="en">
+<head>
+    <title>Worklog Backup</title>
+    <meta name="decorator" content="atl.general"/>
+</head>
+<body>
+<div id="scn-automation-root"></div>
+</body>
+</html>

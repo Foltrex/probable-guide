@@ -1,24 +1,22 @@
 package com.scn.jira.worklog.wl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import com.atlassian.jira.component.ComponentAccessor;
-import org.apache.log4j.Logger;
-import org.ofbiz.core.entity.GenericValue;
-
 import com.atlassian.jira.bc.JiraServiceContext;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
+import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.worklog.Worklog;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.Project;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
+import org.apache.log4j.Logger;
+import org.ofbiz.core.entity.GenericValue;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Component
 public class ExtendedWorklogService {
@@ -89,15 +87,16 @@ public class ExtendedWorklogService {
 		return result;
 	}
 
-	public boolean isDateExpired(JiraServiceContext jiraServiceContext, Date startDate, Project project, boolean isDeleteEvent) {
-		Date wlBlockingDate = scnProjectSettingsManager.getWLBlockingDate(project.getId());
-		long wlBlockingDateInMinutes = (long) Math.floor((wlBlockingDate != null ? wlBlockingDate.getTime() : 0L) / 60000L);
+	public boolean isDateExpired(JiraServiceContext jiraServiceContext, Date startDate, Project project,
+			boolean isDeleteEvent) {
+		Date wlBlockingDate = scnProjectSettingsManager.getWLWorklogBlockingDate(project.getId());
+		long wlBlockingDateInMinutes = (long) Math
+				.floor((wlBlockingDate != null ? wlBlockingDate.getTime() : 0L) / 60000L);
 		long startDateInMinutes = (long) Math.floor(startDate.getTime() / 60000L);
 		if (wlBlockingDateInMinutes - startDateInMinutes >= 0L) {
-			Locale locale = jiraServiceContext.getI18nBean().getLocale();
-			String blockingDate = this.fFactory.formatter().withLocale(locale).format(wlBlockingDate);
-			String msgKey = isDeleteEvent ? "scn.scnworklog.service.error.blocking.date.on.delete"
-					: "scn.scnworklog.service.error.blocking.date.on.save";
+			String blockingDate = formatDate(jiraServiceContext, wlBlockingDate);
+			String msgKey = isDeleteEvent ? "scn.scnworklog.service.error.wl.blocking.date.on.delete"
+					: "scn.scnworklog.service.error.wl.blocking.date.on.save";
 			String msgText = getText(jiraServiceContext, msgKey, blockingDate);
 			jiraServiceContext.getErrorCollection().addErrorMessage(msgText);
 			return true;
@@ -111,5 +110,10 @@ public class ExtendedWorklogService {
 
 	private String getText(JiraServiceContext jiraServiceContext, String key, String param) {
 		return jiraServiceContext.getI18nBean().getText(key, param);
+	}
+	
+	private String formatDate(JiraServiceContext serviceContext, Date date) {
+		Locale locale = serviceContext.getI18nBean().getLocale();
+		return fFactory.formatter().withLocale(locale).withStyle(DateTimeStyle.DATE).format(date);
 	}
 }

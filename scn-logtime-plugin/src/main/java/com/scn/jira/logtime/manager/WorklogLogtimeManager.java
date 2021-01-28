@@ -1,104 +1,52 @@
 package com.scn.jira.logtime.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueKey;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizListIterator;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.scn.jira.logtime.representation.CustomIssueDto;
-import com.scn.jira.logtime.store.ExtWorklogLogtimeStore;
+import com.scn.jira.logtime.representation.*;
 import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogStore;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.IScnUserBlockingManager;
 import com.scn.jira.worklog.core.wl.ExtWorklog;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
-import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import com.scn.jira.logtime.representation.LTIssueRepresentation;
-import com.scn.jira.logtime.representation.LTProjectRepresentation;
-import com.scn.jira.logtime.representation.WLLineIssueRepresentation;
-import com.scn.jira.logtime.representation.WLRepresentation;
-import com.scn.jira.logtime.representation.WLsRepresentation;
-import com.scn.jira.logtime.representation.WLsTypeRepresentation;
-import com.scn.jira.logtime.store.ScnWorklogLogtimeStore;
-import org.ofbiz.core.entity.EntityCondition;
-import org.ofbiz.core.entity.EntityFieldMap;
-import org.ofbiz.core.entity.EntityFindOptions;
-import org.ofbiz.core.entity.EntityOperator;
-import org.ofbiz.core.entity.GenericValue;
+import org.apache.log4j.Logger;
+import org.ofbiz.core.entity.*;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.*;
+
+@Named
 public class WorklogLogtimeManager implements IWorklogLogtimeManager {
+	private static final Logger LOGGER = Logger.getLogger(WorklogLogtimeManager.class);
 
-	private UserManager userManager;
-	private ProjectManager projectManager;
-	private IssueManager issueManager;
-	private PermissionManager permissionManager;
-	private ProjectRoleManager projectRoleManager;
-	private WorklogManager worklogManager;
-	private ExtendedConstantsManager extendedConstantsManager;
-	private ExtendedWorklogManager extendedWorklogManager;
-	
-	private UserUtil userUtil;
-	private IScnWorklogManager scnWorklogManager;
-	private IScnWorklogStore ofBizScnWorklogStore;
-	private IScnProjectSettingsManager projectSettignsManager;
-	private IScnUserBlockingManager scnUserBlockingManager;
-	private IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
-	private IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
-	private IScnWorklogService scnDefaultWorklogService;
-	
-	private Map<String, Map<String, Integer>> calendarMap;
-	
-	public WorklogLogtimeManager(UserManager userManager, ProjectManager projectManager, IssueManager issueManager, UserUtil userUtil,
-			PermissionManager permissionManager, IScnWorklogManager scnWorklogManager, ProjectRoleManager projectRoleManager,
-			WorklogManager worklogManager, ExtendedConstantsManager extendedConstantsManager, IScnWorklogStore ofBizScnWorklogStore,
-			IScnProjectSettingsManager projectSettignsManager, IScnUserBlockingManager scnUserBlockingManager,IScnWorklogService scnDefaultWorklogService) {
-		this.userManager = userManager;
-		this.projectManager = projectManager;
-		this.issueManager = issueManager;
-		this.userUtil = userUtil;
-		this.permissionManager = permissionManager;
-		this.scnWorklogManager = scnWorklogManager;
-		this.projectRoleManager = projectRoleManager;
-		this.worklogManager = worklogManager;
-		this.extendedConstantsManager = extendedConstantsManager;
-		this.ofBizScnWorklogStore = ofBizScnWorklogStore;
-		this.projectSettignsManager = projectSettignsManager;
-		this.scnUserBlockingManager = scnUserBlockingManager;
-		this.iExtWorklogLogtimeStore = new ExtWorklogLogtimeStore(issueManager, worklogManager, extendedWorklogManager);
-		this.iScnWorklogLogtimeStore = new ScnWorklogLogtimeStore(userManager, projectManager, issueManager, permissionManager, projectRoleManager,
-				worklogManager, extendedConstantsManager, ofBizScnWorklogStore, projectSettignsManager, scnUserBlockingManager,scnDefaultWorklogService);
-		this.calendarMap = new HashMap<String, Map<String, Integer>>();
+    private final ExtendedConstantsManager extendedConstantsManager;
+    private final IScnProjectSettingsManager projectSettignsManager;
+    private final IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
+	private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
+
+    private Map<String, Map<String, Integer>> calendarMap;
+
+	@Inject
+	public WorklogLogtimeManager(ExtendedConstantsManager extendedConstantsManager,
+                                 IScnProjectSettingsManager projectSettignsManager,
+                                 IExtWorklogLogtimeStore iExtWorklogLogtimeStore,
+                                 IScnWorklogLogtimeStore iScnWorklogLogtimeStore) {
+        this.extendedConstantsManager = extendedConstantsManager;
+        this.projectSettignsManager = projectSettignsManager;
+        this.iExtWorklogLogtimeStore = iExtWorklogLogtimeStore;
+        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
+		this.calendarMap = new HashMap<>();
 	}
 	
 	public List<Issue> getIssuesByProjectBetweenDates(Project project) throws DataAccessException {
@@ -111,6 +59,26 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 		return iScnWorklogLogtimeStore.getByProjectBetweenDates(assignedCh, project, startDate, endDate, user);
 	}
 	
+	@Override
+	public List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) {
+		try {
+			return iScnWorklogLogtimeStore.getProjectIdsWithScnWorklogsBetweenDates(projectIds, users, startDate, endDate);
+		} catch (DataAccessException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return projectIds;
+	}
+	
+	@Override
+	public List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) {
+		try {
+			return iExtWorklogLogtimeStore.getProjectIdsWithExtWorklogsBetweenDates(projectIds, users, startDate, endDate);
+		} catch (DataAccessException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return projectIds;
+	}
+	
 	public List<ExtWorklog> getExtWorklogsByProjectBetweenDates(Project project, Date startDate, Date endDate, String user, boolean assignedCh)
 			throws DataAccessException {
 		return iExtWorklogLogtimeStore.getExtWorklogsByProjectBetweenDates(assignedCh, project, startDate, endDate, user);
@@ -120,7 +88,7 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 		OfBizListIterator issueIterator = null;
 		List<CustomIssueDto> issues = new ArrayList<CustomIssueDto>();
 		try {
-			issueIterator = ComponentAccessor.getOfBizDelegator().findListIteratorByCondition("Issue", new EntityFieldMap(ImmutableMap.of("project", project.getId()), EntityOperator.AND), (EntityCondition)null, ImmutableList.of("id", "number", "summary"), (List)null, (EntityFindOptions)null);
+			issueIterator = ComponentAccessor.getOfBizDelegator().findListIteratorByCondition("Issue", new EntityFieldMap(ImmutableMap.of("project", project.getId()), EntityOperator.AND), (EntityCondition)null, ImmutableList.of("id", "number", "summary"), (List<String>)null, (EntityFindOptions)null);
 			for(GenericValue issueIdGV = issueIterator.next(); issueIdGV != null; issueIdGV = issueIterator.next()) {
 				issues.add(new CustomIssueDto(issueIdGV.getLong("id"), IssueKey.format(project, issueIdGV.getLong("number")), issueIdGV.getString("summary")));
 			}
@@ -134,7 +102,6 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 
 	public LTProjectRepresentation getLTProjectRepresentationBetweenDates(ApplicationUser loggedUser, Project project, Date startDate, Date endDate,
 			boolean scnWlCheck, boolean extWlCheck, boolean assignedCh, String user) throws DataAccessException {
-		
 		Date startPlus = startDate;
 		Date endPlus = endDate;
 		//if(user.equals(loggedUser.getName())){
@@ -204,9 +171,6 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			
 			issueExtWorkLogsMap.put(issueId, extWorkLogsMap);
 		}
-		
-		System.out.println("User: " + user + "Worklogs for project: " + project.getName() + " Size Int : " + iScnWorklogs.size() + " Size Ext : "
-				+ extWorklogs.size());
 		
 		ltProjectRepresentation.setId(project.getId());
 		ltProjectRepresentation.setName(TextFormatUtil.replaceHTMLSymbols(project.getName()));
@@ -351,11 +315,11 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			
 			List<WLsTypeRepresentation> wLsTypeRepresentationList = new ArrayList<WLsTypeRepresentation>();
 			
-			Iterator typeDayIterator = typeDayRepresentation.keySet().iterator();
+			Iterator<String> typeDayIterator = typeDayRepresentation.keySet().iterator();
 			// А тут мы побежали по ишью у проекта в которых есть ворклоги хоть
 			// какие за этот период у этого автора
 			while (typeDayIterator.hasNext()) {
-				String type = (String) typeDayIterator.next();
+				String type = typeDayIterator.next();
 				
 				int maxSize = typeSize.get(type) == null ? 0 : typeSize.get(type).intValue();
 				for (int i = 0; i < maxSize; i++) {
@@ -375,7 +339,6 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 						Integer status = 0;
 						if(userCalMap!=null){
 							status = userCalMap.get(DateUtils.string1ToString2(date));
-							//System.out.println("We got the status of user  date: " + date+ " status " + status);
 						}	
 						
 						List<WLsRepresentation> wLsRepresentations = dayRepr.get(date);
@@ -468,14 +431,12 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			
 			wlRepresentation.setWlScnRepresentation(makeWLRepresentation(scnWorklog, status));
 			if (scnWorklog.getLinkedWorklog() != null) {
-				ids.add(String.valueOf(scnWorklog.getLinkedWorklog().getId()));
 				ExtWorklog extWorklog = getExtWorklogById(extWorklogs, scnWorklog.getLinkedWorklog().getId());
-				if (extWorklog != null) {
+				if (extWorklog != null && wlRepresentation.getWlTypeId().equals(extWorklog.getWorklogTypeId())) {
+					ids.add(String.valueOf(scnWorklog.getLinkedWorklog().getId()));
 					wlRepresentation.setWlExtRepresentation(makeWLRepresentation(extWorklog, status));
-				}
-				else {
+				} else {
 					wlRepresentation.setWlExtRepresentation(new WLRepresentation(day, status));
-					
 				}
 			}
 			else {
@@ -484,7 +445,7 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 			wlList.add(wlRepresentation);
 		}
 		for (ExtWorklog extWorklog : extWorklogs) {
-			if (!ids.contains(String.valueOf(extWorklog.getId()))) {
+			if (extWorklog != null && extWorklog.getId() != null && !ids.contains(String.valueOf(extWorklog.getId()))) {
 				
 				WLsRepresentation wlRepresentation = new WLsRepresentation();
 				wlRepresentation.setDay(day);
@@ -531,32 +492,28 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 	}
 	
 	public ExtWorklog getExtWorklogById(List<ExtWorklog> extWorklogs, Long id) throws DataAccessException {
-		for (ExtWorklog extWorklog : extWorklogs) {
-			if (extWorklog.getId().longValue() == id.longValue()) {
+		for (ExtWorklog extWorklog : extWorklogs)
+			if (extWorklog.getId().longValue() == id.longValue())
 				return extWorklog;
-			}
-		}
-		
+
 		return null;
 	}
 	
 	public String makeUrl(String key, String name) {
 		String allUrl = key + " - " + name;
 		String url = "";
-		
+
 		String finalString = "";
 		String[] words = allUrl.split(" ");
 		for (String word : words) {
 			finalString = finalString.length() == 0 ? word : finalString + " " + word;
-			if (finalString.length() > 40) {
+			if (finalString.length() > 40)
 				return url + "...";
-			}
-			else {
+			else
 				url = finalString;
-			}
 		}
+
 		return url;
-		
 	}
 
 	public Map<String, Map<String, Integer>> getCalendarMap() {
@@ -566,9 +523,4 @@ public class WorklogLogtimeManager implements IWorklogLogtimeManager {
 	public void setCalendarMap(Map<String, Map<String, Integer>> calendarMap) {
 		this.calendarMap = calendarMap;
 	}
-
-	
-	
-	
-	
 }

@@ -1,42 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" pluginsVersion="2">
-	<plugin-info>
-	    <description>${project.description}</description>
-	    <version>${project.version}</version>
-	    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
-	</plugin-info>
+<atlassian-plugin key="${atlassian.plugin.key}"
+                  name="${project.name}" pluginsVersion="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}"
+                url="${project.organization.url}"/>
+        <param name="plugin-icon">images/scnLogo.png</param>
+        <param name="plugin-logo">images/scnLogo.png</param>
+        <param name="atlassian-data-center-status">compatible</param>
+        <param name="atlassian-data-center-compatible">true</param>
+        <param name="plugin-type">both</param>
+    </plugin-info>
 
-	<gadget key="mytime-gadget" name="JIRA ScienceSoft MyTime Gadget"
-		location="gadget.xml" />
+    <gadget key="mytime-gadget"
+            name="JIRA ScienceSoft MyTime Gadget" location="gadget.xml"/>
 
     <web-resource key="my-resources">
-        <resource type="download" name="i18n/ALL_ALL.xml" location="i18n/ALL_ALL.xml">
-            <param name="content-type" value="text/xml; charset=UTF-8" />
+        <resource type="download" name="i18n/ALL_ALL.xml"
+                  location="i18n/ALL_ALL.xml">
+            <param name="content-type" value="text/xml; charset=UTF-8"/>
         </resource>
 
-        <resource type="download" name="css/scn-mytime-gadget-plugin.css" location="css/scn-mytime-gadget-plugin.css">
-            <param name="content-type" value="text/css; charset=UTF-8" />
+        <resource type="download"
+                  name="css/scn-mytime-gadget-plugin.css"
+                  location="css/scn-mytime-gadget-plugin.css">
+            <param name="content-type" value="text/css; charset=UTF-8"/>
         </resource>
 
-        <resource type="download" name="css/images/back.png" location="css/images/back.png">
-            <param name="content-type" value="image/png; charset=UTF-8" />
+        <resource type="download" name="css/images/back.png"
+                  location="css/images/back.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
         </resource>
 
-        <resource type="download" name="css/images/forward.png" location="css/images/forward.png">
-            <param name="content-type" value="image/png; charset=UTF-8" />
+        <resource type="download" name="css/images/forward.png"
+                  location="css/images/forward.png">
+            <param name="content-type" value="image/png; charset=UTF-8"/>
         </resource>
 
-        <resource type="i18n" name="i18n" location="scn-mytime-gadget-plugin" />
+        <resource type="i18n" name="i18n"
+                  location="scn-mytime-gadget-plugin"/>
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.jira.gadgets:common</dependency>
     </web-resource>
 
-	<!--&lt;!&ndash; Automatically finds all JAX-RS resource classes in the plugin and publishes -->
-		<!--them. &ndash;&gt;-->
-	<rest key="mytime-gadget-rest-resources" path="/mytime-gadget"
-		version="1.0">
-		<description>Provides the REST resource for the project list.</description>
-	</rest>
-
+    <!--&lt;!&ndash; Automatically finds all JAX-RS resource classes in the
+        plugin and publishes -->
+    <!--them. &ndash;&gt; -->
+    <rest key="mytime-gadget-rest-resources" path="/mytime-gadget"
+          version="1.0">
+        <description>Provides the REST resource for the project list.
+        </description>
+    </rest>
 </atlassian-plugin>

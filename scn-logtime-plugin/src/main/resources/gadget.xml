@@ -98,7 +98,7 @@
                 <td class="filterView">
                     <div style="display: flex;">
                         <button id="backbtn" class="back-btn" onclick="slideBack()" > </button>
-                        <label id="periodId"></label>
+                        <button id="periodId" class="aui-button aui-date-picker" type="date" onchange="changePeriod()"></button>
                         <button id="forwardbtn" class="forward-btn" onclick="slideForward()" > </button>
                         <button id="viewButton" class="btn-view" style="margin-left:20px" onclick="changeView()">Weekly view</button>
                         <button class="showWorklog" style="margin-left:10px" onclick="reloadMeClean()">Show Work Log </button>
@@ -114,7 +114,11 @@
 		<br></br>
 
 		 <script type="text/javascript">
-			 			 
+				AJS.$(document).ready(function() {
+    				AJS.$('#periodId').datePicker({
+    					'overrideBrowserDefault': true
+    				});
+				});
 			    // Get userprefs
 			   //var prefs = new gadgets.Prefs();
 			
@@ -155,12 +159,12 @@
                 // :(
                 setTimeout(function() {
                     while (true) {
-                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery.data(jQuery("#myFieldId")[0], "events" ) &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
-                            jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
+                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery._data(jQuery("#myFieldId")[0], "events" ) &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
+                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
                             ) {
-                               var keyupaction = jQuery.data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
+                               var keyupaction = jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
                                AJS.$("#myFieldId").off("keyup");
                                AJS.$("#myFieldId").on("keyup", function() {
                                     if (AJS.$("#myFieldId").val() && AJS.$("#myFieldId").val().length > 2) {
@@ -291,7 +295,6 @@
             	              
                 prj_check_list_string="";
             	prj_check_cnt = 0;
-            	console.log("selected projects:");
             	for (ii=1; ii<=projectArr.length; ii++)
             	{
             		var check_id = "ddcl-s1-i"+ii;
@@ -303,7 +306,6 @@
             			}else{            			
             				prj_check_list_string=prj_check_list_string + ", "+ projectArr[ii-1];
             			}
-            			console.log(projectArr[ii-1]);
             		} 
             	}
             	
@@ -317,8 +319,8 @@
                     baseUrl: "__ATLASSIAN_BASE_URL__",
                     useOauth: "/rest/gadget/1.0/currentUser",                   
 					view:{
-                        onResizeAdjustHeight: true,
-                        onResizeReload: true,
+                        onResizeAdjustHeight: false,
+                        onResizeReload: false,
 						enableReload: true,
                         template: function(args) {
                             var gadget = this;
@@ -374,8 +376,8 @@
             	reloadMe();
             	currentPeriod=0;
 			};		
-			
-			
+
+
 			function slideForward(){
 				currentPeriod=0;	
 				
@@ -394,6 +396,15 @@
 				slideStep = document.getElementById('slideStepHidden').value;
 				
 				reloadMe();			
+			}
+
+			function changePeriod() {
+    			let periodicity = (document.getElementById('viewButton').innerHTML === 'Weekly view') ? 'month' : 'isoWeek';
+    			let diff = moment(AJS.$('#periodId').val()).startOf(periodicity).diff(moment().startOf(periodicity), (periodicity === 'month') ? 'months' : 'weeks', true);
+    			currentPeriod = 0;
+    			AJS.$('#slideStepHidden').val(diff);
+    			slideStep = diff;
+    			reloadMe();
 			}
 			
 			function customKeyUp(event,isScn,userIdentifier,identifierSE,value,idetifier){

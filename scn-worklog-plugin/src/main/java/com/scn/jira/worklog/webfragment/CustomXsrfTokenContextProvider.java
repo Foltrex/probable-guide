@@ -11,7 +11,7 @@ import javax.inject.Named;
 public class CustomXsrfTokenContextProvider extends XsrfTokenContextProvider {
 
     @Inject
-    public CustomXsrfTokenContextProvider(@ComponentImport XsrfTokenGenerator xsrfTokenGenerator) {
+    public CustomXsrfTokenContextProvider(XsrfTokenGenerator xsrfTokenGenerator) {
         super(xsrfTokenGenerator);
     }
 }

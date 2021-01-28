@@ -1,7 +1,6 @@
 package com.scn.jira.worklog.rest.util;
 
 public class JiraScnRestServiceUtil {
-
 	// scn worklog xml properties
 	public static final String ID_ATTR_NAME = "id";
 	public static final String COMMENT_ATTR_NAME = "comment";
@@ -15,11 +14,11 @@ public class JiraScnRestServiceUtil {
 	public static final String CREATED_ATTR_NAME = "created";
 	public static final String UPDATED_ATTR_NAME = "updated";
 	public static final String WORKLOG_TYPE_ATTR_NAME = "worklogType";
-	
-	// scn extended issue 
+
+	// scn extended issue
 	public static final String ISSUE_KEY_ATTR_NAME = "issueKey";
+	public static final String ISSUE_ID_ATTR_NAME = "issueId";
 	public static final String ORIGINAL_EST_ATTR_NAME = "originalEstimate";
 	public static final String ESTIMATE_LEVEL_ATTR_NAME = "estimate";
 	public static final String TIMESPENT_ATTR_NAME = "timeSpent";
-	
 }

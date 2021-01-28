@@ -15,7 +15,7 @@ public class WLTypesStore implements IWLTypesStore {
 	private final ActiveObjects ao;
 
 	@Inject
-	public WLTypesStore(@ComponentImport final ActiveObjects ao) {
+	public WLTypesStore(final ActiveObjects ao) {
 		this.ao = ao;
 	}
 

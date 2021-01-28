@@ -6,18 +6,12 @@ import net.jcip.annotations.Immutable;
 
 @Immutable
 @XmlRootElement
-public class TimeSheetRepresentation
-{
+public class TimeSheetRepresentation {
 
-  @XmlElement
-  private String html;
+	@XmlElement
+	private String html;
 
-  private TimeSheetRepresentation()
-  {
-  }
-
-  public TimeSheetRepresentation(String html)
-  {
-    this.html = html;
-  }
+	public TimeSheetRepresentation(String html) {
+		this.html = html;
+	}
 }

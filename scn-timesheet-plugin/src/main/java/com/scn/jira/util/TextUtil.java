@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.atlassian.core.util.DateUtils;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.customfields.statistics.CustomFieldStattable;
 import com.atlassian.jira.issue.fields.AffectedVersionsSystemField;
@@ -30,12 +31,8 @@ import com.atlassian.jira.issue.fields.IssueTypeSystemField;
 import com.atlassian.jira.issue.statistics.StatisticsMapper;
 import com.atlassian.jira.ofbiz.OfBizValueWrapper;
 import com.atlassian.jira.web.bean.I18nBean;
-import com.atlassian.jira.web.util.OutlookDate;
 
 public class TextUtil {
-	
-	//private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TextUtil.class);
-	
 	private double hoursPerDay;
 	private double daysPerWeek;
 	private ResourceBundle resourceBundle;
@@ -45,9 +42,6 @@ public class TextUtil {
 	private DateFormat dateFormat1;
 	private DateFormat dateFormat2;
 	
-	private TextUtil() {
-	}
-
 	public TextUtil(I18nBean i18nBean) {
 		ApplicationProperties ap = ComponentAccessor.getApplicationProperties();
 		this.hoursPerDay = new Double(ap.getDefaultBackedString("jira.timetracking.hours.per.day"))
@@ -115,7 +109,7 @@ public class TextUtil {
 		return this.percentFormat.format(percents);
 	}
 
-	public static String getFieldValue(String groupByFieldID, Issue issue, OutlookDate outlookDate) {
+	public static String getFieldValue(String groupByFieldID, Issue issue, DateTimeFormatter formatter) {
 		Field groupByField = ComponentAccessor.getFieldManager().getField(groupByFieldID);
 
 		String fieldValue = null;
@@ -132,18 +126,18 @@ public class TextUtil {
 				if (value instanceof List)
 					fieldValue = getMultiValue((List) value);
 				else if (value instanceof Date)
-					fieldValue = outlookDate.format((Date) value);
+					fieldValue = formatter.format((Date) value);
 				else
 					fieldValue = value.toString();
 			}
 		} else if (groupByField instanceof ComponentsSystemField) {
-			fieldValue = getMultiValue(issue.getComponentObjects());
+			fieldValue = getMultiValue(issue.getComponents());
 		} else if (groupByField instanceof AffectedVersionsSystemField) {
 			fieldValue = getMultiValue(issue.getAffectedVersions());
 		} else if (groupByField instanceof FixVersionsSystemField) {
 			fieldValue = getMultiValue(issue.getFixVersions());
 		} else if (groupByField instanceof IssueTypeSystemField) {
-			fieldValue = issue.getIssueTypeObject().getNameTranslation();
+			fieldValue = issue.getIssueType().getNameTranslation();
 		} else {
 			try {
 				fieldValue = issue.getString(groupByFieldID);

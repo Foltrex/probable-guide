@@ -8,101 +8,117 @@
 	<author>Ihar Khadarovich</author>
 	<version>3.0</version>
 
-    <entity entity-name="ScnExtendedIssue" table-name="jiraissue_extended_scn" package-name="">
-        <field name="id" type="numeric"/>
-        <field name="issue" col-name="issue_id" type="numeric"/>
-        <field name="timeoriginalestimate" type="numeric"/>
-        <field name="timeestimate" type="numeric"/>
-        <field name="timespent" type="numeric"/>
+	<entity entity-name="ScnExtendedIssue"
+		table-name="jiraissue_extended_scn" package-name="">
+		<field name="id" type="numeric" />
+		<field name="issue" col-name="issue_id" type="numeric" />
+		<field name="timeoriginalestimate" type="numeric" />
+		<field name="timeestimate" type="numeric" />
+		<field name="timespent" type="numeric" />
 
-		<prim-key field="id"/>
+		<prim-key field="id" />
 
-        <relation type="one" title="Parent" rel-entity-name="Issue">
-            <key-map field-name="issue" rel-field-name="id"/>
-        </relation>
+		<relation type="one" title="Parent" rel-entity-name="Issue">
+			<key-map field-name="issue" rel-field-name="id" />
+		</relation>
 
-        <index name="scnextendedissue_issue_idx">
-            <index-field name="issue"/>
-        </index>
-    </entity>
-    
-    <entity entity-name="ScnWorklog" table-name="worklog_scn" package-name="">
-        <field name="id" type="numeric"/>
-		<field name="linkedWorklog" col-name="worklog_id" type="numeric"/>
-        <field name="issue" col-name="issueid" type="numeric"/>
+		<index name="scnextendedissue_issue_idx">
+			<index-field name="issue" />
+		</index>
+	</entity>
 
-        <field name="author" type="long-varchar"/>
-        <field name="grouplevel" col-name="grouplevel" type="long-varchar"/>
-        <field name="rolelevel" col-name="rolelevel" type="numeric"/>
-        <field name="body" col-name="worklogbody" type="extremely-long"/>
-        <field name="created" type="date-time"/>
-        <field name="updateauthor" type="long-varchar"/>
-        <field name="updated" type="date-time"/>
-        <field name="startdate" type="date-time"/>
-        <field name="timeworked" col-name="timeworked" type="numeric"/>
+	<entity entity-name="ScnWorklog" table-name="worklog_scn"
+		package-name="">
+		<field name="id" type="numeric" />
+		<field name="linkedWorklog" col-name="worklog_id" type="numeric" />
+		<field name="issue" col-name="issueid" type="numeric" />
+
+		<field name="author" type="long-varchar" />
+		<field name="grouplevel" col-name="grouplevel"
+			type="long-varchar" />
+		<field name="rolelevel" col-name="rolelevel" type="numeric" />
+		<field name="body" col-name="worklogbody" type="extremely-long" />
+		<field name="created" type="date-time" />
+		<field name="updateauthor" type="long-varchar" />
+		<field name="updated" type="date-time" />
+		<field name="startdate" type="date-time" />
+		<field name="timeworked" col-name="timeworked" type="numeric" />
 		<field name="worklogtype" type="short-varchar" />
 
-        <prim-key field="id"/>
+		<prim-key field="id" />
 
-		<relation type="one" title="Parent" rel-entity-name="WorklogType">
+		<relation type="one" title="Parent"
+			rel-entity-name="WorklogType">
 			<key-map field-name="worklogtype" rel-field-name="id" />
-		</relation>        
+		</relation>
 
-        <relation type="one" title="Parent" rel-entity-name="Issue">
-            <key-map field-name="issue" rel-field-name="id"/>
-        </relation>
+		<relation type="one" title="Parent" rel-entity-name="Issue">
+			<key-map field-name="issue" rel-field-name="id" />
+		</relation>
 
-        <relation type="one" title="Parent" rel-entity-name="Worklog">
-            <key-map field-name="linkedWorklog" rel-field-name="id"/>
-        </relation>
+		<relation type="one" title="Parent" rel-entity-name="Worklog">
+			<key-map field-name="linkedWorklog" rel-field-name="id" />
+		</relation>
 
-        <index name="worklog_issue_scn">
-            <index-field name="issue"/>
-        </index>
-        <index name="worklog_linkedworklog_scn">
-            <index-field name="linkedWorklog"/>
-        </index>
-    </entity>
-    
-    <view-entity entity-name="ScnWorklogCount" package-name="">
-      <member-entity entity-alias="W" entity-name="ScnWorklog" />
-      <alias entity-alias="W" field="id" function="count" name="count" />
-      <alias entity-alias="W" field="grouplevel" name="grouplevel"/>
-      <alias entity-alias="W" field="rolelevel" name="rolelevel"/>
-    </view-entity>
-    
-    <view-entity entity-name="ScnWorklogMax" package-name="">
-      <member-entity entity-alias="W" entity-name="ScnWorklog" />
-      <alias entity-alias="W" field="id" function="max" name="max" />
-    </view-entity>
-    
-	<view-entity entity-name="ScnWorklogByProjectView" package-name="">
-      <member-entity entity-alias="_project" entity-name="Project" />
-      <member-entity entity-alias="_issue" entity-name="Issue" />
-	  <member-entity entity-alias="_scnWorklog" entity-name="ScnWorklog" />
+		<index name="worklog_issue_scn">
+			<index-field name="issue" />
+		</index>
+		<index name="worklog_linkedworklog_scn">
+			<index-field name="linkedWorklog" />
+		</index>
+	</entity>
 
-	  <alias entity-alias="_project" field="id" name="projectId" />
-	  <alias entity-alias="_issue" field="id" name="issueId" />
-	  
-	  <alias entity-alias="_scnWorklog" field="id" name="id" />	  
-	  <alias entity-alias="_scnWorklog" field="linkedWorklog" name="linkedWorklog" />
-	  <alias entity-alias="_scnWorklog" field="issue" name="issue" />
-	  <alias entity-alias="_scnWorklog" field="author" name="author" />		
-	  <alias entity-alias="_scnWorklog" field="grouplevel" name="grouplevel" />	
-	  <alias entity-alias="_scnWorklog" field="rolelevel" name="rolelevel" />		
-	  <alias entity-alias="_scnWorklog" field="body" name="body" />		  
-	  <alias entity-alias="_scnWorklog" field="created" name="created" />		
-      <alias entity-alias="_scnWorklog" field="updateauthor" name="updateauthor" />		
-	  <alias entity-alias="_scnWorklog" field="updated" name="updated" />		  
-	  <alias entity-alias="_scnWorklog" field="startdate" name="startdate" />	
-	  <alias entity-alias="_scnWorklog" field="timeworked" name="timeworked" />	
-	  <alias entity-alias="_scnWorklog" field="worklogtype" name="worklogtype" />
+	<view-entity entity-name="ScnWorklogCount" package-name="">
+		<member-entity entity-alias="W" entity-name="ScnWorklog" />
+		<alias entity-alias="W" field="id" function="count" name="count" />
+		<alias entity-alias="W" field="grouplevel" name="grouplevel" />
+		<alias entity-alias="W" field="rolelevel" name="rolelevel" />
+	</view-entity>
 
-      <view-link entity-alias="_project" rel-entity-alias="_issue" rel-optional="false">
-        <key-map field-name="id" rel-field-name="project" />
-      </view-link>
-      <view-link entity-alias="_issue" rel-entity-alias="_scnWorklog" rel-optional="false">
-        <key-map field-name="id" rel-field-name="issue" />
-      </view-link>	  
-    </view-entity>		
+	<view-entity entity-name="ScnWorklogMax" package-name="">
+		<member-entity entity-alias="W" entity-name="ScnWorklog" />
+		<alias entity-alias="W" field="id" function="max" name="max" />
+	</view-entity>
+
+	<view-entity entity-name="ScnWorklogByProjectView"
+		package-name="">
+		<member-entity entity-alias="_project"
+			entity-name="Project" />
+		<member-entity entity-alias="_issue" entity-name="Issue" />
+		<member-entity entity-alias="_scnWorklog"
+			entity-name="ScnWorklog" />
+
+		<alias entity-alias="_project" field="id" name="projectId" />
+		<alias entity-alias="_issue" field="id" name="issueId" />
+
+		<alias entity-alias="_scnWorklog" field="id" name="id" />
+		<alias entity-alias="_scnWorklog" field="linkedWorklog"
+			name="linkedWorklog" />
+		<alias entity-alias="_scnWorklog" field="issue" name="issue" />
+		<alias entity-alias="_scnWorklog" field="author" name="author" />
+		<alias entity-alias="_scnWorklog" field="grouplevel"
+			name="grouplevel" />
+		<alias entity-alias="_scnWorklog" field="rolelevel"
+			name="rolelevel" />
+		<alias entity-alias="_scnWorklog" field="body" name="body" />
+		<alias entity-alias="_scnWorklog" field="created" name="created" />
+		<alias entity-alias="_scnWorklog" field="updateauthor"
+			name="updateauthor" />
+		<alias entity-alias="_scnWorklog" field="updated" name="updated" />
+		<alias entity-alias="_scnWorklog" field="startdate"
+			name="startdate" />
+		<alias entity-alias="_scnWorklog" field="timeworked"
+			name="timeworked" />
+		<alias entity-alias="_scnWorklog" field="worklogtype"
+			name="worklogtype" />
+
+		<view-link entity-alias="_project" rel-entity-alias="_issue"
+			rel-optional="false">
+			<key-map field-name="id" rel-field-name="project" />
+		</view-link>
+		<view-link entity-alias="_issue"
+			rel-entity-alias="_scnWorklog" rel-optional="false">
+			<key-map field-name="id" rel-field-name="issue" />
+		</view-link>
+	</view-entity>
 </entitymodel>    

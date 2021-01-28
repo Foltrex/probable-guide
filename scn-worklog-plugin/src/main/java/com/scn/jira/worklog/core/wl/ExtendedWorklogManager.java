@@ -7,15 +7,14 @@ import org.ofbiz.core.entity.GenericValue;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.worklog.Worklog;
 
-public interface ExtendedWorklogManager
-{
-	public Worklog createExtWorklogType(Worklog worklog, String _worklogTypeId) throws DataAccessException;
-	
-	public List<GenericValue> getExtWorklogsByType(String worklogTypeId);
+public interface ExtendedWorklogManager {
+    Worklog createExtWorklogType(Worklog worklog, String _worklogTypeId) throws DataAccessException;
 
-	public void updateExtWorklogType(Long _worklogId, String _worklogType) throws DataAccessException;
+    List<GenericValue> getExtWorklogsByType(String worklogTypeId);
 
-	public GenericValue getExtWorklog(Long _worklogId) throws DataAccessException;
-	
-	public boolean deleteExtWorklogType(Long worklogId) throws DataAccessException;
+    void updateExtWorklogType(Long _worklogId, String _worklogType) throws DataAccessException;
+
+    GenericValue getExtWorklog(Long _worklogId) throws DataAccessException;
+
+    boolean deleteExtWorklogType(Long worklogId) throws DataAccessException;
 }

@@ -158,7 +158,4 @@ public class LTProjectRepresentation {
 	public void setPermission(Boolean permission) {
 		this.permission = permission;
 	}
-	
-	
-
 }

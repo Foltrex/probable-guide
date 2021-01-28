@@ -1,8 +1,5 @@
 package com.scn.jira.worklog.scnwl;
 
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import org.apache.commons.lang.StringUtils;
-
 import com.atlassian.core.util.DateUtils;
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -11,69 +8,63 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
-import com.atlassian.jira.web.FieldVisibilityManager;
-import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
+import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
-import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
-import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
+import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
+import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
+import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import org.apache.commons.lang.StringUtils;
 
-import javax.inject.Inject;
-
+import java.util.Objects;
 
 public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5362590359328831184L;
-	
-	private Long newEstimateLong;
+    private static final long serialVersionUID = -5362590359328831184L;
+
+    private Long newEstimateLong;
     private IScnWorklog worklog;
 
-    @Inject
     public UpdateScnWorklogAction(ProjectRoleManager projectRoleManager,
-    		GroupManager groupManager,
-    		IScnExtendedIssueStore extIssueStore, 
-    		IScnWorklogService scnWorklogService,
-    		IScnProjectSettingsManager projectSettignsManager,
-    		ExtendedConstantsManager extendedConstantsManager) 
-    {
-    	super(ComponentAccessor.getComponent(CommentService.class),
-    			projectRoleManager, 
-    			ComponentAccessor.getComponent(JiraDurationUtils.class), 
-    			groupManager, 
-    			extIssueStore, 
-    			scnWorklogService,
-    			projectSettignsManager, 
-    			extendedConstantsManager);
+                                  GroupManager groupManager,
+                                  IScnWorklogService scnWorklogService) {
+        super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager,
+            ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
+            new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
+            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
+            new DefaultExtendedConstantsManager());
     }
 
-    public String doDefault() throws Exception {        
+    @Override
+    public String doDefault() throws Exception {
         this.worklog = this.scnWorklogService.getById(getJiraServiceContext(), getWorklogId());
         if (this.worklog == null) {
-            addErrorMessage(getJiraServiceContext().getI18nBean().getText("logwork.error.update.invalid.id", (getWorklogId() == null) ? null : getWorklogId().toString()));
+            addErrorMessage(getJiraServiceContext().getI18nBean().getText("logwork.error.update.invalid.id",
+                (getWorklogId() == null) ? null : getWorklogId().toString()));
             return "error";
         }
         if (!this.scnWorklogService.hasPermissionToUpdate(getJiraServiceContext(), this.worklog)) {
             return "securitybreach";
         }
 
-        setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent().longValue(), getHoursPerDay().intValue(), getDaysPerWeek().intValue()));
+        setTimeLogged(DateUtils.getDurationString(this.worklog.getTimeSpent(), getHoursPerDay().intValue(),
+            getDaysPerWeek().intValue()));
         setStartDate(getFormattedStartDate(this.worklog.getStartDate()));
         setComment(this.worklog.getComment());
         setWorklogType(this.worklog.getWorklogTypeId());
-        setCommentLevel(CommentVisibility.getCommentLevelFromLevels(this.worklog.getGroupLevel(), this.worklog.getRoleLevelId()));
+        setCommentLevel(CommentVisibility.getCommentLevelFromLevels(this.worklog.getGroupLevel(),
+            this.worklog.getRoleLevelId()));
 
         return super.doDefault();
     }
 
-    public void doValidation() {
+    @Override
+    protected void doValidation() {
         CommentVisibility visibility = getCommentVisibility();
 
-        if ("new".equalsIgnoreCase(this.adjustEstimate)) {
-            IScnWorklogService.WorklogNewEstimateResult worklogNewEstimateResult = this.scnWorklogService.validateUpdateWithNewEstimate(
-                    getJiraServiceContext(), getWorklogId(), getTimeLogged(), getParsedStartDate(),
-                    getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(), getNewEstimate(), getWorklogType());
+        if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(this.adjustEstimate)) {
+            IScnWorklogService.WorklogNewEstimateResult worklogNewEstimateResult = this.scnWorklogService
+                .validateUpdateWithNewEstimate(getJiraServiceContext(), getWorklogId(), getTimeLogged(),
+                    getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(),
+                    getNewEstimate(), getWorklogType());
 
             if (worklogNewEstimateResult != null) {
                 this.worklog = worklogNewEstimateResult.getWorklog();
@@ -81,60 +72,59 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
             }
         } else {
             this.worklog = this.scnWorklogService.validateUpdate(getJiraServiceContext(), getWorklogId(),
-                    getTimeLogged(), getParsedStartDate(), getComment(), visibility.getGroupLevel(), visibility.getRoleLevel(), getWorklogType());
+                getTimeLogged(), getParsedStartDate(), getComment(), visibility.getGroupLevel(),
+                visibility.getRoleLevel(), getWorklogType());
         }
 
-        if (projectSettignsManager.isWLTypeRequired(getIssueObject().getProjectObject().getId()) && StringUtils.isBlank(getWorklogType()))
-        	getJiraServiceContext().getErrorCollection().addError("worklogType", getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+        if (projectSettignsManager.isWLTypeRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId())
+            && StringUtils.isBlank(getWorklogType()))
+            getJiraServiceContext().getErrorCollection().addError("worklogType",
+                getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
 
         ApplicationUser reporter = null;
         if (!StringUtils.isBlank(getInputReporter())) {
             reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
         }
-        
-        if (reporter == null) {            
+
+        if (reporter == null) {
             getJiraServiceContext().getErrorCollection().addError("inputReporter",
-                    getJiraServiceContext().getI18nBean().getText("logwork.reporter.error.null"));            
+                getJiraServiceContext().getI18nBean().getText("logwork.reporter.error.null"));
         } else if (worklog != null) {
-        	worklog = reassignWorklog(worklog, reporter);
-        }               
+            worklog = reassignWorklog(worklog, reporter);
+        }
     }
 
-    public String doExecute() throws Exception {
-    	if ("auto".equalsIgnoreCase(this.adjustEstimate)) {
-            this.scnWorklogService.updateAndAutoAdjustRemainingEstimate(getJiraServiceContext(), this.worklog, true, isWlAutoCopy());
-        } else if ("new".equalsIgnoreCase(this.adjustEstimate)) {
-            this.scnWorklogService.updateWithNewRemainingEstimate(getJiraServiceContext(), new IScnWorklogService.WorklogNewEstimateResult(this.worklog, this.newEstimateLong), true, isWlAutoCopy());
+    @Override
+    protected String doExecute() {
+        if (ADJUST_ESTIMATE_AUTO.equalsIgnoreCase(this.adjustEstimate)) {
+            this.scnWorklogService.updateAndAutoAdjustRemainingEstimate(getJiraServiceContext(), this.worklog, true,
+                isWlAutoCopy());
+        } else if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(this.adjustEstimate)) {
+            this.scnWorklogService.updateWithNewRemainingEstimate(getJiraServiceContext(),
+                new IScnWorklogService.WorklogNewEstimateResult(this.worklog, this.newEstimateLong), true,
+                isWlAutoCopy());
         } else {
-            this.scnWorklogService.updateAndRetainRemainingEstimate(getJiraServiceContext(), this.worklog, true, isWlAutoCopy());
+            this.scnWorklogService.updateAndRetainRemainingEstimate(getJiraServiceContext(), this.worklog, true,
+                isWlAutoCopy());
         }
 
         if (getHasErrorMessages()) {
             return "error";
         }
 
-        if(isInlineDialogMode())
-		{
-			return returnComplete();
-		}
-        
+        if (isInlineDialogMode()) {
+            return returnComplete();
+        }
+
         return getRedirect("/browse/" + getIssue().getString("key"));
     }
-    
-    public boolean isWlAutoCopyChecked()
-    {
-    	if(getJiraServiceContext().getErrorCollection().hasAnyErrors())
-    		return isWlAutoCopy();
-    	
-    	if (this.worklog.getLinkedWorklog() == null)
-    		return false;
-    	else 
-    		return true;
-    	
-    	//if(getWorklogAutoCopyOption())
-    		//return getWorklogTypeIsChecked(getWorklogType());
-    	
-    	//return false;
+
+    @Override
+    public boolean isWlAutoCopyChecked() {
+        if (getJiraServiceContext().getErrorCollection().hasAnyErrors())
+            return isWlAutoCopy();
+
+        return this.worklog.getLinkedWorklog() != null;
     }
 
     public IScnWorklog getWorklog() {

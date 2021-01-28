@@ -29,6 +29,7 @@ public final class Upgrade001 implements ActiveObjectsUpgradeTask {
 		return ModelVersion.valueOf("1");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void upgrade(ModelVersion currentVersion, ActiveObjects ao) {
 		log.warn(">>>>>>>>>>>>>>>>>>>>>>> AO UPGRADE WLTYPES 001. START <<<<<<<<<<<<<<<<<<<<. VERSION: from " + currentVersion.toString() + " into " + getModelVersion().toString());

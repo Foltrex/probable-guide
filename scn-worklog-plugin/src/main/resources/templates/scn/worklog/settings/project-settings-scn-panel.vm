@@ -27,21 +27,14 @@
 	<meta name="application-base-url" content="$applicationProperties.baseUrl">
 	<meta name="admin.active.section" content="atl.jira.proj.config"/>
 	<meta name="admin.active.tab" content="scnProjectSettings"/>
+    $webResourceManager.requireResource("com.scn.jira.scn-worklog-plugin:scn-worklog-resources")
 	$webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
-	$webResourceManager.requireResource("jira.webresources:calendar")
-	$webResourceManager.requireResource("jira.webresources:calendar-en")
-	$webResourceManager.requireResource("jira.webresources:global-static")
+    $webResourceManager.requireResource("com.atlassian.auiplugin:aui-select2")
+    $webResourceManager.requireResource("jira.webresources:calendar")
+    $webResourceManager.requireResource("jira.webresources:calendar-en")
+    $webResourceManager.requireResource("jira.webresources:global-static")
 </head>
 <body>
-    <script language="JavaScript">
-		function setWlTypeDisabled(wlAutoCopy) 
-		{
-            var value = (wlAutoCopy.value == "false");
-            jQuery("[name='inputWorklogTypes']").attr("disabled", value);
-            jQuery('[name="inputUnspecifiedWorklogType"]').attr("disabled", value);
-		}
-	</script>
-
 ## PAGE HEADER
 
 	#set($jiraformTitle = "$i18n.getText('scn.project_settings.label')")
@@ -49,9 +42,9 @@
 	#parse("templates/scn/decorators/jiraformHeader.vm")
 	#parse("templates/scn/decorators/jiraErrorMessages.vm")
 	#parse("templates/scn/decorators/jiraformFooter.vm")
-	
+
 ## FORM
-	
+
 	#set($jiraformActionName = "$req.contextPath/secure/ScnProjectSettings.jspa")
 	#set($jiraformClass = "aui")
 	#set($jiraformTitle = "$action.getText('scn.project_settings.wl_auto_copy.section')")
@@ -72,7 +65,7 @@
         <table border="0" cellpadding="0" cellspacing="0">
         	<tr>
         		<td>
-            		<input type="checkbox" value="true" name="inputUnspecifiedWorklogType" id="inputUnspecifiedWorklogType" 
+            		<input type="checkbox" value="true" name="inputUnspecifiedWorklogType" id="inputUnspecifiedWorklogType"
             			#if ($inputWLAutoCopy == "false")
                             disabled="true"
                         #elseif ($inputUnspecifiedWorklogType)
@@ -84,7 +77,7 @@
         	</tr>
         #foreach($wlType in $action.worklogTypes)
             <tr><td>
-                <input type="checkbox" value="$wlType.id" name="inputWorklogTypes" id="inputWorklogTypes_$wlType.id"  
+                <input type="checkbox" value="$wlType.id" name="inputWorklogTypes" id="inputWorklogTypes_$wlType.id"
 					#if ($inputWLAutoCopy == "false")
                         disabled="true"
                     #end
@@ -101,11 +94,45 @@
         #end
         </table>
         #controlFooter ($action "" false)
-        
+
         #controlHeader($action "wlTypeRequired" $i18n.getText("scn.project_settings.wl_type_required.label") true false)
-	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end >
+	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end disabled="disabled" >
 	    #controlFooter ($action "" false)
-	                
+
+        #controlHeader($action "defaultWLType" $i18n.getText("scn.project_settings.default_wl_type.label") false false)
+            <div class="field-wrapper">
+                <select id="inputDefaultWorklogType" name="inputDefaultWorklogType" type="text">
+                    <option value="" #if($action.isDefaultWorklogTypeSelected("")) selected="selected" #end>
+                        $i18n.getText('portlet.fastworklog.notDefinedWorklogtype')
+                    </option>
+                    #foreach($wlType in $action.worklogTypes)
+                        <option value="$wlType.id" #if($action.isDefaultWorklogTypeSelected($wlType.id)) selected="selected" #end>
+                            $wlType.name
+                        </option>
+                    #end
+                </select>
+            </div>
+        #controlFooter ($action "" false)
+
+        #controlHeader($action "excludedWorklogTypes" $i18n.getText("scn.project_settings.excluded_wl_types.label") false false)
+            <div class="field-wrapper">
+                <select id="inputExcludedWorklogTypes" name="inputExcludedWorklogTypes" multiple="">
+                    #foreach($wlType in $action.worklogTypes)
+                        <option value="$wlType.id"
+                            #foreach($wlId in $action.inputExcludedWorklogTypes)
+                                #if($wlType.id == $wlId)
+                                selected="selected"
+                                    #break
+                                #end
+                            #end
+                        >
+                            $wlType.name
+                        </option>
+                    #end
+                </select>
+            </div>
+        #controlFooter ($action "" false)
+
 	    #rowClear()
         #sectionBreak($i18n.getText("scn.project_settings.wl_blocking_date.section") $i18n.getText("scn.project_settings.wl_blocking_date.instructions"))
 
@@ -137,10 +164,39 @@
 		        #end
 		    </div>
         #controlFooter ($action "" false)
-        
+
+        ## set date picker
+        #set ($field_id="inputWorklogBlockingDate")
+        #set ($field_name="inputWorklogBlockingDate")
+        #set ($field_value=$inputWorklogBlockingDate)
+        #controlHeader ($action $field_id $i18n.getText("scn.project_settings.wl_worklog_blocking_date.label") false false)
+	        <div>
+		        <input class="text medium-field" type="text" name="$field_name" id="$field_id" value="$!field_value"/>
+		        #if($hasCalendarTranslation)
+		        	<a href="#" id="${field_id}-icon" title="$i18n.getText('date.picker.select.date')">
+						<span class="aui-icon icon-date">$i18n.getText('date.picker.select.date')</span>
+					</a>
+					<script type="text/javascript">
+						Calendar.setup({
+							firstDay : 0, // first day of the week
+							inputField : "$field_id", // id of the input field
+							button : "${field_id}-icon", // trigger for the calendar (button ID)
+							align : "Br", // alignment (defaults to "Bl")
+							singleClick : true,
+							useISO8601WeekNumbers : false, // use ISO8061 date/time standard
+							showsTime : "false",
+							ifFormat : "$action.dateFormat",
+							date : $action.currentCalendar.timeInMillis,
+							timeFormat : "$action.timeFormat"
+						});
+					</script>
+		        #end
+		    </div>
+        #controlFooter ($action "" false)
+
         #rowClear()
         #sectionBreak($i18n.getText("scn.project_settings.wl_project_roles.section") $i18n.getText("scn.project_settings.wl_project_roles.instructions"))
-        
+
         #controlHeader ($action "inputProjectRolesToViewWL" $i18n.getText("scn.project_settings.wl_project_roles.label") false false)
         <table border="0" cellpadding="0" cellspacing="0">
         #foreach($projRole in $action.projectRoles)
@@ -161,9 +217,18 @@
         #controlFooter ($action "" false)
 
         #rowClear()
-		
+
 		<input type="hidden" name="pid" value="$req.getParameter("pid")">
-				
+
 	#parse("templates/scn/decorators/jiraformFooter.vm")
+    <script language="JavaScript">
+        AJS.$("#inputExcludedWorklogTypes").auiSelect2();
+        AJS.$("#inputDefaultWorklogType").auiSelect2();
+        function setWlTypeDisabled(wlAutoCopy) {
+            var value = (wlAutoCopy.value == "false");
+            jQuery("[name='inputWorklogTypes']").attr("disabled", value);
+            jQuery('[name="inputUnspecifiedWorklogType"]').attr("disabled", value);
+        }
+    </script>
 </body>
 </html>

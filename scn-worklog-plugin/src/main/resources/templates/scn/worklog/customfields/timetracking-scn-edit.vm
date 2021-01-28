@@ -9,7 +9,7 @@
 	    ## Original Estimate
 	    #set($originalEstimateId = "${customField.id}:originalEstimate")
 	    #customControlHeader ($action "$originalEstimateId" "$i18n.getText('common.concepts.original.estimate')*" $fieldLayoutItem.required $displayParameters $auiparams)
-		    <input class="text short-field" id="$originalEstimateId" name="$originalEstimateId" type="text" value="$!{value.originalEstimate}"/>
+		    <input class="text short-field" id="$originalEstimateId" name="$originalEstimateId" type="text" value="$!{value.getFormattedOriginal()}"/>
 		    <span class="aui-form example">${i18n.getText('logwork.example', '3w 4d 12h')}</span>
 	    	#jiraHelpLink ('timetracking_local' '')
 	    #customControlFooter ($action "$originalEstimateId" $i18n.getText("timetracking.field.original.estimate.description") $displayParameters $auiparams)
@@ -17,7 +17,7 @@
 	    ## Remaining Estimate
 	    #set($remainingEstimateId = "${customField.id}:remainingEstimate")
 	    #customControlHeader ($action "$remainingEstimateId" "$i18n.getText('common.concepts.remaining.estimate')*" $fieldLayoutItem.required $displayParameters $auiparams)
-		    <input class="text short-field" id="$remainingEstimateId" name="$remainingEstimateId" type="text" value="$!{value.remainingEstimate}"/>
+		    <input class="text short-field" id="$remainingEstimateId" name="$remainingEstimateId" type="text" value="$!{value.getFormattedRemaining()}"/>
 		    <span class="aui-form example">${i18n.getText('logwork.example', '3w 4d 12h')}</span>
 		    #jiraHelpLink ('timetracking_local' '')
 	    #customControlFooter ($action "$remainingEstimateId" $i18n.getText("timetracking.field.remaining.estimate.description") $displayParameters $auiparams)

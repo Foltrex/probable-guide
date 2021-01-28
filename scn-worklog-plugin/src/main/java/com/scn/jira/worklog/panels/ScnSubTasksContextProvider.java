@@ -1,21 +1,5 @@
 package com.scn.jira.worklog.panels;
 
-import static com.atlassian.jira.issue.util.AggregateTimeTrackingBean.addAndPreserveNull;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-
-import com.atlassian.jira.plugin.viewissue.subtasks.SubTasksContextProvider;
-import com.atlassian.jira.plugin.webfragment.CacheableContextProvider;
-import com.atlassian.jira.web.ExecutingHttpRequest;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import org.apache.commons.lang.StringUtils;
-
 import com.atlassian.jira.bean.SubTask;
 import com.atlassian.jira.bean.SubTaskBean;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -31,7 +15,7 @@ import com.atlassian.jira.issue.fields.layout.column.ColumnLayoutStorageExceptio
 import com.atlassian.jira.issue.util.AggregateTimeTrackingBean;
 import com.atlassian.jira.issue.util.AggregateTimeTrackingCalculator;
 import com.atlassian.jira.issue.util.AggregateTimeTrackingCalculatorFactory;
-import com.atlassian.plugin.PluginParseException;
+import com.atlassian.jira.plugin.webfragment.CacheableContextProvider;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
@@ -42,16 +26,28 @@ import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.jira.util.velocity.VelocityRequestContext;
 import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
 import com.atlassian.jira.util.velocity.VelocityRequestSession;
+import com.atlassian.jira.web.ExecutingHttpRequest;
 import com.atlassian.jira.web.bean.TimeTrackingGraphBeanFactory;
 import com.atlassian.jira.web.component.IssueTableLayoutBean;
 import com.atlassian.jira.web.component.IssueTableWebComponent;
 import com.atlassian.jira.web.component.TableLayoutFactory;
+import com.atlassian.plugin.PluginParseException;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.scnwl.ScnExtendedIssue;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
+import org.apache.commons.lang.StringUtils;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import static com.atlassian.jira.issue.util.AggregateTimeTrackingBean.addAndPreserveNull;
 
 @Named
 public class ScnSubTasksContextProvider implements CacheableContextProvider {
@@ -70,11 +66,11 @@ public class ScnSubTasksContextProvider implements CacheableContextProvider {
 	private final IGlobalSettingsManager gpManager;
 
 	@Inject
-	public ScnSubTasksContextProvider(@ComponentImport SubTaskManager subTaskManager, @ComponentImport JiraAuthenticationContext authenticationContext,
-				  @ComponentImport VelocityRequestContextFactory velocityRequestContextFactory,
-				  @ComponentImport AggregateTimeTrackingCalculatorFactory aggregateTimeTrackingCalculatorFactory,
-				  @ComponentImport VelocityTemplatingEngine templatingEngine,
-				  @ComponentImport TimeTrackingGraphBeanFactory ttGraphBeanFactory, @ComponentImport PermissionManager permissionManager,
+	public ScnSubTasksContextProvider(SubTaskManager subTaskManager, JiraAuthenticationContext authenticationContext,
+				  VelocityRequestContextFactory velocityRequestContextFactory,
+				  AggregateTimeTrackingCalculatorFactory aggregateTimeTrackingCalculatorFactory,
+				  VelocityTemplatingEngine templatingEngine,
+				  TimeTrackingGraphBeanFactory ttGraphBeanFactory, PermissionManager permissionManager,
 				  IScnExtendedIssueStore eiStore,
 				  IScnProjectSettingsManager psManager, IGlobalSettingsManager gpManager) {
 //		super(subTaskManager, authenticationContext, velocityRequestContextFactory, aggregateTimeTrackingCalculatorFactory);

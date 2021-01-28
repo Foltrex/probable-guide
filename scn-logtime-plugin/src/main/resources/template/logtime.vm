@@ -1,511 +1,528 @@
 #if ($loggedin)
-<style type="text/css">	
+<style type="text/css">
 </style>
 
 <div id="blanket" style="display:none"></div>
 <div id="popUpDiv" style="display:none">
-	<input type="text" size="30" value="def" id="pop_edit">
-	<input type="hidden" value="def" id="pop_edit_id">
-	
-	<select id="worklogTypeSel">
-		#foreach ($wlType in $wlTypesCombo)
-			<option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
+    <input type="text" size="30" value="def" id="pop_edit">
+    <input type="hidden" value="def" id="pop_edit_id">
+
+    <select id="worklogTypeSel">
+        #foreach ($wlType in $wlTypesCombo)
+            <option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
         #end
-	</select>
-	
-	<br><br>
-	<button onclick="save()">Save</button>
+    </select>
+
+    <br><br>
+    <button onclick="save()">Save</button>
 </div>
 
 <div id="popUpWorklogDiv" style="display:none" onkeydown="popUpPress(event)">
-	
-	<table width="100%>
-		<tr>
-		<td class="close_pop"></td>
-		<td class="close_pop">
-		<button id="closebtn" class="close-btn" onclick="cancelWorklogAJAX()" > </button>	
-		</td>
-		</tr>
-	</table> 	
-	
-	<hr class ="horizontal_line" width="95%">
 
-	<table width=90%; >
-	<tr class="select_pop" >
-	<td class="select_pop" >
-		<label class="popup_label"> Time:</label>
-	</td>	
-	<td class="select_pop" >
-		<input type="text" size="5px" name="t" id="pop_time" value="def" size="30" autofocus> 
-	</td>
-	<td class="select_pop" >
-		<label class="popup_label"> Type:</label>
-	</td>
-	<td class="select_pop" >
-		<select id="worklogTypeSelect">
-			#foreach ($wlType in $wlTypesCombo)
-				<option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
-			#end
-		</select>
-	</td>	
-	
-	</tr >	
-	<tr class="select_pop" >	
-	<td class="select_pop" >
-	
-	
-	<label class="popup_label"> Text:</label>
-	</td>
-	<td colspan="3" class="select_pop" >
-		<textarea rows="5" cols="25" name="text" id="textpopUp" style="width: 310px; height: 150px;"> </textarea>	
-	</td>
-	</tr>	
-	<tr class="select_pop" >
-	<td class="select_pop" > </td> <td class="select_pop" > </td> 
-	<td id="updateWL" class="select_pop" > 
-	<button class="saveUpdate" onclick="addUpdateWorklog()">Update</button>
-	</td> 	
-	<td class="select_pop" > 
-	<button class="saveUpdate"  onclick="cancelWorklogAJAX()">Cancel</button>
-	</td> 
-	</tr>
-	</table>
-	<input type="hidden" value="def" id="pop_edit_worklog_id">
-	<input type="hidden" value="def" id="pop_worklog_scn_ext">
-	<input type="hidden" value="def" id="pop_user_identifier">
-	<input type="hidden" value="def" id="pop_identifier_SE">
-	<input type="hidden" value="0" id="add_wl">
-	<input type="hidden" value="" id="commentId">
-	<input type="hidden" value="" id="dateWeekId">
-	<input type="hidden" value="" id="userKeyId">
-	
-	
+    <table width="100%">
+        <tr>
+            <td class="close_pop">
+                <button id="closebtn" class="close-btn" onclick="cancelWorklogAJAX()"></button>
+            </td>
+        </tr>
+    </table>
+
+    <hr class="horizontal_line" width="95%">
+
+    <table width="90%">
+        <tr class="select_pop">
+            <td class="select_pop">
+                <label class="popup_label"> Time:</label>
+            </td>
+            <td class="select_pop">
+                <input type="text" size="5px" name="t" id="pop_time" value="def" size="30" autofocus>
+            </td>
+            <td class="select_pop">
+                <label class="popup_label"> Type:</label>
+            </td>
+            <td class="select_pop">
+                <select id="worklogTypeSelect">
+                    #foreach ($wlType in $wlTypesCombo)
+                        <option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
+                    #end
+                </select>
+            </td>
+
+        </tr>
+        <tr class="select_pop">
+            <td class="select_pop">
+                <label class="popup_label"> Text:</label>
+            </td>
+            <td colspan="3" class="select_pop">
+                <textarea rows="5" cols="25" name="text" id="textpopUp"
+                          style="width: 310px; height: 150px; resize: none"> </textarea>
+            </td>
+        </tr>
+        <tr class="select_pop">
+            <td class="select_pop"></td>
+            <td class="select_pop"></td>
+            <td id="updateWL" class="select_pop">
+                <button id="popupUpdateButton" class="saveUpdate" onclick="addUpdateWorklog()">Update</button>
+            </td>
+            <td class="select_pop">
+                <button class="saveUpdate" onclick="cancelWorklogAJAX()">Cancel</button>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" value="def" id="pop_edit_worklog_id">
+    <input type="hidden" value="def" id="pop_worklog_scn_ext">
+    <input type="hidden" value="def" id="pop_user_identifier">
+    <input type="hidden" value="def" id="pop_identifier_SE">
+    <input type="hidden" value="0" id="add_wl">
+    <input type="hidden" value="" id="commentId">
+    <input type="hidden" value="" id="dateWeekId">
+    <input type="hidden" value="" id="userKeyId">
 </div>
 
 <script type="text/javascript">
-						var arrayCountS = [];
-						var arrayCountE = [];
-						var arrayCount = [];
-						var arrayCountAdding=[];
-						var arrayCountComments=[];
-</script>	
+    var arrayCountS = [];
+    var arrayCountE = [];
+    var arrayCount = [];
+    var arrayCountAdding = [];
+    var arrayCountComments = [];
+</script>
 
 <div id="jira">
-	<div class="results-wrap">
-	<div>
-	#set($selCount = 0)
-	#set($addWlC = 0)
-	#set($userCount = 0)
-	#foreach ($projectUserKey in $projectUserKeys) 
-		#set($projectKeysForUser = $projectUserKey.getProjects())
-		#set($scnSumList = $projectUserKey.getScnWlTotal())
-		#set($extSumList = $projectUserKey.getExtWlTotal())
-		
-		<label class="userName">$projectUserKey.getUserName()</label>
-	<div style="overflow-x: auto;">    
-		<table class="logtime-table">
-		<thead>
-		<tr>
-			<th rowspan="2">
-				Project
-			</th>
-			<th rowspan="2">
-				Task
-			</th>			
-			<th rowspan="2">
-				WL Type
-			</th>
-			<th rowspan="2">
-				WL/WL*
-			</th>
-			
-			
-			
-			#foreach ($weekRepresentation in $projectUserKey.getWeekRepresentations())
-				<th colspan="$weekRepresentation.getDayRepresentations().size()" class="colHeaderLink day" align="center" >Week $weekRepresentation.getWeekNumber() </th>
-			#end					
-			
-			<th colspan="2" align="center">Total</th>
-		</tr>
-		<tr>
-			#foreach ($weekRepresentation in $projectUserKey.getWeekRepresentations())
-				#foreach ($day in $weekRepresentation.getDayRepresentations())
-					<th class="$day.getCssClass()" align="center" >$textUtil.formatDay($day.getDate())</th>
-				#end
-			#end	
-			<th  class="day-header">
-				WL
-			</th>
-			<th  class="day-header">
-				WL*
-			</th>
-		</tr>
+    <div class="results-wrap">
+        <div>
+            #set($selCount = 0)
+            #set($addWlC = 0)
+            #set($userCount = 0)
+            #foreach ($projectUserKey in $projectUserKeys)
+                #set($projectKeysForUser = $projectUserKey.getProjects())
+                #set($scnSumList = $projectUserKey.getScnWlTotal())
+                #set($extSumList = $projectUserKey.getExtWlTotal())
 
-		</thead>
-		
-		
-		 <tbody>	  
-					 
-					  <script type="text/javascript">						
-						arrayCountS['$userCount'] = [];
-						arrayCountE['$userCount'] = [];
-						arrayCountAdding['$userCount'] = [];
-					  </script>	
-					  	#if($scnWlCheck==true)
-						<tr class="total-rows">
-							<td class="total-rows">Total(WL*)</td>	
-							<td class="total-rows"></td><td class="total-rows"></td><td class="total-rows"></td>							
-							#foreach ($scnSum in $scnSumList)   
-								#if($scnSum=="00:00")
-									<td class="total-rows"></td>
-								#else
-									<td class="total-rows">$scnSum</td>
-								#end
-							#end
-							<td class="total-rows"></td>
-							<td class="total-rows">$projectUserKey.getScnProjectsTotal()</td>
-						</tr>
-						#end
-						#if($extWlCheck==true  )
-							<tr class="total-rows">
-								<td class="total-rows">Total(WL)</td>	
-								<td class="total-rows"></td><td class="total-rows"></td><td class="total-rows"></td>							
-								#foreach ($extSum in $extSumList)        
-									
-									#if($extSum=="00:00")
-										<td class="total-rows"></td>
-									#else
-										<td class="total-rows">$extSum</td>
-									#end
-								#end
-								
-								
-								<td class="total-rows">$projectUserKey.getExtProjectsTotal()</td>
-								<td class="total-rows"></td>
-							</tr>
-						#end
-						#if($projectUserKey.getUserKey()==$loggeduser || $wicketPermission )
-							<tr class="total-wicket">
-								<td class="total-wicket">Wicket Tracker</td>	
-								<td class="total-wicket"></td><td class="total-wicket"></td><td class="total-wicket"></td>							
-								
-								#set($wicketTimes=$userWickets.get($projectUserKey.getUserKey()).getTimes() )
-								#set($wicketTotal=$userWickets.get($projectUserKey.getUserKey()).getTotal() )
-								#foreach ($wickettime in $wicketTimes)        
-									<td class="total-wicket">$wickettime</td>
-								#end
-								
-								
-								<td colspan="2" class="total-wicket">$wicketTotal</td>						
-							</tr>
-						#end
-						#if($projectUserKey.getUserKey()==$loggeduser )							
-							<tr class="add-project">
-						#else
-							<tr class="add-project" style="display:none;">
-						#end	
-							<td class="add-button left">
-								<table>
-								<tr>
-								<td>
-								#set($projectTypeSel = "projectTypeSel"+$userCount)
-								#set($issueTypeSel = "issueTypeSel"+$userCount)
-								#set($worklogTypeSel = "worklogTypeSel"+$userCount)
-								#set($wlWlSel = "wlWl"+$userCount)
-								<button id="addbtn" class="add-btn" onclick="addWorklogsToDb()" > 						
-								</button>
-								</td>
-								<td>
-								
-								<select style="width:50px;"  id='$projectTypeSel' onchange="projectChanged(this.value,'$issueTypeSel','$worklogTypeSel','$userCount','$wlWlSel')">
-									#foreach ($prj in $projectsTest)
-									<option value="$prj.getId()">$prj.getName()</option>
-									#end
-								</select>
-								
-								</td>
-								</tr>
-								</table>
-							</td>	
-							
-							
-							<td id = '$issueTypeSel' class="add-project"></td>
-							
-							<td class="add-project">
-							<select class="wlTypeSelectAdd" title='Undefined Type' id='$worklogTypeSel' style="visibility:hidden;width:80px;" onchange="document.getElementById('$worklogTypeSel').title = this.options[this.selectedIndex].innerHTML">
-								#foreach ($wlType in $wlTypesCombo)
-									<option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
-								#end
-							</select>
-							</td><td id='$wlWlSel' class="add-project"></td>	
-							#set($ii = 0)
-							#foreach ($scnSum in $weekDaysString)
-								#set($addWlComment = "addWlComment"+$addWlC)							
-								#set($addWlCount = "addWlCount"+$addWlC)							
-								
-								<td class="add-project" id='$addWlCount' onClick="addWorklog(event,'$userCount','$addWlCount','$addWlComment','$scnSum', '$projectUserKey.getUserKey()')"></td>
-								<input type="hidden" id='$addWlComment' value="">
-								<script type="text/javascript">															
-									arrayCountAdding['$userCount']['$ii']='$addWlCount'+"_"+'$addWlComment';
-								</script>	
-								#set($ii = $ii+1)
-								#set($addWlC = $addWlC+1)
-							#end
-							<td colspan="2" class="add-button left" >
-							<table>
-								<tr>
-								<td style="width:20px;min-width: 20px;">								
-								<button id="addbtn2" class="add-btn" onclick="addWorklogsToDb()" > 						
-								</button>
-								</td>
-								<td class="add-button">								
-									<button class="addWorklog" onclick="addWorklogsToDb()">Add Task</button>																
-								</td>
-								</tr>
-								</table>
-							
-							</td>	
-						</tr>
+                <label class="userName">$projectUserKey.getUserName()</label>
+                <div style="overflow-x: auto;">
+                    <table class="logtime-table">
+                        <thead>
+                        <tr>
+                            <th rowspan="2">
+                                Project
+                            </th>
+                            <th rowspan="2">
+                                Task
+                            </th>
+                            <th rowspan="2">
+                                WL Type
+                            </th>
+                            <th rowspan="2">
+                                WL/WL*
+                            </th>
 
-					
-					  #set($color = "white")
-					  #set($selCountS = 0)
-					  #set($selCountE = 0)
-                      #foreach ($project in $projectKeysForUser)                      
-						<tr class="table-row">
-						#if( $color == "white" )
-							#set($color = "grey")
-							#else
-							#set($color = "white")						
-						#end		
-						
-							#set($projectSize = $project.getRowspan())
-							#if( $project.getName() != "" )
-								<td class="table-col-project" rowspan=$projectSize>$project.getName()</td>								
-							#else
-								<td class="table-col-project" rowspan=$projectSize>$project.getKey()</td>							
-							#end		
-						
-							
-							
-							#set($issues = $project.getIssues())
-						
-							#set($i = 0)
-							#foreach ($issue in $issues)				
-								#set($issueSize = $issue.getRowspan())							
-								#if( $i!=0 )
-									<tr class="table-row">
-									#if( $color == "white" )
-										#set($color = "grey")
-									#else
-										#set($color = "white")
-									#end				
-								#end							
-								<td rowspan=$issueSize class="table-col table-col-bold" >
-									<a href="$req.contextPath/browse/$issue.getKey()" style="text-decoration: none; " title="$issue.getKey() - $issue.getName()" >$issue.getUrlName()</a>
-								</td>
-								
-								#set($wlLineIssueRepresentations = $issue.getWlTypes())
-								#set($j = 0)
-								#foreach ($wlLineIssueRepresentation in $wlLineIssueRepresentations)	
-									#set($wlsRepresentations = $wlLineIssueRepresentation.getWlsRepresentation())
-										#foreach ($wlsRepresentation in $wlsRepresentations)
-											#if( $j!=0 )
-												<tr class="table-row">
-												#if( $color == "white" )
-													#set($color = "grey")
-												#else
-													#set($color = "white")
-												#end	
-											#end
-											
-												#set($wlSpan = 1)	
-												#if( $scnWlCheck==true && $extWlCheck==true && $project.getPermission()==true)
-													#set($wlSpan = 2)	
-												#end
-												<td class="table-col table-col-regular" rowspan=$wlSpan >$wlsRepresentation.getWlTypeName()</td>
-											
-												
-												#set($wlReps = $wlsRepresentation.getWlsRepresentation())												
-												#if( $scnWlCheck==true)
-													<td class="table-col table-col-regular" >WL*</td>
-													#foreach ($wlRep in $wlReps)
-														#set($timeSpentScn = $wlRep.getWlScnRepresentation().getTimeSpentString2())	
-														#if( $timeSpentScn=="00:00" )
-															#set($timeSpentScn = "")	
-														#end
-														#set($dayColor = $wlRep.getWlScnRepresentation().getDayColor())	
-														
-														#if( $timeSpentScn!="")
-															<td class="table-col spanWrap $color $dayColor" id='$selCount' tabindex="$selCount" 
-															title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlScnRepresentation().getComment()' class="nav issuetype"
-															onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
-															onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')" nowrap >$timeSpentScn</td>
-														#else
-															<td class="table-col spanWrap $color $dayColor" id='$selCount' tabindex="$selCount" 	class="nav issuetype"
-															onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
-															onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')" nowrap >$timeSpentScn</td>
-														#end
-														
-														<script type="text/javascript">
-															arrayCount['$selCount'] = '$issue.getId()'+'_'+'$wlsRepresentation.getWlTypeId()'+'_'+'$wlRep.getWlScnRepresentation().getId()'+'_'+'$wlRep.getWlScnRepresentation().getDate()'+'_'+'$selCount'+'_'+'$projectUserKey.getUserKey()';
-															arrayCountS['$userCount']['$selCountS']='$selCount';															
-															arrayCountComments['$selCount']='$wlRep.getWlScnRepresentation().getComment()';
-														</script>												
-														#set($selCount = $selCount+1)
-														#set($selCountS = $selCountS+1)
-													#end
-												#end
-													
-												#if( $scnWlCheck==false)	
-													#if($extWlCheck==false || $project.getPermission()==false)												
-														<td class="table-col table-col-regular" >WL*/WL</td>
-													#end
-													#foreach ($wlRep in $wlReps)
-														#set($timeSpentScn = $wlRep.getWlScnRepresentation().getTimeSpentString2())	
-														#if( $timeSpentScn=="00:00" )
-															#set($timeSpentScn = "")	
-														#end
-														
-														
-															<div style="display: none;" id='$selCount'>$timeSpent</div>
-															<script type="text/javascript">
-																arrayCount['$selCount'] = '$issue.getId()'+'_'+'$wlsRepresentation.getWlTypeId()'+'_'+'$wlRep.getWlScnRepresentation().getId()'+'_'+'$wlRep.getWlScnRepresentation().getDate()'+'_'+'$selCount'+'_'+'$projectUserKey.getUserKey()';
-																arrayCountS['$userCount']['$selCountS']='$selCount';
-																arrayCountComments['$selCount']='$wlRep.getWlScnRepresentation().getComment()';																
-															</script>	
-															#if($extWlCheck==false || $project.getPermission()==false)
-																<td class="table-col $color $dayColor" id='$selCount' tabindex="$selCount"></td>															
-															#end
-															#set($selCount = $selCount+1)
-															#set($selCountS = $selCountS+1)
-																											
-														#end												
-												#end
-												
-												#if($i==0 && $j==0 && $scnWlCheck==true)
-													#if($extWlCheck==true && $project.getPermission()==true)
-														<td class="table-col" rowspan=$projectSize >$project.getExtPrTotal()</td>	
-													#else
-														<td class="table-col" rowspan=$projectSize ></td>	
-													#end
-													#if($scnWlCheck==true)
-														<td class="table-col" rowspan=$projectSize >$project.getScnPrTotal()</td>
-													#else
-														<td class="table-col" rowspan=$projectSize ></td>
-													#end													
-												#end	
-												
-												
-												#if( $extWlCheck==true &&  $project.getPermission()==true)												
-													#if( $scnWlCheck==true)
-														<tr class="table-row">
-													#end	
-														<td class="table-col table-col-regular">WL</td>
-														#foreach ($wlRep in $wlReps)
-															#set($timeSpent = $wlRep.getWlExtRepresentation().getTimeSpentString2())	
-															#if( $timeSpent=="00:00" )
-																#set($timeSpent = "")	
-															#end
-															#set($dayColor = $wlRep.getWlExtRepresentation().getDayColor())	
-														
-															#if( $timeSpent!="")
-																<td class="table-col spanWrap $color $dayColor" id='$selCount' tabindex="$selCount" title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlExtRepresentation().getComment()' 
-																class="nav issuetype" onDblclick="openinplace('$userCount','$selCountE','$selCount','false')" 
-																onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')" nowrap>$timeSpent</td>
-															#else
-																<td class="table-col spanWrap $color $dayColor" id='$selCount' tabindex="$selCount"  
-																class="nav issuetype" onDblclick="openinplace('$userCount','$selCountE','$selCount','false')" 
-																onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')" nowrap>$timeSpent</td>
-															#end
-														
-														
-															
-															<script type="text/javascript">
-															
-																arrayCount['$selCount'] = '$issue.getId()'+'_'+'$wlsRepresentation.getWlTypeId()'+'_'+'$wlRep.getWlExtRepresentation().getId()'+'_'+'$wlRep.getWlExtRepresentation().getDate()'+'_'+'$selCount'+'_'+'$projectUserKey.getUserKey()';
-																arrayCountE['$userCount']['$selCountE']='$selCount';															
-																var tmpExample = arrayCount['$selCount'];
-																arrayCountComments['$selCount']='$wlRep.getWlExtRepresentation().getComment()';
-																
-															</script>															
-															#set($selCount = $selCount+1)
-															#set($selCountE = $selCountE+1)
-																											
-														#end
-													#if( $scnWlCheck==true)
-														</tr>
-													#end	
-												#end
-												
-												#if( $extWlCheck==false || $project.getPermission()==false)											
-													
-														#foreach ($wlRep in $wlReps)
-															#set($timeSpent = $wlRep.getWlExtRepresentation().getTimeSpentString2())	
-															#if( $timeSpent=="00:00" )
-																#set($timeSpent = "")	
-															#end
-														
-															<div style="display: none;" id='$selCount'>$timeSpent</div>
-															<script type="text/javascript">
-															
-																arrayCount['$selCount'] = '$issue.getId()'+'_'+'$wlsRepresentation.getWlTypeId()'+'_'+'$wlRep.getWlExtRepresentation().getId()'+'_'+'$wlRep.getWlExtRepresentation().getDate()'+'_'+'$selCount'+'_'+'$projectUserKey.getUserKey()';
-																arrayCountE['$userCount']['$selCountE']='$selCount';															
-																var tmpExample = arrayCount['$selCount'];
-																arrayCountComments['$selCount']='$wlRep.getWlExtRepresentation().getComment()';
-																
-															</script>															
-															#set($selCount = $selCount+1)
-															#set($selCountE = $selCountE+1)
-																											
-														#end												
-												#end
-												
-												
-												#if($i==0 && $j==0 && $scnWlCheck!=true)
-													#if($extWlCheck==true && $project.getPermission()==true)
-														<td class="table-col" rowspan=$projectSize >$project.getExtPrTotal()</td>	
-													#else
-														<td class="table-col" rowspan=$projectSize ></td>	
-													#end
-													#if($scnWlCheck==true)
-														<td class="table-col" rowspan=$projectSize >$project.getScnPrTotal()</td>
-													#else
-														<td class="table-col" rowspan=$projectSize ></td>
-													#end													
-												#end	
-											
-											#if( $j!=0 )
-												</tr>
-											#end
-												
-											#set($j = $j+1)	
-										#end
-								
-								#end
-								
-								#if( $i!=0 )								
-									</tr>
-								#end		
-							#set($i = $i+1)								
-							
-							#end
-								
-														
-                    #end
-					
-     </tbody>
-	
-	  	
-	  	
+                            #foreach ($weekRepresentation in $projectUserKey.getWeekRepresentations())
+                                <th colspan="$weekRepresentation.getDayRepresentations().size()"
+                                    class="colHeaderLink day" align="center">
+                                    Week $weekRepresentation.getWeekNumber() </th>
+                            #end
 
-	</table>
-	</div> 
-	<div style="height: 30px;"></div>  	
-	#set($userCount = $userCount +1)
-	#end	  	
-	</div>
-	</div>
+                            <th colspan="2" align="center">Total</th>
+                        </tr>
+                        <tr>
+                            #foreach ($weekRepresentation in $projectUserKey.getWeekRepresentations())
+                                #foreach ($day in $weekRepresentation.getDayRepresentations())
+                                    <th class="$day.getCssClass()"
+                                        align="center">$textUtil.formatDay($day.getDate())</th>
+                                #end
+                            #end
+                            <th class="day-header">
+                                WL
+                            </th>
+                            <th class="day-header">
+                                WL*
+                            </th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        <script type="text/javascript">
+                            arrayCountS['$userCount'] = [];
+                            arrayCountE['$userCount'] = [];
+                            arrayCountAdding['$userCount'] = [];
+                        </script>
+                            #if($scnWlCheck==true)
+                            <tr class="total-rows">
+                                <td class="total-rows">Total(WL*)</td>
+                                <td class="total-rows"></td>
+                                <td class="total-rows"></td>
+                                <td class="total-rows"></td>
+                                #foreach ($scnSum in $scnSumList)
+                                    #if($scnSum=="00:00")
+                                        <td class="total-rows"></td>
+                                    #else
+                                        <td class="total-rows">$scnSum</td>
+                                    #end
+                                #end
+                                <td class="total-rows"></td>
+                                <td class="total-rows">$projectUserKey.getScnProjectsTotal()</td>
+                            </tr>
+                            #end
+                            #if($extWlCheck==true  )
+                            <tr class="total-rows">
+                                <td class="total-rows">Total(WL)</td>
+                                <td class="total-rows"></td>
+                                <td class="total-rows"></td>
+                                <td class="total-rows"></td>
+                                #foreach ($extSum in $extSumList)
+
+                                    #if($extSum=="00:00")
+                                        <td class="total-rows"></td>
+                                    #else
+                                        <td class="total-rows">$extSum</td>
+                                    #end
+                                #end
+
+                                <td class="total-rows">$projectUserKey.getExtProjectsTotal()</td>
+                                <td class="total-rows"></td>
+                            </tr>
+                            #end
+                            #if($projectUserKey.getUserKey()==$loggeduserKey || $wicketPermission )
+                            <tr class="total-wicket">
+                                <td class="total-wicket">Wicket Tracker</td>
+                                <td class="total-wicket"></td>
+                                <td class="total-wicket"></td>
+                                <td class="total-wicket"></td>
+
+                                #set($wicketTimes=$userWickets.get($projectUserKey.getUserKey()).getTimes() )
+                                #set($wicketTotal=$userWickets.get($projectUserKey.getUserKey()).getTotal() )
+                                #foreach ($wickettime in $wicketTimes)
+                                    <td class="total-wicket">$wickettime</td>
+                                #end
+
+                                <td colspan="2" class="total-wicket">$wicketTotal</td>
+                            </tr>
+                            #end
+                        <tr class="add-project">
+                            <td class="add-button">
+                                <table>
+                                    <tr>
+                                        #set($projectTypeSel = "projectTypeSel"+$userCount)
+                                        #set($issueTypeSel = "issueTypeSel"+$userCount)
+                                        #set($worklogTypeSel = "worklogTypeSel"+$userCount)
+                                        #set($wlWlSel = "wlWl"+$userCount)
+                                        <td>
+                                            <select style="width:80px;" id='$projectTypeSel'
+                                                    onchange="projectChanged(this.value,'$issueTypeSel','$worklogTypeSel','$userCount','$wlWlSel')">
+                                                #foreach ($prj in $projectsTest)
+                                                    <option value="$prj.getId()">$prj.getName()</option>
+                                                #end
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                            <td id='$issueTypeSel' class="add-project"></td>
+
+                            <td class="add-project">
+                                <select class="wlTypeSelectAdd" title='Undefined Type' id='$worklogTypeSel'
+                                        style="visibility:hidden;width:80px;"
+                                        onchange="document.getElementById('$worklogTypeSel').title = this.options[this.selectedIndex].innerHTML">
+                                    #foreach ($wlType in $wlTypesCombo)
+                                        <option value="$wlType.getWlTypeId()">$wlType.getWlTypeName()</option>
+                                    #end
+                                </select>
+                            </td>
+                            <td id='$wlWlSel' class="add-project"></td>
+                            #set($ii = 0)
+                            #foreach ($scnSum in $weekDaysString)
+                                #set($addWlComment = "addWlComment"+$addWlC)
+                                #set($addWlCount = "addWlCount"+$addWlC)
+
+                                <td class="add-project" id='$addWlCount'
+                                    onClick="addWorklog(event,'$userCount','$addWlCount','$addWlComment','$scnSum', '$projectUserKey.getUserKey()')"></td>
+                                <input type="hidden" id='$addWlComment' value="">
+                                <script type="text/javascript">
+                                    arrayCountAdding['$userCount']['$ii'] = '$addWlCount' + "_" + '$addWlComment';
+                                </script>
+                                #set($ii = $ii+1)
+                                #set($addWlC = $addWlC+1)
+                            #end
+                            <td colspan="2" class="add-button left">
+                                <table>
+                                    <tr>
+                                        <td style="width:20px;min-width: 20px;">
+                                            <button id="addbtn2" class="add-btn" onclick="addWorklogsToDb()">
+                                            </button>
+                                        </td>
+                                        <td class="add-button">
+                                            <button class="addWorklog" onclick="addWorklogsToDb()">Apply</button>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                            #set($color = "white")
+                            #set($selCountS = 0)
+                            #set($selCountE = 0)
+                            #foreach ($project in $projectKeysForUser)
+                            <tr class="table-row">
+                                #if( $color == "white" )
+                                    #set($color = "grey")
+                                #else
+                                    #set($color = "white")
+                                #end
+
+                                #set($projectSize = $project.getRowspan())
+                                #if( $project.getName() != "" )
+                                    <td class="table-col-project" rowspan=$projectSize>
+                                        $project.getName()
+                                        <a
+                                            class="aui-icon aui-icon-small aui-iconfont-add"
+                                            href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
+                                            title="Create a new issue / bug / feature request / etc"
+                                            target="_blank"><span>Create issue</span></a>
+                                    </td>
+                                #else
+                                    <td class="table-col-project" rowspan=$projectSize>
+                                        $project.getKey()
+                                        <a
+                                            class="aui-icon aui-icon-small aui-iconfont-add"
+                                            href="$req.contextPath/secure/CreateIssue.jspa?pid=$project.getId()"
+                                            title="Create a new issue / bug / feature request / etc"
+                                            target="_blank"><span>Create issue</span></a>
+                                    </td>
+                                #end
+
+                                #set($issues = $project.getIssues())
+
+                                #set($i = 0)
+                                #foreach ($issue in $issues)
+                                    #set($issueSize = $issue.getRowspan())
+                                    #if( $i!=0 )
+                                    <tr class="table-row">
+                                        #if( $color == "white" )
+                                            #set($color = "grey")
+                                        #else
+                                            #set($color = "white")
+                                        #end
+                                    #end
+                                    <td class="table-col table-col-bold" rowspan=$issueSize>
+                                        <a href="$req.contextPath/browse/$issue.getName()"
+                                           style="text-decoration: none; "
+                                           target="_blank">$issue.getUrlName()</a>
+                                    </td>
+
+                                    #set($wlLineIssueRepresentations = $issue.getWlTypes())
+                                    #set($j = 0)
+                                    #foreach ($wlLineIssueRepresentation in $wlLineIssueRepresentations)
+                                        #set($wlsRepresentations = $wlLineIssueRepresentation.getWlsRepresentation())
+                                        #foreach ($wlsRepresentation in $wlsRepresentations)
+                                            #if( $j!=0 )
+                                            <tr class="table-row">
+                                                #if( $color == "white" )
+                                                    #set($color = "grey")
+                                                #else
+                                                    #set($color = "white")
+                                                #end
+                                            #end
+
+                                            #set($wlSpan = 1)
+                                            #if( $scnWlCheck==true && $extWlCheck==true && $project.getPermission()==true)
+                                                #set($wlSpan = 2)
+                                            #end
+                                            <td class="table-col table-col-regular"
+                                                rowspan=$wlSpan>$wlsRepresentation.getWlTypeName()</td>
+
+
+                                            #set($wlReps = $wlsRepresentation.getWlsRepresentation())
+                                            #if( $scnWlCheck==true)
+                                                <td class="table-col table-col-regular">WL*</td>
+                                                #foreach ($wlRep in $wlReps)
+                                                    #set($timeSpentScn = $wlRep.getWlScnRepresentation().getTimeSpentString2())
+                                                    #if( $timeSpentScn=="00:00" )
+                                                        #set($timeSpentScn = "")
+                                                    #end
+                                                    #set($dayColor = $wlRep.getWlScnRepresentation().getDayColor())
+
+                                                    #if( $timeSpentScn!="")
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
+                                                            tabindex="$selCount"
+                                                            title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlScnRepresentation().getComment()'
+                                                            class="nav issuetype"
+                                                            onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
+                                                            onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
+                                                            nowrap>$timeSpentScn</td>
+                                                    #else
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
+                                                            tabindex="$selCount" class="nav issuetype"
+                                                            onDblclick="openinplace('$userCount','$selCountS','$selCount','true')"
+                                                            onClick="updateWorklog(event,'$selCount','$wlRep.getWlScnRepresentation().getId()', 'false', '$timeSpentScn','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlScnRepresentation().getComment()','$userCount','$selCountS')"
+                                                            nowrap>$timeSpentScn</td>
+                                                    #end
+
+                                                    <script type="text/javascript">
+                                                        arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlScnRepresentation().getId()' + '_' + '$wlRep.getWlScnRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
+                                                        arrayCountS['$userCount']['$selCountS'] = '_$selCount';
+                                                        arrayCountComments['$selCount'] = '$wlRep.getWlScnRepresentation().getComment()';
+                                                    </script>
+                                                    #set($selCount = $selCount+1)
+                                                    #set($selCountS = $selCountS+1)
+                                                #end
+                                            #end
+
+                                            #if( $scnWlCheck==false)
+                                                #if($extWlCheck==false || $project.getPermission()==false)
+                                                    <td class="table-col table-col-regular">WL*/WL</td>
+                                                #end
+                                                #foreach ($wlRep in $wlReps)
+                                                    #set($timeSpentScn = $wlRep.getWlScnRepresentation().getTimeSpentString2())
+                                                    #if( $timeSpentScn=="00:00" )
+                                                        #set($timeSpentScn = "")
+                                                    #end
+
+
+                                                    <div style="display: none;" id='_$selCount'>$timeSpent</div>
+                                                    <script type="text/javascript">
+                                                        arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlScnRepresentation().getId()' + '_' + '$wlRep.getWlScnRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
+                                                        arrayCountS['$userCount']['$selCountS'] = '_$selCount';
+                                                        arrayCountComments['$selCount'] = '$wlRep.getWlScnRepresentation().getComment()';
+                                                    </script>
+                                                    #if($extWlCheck==false || $project.getPermission()==false)
+                                                        <td class="table-col $color $dayColor" id='_$selCount'
+                                                            tabindex="$selCount"></td>
+                                                    #end
+                                                    #set($selCount = $selCount+1)
+                                                    #set($selCountS = $selCountS+1)
+
+                                                #end
+                                            #end
+
+                                            #if($i==0 && $j==0 && $scnWlCheck==true)
+                                                #if($extWlCheck==true && $project.getPermission()==true)
+                                                    <td class="table-col"
+                                                        rowspan=$projectSize>$project.getExtPrTotal()</td>
+                                                #else
+                                                    <td class="table-col" rowspan=$projectSize></td>
+                                                #end
+                                                #if($scnWlCheck==true)
+                                                    <td class="table-col"
+                                                        rowspan=$projectSize>$project.getScnPrTotal()</td>
+                                                #else
+                                                    <td class="table-col" rowspan=$projectSize></td>
+                                                #end
+                                            #end
+
+
+                                            #if( $extWlCheck==true &&  $project.getPermission()==true)
+                                                #if( $scnWlCheck==true)
+                                                <tr class="table-row">
+                                                #end
+                                                <td class="table-col table-col-regular">WL</td>
+                                                #foreach ($wlRep in $wlReps)
+                                                    #set($timeSpent = $wlRep.getWlExtRepresentation().getTimeSpentString2())
+                                                    #if( $timeSpent=="00:00" )
+                                                        #set($timeSpent = "")
+                                                    #end
+                                                    #set($dayColor = $wlRep.getWlExtRepresentation().getDayColor())
+
+                                                    #if( $timeSpent!="")
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
+                                                            tabindex="$selCount"
+                                                            title='$wlsRepresentation.getWlTypeName() &#xA; $wlRep.getWlExtRepresentation().getComment()'
+                                                            class="nav issuetype"
+                                                            onDblclick="openinplace('$userCount','$selCountE','$selCount','false')"
+                                                            onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')"
+                                                            nowrap>$timeSpent</td>
+                                                    #else
+                                                        <td class="table-col spanWrap $color $dayColor" id='_$selCount'
+                                                            tabindex="$selCount"
+                                                            class="nav issuetype"
+                                                            onDblclick="openinplace('$userCount','$selCountE','$selCount','false')"
+                                                            onClick="updateWorklog(event,'$selCount','$wlRep.getWlExtRepresentation().getId()', 'true', '$timeSpent','$wlsRepresentation.getWlTypeId()', '$wlRep.getWlExtRepresentation().getComment()','$userCount','$selCountE')"
+                                                            nowrap>$timeSpent</td>
+                                                    #end
+
+                                                    <script type="text/javascript">
+
+                                                        arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlExtRepresentation().getId()' + '_' + '$wlRep.getWlExtRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
+                                                        arrayCountE['$userCount']['$selCountE'] = '_$selCount';
+                                                        var tmpExample = arrayCount['$selCount'];
+                                                        arrayCountComments['$selCount'] = '$wlRep.getWlExtRepresentation().getComment()';
+
+                                                    </script>
+                                                    #set($selCount = $selCount+1)
+                                                    #set($selCountE = $selCountE+1)
+
+                                                #end
+                                                #if( $scnWlCheck==true)
+                                                </tr>
+                                                #end
+                                            #end
+
+                                            #if( $extWlCheck==false || $project.getPermission()==false)
+
+                                                #foreach ($wlRep in $wlReps)
+                                                    #set($timeSpent = $wlRep.getWlExtRepresentation().getTimeSpentString2())
+                                                    #if( $timeSpent=="00:00" )
+                                                        #set($timeSpent = "")
+                                                    #end
+
+                                                <div style="display: none;" id='_$selCount'>$timeSpent</div>
+                                                <script type="text/javascript">
+
+                                                    arrayCount['$selCount'] = '$issue.getId()' + '_' + '$wlsRepresentation.getWlTypeId()' + '_' + '$wlRep.getWlExtRepresentation().getId()' + '_' + '$wlRep.getWlExtRepresentation().getDate()' + '_' + '$selCount' + '_' + '$projectUserKey.getUserKey()';
+                                                    arrayCountE['$userCount']['$selCountE'] = '_$selCount';
+                                                    var tmpExample = arrayCount['$selCount'];
+                                                    arrayCountComments['$selCount'] = '$wlRep.getWlExtRepresentation().getComment()';
+
+                                                </script>
+                                                    #set($selCount = $selCount+1)
+                                                    #set($selCountE = $selCountE+1)
+
+                                                #end
+                                            #end
+
+
+                                            #if($i==0 && $j==0 && $scnWlCheck!=true)
+                                                #if($extWlCheck==true && $project.getPermission()==true)
+                                                <td class="table-col" rowspan=$projectSize>$project.getExtPrTotal()</td>
+                                                #else
+                                                <td class="table-col" rowspan=$projectSize></td>
+                                                #end
+                                                #if($scnWlCheck==true)
+                                                <td class="table-col" rowspan=$projectSize>$project.getScnPrTotal()</td>
+                                                #else
+                                                <td class="table-col" rowspan=$projectSize></td>
+                                                #end
+                                            #end
+
+                                            #if( $j!=0 )
+                                            </tr>
+                                            #end
+
+                                            #set($j = $j+1)
+                                        #end
+
+                                    #end
+
+                                    #if( $i!=0 )
+                                    </tr>
+                                    #end
+                                    #set($i = $i+1)
+
+                                #end
+
+                            #end
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <div style="height: 30px;"></div>
+                #set($userCount = $userCount +1)
+            #end
+        </div>
+    </div>
 </div>
 
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -514,24 +531,16 @@
 <input type="hidden" value="$scnWlChShow" id="scnWlChShow">
 <input type="hidden" value="$loggeduser" id="userHidden">
 
-
 <script type="text/javascript">
-	#include("template/editdiv.js");
-	document.getElementById('periodId').innerHTML = document.getElementById('labelPeriodHidden').value;	
-	if(document.getElementById('myFieldId').value==''){
-	var log='$loggeduser'+",";
-		document.getElementById('myFieldId').value=log;
-		}
-	var log='$loggeduser'+",";
-	document.getElementById('userHidden').value=log;
-	
-	if(document.getElementById('scnWlChShow').value=="false"){
-	//	document.getElementById('wlsc').style.display= "none";
-		document.getElementById('wlsc').style.visibility= "hidden";
-	}		
-	
-	
+        #include("template/editdiv.js");
+    AJS.$('#periodId').val(moment($startDate).format('YYYY-MM-DD'));
+    document.getElementById('periodId').innerHTML = document.getElementById('labelPeriodHidden').value;
+    if (document.getElementById('myFieldId').value === '') {
+        document.getElementById('myFieldId').value = '$loggeduser' + ",";
+    }
+    document.getElementById('userHidden').value = '$loggeduser' + ",";
+    if (document.getElementById('scnWlChShow').value === "false") {
+        document.getElementById('wlsc').style.visibility = "hidden";
+    }
 </script>
-
-
 #end

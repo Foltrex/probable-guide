@@ -10,74 +10,57 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: nsokolova
- * Date: 11/29/11
- * Time: 4:22 AM
- * To change this template use File | Settings | File Templates.
- */
 @XmlRootElement
-public class ValidationError
-{
+public class ValidationError {
 
-  @XmlElement
-  private String field;
+	@XmlElement
+	private String field;
 
-  @XmlElement
-  private String error;
+	@XmlElement
+	private String error;
 
-  @XmlElement
-  private List<String> params;
+	@XmlElement
+	private List<String> params;
 
-  private ValidationError()
-  {
-  }
+	public ValidationError() {
+	}
 
-  public ValidationError(String field, String error)
-  {
-    this.field = field;
-    this.error = error;
-  }
+	public ValidationError(String field, String error) {
+		this.field = field;
+		this.error = error;
+	}
 
-  public ValidationError(String field, String error, List<String> params)
-  {
-    this.field = field;
-    this.error = error;
-    this.params = params;
-  }
+	public ValidationError(String field, String error, List<String> params) {
+		this.field = field;
+		this.error = error;
+		this.params = params;
+	}
 
-  public ValidationError(String field, String error, String param) {
-    this(field, error, Arrays.asList(new String[]{param}));
-  }
+	public ValidationError(String field, String error, String param) {
+		this(field, error, Arrays.asList(new String[] { param }));
+	}
 
-  public String getField()
-  {
-    return this.field;
-  }
+	public String getField() {
+		return this.field;
+	}
 
-  public String getError()
-  {
-    return this.error;
-  }
+	public String getError() {
+		return this.error;
+	}
 
-  public List<String> getParams()
-  {
-    return this.params;
-  }
+	public List<String> getParams() {
+		return this.params;
+	}
 
-  public int hashCode()
-  {
-    return HashCodeBuilder.reflectionHashCode(this);
-  }
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
 
-  public boolean equals(Object o)
-  {
-    return EqualsBuilder.reflectionEquals(this, o);
-  }
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o);
+	}
 
-  public String toString()
-  {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-  }
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 }

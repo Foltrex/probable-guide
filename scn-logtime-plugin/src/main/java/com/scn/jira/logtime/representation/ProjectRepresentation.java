@@ -57,7 +57,7 @@ public class ProjectRepresentation {
 		this.key = project.getKey();
 		this.name = project.getName();
 		this.projectUrl = project.getUrl();
-		this.projectLead = project.getLead().getDisplayName();
+		this.projectLead = project.getLeadUserName();
 		this.description = project.getDescription();
 
 	}

@@ -6,3 +6,12 @@ scn-mytime-gadget-plugin/target
 scn-clone-project-plugin/target
 scn-timesheet-plugin/target
 scn-worklog-plugin/target
+scn-automation-plugin/target/
+.project
+.settings
+.classpath
+node_modules/
+scn-automation-plugin/src/main/resources/build/
+scn-automation-plugin/src/main/resources/META-INF/plugin-descriptors/
+/scn-plugins-frontend/node/
+/scn-plugins-frontend/target/

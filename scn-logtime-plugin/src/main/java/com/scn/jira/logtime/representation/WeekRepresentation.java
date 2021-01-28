@@ -12,7 +12,6 @@ import net.jcip.annotations.Immutable;
  * either JSON or XML, depending on what the client asks for.
  */
 @Immutable
-@SuppressWarnings("UnusedDeclaration")
 @XmlRootElement
 public class WeekRepresentation {
 

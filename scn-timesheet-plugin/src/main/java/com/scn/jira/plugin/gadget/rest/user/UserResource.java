@@ -1,10 +1,13 @@
 package com.scn.jira.plugin.gadget.rest.user;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.bc.user.search.UserSearchParams;
+import com.atlassian.jira.bc.user.search.UserSearchService;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.user.ApplicationUser;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -13,41 +16,39 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
-
-/**
- * Created by IntelliJ IDEA.
- * User: nsokolova
- * Date: 12/1/11
- * Time: 8:16 AM
- * To change this template use File | Settings | File Templates.
- */
+@Named
 @Path("/user-list")
-@AnonymousAllowed
 public class UserResource {
+    private final UserSearchService userSearchService;
+    private static final Integer MAX_RESULTS = 5000;
 
-    private final UserManager userManager;
-
-    public UserResource() {
-        this.userManager = ComponentAccessor.getUserManager();
+    @Autowired
+    public UserResource(UserSearchService userSearchService) {
+        this.userSearchService = userSearchService;
     }
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public Response getUsers() {
-        Collection<ApplicationUser> userList = this.userManager.getUsers();
-        ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getUser();
-        UserCollection userCollection = new UserCollection(convertUserToUserItem(currentUser)
-                , convertUserListToUserItems(userList));
+        ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+        Collection<ApplicationUser> userList = this.userSearchService
+            .findUsers(new JiraServiceContextImpl(currentUser), "",
+                new UserSearchParams.Builder()
+                    .maxResults(MAX_RESULTS)
+                    .allowEmptyQuery(true)
+                    .includeActive(true)
+                    .includeInactive(false).build());
+        UserCollection userCollection = new UserCollection(convertUserToUserItem(currentUser),
+            convertUserListToUserItems(userList));
         return Response.ok(userCollection).cacheControl(getNoCacheControl()).build();
     }
 
     private List<UserItem> convertUserListToUserItems(Collection<ApplicationUser> stdUserList) {
-        List<UserItem> userList = new ArrayList<UserResource.UserItem>();
+        List<UserItem> userList = new ArrayList<>();
         for (ApplicationUser u : stdUserList) {
             userList.add(convertUserToUserItem(u));
         }
@@ -66,7 +67,6 @@ public class UserResource {
 
     @XmlRootElement
     public static class UserItem {
-
         @XmlElement
         private String value;
 
@@ -78,24 +78,24 @@ public class UserResource {
             this.label = label;
         }
 
-        private UserItem() {
+        public UserItem() {
         }
     }
 
     @XmlRootElement
     public static class UserCollection {
         @XmlElement
-        private UserResource.UserItem currentUser;
+        private UserItem currentUser;
 
         @XmlElement
-        private List<UserResource.UserItem> userList;
+        private List<UserItem> userList;
 
         public UserCollection(UserItem currentUser, List<UserItem> userList) {
             this.currentUser = currentUser;
             this.userList = userList;
         }
 
-        private UserCollection() {
+        public UserCollection() {
         }
     }
 }

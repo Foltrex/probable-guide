@@ -12,30 +12,39 @@ import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 
 public interface IScnWorklogLogtimeStore {
 	
-	public List<IScnWorklog> getByProjectBetweenDates(boolean assignedCh,Project project, Date startDate, Date endDate,String user) throws DataAccessException;
+	List<IScnWorklog> getByProjectBetweenDates(boolean assignedCh, Project project, Date startDate, Date endDate, String user) throws DataAccessException;
 	
-	public List<IScnWorklog> getScnWorklogsByUserAndIssueBetweenDates(Issue issue, Date startDate, Date endDate, String user)
+	List<IScnWorklog> getScnWorklogsByUserAndIssueBetweenDates(Issue issue, Date startDate, Date endDate, String user)
 			throws DataAccessException;
 	
-	public List<IScnWorklog> getScnWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate) throws DataAccessException;
+	List<IScnWorklog> getScnWorklogsByIssueBetweenDates(Issue issue, Date startDate, Date endDate) throws DataAccessException;
 	
-	public boolean deleteScnWorklogById(Long worklogId) throws DataAccessException;
+	List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate) throws DataAccessException;
 	
-	public boolean updateScnWorklog(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;
+	boolean deleteScnWorklogById(Long worklogId) throws DataAccessException;
 	
-	public boolean updateScnWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;
+	boolean updateScnWorklog(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;
+
+	boolean updateScnWorklogAndExt(Long _worklogId, Worklog linkedWorklog) throws DataAccessException;
+
+	boolean updateScnWorklog(Long _worklogId, String _worklogType, Long _timeSpent, String _comment) throws DataAccessException;
 	
-	public boolean createScnWorklog(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
-			String worklogTypeId) throws DataAccessException;
+	boolean createScnWorklog(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
+							 String worklogTypeId) throws DataAccessException;
 	
-	public Map<String, Object> createScnWorklogResultMap(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
-			String worklogTypeId) throws DataAccessException;
+	Map<String, Object> createScnWorklogResultMap(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
+												  String worklogTypeId) throws DataAccessException;
 	
-	public IScnWorklog createScnWorklogWithoutCopy(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
-			String worklogTypeId) throws DataAccessException;
+	IScnWorklog createScnWorklogWithoutCopy(Long issueId, String _worklogType, Long _timeSpent, String _comment, String authorKey, Date date,
+											String worklogTypeId) throws DataAccessException;
 	
-	public IScnWorklog getScnWorklog(Long _worklogId) throws DataAccessException;
+	IScnWorklog getScnWorklog(Long _worklogId) throws DataAccessException;
 	
-	public boolean isProjectWLBlocked(Long projectId, Date date);
+	boolean isProjectWLBlocked(Long projectId, Date date);
 	
+	boolean isProjectWLWorklogBlocked(Long projectId, Date date);
+	
+	boolean isWlAutoCopy(Issue issue, String worklogTypeId);
+
+    boolean isWLTypeRequired(Long projectId);
 }

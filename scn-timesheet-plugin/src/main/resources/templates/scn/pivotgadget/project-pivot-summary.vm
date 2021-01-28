@@ -82,7 +82,7 @@
                 <tfoot>
                 	<tr class="rowFooter">
                         #set ($total = 0)
-                        <th class="colFooter total" colspan="4">$i18n.getText("project.pivot.total")</th>
+                        <th class="colFooter total" colspan="4">$i18n.getText("project.pivot.total.label")</th>
                         #foreach ($user in $workedUsers.keySet())
                             <th class="total userTime">$textUtil.getPrettyHours($workedUsers.get($user))</th>
                             #set ($total = $total + $workedUsers.get($user).intValue())
