@@ -71,8 +71,10 @@ public class AutoTTValidatorImpl implements AutoTTValidator {
             }
         }
 
-        if (autoTTDto.getWorklogType() != null
-            && worklogContextService.getWorklogType(autoTTDto.getWorklogType().getId()) == null) {
+        if (autoTTDto.getWorklogType() == null) {
+            errors.put("worklogType", "Worklog type has to be set");
+            validator.setValid(false);
+        } else if (worklogContextService.getWorklogType(autoTTDto.getWorklogType().getId()) == null) {
             errors.put("worklogType", "Couldn't find worklog type");
             validator.setValid(false);
         }
