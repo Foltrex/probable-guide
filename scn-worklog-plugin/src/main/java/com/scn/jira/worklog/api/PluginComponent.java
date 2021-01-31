@@ -1,4 +1,4 @@
-package com.scn.jira.worklog;
+package com.scn.jira.worklog.api;
 
 public interface PluginComponent {
     String getName();

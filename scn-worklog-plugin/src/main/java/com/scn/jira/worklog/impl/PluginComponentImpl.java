@@ -1,4 +1,4 @@
-package com.scn.jira.worklog;
+package com.scn.jira.worklog.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.event.api.EventPublisher;
@@ -44,6 +44,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugin.web.WebFragmentHelper;
 import com.atlassian.sal.api.scheduling.PluginScheduler;
+import com.scn.jira.worklog.api.PluginComponent;
 import org.springframework.stereotype.Component;
 
 @Component
