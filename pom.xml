@@ -106,7 +106,7 @@
 	</dependencyManagement>
 
 	<properties>
-		<jira.version>8.0.2</jira.version>
+		<jira.version>8.14.1</jira.version>
 		<amps.version>8.0.2</amps.version>
 		<jira.servicedesk.application.version>4.0.2</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
@@ -127,8 +127,8 @@
 		<junit>4.11</junit>
 		<!-- Maven project settings -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<!-- AMPS properties -->
 		<atlassian.dev.mode>false</atlassian.dev.mode>
 		<skipTests>true</skipTests>
@@ -145,6 +145,28 @@
 		<module>scn-automation-plugin</module>
 	</modules>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<excludeDefaultDirectories>true</excludeDefaultDirectories>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+							<excludes>
+								<exclude>container/**</exclude>
+								<exclude>jira/**</exclude>
+							</excludes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<profile>
 			<id>test</id>
@@ -158,6 +180,34 @@
 				<atlassian.dev.mode>true</atlassian.dev.mode>
 				<compressResources>true</compressResources>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>${maven-resources-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/../plugins</outputDirectory>
+									<resources>
+										<resource>
+											<directory>target</directory>
+											<includes>
+												<include>${project.artifactId}-${project.version}.jar</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>
