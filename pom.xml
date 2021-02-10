@@ -11,7 +11,7 @@
 	<groupId>com.scn.jira</groupId>
 	<artifactId>scn-jira-super-pom</artifactId>
 	<packaging>pom</packaging>
-	<version>4.1.0</version>
+	<version>1.0.0</version>
 
 	<repositories>
 		<repository>
@@ -106,9 +106,10 @@
 	</dependencyManagement>
 
 	<properties>
+		<revision>4.2.0</revision>
 		<jira.version>8.14.1</jira.version>
-		<amps.version>8.0.2</amps.version>
-		<jira.servicedesk.application.version>4.0.2</jira.servicedesk.application.version>
+		<amps.version>8.1.0</amps.version>
+		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
 		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>

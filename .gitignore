@@ -11,5 +11,6 @@ scn-timesheet-plugin/target
 scn-worklog-plugin/target
 scn-automation-plugin/target/
 scn-plugins-frontend/target/
+scn-plugins-integration/target/
 node_modules/
 scn-plugins-frontend/node/

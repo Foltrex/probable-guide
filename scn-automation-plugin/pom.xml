@@ -5,17 +5,17 @@
 	<parent>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<groupId>com.scn.jira</groupId>
-		<version>4.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
+
+	<name>JIRA ScienceSoft Automation Plugin</name>
+	<description>The plugin provide automation functionality.</description>
 
 	<groupId>com.scn.jira.automation</groupId>
 	<artifactId>scn-automation-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.2</version>
-
-	<name>JIRA ScienceSoft Automation Plugin</name>
-	<description>The plugin provide automation functionality.</description>
+	<version>${revision}</version>
 
 	<dependencies>
 		<dependency>
@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>com.scn.jira</groupId>
 			<artifactId>scn-worklog-plugin</artifactId>
-			<version>4.1.5</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

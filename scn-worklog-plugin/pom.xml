@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
-		<version>4.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
@@ -16,7 +16,7 @@
 
 	<artifactId>scn-worklog-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.5</version>
+	<version>${revision}</version>
 
 	<dependencies>
 		<dependency>
