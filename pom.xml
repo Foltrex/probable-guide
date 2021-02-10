@@ -144,6 +144,7 @@
 		<module>scn-timesheet-plugin</module>
 		<module>scn-clone-project-plugin</module>
 		<module>scn-automation-plugin</module>
+		<module>scn-plugins-integration</module>
 	</modules>
 
 	<build>
