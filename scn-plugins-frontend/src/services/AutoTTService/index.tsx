@@ -29,7 +29,7 @@ const AutoTTService: React.FC = ({ children }) => {
     item: null,
     isLoaded: true,
   });
-  const { showSuccess, showInfo, showError } = useFlagService();
+  const { showSuccess, showError } = useFlagService();
 
   const api = useMemo(
     () => ({
