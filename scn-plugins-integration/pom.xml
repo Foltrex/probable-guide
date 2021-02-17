@@ -133,4 +133,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>integration</id>
+			<properties>
+				<skipTests>false</skipTests>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<properties>
+				<skipCopyResource>true</skipCopyResource>
+			</properties>
+		</profile>
+	</profiles>
 </project>
