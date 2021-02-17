@@ -63,7 +63,7 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
                                  JiraAuthenticationContext authenticationContext) {
         super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
             dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
-            null, null, null, null);
+            null, null, null, null, null);
 
         this.worklogManager = worklogManager;
         this.worklogService = worklogService;

@@ -5,15 +5,16 @@
 	<parent>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<groupId>com.scn.jira</groupId>
-		<version>4.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
+	<name>JIRA ScienceSoft Plugins Frontend</name>
+	<description>Frontend for JIRA ScienceSoft Plugins</description>
+
 	<artifactId>scn-plugins-frontend</artifactId>
 	<packaging>pom</packaging>
-
-	<name>JIRA ScienceSoft Plugins' Frontend</name>
-	<description>Frontend for JIRA ScienceSoft Plugins</description>
+	<version>${revision}</version>
 
 	<build>
 		<plugins>
@@ -66,7 +67,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/../scn-automation-plugin/src/main/resources</outputDirectory>
+							<outputDirectory>${basedir}/../scn-automation-plugin/target/classes</outputDirectory>
 							<resources>
 								<resource>
 									<directory>target/scn-automation-plugin</directory>
@@ -79,5 +80,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

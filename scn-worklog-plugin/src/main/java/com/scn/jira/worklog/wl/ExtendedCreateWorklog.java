@@ -60,7 +60,7 @@ public class ExtendedCreateWorklog extends CreateWorklog {
                                  JiraAuthenticationContext authenticationContext) {
         super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
             dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
-            null, null, null, null);
+            null, null, null, null, null);
 
         this.worklogService = worklogService;
         this.worklogManager = worklogManager;

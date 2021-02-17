@@ -1,11 +1,9 @@
 package com.scn.jira.automation.impl.listener;
 
-import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.service.ServiceException;
 import com.atlassian.jira.service.ServiceManager;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
-import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.automation.impl.service.AutoTTExecutionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +17,14 @@ import static com.scn.jira.automation.impl.service.AutoTTExecutionService.DEFAUL
 public class PluginLauncher implements LifecycleAware {
     private static final Logger LOGGER = Logger.getLogger(PluginLauncher.class);
     private final ServiceManager serviceManager;
-    private final ActiveObjects ao;
 
     @Autowired
-    public PluginLauncher(ServiceManager serviceManager, ActiveObjects ao) {
+    public PluginLauncher(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
-        this.ao = ao;
     }
 
     @Override
     public void onStart() {
-        ao.migrate(AutoTT.class);
         removeServicesIfExist();
         createServices();
     }

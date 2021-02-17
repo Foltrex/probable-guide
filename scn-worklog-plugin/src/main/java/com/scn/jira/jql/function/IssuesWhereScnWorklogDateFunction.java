@@ -26,7 +26,7 @@ public class IssuesWhereScnWorklogDateFunction extends AbstractJqlFunction {
     private final OfBizDelegator ofBizDelegator;
     private final JqlDateSupport jqlDateSupport;
     private static final String ENTITY_SCN_WORKLOG = "ScnWorklog";
-    private static final Map<String, EntityOperator> ENTITY_OPERATOR_MAP = new HashMap<String, EntityOperator>() {
+    private static final Map<String, EntityOperator> ENTITY_OPERATOR_MAP = new HashMap<>() {
         {
             this.put("=", EntityOperator.EQUALS);
             this.put("<>", EntityOperator.NOT_EQUAL);

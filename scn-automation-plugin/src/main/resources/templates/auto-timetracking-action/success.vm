@@ -2,6 +2,12 @@
 <head>
     <title>Auto Timetracking</title>
     <meta name="decorator" content="atl.general"/>
+    <style>
+        input:focus {
+            outline-style: hidden !important;
+            box-shadow: 0 0 0 0 white !important;
+        }
+    </style>
 </head>
 <body>
 <div id="scn-automation-root"></div>

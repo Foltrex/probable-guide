@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.scn.jira</groupId>
 		<artifactId>scn-jira-super-pom</artifactId>
-		<version>4.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<name>JIRA ScienceSoft Worklog* Plugin</name>
@@ -16,7 +16,7 @@
 
 	<artifactId>scn-worklog-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.5</version>
+	<version>${revision}</version>
 
 	<dependencies>
 		<dependency>
@@ -126,61 +126,6 @@
 					<verbose>false</verbose>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<excludeDefaultDirectories>true</excludeDefaultDirectories>
-					<filesets>
-						<fileset>
-							<directory>target</directory>
-							<excludes>
-								<exclude>container/**</exclude>
-								<exclude>jira/**</exclude>
-							</excludes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<properties>
-				<atlassian.dev.mode>true</atlassian.dev.mode>
-				<compressResources>true</compressResources>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>${maven-resources-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${basedir}/../plugins</outputDirectory>
-									<resources>
-										<resource>
-											<directory>target</directory>
-											<includes>
-												<include>scn-worklog-plugin-${project.version}.jar</include>
-											</includes>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

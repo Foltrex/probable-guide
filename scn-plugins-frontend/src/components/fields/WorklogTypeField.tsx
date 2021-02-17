@@ -38,12 +38,16 @@ const WorklogTypeField: React.FC<WorklogTypeFieldProps> = ({
   }, [value]);
 
   return (
-    <Field<WorklogTypeDto> label={label} name={name} defaultValue={value}>
+    <Field<WorklogTypeDto>
+      label={label}
+      name={name}
+      defaultValue={value}
+      isRequired={true}
+    >
       {({ fieldProps: { id, ...rest }, error }) => (
         <>
           <Select
             menuPosition={"fixed"}
-            isClearable={true}
             options={options}
             id={`${id}-select`}
             className="single-select"

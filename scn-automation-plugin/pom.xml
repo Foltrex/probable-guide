@@ -5,17 +5,17 @@
 	<parent>
 		<artifactId>scn-jira-super-pom</artifactId>
 		<groupId>com.scn.jira</groupId>
-		<version>4.1.0</version>
+		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
+
+	<name>JIRA ScienceSoft Automation Plugin</name>
+	<description>The plugin provide automation functionality.</description>
 
 	<groupId>com.scn.jira.automation</groupId>
 	<artifactId>scn-automation-plugin</artifactId>
 	<packaging>atlassian-plugin</packaging>
-	<version>4.1.2</version>
-
-	<name>JIRA ScienceSoft Automation Plugin</name>
-	<description>The plugin provide automation functionality.</description>
+	<version>${revision}</version>
 
 	<dependencies>
 		<dependency>
@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>com.scn.jira</groupId>
 			<artifactId>scn-worklog-plugin</artifactId>
-			<version>4.1.5</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -124,62 +124,7 @@
 					<verbose>false</verbose>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<excludeDefaultDirectories>true</excludeDefaultDirectories>
-					<filesets>
-						<fileset>
-							<directory>target</directory>
-							<excludes>
-								<exclude>container/**</exclude>
-								<exclude>jira/**</exclude>
-							</excludes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<properties>
-				<atlassian.dev.mode>true</atlassian.dev.mode>
-				<compressResources>false</compressResources>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>${maven-resources-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${basedir}/../plugins</outputDirectory>
-									<resources>
-										<resource>
-											<directory>target</directory>
-											<includes>
-												<include>scn-automation-plugin-${project.version}.jar</include>
-											</includes>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
