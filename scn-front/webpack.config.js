@@ -22,7 +22,7 @@ module.exports = isProd
     : {
           context: path.resolve(__dirname, "src"),
           mode: "development",
-          entry: { index: ["@babel/polyfill", "./index.tsx"] },
+          entry: { index: "./index.tsx" },
           output: {
               filename: "[name].bundle.js",
               path: path.resolve(__dirname, "target"),

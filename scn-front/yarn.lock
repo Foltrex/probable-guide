@@ -341,6 +341,20 @@
     "@babel/runtime" "^7.0.0"
     "@emotion/core" "^10.0.9"
 
+"@atlaskit/table-tree@^9.0.7":
+  version "9.0.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/table-tree/-/table-tree-9.0.7.tgz#9b135197c4036f5de524d21d6052a1d21eed6852"
+  integrity sha512-hcF4uYz3gudg/mt3warbZnd/8u8EVpUWvyJA7Gm6kFCmY0OvWf5a1o/yIfMlV1ABIa+KsQvcsxiLfNf0BaQQvg==
+  dependencies:
+    "@atlaskit/analytics-next" "^8.0.0"
+    "@atlaskit/button" "^15.1.0"
+    "@atlaskit/icon" "^21.0.0"
+    "@atlaskit/spinner" "^15.0.0"
+    "@atlaskit/theme" "^11.0.0"
+    "@babel/runtime" "^7.0.0"
+    lodash "^4.17.15"
+    prop-types "^15.5.10"
+
 "@atlaskit/textfield@^4.0.10":
   version "4.0.10"
   resolved "https://registry.yarnpkg.com/@atlaskit/textfield/-/textfield-4.0.10.tgz#463473f5743d7abe7a37584f85e4a37cca061cd0"
@@ -5406,6 +5420,11 @@ react-clientside-effect@^1.2.0:
   integrity sha512-2bL8qFW1TGBHozGGbVeyvnggRpMjibeZM2536AKNENLECutp2yfs44IL8Hmpn8qjFQ2K7A9PnYf3vc7aQq/cPA==
   dependencies:
     "@babel/runtime" "^7.12.13"
+
+react-context-devtool@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-context-devtool/-/react-context-devtool-2.0.3.tgz#60d6d8669bc64e32e42069638e961acc8320d77a"
+  integrity sha512-GVpDaQqRsVoofcbViVWelWTUHNjk4CAA81ZU+TVjEwZUTjhwOgKDM4t6yGfLBoEEG8PFYKbp9QqzyWw2BASe5Q==
 
 react-dom@^16.8.0:
   version "16.14.0"

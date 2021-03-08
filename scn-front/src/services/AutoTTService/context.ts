@@ -12,3 +12,4 @@ type ContextProps = AutoTTState & {
 };
 
 export const AutoTTContext = createContext<ContextProps>(null);
+AutoTTContext.displayName = "Auto Time Tracking";

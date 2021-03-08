@@ -39,10 +39,12 @@
     "@atlaskit/quick-search": "^8.0.5",
     "@atlaskit/select": "^13.0.6",
     "@atlaskit/spinner": "^15.0.6",
+    "@atlaskit/table-tree": "^9.0.7",
     "@atlaskit/textfield": "^4.0.10",
     "@babel/polyfill": "^7.11.5",
     "axios": "^0.20.0",
     "react": "^16.8.0",
+    "react-context-devtool": "^2.0.3",
     "react-dom": "^16.8.0",
     "styled-components": "^3.2.6"
   },

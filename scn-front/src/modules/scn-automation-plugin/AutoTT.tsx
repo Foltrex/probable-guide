@@ -3,6 +3,7 @@ import AutoTTContainer from "containers/AutoTTContainer";
 import AutoTTService from "services/AutoTTService";
 import FlagService from "services/FlagService";
 import ReactDOM from "react-dom";
+import { debugContextDevtool } from "react-context-devtool";
 
 const AutoTT = () => {
   return (
@@ -14,6 +15,8 @@ const AutoTT = () => {
   );
 };
 
-window.addEventListener("load", () =>
-  ReactDOM.render(<AutoTT />, document.getElementById("scn-automation-root"))
-);
+window.addEventListener("load", () => {
+  const container = document.getElementById("scn-automation-root");
+  ReactDOM.render(<AutoTT />, container);
+  debugContextDevtool(container);
+});
