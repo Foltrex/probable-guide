@@ -4,25 +4,28 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.logtime.manager.IWorklogLogtimeManager;
 import com.scn.jira.logtime.manager.WicketManager;
-import com.scn.jira.logtime.representation.*;
+import com.scn.jira.logtime.representation.LTProjectRepresentation;
+import com.scn.jira.logtime.representation.LTProjectsRepresentation;
+import com.scn.jira.logtime.representation.ProjectRepresentation;
+import com.scn.jira.logtime.representation.WLsTypeRepresentation;
+import com.scn.jira.logtime.representation.WeekRepresentation;
+import com.scn.jira.logtime.representation.WicketRepresentation;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.ServletUtil;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
-import org.apache.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.apache.velocity.exception.VelocityException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -31,7 +34,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,9 +50,9 @@ import static com.scn.jira.worklog.globalsettings.GlobalSettingsManager.SCN_TIME
 
 @Named
 @Path("/projectsobj")
+@RequiredArgsConstructor
+@Log4j
 public class LTProjectsResource extends BaseResource {
-    private static final Logger LOGGER = Logger.getLogger(LTProjectsResource.class);
-
     private final UserManager userManager;
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;
@@ -50,26 +61,7 @@ public class LTProjectsResource extends BaseResource {
     private final IWorklogLogtimeManager iWorklogLogtimeManager;
     private final WicketManager wicketManager;
 
-    @Inject
-    public LTProjectsResource(PermissionManager permissionManager,
-                              JiraAuthenticationContext authenticationContext,
-                              ProjectManager projectManager,
-                              ExtendedConstantsManager defaultExtendedConstantsManager,
-                              IGlobalSettingsManager scnGlobalPermissionManager,
-                              IWorklogLogtimeManager iWorklogLogtimeManager,
-                              WicketManager wicketManager) {
-        this.wicketManager = wicketManager;
-        this.userManager = ComponentAccessor.getUserManager();
-        this.permissionManager = permissionManager;
-        this.authenticationContext = authenticationContext;
-        this.projectManager = projectManager;
-        this.extendedConstantsManager = defaultExtendedConstantsManager;
-        this.scnGlobalPermissionManager = scnGlobalPermissionManager;
-        this.iWorklogLogtimeManager = iWorklogLogtimeManager;
-    }
-
     @POST
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getTimesheet(@Context HttpServletRequest request, @FormParam("prjList") String prjList,
                                  @FormParam("usersSelected") String usersSelected, @FormParam("viewType") String viewType) {
@@ -94,7 +86,7 @@ public class LTProjectsResource extends BaseResource {
                     selectedProjects, scnWl, extWl, selectedUsers, viewType))))
                 .cacheControl(getNoCacheControl()).build();
         } catch (VelocityException e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
             response = Response.serverError().build();
         }
         return response;
@@ -273,7 +265,7 @@ public class LTProjectsResource extends BaseResource {
             ApplicationUser user = userManager.getUserByKey(userString);
 
             if (user == null) {
-                LOGGER.error("USER WAS NOT FOUND!");
+                log.error("USER WAS NOT FOUND!");
                 continue;
             }
 
@@ -287,13 +279,13 @@ public class LTProjectsResource extends BaseResource {
                         extWlCheck, false, userString);
 
                 for (String date : dates) {
-                    Integer totalScn = totalScnList.get(date) == null ? new Integer(0) : totalScnList.get(date);
-                    totalScn = totalScn + (ltProjectRepresentation == null ? new Integer(0)
+                    Integer totalScn = totalScnList.get(date) == null ? Integer.valueOf(0) : totalScnList.get(date);
+                    totalScn = totalScn + (ltProjectRepresentation == null ? Integer.valueOf(0)
                         : ltProjectRepresentation.getScnWlTotal().get(date));
                     totalScnList.put(date, totalScn);
 
-                    Integer totalExt = totalExtList.get(date) == null ? new Integer(0) : totalExtList.get(date);
-                    totalExt = totalExt + (ltProjectRepresentation == null ? new Integer(0)
+                    Integer totalExt = totalExtList.get(date) == null ? Integer.valueOf(0) : totalExtList.get(date);
+                    totalExt = totalExt + (ltProjectRepresentation == null ? Integer.valueOf(0)
                         : ltProjectRepresentation.getExtWlTotal().get(date));
                     totalExtList.put(date, totalExt);
                 }

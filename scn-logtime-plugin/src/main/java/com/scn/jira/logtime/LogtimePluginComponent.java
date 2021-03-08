@@ -1,5 +1,5 @@
 package com.scn.jira.logtime;
 
-public interface PluginComponent {
+public interface LogtimePluginComponent {
     String getName();
 }

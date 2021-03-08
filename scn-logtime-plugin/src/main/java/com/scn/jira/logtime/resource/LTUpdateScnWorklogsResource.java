@@ -5,15 +5,13 @@ import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -30,24 +28,13 @@ import java.util.stream.Collectors;
 
 @Named
 @Path("/updateScnWorklogs")
+@RequiredArgsConstructor
 public class LTUpdateScnWorklogsResource extends BaseResource {
     private final IssueManager issueManager;
     private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
     private final IScnWorklogService scnWorklogService;
 
-    @Inject
-    public LTUpdateScnWorklogsResource(JiraAuthenticationContext authenticationContext,
-                                       IssueManager issueManager,
-                                       IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
-                                       IScnWorklogService scnWorklogService) {
-        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
-        this.authenticationContext = authenticationContext;
-        this.issueManager = issueManager;
-        this.scnWorklogService = scnWorklogService;
-    }
-
     @GET
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getWorklogForUpdate(@Context HttpServletRequest request,
                                         @QueryParam("wlsToSave") List<String> wlsToSave, @QueryParam("issueId") String issueId) {

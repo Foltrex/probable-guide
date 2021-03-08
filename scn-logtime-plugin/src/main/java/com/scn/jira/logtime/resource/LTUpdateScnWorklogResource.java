@@ -1,6 +1,5 @@
 package com.scn.jira.logtime.resource;
 
-import aQute.lib.strings.Strings;
 import com.atlassian.crowd.integration.rest.entity.ErrorEntity;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
@@ -8,18 +7,16 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.permission.ProjectPermissions;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -34,6 +31,7 @@ import java.util.Objects;
 
 @Named
 @Path("/updateScnWorklog")
+@RequiredArgsConstructor
 public class LTUpdateScnWorklogResource extends BaseResource {
     private final IssueManager issueManager;
     private final IScnWorklogManager scnWorklogManager;
@@ -41,23 +39,7 @@ public class LTUpdateScnWorklogResource extends BaseResource {
     private final IScnWorklogService scnWorklogService;
     private final PermissionManager permissionManager;
 
-    @Inject
-    public LTUpdateScnWorklogResource(JiraAuthenticationContext authenticationContext,
-                                      IssueManager issueManager,
-                                      IScnWorklogManager scnWorklogManager,
-                                      IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
-                                      IScnWorklogService scnWorklogService,
-                                      PermissionManager permissionManager) {
-        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
-        this.authenticationContext = authenticationContext;
-        this.issueManager = issueManager;
-        this.scnWorklogManager = scnWorklogManager;
-        this.scnWorklogService = scnWorklogService;
-        this.permissionManager = permissionManager;
-    }
-
     @GET
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getWorklogForUpdate(@Context HttpServletRequest request, @QueryParam("complexWLId") String complexWLId,
                                         @QueryParam("complexId2") String complexId2, @QueryParam("newValue") String newValue, @QueryParam("newWLType") String newWLType,
