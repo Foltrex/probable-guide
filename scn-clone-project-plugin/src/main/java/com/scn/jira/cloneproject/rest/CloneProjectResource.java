@@ -1,13 +1,4 @@
-package com.scn.cloneproject.rest;
-
-import java.util.List;
-
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+package com.scn.jira.cloneproject.rest;
 
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.jira.avatar.Avatar;
@@ -29,9 +20,19 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+import lombok.RequiredArgsConstructor;
+
+import javax.inject.Named;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.List;
 
 @Named
 @Path("/doclone")
+@RequiredArgsConstructor
 public class CloneProjectResource {
     private final ProjectService projectService;
     private final AvatarManager avatarManager;
@@ -43,23 +44,6 @@ public class CloneProjectResource {
     private final FieldLayoutManager fieldLayoutManager;
     private final IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
     private final UserManager userManager;
-
-    public CloneProjectResource(ProjectService projectService, ProjectManager projectManager,
-                                PermissionSchemeManager permissionSchemeManager, NotificationSchemeManager notificationSchemeManager,
-                                IssueSecuritySchemeManager issueSecuritySchemeManager, WorkflowSchemeManager workflowSchemeManager,
-                                FieldLayoutManager fieldLayoutManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager,
-                                AvatarManager avatarManager, UserManager userManager) {
-        this.projectService = projectService;
-        this.projectManager = projectManager;
-        this.permissionSchemeManager = permissionSchemeManager;
-        this.notificationSchemeManager = notificationSchemeManager;
-        this.issueSecuritySchemeManager = issueSecuritySchemeManager;
-        this.workflowSchemeManager = workflowSchemeManager;
-        this.fieldLayoutManager = fieldLayoutManager;
-        this.issueTypeScreenSchemeManager = issueTypeScreenSchemeManager;
-        this.avatarManager = avatarManager;
-        this.userManager = userManager;
-    }
 
     @POST
     @Produces("text/plain")

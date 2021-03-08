@@ -1,12 +1,4 @@
-package com.scn.cloneproject.rest;
-
-import javax.inject.Named;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+package com.scn.jira.cloneproject.rest;
 
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.jira.bc.project.ProjectService;
@@ -19,9 +11,19 @@ import com.atlassian.jira.notification.NotificationSchemeManager;
 import com.atlassian.jira.permission.PermissionSchemeManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
+import lombok.RequiredArgsConstructor;
+
+import javax.inject.Named;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 @Named
 @Path("/project")
+@RequiredArgsConstructor
 public class ProjectResource {
     private final ProjectService projectService;
     private final WorkflowSchemeManager workflowSchemeManager;
@@ -31,20 +33,6 @@ public class ProjectResource {
     private final NotificationSchemeManager notificationSchemeManager;
     private final IssueSecuritySchemeManager issueSecuritySchemeManager;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
-
-    public ProjectResource(ProjectService projectService, WorkflowSchemeManager workflowSchemeManager,
-                           IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldLayoutManager fieldLayoutManager,
-                           PermissionSchemeManager permissionSchemeManager, NotificationSchemeManager notificationSchemeManager,
-                           IssueSecuritySchemeManager issueSecuritySchemeManager, IssueTypeSchemeManager issueTypeSchemeManager) {
-        this.projectService = projectService;
-        this.workflowSchemeManager = workflowSchemeManager;
-        this.issueTypeScreenSchemeManager = issueTypeScreenSchemeManager;
-        this.fieldLayoutManager = fieldLayoutManager;
-        this.permissionSchemeManager = permissionSchemeManager;
-        this.notificationSchemeManager = notificationSchemeManager;
-        this.issueSecuritySchemeManager = issueSecuritySchemeManager;
-        this.issueTypeSchemeManager = issueTypeSchemeManager;
-    }
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
