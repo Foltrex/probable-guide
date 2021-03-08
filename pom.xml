@@ -13,13 +13,6 @@
 	<packaging>pom</packaging>
 	<version>1.0.0</version>
 
-	<repositories>
-		<repository>
-			<id>atlassian-public</id>
-			<url>https://maven.atlassian.com/repository/public/</url>
-		</repository>
-	</repositories>
-
 	<organization>
 		<name>ScienceSoft</name>
 		<url>http://www.scnsoft.com</url>
@@ -51,34 +44,32 @@
 				<version>${atlassian-rest-common}</version>
 				<scope>provided</scope>
 			</dependency>
+
 			<dependency>
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>jsr311-api</artifactId>
-				<version>${jsr311-api}</version>
+				<groupId>com.atlassian.plugins</groupId>
+				<artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+				<version>${osgi.javaconfig.version}</version>
+			</dependency>
+			<!-- OSGi Java Config dependencies -->
+			<dependency>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>org.apache.felix.framework</artifactId>
+				<version>4.0.0</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.atlassian.plugin</groupId>
-				<artifactId>atlassian-spring-scanner-annotation</artifactId>
-				<version>${atlassian.spring.scanner.version}</version>
-				<scope>compile</scope>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.atlassian.plugin</groupId>
-				<artifactId>atlassian-spring-scanner-runtime</artifactId>
-				<version>${atlassian.spring.scanner.version}</version>
-				<scope>runtime</scope>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
-			<dependency>
-				<groupId>net.jcip</groupId>
-				<artifactId>jcip-annotations</artifactId>
-				<version>${jcip}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mapstruct</groupId>
-				<artifactId>mapstruct-jdk8</artifactId>
-				<version>${mapstruct}</version>
-			</dependency>
+
 			<dependency>
 				<groupId>com.atlassian.activeobjects</groupId>
 				<artifactId>activeobjects-plugin</artifactId>
@@ -97,6 +88,32 @@
 				<version>${jtds.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- WIRED TEST RUNNER DEPENDENCIES -->
+			<dependency>
+				<groupId>com.atlassian.plugins</groupId>
+				<artifactId>atlassian-plugins-osgi-testrunner</artifactId>
+				<version>${plugin.testrunner.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>jsr311-api</artifactId>
+				<version>${jsr311-api}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.2.2-atlassian-1</version>
+			</dependency>
+
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>${junit}</version>
@@ -106,13 +123,16 @@
 	</dependencyManagement>
 
 	<properties>
-		<revision>4.2.0</revision>
+		<revision>4.2.1-M1</revision>
 		<jira.version>8.14.1</jira.version>
 		<amps.version>8.1.0</amps.version>
 		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
 		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
+		<osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
+		<spring.version>4.2.5.RELEASE</spring.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+		<testkit.version>6.3.11</testkit.version>
 		<atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
 		<org.mapstruct.version>1.3.0.Final</org.mapstruct.version>
 		<quick.reload.version>3.0.0</quick.reload.version>
@@ -124,28 +144,29 @@
 		<ao.version>3.0.0</ao.version>
 		<jsoup.version>1.8.3</jsoup.version>
 		<jtds.version>1.3.1</jtds.version>
-		<skipCopyResource>false</skipCopyResource>
-
+		<lombok.version>1.18.12</lombok.version>
 		<junit>4.11</junit>
 		<!-- Maven project settings -->
+		<skipCopyResource>false</skipCopyResource>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- AMPS properties -->
 		<atlassian.dev.mode>false</atlassian.dev.mode>
 		<skipTests>true</skipTests>
 		<compressResources>false</compressResources>
+		<httpPort>2990</httpPort>
 	</properties>
 
 	<modules>
-		<module>scn-plugins-frontend</module>
+		<module>scn-front</module>
 		<module>scn-worklog-plugin</module>
 		<module>scn-logtime-plugin</module>
 		<module>scn-mytime-gadget-plugin</module>
 		<module>scn-timesheet-plugin</module>
 		<module>scn-clone-project-plugin</module>
 		<module>scn-automation-plugin</module>
-		<module>scn-plugins-integration</module>
+		<module>scn-integration-plugin</module>
 	</modules>
 
 	<build>
@@ -190,7 +211,7 @@
 									<goal>copy-resources</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${basedir}/../plugins</outputDirectory>
+									<outputDirectory>${basedir}/../plugins/${revision}</outputDirectory>
 									<resources>
 										<resource>
 											<directory>target</directory>

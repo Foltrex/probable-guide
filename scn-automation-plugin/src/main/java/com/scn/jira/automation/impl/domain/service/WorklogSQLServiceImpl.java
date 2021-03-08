@@ -5,6 +5,7 @@ import com.atlassian.jira.ofbiz.OfBizConnectionFactory;
 import com.scn.jira.automation.api.domain.service.WorklogSQLService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogKind;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WorklogSQLServiceImpl implements WorklogSQLService {
     private final OfBizConnectionFactory ofBizConnectionFactory = DefaultOfBizConnectionFactory.getInstance();
 

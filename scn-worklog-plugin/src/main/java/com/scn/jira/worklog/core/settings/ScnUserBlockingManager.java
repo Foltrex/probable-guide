@@ -1,5 +1,13 @@
 package com.scn.jira.worklog.core.settings;
 
+import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.properties.PropertiesManager;
+import com.atlassian.jira.util.dbc.Assertions;
+import com.opensymphony.module.propertyset.PropertySet;
+
+import javax.annotation.Nullable;
+import javax.inject.Named;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,17 +15,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.inject.Named;
-
-import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.config.properties.PropertiesManager;
-import com.atlassian.jira.util.dbc.Assertions;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.opensymphony.module.propertyset.PropertySet;
-
-@ExportAsService({ScnUserBlockingManager.class, IScnUserBlockingManager.class})
 @Named("scnUserBlockingManager")
 public class ScnUserBlockingManager implements IScnUserBlockingManager {
     private static final String BLOCKING_DATE_FOR = "scn_user_blocking_date_for_";

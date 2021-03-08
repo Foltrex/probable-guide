@@ -1,15 +1,18 @@
 package com.scn.jira.automation.impl.rest;
 
-import com.atlassian.jira.project.ProjectManager;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.WorklogBackupService;
 import com.scn.jira.automation.impl.domain.dto.Validator;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Named;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -26,22 +29,16 @@ import java.util.stream.Stream;
 @Named
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class BackupResource extends BaseResource {
     private final WorklogBackupService worklogBackupService;
-
-    @Autowired
-    public BackupResource(WorklogBackupService worklogBackupService,
-                          JiraContextService contextService,
-                          ProjectManager projectManager) {
-        super(contextService, projectManager);
-        this.worklogBackupService = worklogBackupService;
-    }
+    private final JiraContextService contextService;
 
     @POST
     public Response doBackup(@QueryParam("pid") Long pid,
                              @QueryParam("from") String from,
                              @QueryParam("to") String to) throws ParseException {
-        if (!this.isAdministrationAllowed()) {
+        if (!this.contextService.isCurrentUserAdmin()) {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new Validator("No permissions to backup.")).build();
         }

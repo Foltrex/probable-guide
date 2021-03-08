@@ -1,8 +1,7 @@
 package com.scn.jira.automation.impl.domain.service;
 
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.scn.jira.automation.api.domain.service.ScnBIService;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -16,9 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@ExportAsService(ScnBIService.class)
+@Log4j
 public class ScnBIServiceImpl implements ScnBIService {
-    private static final Logger LOGGER = Logger.getLogger(ScnBIServiceImpl.class);
     private final static String DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
     private final static String CONNECTION = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
     private final static String LOGIN = "sps-training-admin";
@@ -48,10 +46,10 @@ public class ScnBIServiceImpl implements ScnBIService {
                 rs.close();
                 pstmt.close();
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                log.error(e.getMessage());
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
         }
 
         return result;

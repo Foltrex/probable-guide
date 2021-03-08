@@ -4,10 +4,17 @@ import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.validator.AutoTTValidator;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Named;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -18,16 +25,10 @@ import java.util.stream.Collectors;
 @Provider
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
+@RequiredArgsConstructor
 public class AutoTTResource {
     private final AutoTTService autoTTService;
     private final AutoTTValidator autoTTValidator;
-
-    @Autowired
-    public AutoTTResource(AutoTTService autoTTService,
-                          AutoTTValidator autoTTValidator) {
-        this.autoTTService = autoTTService;
-        this.autoTTValidator = autoTTValidator;
-    }
 
     @GET
     public Response getAll() {

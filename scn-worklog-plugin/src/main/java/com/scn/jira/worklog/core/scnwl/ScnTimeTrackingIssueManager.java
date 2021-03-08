@@ -1,13 +1,11 @@
 package com.scn.jira.worklog.core.scnwl;
 
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.util.Assertions;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@ExportAsService({ScnTimeTrackingIssueManager.class })
 @Named("scnTimeTrackingIssueManager")
 public class ScnTimeTrackingIssueManager implements IScnTimeTrackingIssueManager {
 
@@ -63,12 +61,12 @@ public class ScnTimeTrackingIssueManager implements IScnTimeTrackingIssueManager
             }
 
             final IScnExtendedIssue newExtIssue = new ScnExtendedIssue(newWorklog.getIssue(), extIssue.getId(),
-                    extIssue.getOriginalEstimate(),
-                    newEstimate == null ? extIssue.getEstimate() : newEstimate,
-                    newTimeSpent);
+                extIssue.getOriginalEstimate(),
+                newEstimate == null ? extIssue.getEstimate() : newEstimate,
+                newTimeSpent);
 
             ofBizExtIssueStore.update(newExtIssue);
-        }        
+        }
     }
 
     public void updateIssueOnWorklogDelete(ApplicationUser user, IScnWorklog worklog, Long newEstimate, boolean dispatchEvent) {
@@ -81,18 +79,18 @@ public class ScnTimeTrackingIssueManager implements IScnTimeTrackingIssueManager
             if (extIssue.getTimeSpent() != null && (extIssue.getTimeSpent() - worklog.getTimeSpent()) > 0L) {
                 newTotalTimeSpent = extIssue.getTimeSpent() - worklog.getTimeSpent();
             }
-            
+
             final IScnExtendedIssue newExtIssue = new ScnExtendedIssue(worklog.getIssue(), extIssue.getId(),
-                    extIssue.getOriginalEstimate(),
-                    newEstimate == null ? extIssue.getEstimate() : newEstimate,
-                    newTotalTimeSpent);
+                extIssue.getOriginalEstimate(),
+                newEstimate == null ? extIssue.getEstimate() : newEstimate,
+                newTotalTimeSpent);
 
             ofBizExtIssueStore.update(newExtIssue);
         }
     }
 
     private void validateWorklogAndIssue(IScnWorklog worklog) {
-    	Assertions.notNull("IScnWorklog", worklog);
-		Assertions.notNull("issue", worklog.getIssue());
+        Assertions.notNull("IScnWorklog", worklog);
+        Assertions.notNull("issue", worklog.getIssue());
     }
 }

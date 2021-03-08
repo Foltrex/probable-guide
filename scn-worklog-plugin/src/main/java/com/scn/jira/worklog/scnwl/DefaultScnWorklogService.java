@@ -26,9 +26,12 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.opensymphony.util.TextUtils;
-import com.scn.jira.worklog.core.scnwl.*;
+import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
+import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
+import com.scn.jira.worklog.core.scnwl.IScnWorklog;
+import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
+import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnUserBlockingManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
@@ -37,9 +40,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
-@ExportAsService(IScnWorklogService.class)
 @Service
 public class DefaultScnWorklogService implements IScnWorklogService {
     private static final Logger LOGGER = Logger.getLogger(DefaultScnWorklogService.class);

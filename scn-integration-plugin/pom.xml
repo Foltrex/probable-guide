@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>scn-jira-super-pom</artifactId>
+		<groupId>com.scn.jira</groupId>
+		<version>1.0.0</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>JIRA ScienceSoft Integration Plugin</name>
+	<description>Integration for JIRA ScienceSoft Plugins</description>
+
+	<artifactId>scn-integration-plugin</artifactId>
+	<packaging>atlassian-plugin</packaging>
+	<version>${revision}</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.scn.jira</groupId>
+			<artifactId>scn-worklog-plugin</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.scn.jira</groupId>
+			<artifactId>scn-clone-project-plugin</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.atlassian.plugins</groupId>
+			<artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+		</dependency>
+		<!-- OSGi Java Config dependencies -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<!-- WIRED TEST RUNNER DEPENDENCIES -->
+		<dependency>
+			<groupId>com.atlassian.plugins</groupId>
+			<artifactId>atlassian-plugins-osgi-testrunner</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.atlassian.maven.plugins</groupId>
+				<artifactId>jira-maven-plugin</artifactId>
+				<version>${amps.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<productVersion>${jira.version}</productVersion>
+					<productDataVersion>${jira.version}</productDataVersion>
+					<!--					<productDataPath>${basedir}/src/test/resources/generated-test-resources.zip</productDataPath>-->
+					<enableQuickReload>true</enableQuickReload>
+					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
+					<skipITs>${skipTests}</skipITs>
+					<skipUTs>${skipTests}</skipUTs>
+					<skipAllPrompts>${skipTests}</skipAllPrompts>
+					<extractDependencies>false</extractDependencies>
+					<skipManifestValidation>true</skipManifestValidation>
+					<systemProperties>
+						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
+					</systemProperties>
+					<instructions>
+						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
+						<Spring-Context>*</Spring-Context>
+						<Export-Package>
+							com.scn.jira.integration.*,
+						</Export-Package>
+						<Import-Package>
+							com.scn.jira.cloneproject.*,
+							com.scn.jira.worklog.*,
+							org.springframework.osgi.*;resolution:="optional",
+							org.eclipse.gemini.blueprint.*;resolution:="optional",
+							*;resolution:="optional"
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>integration</id>
+			<properties>
+				<skipTests>false</skipTests>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<properties>
+				<skipCopyResource>true</skipCopyResource>
+			</properties>
+		</profile>
+	</profiles>
+</project>

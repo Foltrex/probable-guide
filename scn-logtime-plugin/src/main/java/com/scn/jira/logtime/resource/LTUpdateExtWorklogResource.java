@@ -14,21 +14,17 @@ import com.atlassian.jira.issue.worklog.WorklogImpl2;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -42,6 +38,7 @@ import java.util.Objects;
 
 @Named
 @Path("/updateExtWorklog")
+@RequiredArgsConstructor
 public class LTUpdateExtWorklogResource extends BaseResource {
     private static final Logger LOGGER = Logger.getLogger(LTUpdateExtWorklogResource.class);
 
@@ -53,27 +50,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
     private final WorklogService worklogService;
     private final PermissionManager permissionManager;
 
-    @Inject
-    public LTUpdateExtWorklogResource(JiraAuthenticationContext authenticationContext,
-                                      IssueManager issueManager,
-                                      @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-                                      ExtendedWorklogManager extendedWorklogManager,
-                                      ScnProjectSettingsManager projectSettignsManager,
-                                      IScnWorklogLogtimeStore iScnWorklogLogtimeStore,
-                                      WorklogService worklogService,
-                                      PermissionManager permissionManager) {
-        this.iScnWorklogLogtimeStore = iScnWorklogLogtimeStore;
-        this.authenticationContext = authenticationContext;
-        this.issueManager = issueManager;
-        this.worklogManager = worklogManager;
-        this.extendedWorklogManager = extendedWorklogManager;
-        this.projectSettignsManager = projectSettignsManager;
-        this.worklogService = worklogService;
-        this.permissionManager = permissionManager;
-    }
-
     @GET
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getTimesheet(@Context HttpServletRequest request, @QueryParam("complexWLId") String complexWLId,
                                  @QueryParam("newValue") String newValue, @QueryParam("newWLType") String newWLType,
@@ -137,8 +114,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
                     ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
                 .status(Response.Status.FORBIDDEN)
                 .build();
-        } else
-        if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
+        } else if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
             || (worklogId != 0 && isValueEmplty && !worklogService.hasPermissionToDelete(serviceContext, worklog))
             || (worklogId != 0 && !isValueEmplty && !worklogService.hasPermissionToUpdate(serviceContext, worklog))
             || (worklogId == 0) && !isValueEmplty && !worklogService.hasPermissionToCreate(serviceContext, issue, false)) {

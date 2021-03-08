@@ -13,21 +13,33 @@ import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.util.collect.MapBuilder;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
-import org.ofbiz.core.entity.*;
+import org.ofbiz.core.entity.EntityCondition;
+import org.ofbiz.core.entity.EntityConditionList;
+import org.ofbiz.core.entity.EntityExpr;
+import org.ofbiz.core.entity.EntityFieldMap;
+import org.ofbiz.core.entity.EntityOperator;
+import org.ofbiz.core.entity.GenericEntityException;
+import org.ofbiz.core.entity.GenericTransactionException;
+import org.ofbiz.core.entity.GenericValue;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static org.ofbiz.core.entity.EntityOperator.*;
+import static org.ofbiz.core.entity.EntityOperator.EQUALS;
+import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.LESS_THAN_EQUAL_TO;
 
-@ExportAsService({OfBizScnWorklogStore.class})
 @Named("ofBizScnWorklogStore")
 public class OfBizScnWorklogStore implements IScnWorklogStore {
     private final OfBizDelegator ofBizDelegator;

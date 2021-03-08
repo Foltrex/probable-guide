@@ -2,18 +2,14 @@ package com.scn.jira.automation.impl.webaction;
 
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Named;
 
 @Named
+@RequiredArgsConstructor
 public class AutoTTAction extends JiraWebActionSupport {
     private final PageBuilderService pageBuilderService;
-
-    @Autowired
-    public AutoTTAction(PageBuilderService pageBuilderService) {
-        this.pageBuilderService = pageBuilderService;
-    }
 
     @Override
     public String execute() throws Exception {

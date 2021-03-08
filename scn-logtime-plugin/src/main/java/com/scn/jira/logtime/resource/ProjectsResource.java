@@ -3,14 +3,12 @@ package com.scn.jira.logtime.resource;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.representation.ProjectRepresentation;
 import com.scn.jira.logtime.representation.ProjectsRepresentation;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -20,21 +18,19 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 @Named
 @Path("/projectsuser")
+@RequiredArgsConstructor
 public class ProjectsResource extends BaseResource {
-    private PermissionManager permissionManager;
-
-    @Inject
-    public ProjectsResource(JiraAuthenticationContext authenticationContext, PermissionManager permissionManager) {
-        this.permissionManager = permissionManager;
-        this.authenticationContext = authenticationContext;
-    }
+    private final PermissionManager permissionManager;
 
     @GET
-    @AnonymousAllowed
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProjects(@Context HttpServletRequest request) {
         // get the corresponding com.opensymphony.os.User object for
@@ -59,7 +55,6 @@ public class ProjectsResource extends BaseResource {
 
     @GET
     @Path("/validate")
-    @AnonymousAllowed
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response validate(@QueryParam("project") String projects) {
         return Response.ok().cacheControl(getNoCacheControl()).build();
