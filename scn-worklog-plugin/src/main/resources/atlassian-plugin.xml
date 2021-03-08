@@ -29,8 +29,8 @@
 	<!-- ACTIVEOBJECTS CONFIG -->
 	<ao key="ao-module" name="Plugin Active Objects">
 		<description>AO entities and upgrade tasks Configuration</description>
-		<entity>com.scn.jira.wl.wltypes.dal.WLTypeEntity</entity>
-		<upgradeTask>com.scn.jira.wl.wltypes.dal.upgrades.v1.Upgrade001</upgradeTask>
+		<entity>com.scn.jira.worklog.wltypes.dal.WLTypeEntity</entity>
+		<upgradeTask>com.scn.jira.worklog.wltypes.dal.upgrades.v1.Upgrade001</upgradeTask>
 	</ao>
 	<!-- REST SERVICE -->
 	<rest key="rest-service" name="Plugin Global REST Service"
@@ -527,7 +527,7 @@
 	<jql-function name="Recent Project Function"
 				  i18n-name-key="recent-project-function.name"
 				  key="recent-project-function"
-				  class="com.scn.jira.jql.function.RecentProjectFunction">
+				  class="com.scn.jira.worklog.jql.function.RecentProjectFunction">
 		<description>The Recent Project Function Plugin</description>
 		<fname>recentProjects</fname>
 		<list>true</list>
@@ -535,7 +535,7 @@
 	<jql-function name="Updated Without History Function"
 				  i18n-name-key="updated-without-history-function.name"
 				  key="updated-without-history-function"
-				  class="com.scn.jira.jql.function.UpdatedWithoutHistoryFunction">
+				  class="com.scn.jira.worklog.jql.function.UpdatedWithoutHistoryFunction">
 		<description>The Updated Without History Function Plugin</description>
 		<fname>updatedWithoutHistory</fname>
 		<list>true</list>
@@ -543,7 +543,7 @@
 	<jql-function name="Issues Where WL* Date"
 				  i18n-name-key="issues-where-scn-worklog-date-function.name"
 				  key="issues-where-scn-worklog-date-function"
-				  class="com.scn.jira.jql.function.IssuesWhereScnWorklogDateFunction">
+				  class="com.scn.jira.worklog.jql.function.IssuesWhereScnWorklogDateFunction">
 		<description>The Issues Where WL* Date Function Plugin</description>
 		<fname>issuesWhereScnWorklogDate</fname>
 		<list>true</list>

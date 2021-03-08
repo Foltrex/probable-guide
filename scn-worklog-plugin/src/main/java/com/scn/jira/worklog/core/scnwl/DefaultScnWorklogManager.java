@@ -7,7 +7,6 @@ import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.dbc.Assertions;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 
 import javax.inject.Inject;
@@ -15,7 +14,6 @@ import javax.inject.Named;
 import java.util.Date;
 import java.util.List;
 
-@ExportAsService({DefaultScnWorklogManager.class, IScnWorklogManager.class})
 @Named("defaultScnWorklogManager")
 public class DefaultScnWorklogManager implements IScnWorklogManager {
     private final OfBizScnWorklogStore worklogStore;

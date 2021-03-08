@@ -1,20 +1,17 @@
 package com.scn.jira.worklog.settings;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.util.dbc.Assertions;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 
-@ExportAsService({ScnProjectSettingsService.class})
 @Named("scnProjectSettingsService")
 public class ScnProjectSettingsService implements IScnProjectSettingsService {
     private final IScnProjectSettingsManager psManager;

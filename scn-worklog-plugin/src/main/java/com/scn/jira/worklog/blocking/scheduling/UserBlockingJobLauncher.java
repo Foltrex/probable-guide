@@ -1,6 +1,5 @@
 package com.scn.jira.worklog.blocking.scheduling;
 
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.sal.api.scheduling.PluginScheduler;
 import com.scn.jira.worklog.core.settings.IScnUserBlockingManager;
@@ -9,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Calendar;
 
-@ExportAsService({UserBlockingJobLauncher.class})
 @Named("userBlockingJobLauncher")
 public class UserBlockingJobLauncher implements LifecycleAware {
     private static final String JOB_KEY = UserBlockingJobLauncher.class.getName() + ":job";
