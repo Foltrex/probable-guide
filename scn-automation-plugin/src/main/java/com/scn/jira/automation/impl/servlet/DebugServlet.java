@@ -1,7 +1,7 @@
 package com.scn.jira.automation.impl.servlet;
 
 import com.scn.jira.automation.api.domain.service.ScnBIService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServlet;
@@ -13,13 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 @Component
+@RequiredArgsConstructor
 public class DebugServlet extends HttpServlet {
     private final ScnBIService scnBIService;
-
-    @Autowired
-    public DebugServlet(ScnBIService scnBIService) {
-        this.scnBIService = scnBIService;
-    }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);

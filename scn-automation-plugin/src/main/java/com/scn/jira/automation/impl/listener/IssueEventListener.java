@@ -1,25 +1,20 @@
 package com.scn.jira.automation.impl.listener;
 
-import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.jira.event.issue.IssueEvent;
 import com.atlassian.jira.event.type.EventType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
 @Component
+@RequiredArgsConstructor
 public class IssueEventListener implements InitializingBean, DisposableBean {
     public final EventPublisher eventPublisher;
-
-    @Autowired
-    public IssueEventListener(EventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
 
     @Override
     public void afterPropertiesSet() {

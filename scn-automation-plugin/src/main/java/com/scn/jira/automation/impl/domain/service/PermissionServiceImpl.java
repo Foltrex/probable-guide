@@ -5,19 +5,15 @@ import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.PermissionService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 
 @Service
+@RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {
     private final JiraContextService jiraContextService;
-
-    @Autowired
-    public PermissionServiceImpl(JiraContextService jiraContextService) {
-        this.jiraContextService = jiraContextService;
-    }
 
     @Override
     public boolean hasPermission(@Nonnull PermissionKey key, @Nonnull AutoTTDto autoTTDto, @Nonnull ApplicationUser user) {

@@ -1,5 +1,5 @@
 package com.scn.jira.automation.api;
 
-public interface PluginComponent {
+public interface AutomationPluginComponent {
     String getName();
 }

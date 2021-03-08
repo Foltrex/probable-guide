@@ -13,30 +13,20 @@ import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.impl.domain.dto.IssueDto;
 import com.scn.jira.automation.impl.domain.dto.ProjectDto;
 import com.scn.jira.automation.impl.domain.dto.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
 
 @Service
+@RequiredArgsConstructor
 public class JiraContextServiceImpl implements JiraContextService {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final UserManager userManager;
     private final ProjectManager projectManager;
     private final IssueManager issueManager;
     private final GlobalPermissionManager globalPermissionManager;
-
-    @Autowired
-    public JiraContextServiceImpl(JiraAuthenticationContext jiraAuthenticationContext,
-                                  UserManager userManager, ProjectManager projectManager,
-                                  IssueManager issueManager, GlobalPermissionManager globalPermissionManager) {
-        this.jiraAuthenticationContext = jiraAuthenticationContext;
-        this.userManager = userManager;
-        this.projectManager = projectManager;
-        this.issueManager = issueManager;
-        this.globalPermissionManager = globalPermissionManager;
-    }
 
     @Override
     public Locale getLocale() {
