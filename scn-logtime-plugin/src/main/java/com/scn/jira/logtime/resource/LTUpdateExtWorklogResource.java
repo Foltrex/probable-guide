@@ -61,7 +61,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
             .valueOf(getWlIdFromRequestParameter(complexWLId, 1)));
         String date = getWlIdFromRequestParameter(complexWLId, 3).equals("") ? "" : (getWlIdFromRequestParameter(complexWLId, 3));
         String userCreated = getWlIdFromRequestParameter(complexWLId, 5).equals("") ? "" : (getWlIdFromRequestParameter(complexWLId, 5));
-        userCreated = userCreated != null ? userCreated.toLowerCase() : "";
+        userCreated = userCreated != null ? userCreated : "";
 
         if (newValue != null) {
             newValue = newValue.trim();
