@@ -1,18 +1,29 @@
 package com.scn.jira.worklog.wl;
 
 import com.atlassian.jira.bc.issue.comment.CommentService;
-import com.atlassian.jira.bc.issue.worklog.*;
+import com.atlassian.jira.bc.issue.worklog.WorklogAdjustmentAmountResult;
+import com.atlassian.jira.bc.issue.worklog.WorklogInputParametersImpl;
+import com.atlassian.jira.bc.issue.worklog.WorklogNewEstimateResult;
+import com.atlassian.jira.bc.issue.worklog.WorklogResult;
+import com.atlassian.jira.bc.issue.worklog.WorklogResultFactory;
+import com.atlassian.jira.bc.issue.worklog.WorklogService;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.comparator.UserBestNameComparator;
 import com.atlassian.jira.issue.fields.CommentVisibility;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.fields.screen.FieldScreenRendererFactory;
 import com.atlassian.jira.issue.worklog.Worklog;
 import com.atlassian.jira.issue.worklog.WorklogImpl;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.mention.MentionService;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.security.plugin.ProjectPermissionKey;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
@@ -20,20 +31,24 @@ import com.atlassian.jira.util.BrowserUtils;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.CreateWorklog;
+import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
 import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
-import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
-import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ExtendedCreateWorklog extends CreateWorklog {
     private static final long serialVersionUID = -4594446887729353135L;
@@ -52,22 +67,23 @@ public class ExtendedCreateWorklog extends CreateWorklog {
     private Long newEstimateLong;
     private Long adjustmentAmountLong;
 
-    public ExtendedCreateWorklog(WorklogService worklogService, CommentService commentService,
-                                 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
-                                 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-                                 RendererManager rendererManager, UserUtil userUtil,
+    public ExtendedCreateWorklog(WorklogService worklogService, CommentService commentService, ProjectRoleManager projectRoleManager,
+                                 DateTimeFormatterFactory dateTimeFormatterFactory, FieldVisibilityManager fieldVisibilityManager,
+                                 FieldLayoutManager fieldLayoutManager, RendererManager rendererManager, UserUtil userUtil,
                                  @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-                                 JiraAuthenticationContext authenticationContext) {
-        super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
-            dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, userUtil,
-            null, null, null, null, null);
-
+                                 JiraAuthenticationContext authenticationContext, FieldScreenRendererFactory fieldScreenRendererFactory,
+                                 FieldManager fieldManager, SubTaskManager subTaskManager, AttachmentHelper attachmentHelper,
+                                 MentionService mentionService, IScnProjectSettingsManager scnProjectSettingsManager,
+                                 ExtendedWorklogService extendedWorklogService, JiraDurationUtils jiraDurationUtils,
+                                 ExtendedConstantsManager extendedConstantsManager) {
+        super(worklogService, commentService, projectRoleManager, jiraDurationUtils, dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager,
+            rendererManager, userUtil, fieldScreenRendererFactory, fieldManager, subTaskManager, attachmentHelper, mentionService);
         this.worklogService = worklogService;
         this.worklogManager = worklogManager;
         this.authenticationContext = authenticationContext;
-        this.extWorklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
-        this.extendedConstantsManager = new DefaultExtendedConstantsManager();
-        this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
+        this.extWorklogService = extendedWorklogService;
+        this.extendedConstantsManager = extendedConstantsManager;
+        this.psManager = scnProjectSettingsManager;
     }
 
     public boolean shouldDisplay() {
@@ -164,7 +180,7 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 
         ApplicationUser reporter = null;
         if (!StringUtils.isBlank(getInputReporter())) {
-            reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
+            reporter = ComponentAccessor.getUserManager().getUserByKey(getInputReporter());
         }
 
         if (reporter == null) {
@@ -188,8 +204,7 @@ public class ExtendedCreateWorklog extends CreateWorklog {
     public Map<String, String> getAssignableUsers() {
         try {
             List<ApplicationUser> users = Lists.newArrayList(ComponentAccessor.getPermissionSchemeManager().getUsers(
-                new Long(Permissions.WORK_ISSUE),
-                ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
+                ProjectPermissions.WORK_ON_ISSUES, ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
 
             if (CollectionUtils.isEmpty(users)) return Collections.emptyMap();
 
@@ -197,7 +212,7 @@ public class ExtendedCreateWorklog extends CreateWorklog {
 
             Map<String, String> assignableUsers = new ListOrderedMap();
             for (ApplicationUser user : users) {
-                assignableUsers.put(user.getName(), user.getDisplayName());
+                assignableUsers.put(user.getKey(), user.getDisplayName());
             }
             return assignableUsers;
         } catch (Exception e) {

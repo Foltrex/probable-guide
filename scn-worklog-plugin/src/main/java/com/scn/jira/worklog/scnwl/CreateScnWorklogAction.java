@@ -104,7 +104,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 
         ApplicationUser reporter = null;
         if (!StringUtils.isBlank(getInputReporter())) {
-            reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
+            reporter = ComponentAccessor.getUserManager().getUserByKey(getInputReporter());
         }
 
         if (reporter == null) {

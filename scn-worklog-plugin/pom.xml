@@ -76,11 +76,17 @@
 				<version>${amps.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<applications>
+						<application>
+							<applicationKey>jira-software</applicationKey>
+							<version>${jira.version}</version>
+						</application>
+					</applications>
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
-					<jvmArgs>-Xms4g -Xmx8g -Datlassian.plugins.enable.wait=30</jvmArgs>
+					<jvmArgs>-Xms4g -Xmx8g -Datlassian.plugins.enable.wait=500</jvmArgs>
 					<skipITs>true</skipITs>
 					<skipUTs>true</skipUTs>
 					<skipAllPrompts>true</skipAllPrompts>

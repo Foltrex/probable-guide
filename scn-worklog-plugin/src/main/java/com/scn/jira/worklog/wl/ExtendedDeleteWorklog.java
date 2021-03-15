@@ -2,17 +2,21 @@ package com.scn.jira.worklog.wl;
 
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.bc.issue.worklog.WorklogService;
-import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.issue.RendererManager;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.fields.screen.FieldScreenRendererFactory;
 import com.atlassian.jira.issue.worklog.WorklogManager;
+import com.atlassian.jira.mention.MentionService;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.BrowserUtils;
 import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.issue.DeleteWorklog;
+import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
@@ -29,20 +33,18 @@ public class ExtendedDeleteWorklog extends DeleteWorklog {
 
     protected final ExtendedConstantsManager extendedConstantsManager;
     protected final ExtendedWorklogService worklogService;
-    private final WorklogManager worklogManager;
     private final IScnProjectSettingsManager psManager;
 
     private String worklogType;
 
-    public ExtendedDeleteWorklog(WorklogService worklogService, CommentService commentService,
-                                 ProjectRoleManager projectRoleManager, DateTimeFormatterFactory dateTimeFormatterFactory,
-                                 FieldVisibilityManager fieldVisibilityManager, FieldLayoutManager fieldLayoutManager,
-                                 RendererManager rendererManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager,
-                                 UserUtil userUtil) {
-        super(worklogService, commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class),
-            dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, worklogManager, userUtil,
-            null, null, null, null, null);
-        this.worklogManager = worklogManager;
+    public ExtendedDeleteWorklog(WorklogService worklogService, CommentService commentService, ProjectRoleManager projectRoleManager,
+                                 DateTimeFormatterFactory dateTimeFormatterFactory, FieldVisibilityManager fieldVisibilityManager,
+                                 FieldLayoutManager fieldLayoutManager, RendererManager rendererManager,
+                                 @Qualifier("overridedWorklogManager") WorklogManager worklogManager, UserUtil userUtil,
+                                 JiraDurationUtils jiraDurationUtils, SubTaskManager subTaskManager, FieldScreenRendererFactory fieldScreenRendererFactory,
+                                 FieldManager fieldManager, AttachmentHelper attachmentHelper, MentionService mentionService) {
+        super(worklogService, commentService, projectRoleManager, jiraDurationUtils, dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, worklogManager, userUtil,
+            subTaskManager, fieldScreenRendererFactory, fieldManager, attachmentHelper, mentionService);
         this.worklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
         this.extendedConstantsManager = new DefaultExtendedConstantsManager();
         this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
