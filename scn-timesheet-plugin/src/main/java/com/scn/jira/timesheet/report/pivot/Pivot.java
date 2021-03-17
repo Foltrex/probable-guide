@@ -1,6 +1,5 @@
 package com.scn.jira.timesheet.report.pivot;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
@@ -31,7 +30,7 @@ import com.atlassian.jira.web.bean.PagerFilter;
 import com.scn.jira.timesheet.util.MyFullNameComparator;
 import com.scn.jira.timesheet.util.MyUser;
 import com.scn.jira.timesheet.util.TextUtil;
-import com.scn.jira.timesheet.util.UserToNameFunction;
+import com.scn.jira.timesheet.util.UserToKeyFunction;
 import com.scn.jira.timesheet.util.WorklogUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
@@ -128,7 +127,7 @@ public class Pivot extends AbstractReport {
         conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
         conditions.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
         if (StringUtils.isNotEmpty(targetGroup)) {
-            Collection<String> usersNames = UserToNameFunction.transform(groupManager.getUsersInGroup(targetGroup));
+            Collection<String> usersNames = UserToKeyFunction.transform(groupManager.getUsersInGroup(targetGroup));
             conditions.add(new EntityExpr("author", IN, usersNames));
             log.info("Searching worklogs created since '" + startDate + "', till '" + endDate + "', by group '"
                 + targetGroup + "'");
@@ -156,8 +155,7 @@ public class Pivot extends AbstractReport {
                     MyUser user;
                     ApplicationUser appUser = ComponentAccessor.getUserManager().getUserByKey(worklog.getAuthorKey());
                     if (worklog.getAuthorKey() != null && appUser != null) {
-                        User osuser = appUser.getDirectoryUser();
-                        user = new MyUser(osuser.getName(), osuser.getDisplayName());
+                        user = new MyUser(appUser.getKey(), appUser.getDisplayName());
                     } else {
                         user = new MyUser("anonymous", "anonymous");
                     }

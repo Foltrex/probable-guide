@@ -10,7 +10,6 @@ import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.comparator.IssueKeyComparator;
-import com.atlassian.jira.issue.comparator.UserComparator;
 import com.atlassian.jira.issue.search.DocumentWithId;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
@@ -33,7 +32,7 @@ import com.atlassian.jira.web.bean.I18nBean;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.scn.jira.timesheet.report.pivot.Pivot;
 import com.scn.jira.timesheet.util.TextUtil;
-import com.scn.jira.timesheet.util.UserToNameFunction;
+import com.scn.jira.timesheet.util.UserToKeyFunction;
 import com.scn.jira.timesheet.util.WeekPortletHeader;
 import com.scn.jira.timesheet.util.WorklogUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
@@ -43,7 +42,6 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.EntityCondition;
 import org.ofbiz.core.entity.EntityExpr;
-import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
 
 import javax.inject.Named;
@@ -54,7 +52,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,47 +82,30 @@ public class TimeSheet extends AbstractReport {
     private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class).formatter().forLoggedInUser()
         .withSystemZone().withStyle(DateTimeStyle.DATE_PICKER);
 
-    private final List<WeekPortletHeader> weekDays = new ArrayList<>();
-    private final Map<Issue, List<IScnWorklog>> allWorkLogs = new Hashtable<>();
-    private final Map<ApplicationUser, Map<Issue, Map<IScnWorklog, Long>>> weekWorkLog = new TreeMap<>(new UserComparator());
-    private final Map<Issue, Map<Date, Long>> weekWorkLogShort = new TreeMap<Issue, Map<Date, Long>>(new IssueKeyComparator());
-    private final Map<ApplicationUser, Map<Date, Long>> userWorkLogShort = new TreeMap<>(new UserComparator());
-    private final Map<Long, Long> weekTotalTimeSpents = new Hashtable<>();
-    private final Map<ApplicationUser, Map<Issue, Long>> userTotalTimeSpents = new Hashtable<>();
-    private final Map<Project, Map<Date, Long>> projectTimeSpents = new Hashtable<>();
-    private final Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents = new Hashtable<>();
-
     @Override
     public boolean showReport() {
         final ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         return this.scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, user);
     }
 
-    public Map<Long, Long> getWeekTotalTimeSpents() {
-        return this.weekTotalTimeSpents;
-    }
-
-    public Map<ApplicationUser, Map<Date, Long>> getUserWorkLog() {
-        return this.userWorkLogShort;
-    }
-
-    public Map<Issue, Map<Date, Long>> getWeekWorkLogShort() {
-        return this.weekWorkLogShort;
-    }
-
-    public List<WeekPortletHeader> getWeekDays() {
-        return this.weekDays;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void getTimeSpents(ApplicationUser appUser, Date startDate, Date endDate, String targetUserName,
-                              boolean excelView, String priority, String targetGroup, Long projectId, Long filterId, Boolean showWeekends,
-                              Boolean showUsers, String groupByField, DateTimeFormatter formatter)
-        throws SearchException, GenericEntityException {
+    public TimeSheetDto getTimeSpents(ApplicationUser appUser, Date startDate, Date endDate, String targetUserKey,
+                                      boolean excelView, String priority, String targetGroup, Long projectId, Long filterId, Boolean showWeekends,
+                                      Boolean showUsers, String groupByField, DateTimeFormatter formatter) throws SearchException {
+        TimeSheetDto resultDto = new TimeSheetDto();
 
         if (!this.scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, appUser)) {
-            return;
+            return resultDto;
         }
+
+        final List<WeekPortletHeader> weekDays = resultDto.getWeekDays();
+        final Map<Issue, List<IScnWorklog>> allWorkLogs = resultDto.getAllWorkLogs();
+        final Map<ApplicationUser, Map<Issue, Map<IScnWorklog, Long>>> weekWorkLog = resultDto.getWeekWorkLog();
+        final Map<Issue, Map<Date, Long>> weekWorkLogShort = resultDto.getWeekWorkLogShort();
+        final Map<ApplicationUser, Map<Date, Long>> userWorkLogShort = resultDto.getUserWorkLogShort();
+        final Map<Long, Long> weekTotalTimeSpents = resultDto.getWeekTotalTimeSpents();
+        final Map<ApplicationUser, Map<Issue, Long>> userTotalTimeSpents = resultDto.getUserTotalTimeSpents();
+        final Map<Project, Map<Date, Long>> projectTimeSpents = resultDto.getProjectTimeSpents();
+        final Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents = resultDto.getProjectGroupedByFieldTimeSpents();
 
         Set<Long> filteredIssues = new TreeSet<>();
         if (filterId != null) {
@@ -144,25 +124,22 @@ public class TimeSheet extends AbstractReport {
             }
         }
 
-        List<EntityCondition> conditions = new ArrayList<EntityCondition>();
+        List<EntityCondition> conditions = new ArrayList<>();
         conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(startDate.getTime())));
         conditions.add(new EntityExpr("startdate", LESS_THAN, new Timestamp(endDate.getTime())));
         if (StringUtils.isNotEmpty(targetGroup)) {
-            Collection<String> usersNames = UserToNameFunction
+            Collection<String> userKeys = UserToKeyFunction
                 .transform(this.groupManager.getUsersInGroup(targetGroup));
-            conditions.add(new EntityExpr("author", IN, usersNames));
+            conditions.add(new EntityExpr("author", IN, userKeys));
         } else {
-            conditions.add(new EntityExpr("author", EQUALS, targetUserName));
+            conditions.add(new EntityExpr("author", EQUALS, targetUserKey));
         }
 
         List<GenericValue> worklogs = ComponentAccessor.getOfBizDelegator().findByAnd(SCN_WORKLOG_ENTITY, conditions);
 
         log.info("Query returned : " + worklogs.size() + " worklogs");
 
-        Iterator<GenericValue> worklogsIterator = worklogs.iterator();
-        while (worklogsIterator.hasNext()) {
-            GenericValue genericWorklog = worklogsIterator.next();
-
+        for (GenericValue genericWorklog : worklogs) {
             Issue issue = this.issueManager.getIssueObject(genericWorklog.getLong("issue"));
             IScnWorklog worklog = WorklogUtil.convertToWorklog(projectRoleManager, genericWorklog, issue);
 
@@ -189,105 +166,75 @@ public class TimeSheet extends AbstractReport {
                 continue;
             }
 
-            ApplicationUser workedUser = this.userManager.getUserByName(genericWorklog.getString("author"));
+            ApplicationUser workedUser = this.userManager.getUserByKey(genericWorklog.getString("author"));
 
             Date dateCreated = worklog.getStartDate();
             WeekPortletHeader weekDay = new WeekPortletHeader(dateCreated);
-            if ((showWeekends != null) && (!showWeekends.booleanValue()) && (weekDay.isNonBusinessDay())) {
+            if ((showWeekends != null) && (!showWeekends) && (weekDay.isNonBusinessDay())) {
                 continue;
             }
 
             Calendar cal = Calendar.getInstance();
             cal.setTime(dateCreated);
-            cal.set(11, 0);
-            cal.set(12, 0);
-            cal.set(13, 0);
-            cal.set(14, 0);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
 
             Date dateOfTheDay = cal.getTime();
-            Long dateCreatedLong = new Long(cal.getTimeInMillis());
+            Long dateCreatedLong = cal.getTimeInMillis();
 
             if (!this.permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, appUser)) {
                 continue;
             }
 
             if (excelView) {
-                List<IScnWorklog> issueWorklogs = this.allWorkLogs.get(issue);
-                if (issueWorklogs == null) {
-                    issueWorklogs = new ArrayList<>();
-                    this.allWorkLogs.put(issue, issueWorklogs);
-                }
+                List<IScnWorklog> issueWorklogs = allWorkLogs.computeIfAbsent(issue, k -> new ArrayList<>());
                 issueWorklogs.add(worklog);
             } else {
-                Map<Date, Long> weekTimeSpents = (Map<Date, Long>) this.weekWorkLogShort.get(issue);
-                if (weekTimeSpents == null) {
-                    weekTimeSpents = new Hashtable<Date, Long>();
-                    this.weekWorkLogShort.put(issue, weekTimeSpents);
-                }
-
-                long spent = worklog.getTimeSpent().longValue();
-                Long dateSpent = (Long) weekTimeSpents.get(dateOfTheDay);
-
+                Map<Date, Long> weekTimeSpents = weekWorkLogShort.computeIfAbsent(issue, k -> new Hashtable<>());
+                long spent = worklog.getTimeSpent();
+                Long dateSpent = weekTimeSpents.get(dateOfTheDay);
                 if (dateSpent != null) {
-                    spent += dateSpent.longValue();
+                    spent += dateSpent;
                 }
-
-                weekTimeSpents.put(dateOfTheDay, new Long(spent));
-
-                updateUserWorkLog(worklog, workedUser, dateOfTheDay);
-
-                Map<Date, Long> projectWorkLog = (Map<Date, Long>) this.projectTimeSpents.get(project);
-                if (projectWorkLog == null) {
-                    projectWorkLog = new Hashtable<Date, Long>();
-                    this.projectTimeSpents.put(project, projectWorkLog);
-                }
-
-                spent = worklog.getTimeSpent().longValue();
-
-                Long projectSpent = (Long) projectWorkLog.get(dateOfTheDay);
-
+                weekTimeSpents.put(dateOfTheDay, spent);
+                updateUserWorkLog(worklog, workedUser, dateOfTheDay, userWorkLogShort);
+                Map<Date, Long> projectWorkLog = projectTimeSpents.computeIfAbsent(project, k -> new Hashtable<>());
+                spent = worklog.getTimeSpent();
+                Long projectSpent = projectWorkLog.get(dateOfTheDay);
                 if (projectSpent != null) {
-                    spent += projectSpent.longValue();
+                    spent += projectSpent;
                 }
-
-                projectWorkLog.put(dateOfTheDay, new Long(spent));
-
-                calculateTimesForProjectGroupedByField(groupByField, worklog, issue, project, dateOfTheDay, formatter);
-
-                spent = worklog.getTimeSpent().longValue();
-                dateSpent = (Long) this.weekTotalTimeSpents.get(dateCreatedLong);
+                projectWorkLog.put(dateOfTheDay, spent);
+                calculateTimesForProjectGroupedByField(groupByField, worklog, issue, project, dateOfTheDay, formatter, projectGroupedByFieldTimeSpents);
+                spent = worklog.getTimeSpent();
+                dateSpent = weekTotalTimeSpents.get(dateCreatedLong);
                 if (dateSpent != null) {
-                    spent += dateSpent.longValue();
+                    spent += dateSpent;
                 }
-                this.weekTotalTimeSpents.put(dateCreatedLong, new Long((int) spent));
-
-                spent = worklog.getTimeSpent().longValue();
-                if ((showUsers != null) && (showUsers.booleanValue())) {
-                    Map<Issue, Map<IScnWorklog, Long>> userWorkLog = this.weekWorkLog
+                weekTotalTimeSpents.put(dateCreatedLong, spent);
+                spent = worklog.getTimeSpent();
+                if ((showUsers != null) && (showUsers)) {
+                    Map<Issue, Map<IScnWorklog, Long>> userWorkLog = weekWorkLog
                         .get(workedUser);
                     if (userWorkLog == null) {
                         userWorkLog = new TreeMap<>(new IssueProjectComparator());
-                        this.weekWorkLog.put(workedUser, userWorkLog);
+                        weekWorkLog.put(workedUser, userWorkLog);
                     }
-                    Map<IScnWorklog, Long> issueWorkLog = userWorkLog.get(issue);
-
-                    if (issueWorkLog == null) {
-                        issueWorkLog = new Hashtable<>();
-                        userWorkLog.put(issue, issueWorkLog);
-                    }
-                    issueWorkLog.put(worklog, new Long(spent));
-
-                    spent = worklog.getTimeSpent().longValue();
-                    Map<Issue, Long> issueTotalTimeSpents = this.userTotalTimeSpents.get(workedUser);
+                    Map<IScnWorklog, Long> issueWorkLog = userWorkLog.computeIfAbsent(issue, k -> new Hashtable<>());
+                    issueWorkLog.put(worklog, spent);
+                    spent = worklog.getTimeSpent();
+                    Map<Issue, Long> issueTotalTimeSpents = userTotalTimeSpents.get(workedUser);
                     if (issueTotalTimeSpents == null) {
                         issueTotalTimeSpents = new TreeMap<Issue, Long>(new IssueKeyComparator());
-                        this.userTotalTimeSpents.put(workedUser, issueTotalTimeSpents);
+                        userTotalTimeSpents.put(workedUser, issueTotalTimeSpents);
                     }
                     Long issueSpent = issueTotalTimeSpents.get(issue);
                     if (issueSpent != null) {
-                        spent += issueSpent.longValue();
+                        spent += issueSpent;
                     }
-                    issueTotalTimeSpents.put(issue, new Long(spent));
+                    issueTotalTimeSpents.put(issue, spent);
                 }
             }
         }
@@ -298,62 +245,46 @@ public class TimeSheet extends AbstractReport {
         while (endDate.after(calendarDate.getTime())) {
             WeekPortletHeader wph = new WeekPortletHeader();
             wph.setWeekDayDate(calendarDate.getTime());
-
             String businessDay = "";
-            if ((calendarDate.get(5) == Calendar.getInstance().get(5))
-                && (calendarDate.get(2) == Calendar.getInstance().get(2))
-                && (calendarDate.get(1) == Calendar.getInstance().get(1))) {
+            if ((calendarDate.get(Calendar.DATE) == Calendar.getInstance().get(Calendar.DATE))
+                && (calendarDate.get(Calendar.MONTH) == Calendar.getInstance().get(Calendar.MONTH))
+                && (calendarDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR))) {
                 businessDay = "toDay";
-            } else if (wph.isNonBusinessDay() == true) {
+            } else if (wph.isNonBusinessDay()) {
                 businessDay = "nonBusinessDay";
             }
-
             wph.setWeekDayCSS(businessDay);
-
-            if ((showWeekends == null) || (showWeekends.booleanValue()) || (!wph.isNonBusinessDay())) {
-                this.weekDays.add(wph);
+            if ((showWeekends == null) || (showWeekends) || (!wph.isNonBusinessDay())) {
+                weekDays.add(wph);
             }
-            calendarDate.add(6, 1);
+            calendarDate.add(Calendar.DAY_OF_YEAR, 1);
         }
+
+        return resultDto;
     }
 
-    private void updateUserWorkLog(IScnWorklog worklog, ApplicationUser workedUser, Date dateOfTheDay) {
-        Map<Date, Long> dateToWorkMap = this.userWorkLogShort.get(workedUser);
-        if (dateToWorkMap == null) {
-            dateToWorkMap = new HashMap<>();
-            this.userWorkLogShort.put(workedUser, dateToWorkMap);
-        }
+    private void updateUserWorkLog(IScnWorklog worklog, ApplicationUser workedUser, Date dateOfTheDay, Map<ApplicationUser, Map<Date, Long>> userWorkLogShort) {
+        Map<Date, Long> dateToWorkMap = userWorkLogShort.computeIfAbsent(workedUser, k -> new HashMap<>());
 
-        long spent = worklog.getTimeSpent().longValue();
-        Long dateSpent = (Long) dateToWorkMap.get(dateOfTheDay);
-
+        long spent = worklog.getTimeSpent();
+        Long dateSpent = dateToWorkMap.get(dateOfTheDay);
         if (dateSpent != null) {
-            spent += dateSpent.longValue();
+            spent += dateSpent;
         }
-        dateToWorkMap.put(dateOfTheDay, Long.valueOf(spent));
+        dateToWorkMap.put(dateOfTheDay, spent);
     }
 
     private void calculateTimesForProjectGroupedByField(String groupByFieldID, IScnWorklog worklog, Issue issue,
-                                                        Project project, Date dateOfTheDay, DateTimeFormatter formatter) {
+                                                        Project project, Date dateOfTheDay, DateTimeFormatter formatter,
+                                                        Map<Project, Map<String, Map<Date, Long>>> projectGroupedByFieldTimeSpents) {
         if (groupByFieldID == null) {
             return;
         }
         String fieldValue = TextUtil.getFieldValue(groupByFieldID, issue, formatter);
 
-        Map<String, Map<Date, Long>> projectToFieldWorkLog = this.projectGroupedByFieldTimeSpents
-            .get(project);
+        Map<String, Map<Date, Long>> projectToFieldWorkLog = projectGroupedByFieldTimeSpents.computeIfAbsent(project, k -> new Hashtable<>());
 
-        if (projectToFieldWorkLog == null) {
-            projectToFieldWorkLog = new Hashtable<>();
-            this.projectGroupedByFieldTimeSpents.put(project, projectToFieldWorkLog);
-        }
-
-        Map<Date, Long> fieldToTimeWorkLog = projectToFieldWorkLog.get(fieldValue);
-
-        if (fieldToTimeWorkLog == null) {
-            fieldToTimeWorkLog = new Hashtable<>();
-            projectToFieldWorkLog.put(fieldValue, fieldToTimeWorkLog);
-        }
+        Map<Date, Long> fieldToTimeWorkLog = projectToFieldWorkLog.computeIfAbsent(fieldValue, k -> new Hashtable<>());
 
         long spent = worklog.getTimeSpent();
         Long projectGroupedSpent = fieldToTimeWorkLog.get(dateOfTheDay);
@@ -365,8 +296,7 @@ public class TimeSheet extends AbstractReport {
         fieldToTimeWorkLog.put(dateOfTheDay, spent);
     }
 
-    public String generateReport(ProjectActionSupport action, Map<String, Object> params, boolean excelView)
-        throws Exception {
+    public String generateReport(ProjectActionSupport action, Map<String, Object> params, boolean excelView) throws Exception {
         ApplicationUser remoteUser = action.getLoggedInUser();
         I18nBean i18nBean = new I18nBean(remoteUser);
 
@@ -410,29 +340,27 @@ public class TimeSheet extends AbstractReport {
             }
         }
 
-        if (remoteUser != null) {
-            getTimeSpents(remoteUser, startDate, endDate, targetUser.getName(), excelView, priority, targetGroup,
+        TimeSheetDto timeSheetDto = getTimeSpents(remoteUser, startDate, endDate, targetUser.getKey(), excelView, priority, targetGroup,
                 projectId, filterId, showWeekends, showUsers, groupByField, formatter);
-        }
 
         Map<String, Object> velocityParams = new HashMap<>();
         velocityParams.put("startDate", startDate);
         velocityParams.put("endDate", endDate);
-        velocityParams.put("weekDays", this.weekDays);
+        velocityParams.put("weekDays", timeSheetDto.getWeekDays());
         velocityParams.put("showUsers", showUsers);
 
         if (excelView) {
-            velocityParams.put("allWorkLogs", this.allWorkLogs);
+            velocityParams.put("allWorkLogs", timeSheetDto.getAllWorkLogs());
         } else {
             if (showUsers)
-                velocityParams.put("weekWorkLog", this.weekWorkLog);
+                velocityParams.put("weekWorkLog", timeSheetDto.getWeekWorkLog());
             else {
-                velocityParams.put("weekWorkLog", this.weekWorkLogShort);
+                velocityParams.put("weekWorkLog", timeSheetDto.getWeekWorkLogShort());
             }
-            velocityParams.put("weekTotalTimeSpents", this.weekTotalTimeSpents);
-            velocityParams.put("userTotalTimeSpents", this.userTotalTimeSpents);
-            velocityParams.put("projectTimeSpents", this.projectTimeSpents);
-            velocityParams.put("projectGroupedTimeSpents", this.projectGroupedByFieldTimeSpents);
+            velocityParams.put("weekTotalTimeSpents", timeSheetDto.getWeekTotalTimeSpents());
+            velocityParams.put("userTotalTimeSpents", timeSheetDto.getUserTotalTimeSpents());
+            velocityParams.put("projectTimeSpents", timeSheetDto.getProjectTimeSpents());
+            velocityParams.put("projectGroupedTimeSpents", timeSheetDto.getProjectGroupedByFieldTimeSpents());
         }
         velocityParams.put("groupByField", groupByField);
         velocityParams.put("formatter", formatter);
@@ -443,21 +371,15 @@ public class TimeSheet extends AbstractReport {
     }
 
     @Override
-    public void validate(ProjectActionSupport action, Map params) {
-    }
-
-    @Override
     public boolean isExcelViewSupported() {
         return true;
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
     public String generateReportHtml(ProjectActionSupport action, Map params) throws Exception {
         return generateReport(action, params, false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public String generateReportExcel(ProjectActionSupport action, Map params) throws Exception {
         return generateReport(action, params, true);

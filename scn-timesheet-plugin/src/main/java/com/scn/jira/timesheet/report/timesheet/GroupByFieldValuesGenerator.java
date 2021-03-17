@@ -2,6 +2,7 @@ package com.scn.jira.timesheet.report.timesheet;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +26,7 @@ public class GroupByFieldValuesGenerator implements ValuesGenerator {
 
 		Set<SearchableField> fields = ComponentAccessor.getFieldManager().getAllSearchableFields();
 
-		Set<SearchableField> sortedFields = new TreeSet<SearchableField>(
-				(o, other) -> o.getName().compareTo(other.getName()));
+		Set<SearchableField> sortedFields = new TreeSet<>(Comparator.comparing(Field::getName));
 		sortedFields.addAll(fields);
 
 		String groupByFieldsP = ComponentAccessor.getApplicationProperties()
