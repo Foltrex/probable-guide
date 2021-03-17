@@ -1,21 +1,5 @@
 package com.scn.jira.mytime.store;
 
-import static org.ofbiz.core.entity.EntityOperator.EQUALS;
-import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
-import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import org.ofbiz.core.entity.EntityCondition;
-import org.ofbiz.core.entity.EntityConditionList;
-import org.ofbiz.core.entity.EntityExpr;
-import org.ofbiz.core.entity.EntityOperator;
-import org.ofbiz.core.entity.GenericValue;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.IssueManager;
@@ -24,25 +8,31 @@ import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.google.common.collect.ImmutableList;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import org.ofbiz.core.entity.EntityCondition;
+import org.ofbiz.core.entity.EntityConditionList;
+import org.ofbiz.core.entity.EntityExpr;
+import org.ofbiz.core.entity.EntityOperator;
+import org.ofbiz.core.entity.GenericValue;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.ofbiz.core.entity.EntityOperator.EQUALS;
+import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
 
 @Named
+@RequiredArgsConstructor
 public class ScnWorklogMyTimeStore {
     public static final String SCN_WORKLOG_ISSUE_ENTITY = "ScnWorklogByIssueView";
 
     private final IssueManager issueManager;
     private final ProjectRoleManager projectRoleManager;
     private final WorklogManager worklogManager;
-
-    @Inject
-    public ScnWorklogMyTimeStore(IssueManager issueManager, ProjectRoleManager projectRoleManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager) {
-        this.issueManager = issueManager;
-        this.projectRoleManager = projectRoleManager;
-        this.worklogManager = worklogManager;
-    }
 
     public List<IScnWorklog> getScnWorklogsByUserBetweenDates(Date startDate, Date endDate, String user) throws DataAccessException {
         List<EntityCondition> conditions1 = new ArrayList<>();
