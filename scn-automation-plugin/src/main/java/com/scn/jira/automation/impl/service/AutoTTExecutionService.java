@@ -10,7 +10,7 @@ import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.ScnBIService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDate;
@@ -19,8 +19,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+@Log4j
 public class AutoTTExecutionService extends AbstractService {
-    private static final Logger LOGGER = Logger.getLogger(AutoTTExecutionService.class);
     public static final String DEFAULT_NAME = "Auto time tracking";
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 * * * ?";
     public static final Long WORKED_TIME = 28800L;
@@ -55,7 +55,7 @@ public class AutoTTExecutionService extends AbstractService {
         userCalendar.forEach((date, dayType) -> {
             if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
                 worklogContextService.createScnWorklog(autoTTDto, date);
-                LOGGER.debug(autoTTDto + " for date: " + date);
+                log.debug(autoTTDto + " for date: " + date);
             }
         });
     }

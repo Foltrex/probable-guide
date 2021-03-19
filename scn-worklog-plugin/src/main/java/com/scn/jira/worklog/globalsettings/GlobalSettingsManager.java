@@ -5,7 +5,6 @@ import com.atlassian.jira.config.properties.PropertiesManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.dbc.Assertions;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -16,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@ExportAsService(IGlobalSettingsManager.class)
 @Named
 public class GlobalSettingsManager implements IGlobalSettingsManager {
     private static final String PROPERTIES_SEPARATOR = ";";

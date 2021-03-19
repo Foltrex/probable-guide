@@ -10,21 +10,34 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.worklog.core.wl.ExtWorklog;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
-import org.ofbiz.core.entity.*;
+import org.ofbiz.core.entity.EntityCondition;
+import org.ofbiz.core.entity.EntityConditionList;
+import org.ofbiz.core.entity.EntityExpr;
+import org.ofbiz.core.entity.EntityOperator;
+import org.ofbiz.core.entity.GenericEntityException;
+import org.ofbiz.core.entity.GenericValue;
 import org.ofbiz.core.util.UtilMisc;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.ofbiz.core.entity.EntityOperator.*;
+import static org.ofbiz.core.entity.EntityOperator.EQUALS;
+import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.IN;
+import static org.ofbiz.core.entity.EntityOperator.LESS_THAN;
+import static org.ofbiz.core.entity.EntityOperator.LESS_THAN_EQUAL_TO;
 
 @Named
+@RequiredArgsConstructor
 public class ExtWorklogLogtimeStore implements IExtWorklogLogtimeStore {
     private static final Logger LOGGER = Logger.getLogger(ExtWorklogLogtimeStore.class);
 
@@ -33,12 +46,6 @@ public class ExtWorklogLogtimeStore implements IExtWorklogLogtimeStore {
 
     private final IssueManager issueManager;
     private final WorklogManager worklogManager;
-
-    @Inject
-    public ExtWorklogLogtimeStore(IssueManager issueManager, @Qualifier("overridedWorklogManager") WorklogManager worklogManager) {
-        this.issueManager = issueManager;
-        this.worklogManager = worklogManager;
-    }
 
     public List<ExtWorklog> getExtWorklogsByProjectBetweenDates(boolean assignedCh, @Nonnull Project project, @Nonnull Date startDate,
                                                                 @Nonnull Date endDate, @Nonnull String user) throws DataAccessException {

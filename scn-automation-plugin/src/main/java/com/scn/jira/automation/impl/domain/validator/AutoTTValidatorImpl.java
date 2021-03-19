@@ -9,27 +9,19 @@ import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.IssueDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
 import com.scn.jira.automation.impl.domain.dto.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class AutoTTValidatorImpl implements AutoTTValidator {
     private final PermissionService permissionService;
     private final JiraContextService contextService;
     private final WorklogContextService worklogContextService;
     private final AutoTTService autoTTService;
-
-    @Autowired
-    public AutoTTValidatorImpl(PermissionService permissionService, JiraContextService contextService,
-                               WorklogContextService worklogContextService, AutoTTService autoTTService) {
-        this.permissionService = permissionService;
-        this.contextService = contextService;
-        this.worklogContextService = worklogContextService;
-        this.autoTTService = autoTTService;
-    }
 
     @Override
     public Validator validate(@Nonnull AutoTTDto autoTTDto) {

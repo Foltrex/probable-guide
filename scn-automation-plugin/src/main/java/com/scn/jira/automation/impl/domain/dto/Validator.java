@@ -1,41 +1,27 @@
 package com.scn.jira.automation.impl.domain.dto;
 
-import javax.xml.bind.annotation.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@NoArgsConstructor
+@Getter
+@Setter
+@JsonAutoDetect
 public class Validator {
-    @XmlTransient
+    @JsonIgnore
     private boolean valid = true;
-    @XmlElement
     private final List<String> errorMessages = new ArrayList<>();
-    @XmlElement
     private final Map<String, String> errors = new HashMap<>();
 
-    public Validator() {
-    }
-
-    public Validator(String errorMessage){
+    public Validator(String errorMessage) {
         this.errorMessages.add(errorMessage);
-    }
-
-    public boolean isValid() {
-        return this.valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
-    public List<String> getErrorMessages() {
-        return this.errorMessages;
-    }
-
-    public Map<String, String> getErrors() {
-        return this.errors;
     }
 }

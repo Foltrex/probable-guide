@@ -2,14 +2,13 @@ package com.scn.jira.automation.impl.domain.service;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.tx.Transactional;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
+import lombok.RequiredArgsConstructor;
 import net.java.ao.DBParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -20,19 +19,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-@ExportAsService(AutoTTService.class)
+@RequiredArgsConstructor
 public class AutoTTServiceImpl implements AutoTTService {
     private final ActiveObjects ao;
     private final JiraContextService contextService;
     private final WorklogContextService worklogContextService;
-
-    @Autowired
-    public AutoTTServiceImpl(ActiveObjects ao, JiraContextService contextService,
-                             WorklogContextService worklogContextService) {
-        this.ao = ao;
-        this.contextService = contextService;
-        this.worklogContextService = worklogContextService;
-    }
 
     @Override
     public List<AutoTTDto> getAll() {

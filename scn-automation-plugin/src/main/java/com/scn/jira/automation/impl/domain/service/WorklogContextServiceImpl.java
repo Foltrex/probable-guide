@@ -11,7 +11,6 @@ import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.util.JiraDurationUtils;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.google.common.collect.Lists;
 import com.scn.jira.automation.api.domain.service.JiraContextService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
@@ -25,12 +24,11 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import lombok.RequiredArgsConstructor;
 import org.ofbiz.core.entity.EntityCondition;
 import org.ofbiz.core.entity.EntityConditionList;
 import org.ofbiz.core.entity.EntityExpr;
 import org.ofbiz.core.entity.EntityOperator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -42,10 +40,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.ofbiz.core.entity.EntityOperator.*;
+import static org.ofbiz.core.entity.EntityOperator.EQUALS;
+import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.LESS_THAN_EQUAL_TO;
 
 @Service
-@ExportAsService(WorklogContextService.class)
+@RequiredArgsConstructor
 public class WorklogContextServiceImpl implements WorklogContextService {
     private final ExtendedConstantsManager extendedConstantsManager;
     private final OfBizDelegator ofBizDelegator;
@@ -54,27 +54,9 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final JiraContextService jiraContextService;
     private final IScnProjectSettingsManager projectSettingsManager;
     private final IScnWorklogService scnDefaultWorklogService;
-    private final JiraDurationUtils jiraDurationUtils;
+    private final JiraDurationUtils jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
     private final WorklogManager worklogManager;
     private final ExtendedWorklogManager extendedWorklogManager;
-
-    @Autowired
-    public WorklogContextServiceImpl(ExtendedConstantsManager extendedConstantsManager, OfBizDelegator ofBizDelegator,
-                                     IssueManager issueManager, ProjectRoleManager projectRoleManager,
-                                     JiraContextService jiraContextService, IScnProjectSettingsManager projectSettingsManager,
-                                     IScnWorklogService scnDefaultWorklogService, ExtendedWorklogManager extendedWorklogManager,
-                                     @Qualifier("overridedWorklogManager") WorklogManager worklogManager) {
-        this.extendedConstantsManager = extendedConstantsManager;
-        this.ofBizDelegator = ofBizDelegator;
-        this.issueManager = issueManager;
-        this.projectRoleManager = projectRoleManager;
-        this.jiraContextService = jiraContextService;
-        this.projectSettingsManager = projectSettingsManager;
-        this.scnDefaultWorklogService = scnDefaultWorklogService;
-        this.worklogManager = worklogManager;
-        this.extendedWorklogManager = extendedWorklogManager;
-        this.jiraDurationUtils = ComponentAccessor.getComponent(JiraDurationUtils.class);
-    }
 
     @Override
     public WorklogTypeDto getWorklogType(String id) {

@@ -1,36 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <atlassian-plugin
-        key="${project.groupId}.${project.artifactId}" name="${project.name}"
-        plugins-version="2">
-    <plugin-info>
-        <description>${project.description}</description>
-        <version>${project.version}</version>
-        <vendor name="${project.organization.name}"
-                url="${project.organization.url}"/>
-        <param name="plugin-icon">images/scnLogo.png</param>
-        <param name="plugin-logo">images/scnLogo.png</param>
-        <param name="atlassian-data-center-status">compatible</param>
-        <param name="atlassian-data-center-compatible">true</param>
-        <param name="plugin-type">both</param>
-    </plugin-info>
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="scn-clone-project"/>
-    <!-- add our web resources -->
-    <web-resource key="scn-clone-project-resources"
-                  name="scn-clone-project Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <resource type="download" name="scn-clone-project.css"
-                  location="/css/scn-clone-project.css"/>
-        <resource type="download" name="scn-clone-project.js"
-                  location="/js/scn-clone-project.js"/>
-        <resource type="download" name="images/" location="/images"/>
-        <context>scn-clone-project</context>
-    </web-resource>
-    <rest name="Clone Project Resource"
-          i18n-name-key="clone-project-resource.name"
-          key="clone-project-resource" path="/cloneproject" version="1.0">
-        <description key="clone-project-resource.description">The Clone Project REST Plugin
-        </description>
-    </rest>
+	key="${project.groupId}.${project.artifactId}" name="${project.name}"
+	plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}"
+				url="${project.organization.url}"/>
+		<param name="plugin-icon">images/scnLogo.png</param>
+		<param name="plugin-logo">images/scnLogo.png</param>
+		<param name="atlassian-data-center-status">compatible</param>
+		<param name="atlassian-data-center-compatible">true</param>
+		<param name="plugin-type">both</param>
+	</plugin-info>
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="scn-clone-project"/>
+	<rest name="Clone Project Resource"
+		  i18n-name-key="clone-project-resource.name"
+		  key="clone-project-resource" path="/cloneproject" version="1.0">
+		<description key="clone-project-resource.description">The Clone Project REST Plugin
+		</description>
+	</rest>
 </atlassian-plugin>

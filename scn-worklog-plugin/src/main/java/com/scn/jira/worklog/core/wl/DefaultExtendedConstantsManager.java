@@ -6,23 +6,23 @@ import com.atlassian.jira.issue.IssueConstant;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.BaseUrl;
-import com.atlassian.jira.web.action.admin.translation.TranslationManager;
 import com.atlassian.jira.util.DefaultBaseUrl;
 import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.atlassian.jira.web.action.admin.translation.TranslationManager;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.lazyloading.LazyLoadingCache;
-
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.EntityUtil;
 import org.ofbiz.core.entity.GenericValue;
 
-import java.util.*;
-
 import javax.inject.Named;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-@ExportAsService({DefaultExtendedConstantsManager.class, ExtendedConstantsManager.class})
 @Named("defaultExtendedConstantsManager")
 public class DefaultExtendedConstantsManager implements ExtendedConstantsManager {
     // private List worklogTypes;

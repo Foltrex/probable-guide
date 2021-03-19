@@ -2,10 +2,20 @@ package com.scn.jira.automation.impl.domain.dto;
 
 import com.scn.jira.automation.impl.domain.entity.ScnWorklog;
 import com.scn.jira.automation.impl.domain.entity.Worklog;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
 
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@JsonAutoDetect
 public class WorklogDto {
     private WorklogKind worklogKind;
     private Long id;
@@ -20,9 +30,6 @@ public class WorklogDto {
     private Timestamp created;
     private Timestamp updated;
     private Long linkedWorklogId;
-
-    public WorklogDto() {
-    }
 
     public WorklogDto(@Nonnull Worklog worklog) {
         setWorklogKind(WorklogKind.WORKLOG);
@@ -43,109 +50,5 @@ public class WorklogDto {
         this((Worklog) worklog);
         setWorklogKind(WorklogKind.WORKLOG_SCN);
         setLinkedWorklogId(worklog.getWorklog() == null ? null : worklog.getWorklog().getId());
-    }
-
-    public WorklogKind getWorklogKind() {
-        return worklogKind;
-    }
-
-    public void setWorklogKind(WorklogKind worklogKind) {
-        this.worklogKind = worklogKind;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getIssueId() {
-        return issueId;
-    }
-
-    public void setIssueId(Long issueId) {
-        this.issueId = issueId;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getWorklogBody() {
-        return worklogBody;
-    }
-
-    public void setWorklogBody(String worklogBody) {
-        this.worklogBody = worklogBody;
-    }
-
-    public Timestamp getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Timestamp startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getTimeWorked() {
-        return timeWorked;
-    }
-
-    public void setTimeWorked(Long timeWorked) {
-        this.timeWorked = timeWorked;
-    }
-
-    public String getWorklogTypeId() {
-        return worklogTypeId;
-    }
-
-    public void setWorklogTypeId(String worklogTypeId) {
-        this.worklogTypeId = worklogTypeId;
-    }
-
-    public String getAuthorKey() {
-        return authorKey;
-    }
-
-    public void setAuthorKey(String authorKey) {
-        this.authorKey = authorKey;
-    }
-
-    public String getUpdateAuthorKey() {
-        return updateAuthorKey;
-    }
-
-    public void setUpdateAuthorKey(String updateAuthorKey) {
-        this.updateAuthorKey = updateAuthorKey;
-    }
-
-    public Timestamp getCreated() {
-        return created;
-    }
-
-    public void setCreated(Timestamp created) {
-        this.created = created;
-    }
-
-    public Timestamp getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Timestamp updated) {
-        this.updated = updated;
-    }
-
-    public Long getLinkedWorklogId() {
-        return linkedWorklogId;
-    }
-
-    public void setLinkedWorklogId(Long linkedWorklogId) {
-        this.linkedWorklogId = linkedWorklogId;
     }
 }

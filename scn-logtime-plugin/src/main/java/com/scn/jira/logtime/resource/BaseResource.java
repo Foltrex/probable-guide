@@ -2,12 +2,18 @@ package com.scn.jira.logtime.resource;
 
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.CacheControl;
 
 public class BaseResource {
     protected JiraAuthenticationContext authenticationContext;
+
+    @Autowired
+    public void setAuthenticationContext(JiraAuthenticationContext authenticationContext) {
+        this.authenticationContext = authenticationContext;
+    }
 
     protected ApplicationUser getLoggedInUser() {
         return authenticationContext.getLoggedInUser();

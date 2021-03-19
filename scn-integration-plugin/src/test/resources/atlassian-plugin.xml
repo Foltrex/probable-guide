@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}-tests" name="${project.name} Tests" plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
+	</plugin-info>
+
+	<component-import key="integrationPluginComponent" interface="com.scn.jira.integration.IntegrationPluginComponent"/>
+<!--	<component-import key="cloneProjectPluginComponent" interface="com.scn.jira.cloneproject.CloneProjectPluginComponent"/>-->
+	<component-import key="testComponent" interface="com.scn.jira.integration.TestComponent"/>
+</atlassian-plugin>

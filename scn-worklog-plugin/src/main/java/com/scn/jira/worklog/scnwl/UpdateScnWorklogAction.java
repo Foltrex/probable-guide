@@ -8,7 +8,6 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
@@ -83,7 +82,7 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 
         ApplicationUser reporter = null;
         if (!StringUtils.isBlank(getInputReporter())) {
-            reporter = ComponentAccessor.getUserManager().getUserByName(getInputReporter());
+            reporter = ComponentAccessor.getUserManager().getUserByKey(getInputReporter());
         }
 
         if (reporter == null) {

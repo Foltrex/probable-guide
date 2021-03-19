@@ -1,22 +1,18 @@
 package com.scn.jira.worklog.core.wl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.entity.EntityUtils;
+import com.atlassian.jira.exception.DataAccessException;
+import com.atlassian.jira.issue.worklog.Worklog;
 import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
 import org.ofbiz.core.util.UtilMisc;
 
-import com.atlassian.jira.entity.EntityUtils;
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.exception.DataAccessException;
-import com.atlassian.jira.issue.worklog.Worklog;
-
 import javax.inject.Named;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-@ExportAsService({ExtendedWorklogManagerImpl.class, ExtendedWorklogManager.class})
 @Named("extendedWorklogManagerImpl")
 public class ExtendedWorklogManagerImpl implements ExtendedWorklogManager {
 

@@ -3,16 +3,15 @@ package com.scn.jira.mytime.resource;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.velocity.VelocityManager;
 import com.scn.jira.mytime.manager.MyTimeManager;
 import com.scn.jira.mytime.representation.MyTimeRepresentation;
 import com.scn.jira.mytime.representation.WeekRepresentation;
 import com.scn.jira.mytime.util.DateUtils;
 import com.scn.jira.mytime.util.ServletUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.velocity.exception.VelocityException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -22,22 +21,22 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * REST resource that provides a list of projects in JSON format.
  */
 @Path("/timeobj")
 @Named
+@RequiredArgsConstructor
 public class MyTimeResource {
     private final JiraAuthenticationContext authenticationContext;
     private final MyTimeManager myTimeManager;
-
-    @Inject
-    public MyTimeResource(JiraAuthenticationContext jiraAuthenticationContext, MyTimeManager myTimeManager) {
-        this.authenticationContext = jiraAuthenticationContext;
-        this.myTimeManager = myTimeManager;
-    }
 
     private CacheControl getNoCacheControl() {
         CacheControl noCache = new CacheControl();
@@ -46,7 +45,6 @@ public class MyTimeResource {
     }
 
     @GET
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getTimesheet(@Context HttpServletRequest request, @QueryParam("viewType") String viewType) {
         VelocityManager vm = ComponentAccessor.getVelocityManager();

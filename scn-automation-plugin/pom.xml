@@ -27,12 +27,8 @@
 			<artifactId>jira-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.atlassian.plugins.rest</groupId>
-			<artifactId>atlassian-rest-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.activeobjects</groupId>
@@ -48,21 +44,35 @@
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>com.atlassian.plugin</groupId>
-			<artifactId>atlassian-spring-scanner-annotation</artifactId>
+			<groupId>com.atlassian.plugins</groupId>
+			<artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+		</dependency>
+		<!-- OSGi Java Config dependencies -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.atlassian.plugin</groupId>
-			<artifactId>atlassian-spring-scanner-runtime</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/../compiled-front/scn-automation-plugin</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>com.atlassian.maven.plugins</groupId>
@@ -73,58 +83,34 @@
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<compressResources>${compressResources}</compressResources>
+					<compressJs>false</compressJs>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g -Datlassian.plugins.enable.wait=30</jvmArgs>
-					<skipITs>${skipTests}</skipITs>
-					<skipUTs>${skipTests}</skipUTs>
-					<skipAllPrompts>${skipTests}</skipAllPrompts>
+					<skipITs>true</skipITs>
+					<skipUTs>true</skipUTs>
+					<skipAllPrompts>true</skipAllPrompts>
+					<extractDependencies>false</extractDependencies>
+					<skipManifestValidation>true</skipManifestValidation>
 					<systemProperties>
 						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
 					</systemProperties>
-					<extractDependencies>false</extractDependencies>
 					<instructions>
 						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
 						<Spring-Context>*</Spring-Context>
 						<Export-Package>
-							com.scn.jira.automation.api.*,
+							com.scn.jira.automation.*,
 						</Export-Package>
 						<Import-Package>
+							com.scn.jira.worklog.*,
 							org.springframework.osgi.*;resolution:="optional",
 							org.eclipse.gemini.blueprint.*;resolution:="optional",
-							com.atlassian.plugin.osgi.bridge.external,
-							com.atlassian.jira.plugin.webfragment.conditions,
-							*;resolution:=optional
+							*;resolution:="optional"
 						</Import-Package>
 						<Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
 					</instructions>
-					<skipManifestValidation>true</skipManifestValidation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.atlassian.plugin</groupId>
-				<artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-				<version>${atlassian.spring.scanner.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>atlassian-spring-scanner</goal>
-						</goals>
-						<phase>process-classes</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<includeExclude>-com.atlassian.plugin.spring.scanner.annotation.*</includeExclude>
-					<scannedDependencies>
-						<dependency>
-							<groupId>com.atlassian.plugin</groupId>
-							<artifactId>atlassian-spring-scanner-external-jar</artifactId>
-						</dependency>
-					</scannedDependencies>
-					<verbose>false</verbose>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

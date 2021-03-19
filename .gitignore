@@ -10,7 +10,8 @@ scn-clone-project-plugin/target
 scn-timesheet-plugin/target
 scn-worklog-plugin/target
 scn-automation-plugin/target/
-scn-plugins-frontend/target/
-scn-plugins-integration/target/
+scn-front/target/
+scn-integration-plugin/target/
 node_modules/
-scn-plugins-frontend/node/
+scn-front/node/
+/compiled-front/

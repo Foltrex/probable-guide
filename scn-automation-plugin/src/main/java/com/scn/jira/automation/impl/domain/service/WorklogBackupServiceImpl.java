@@ -6,8 +6,8 @@ import com.scn.jira.automation.api.domain.service.WorklogSQLService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.entity.ScnWorklog;
 import com.scn.jira.automation.impl.domain.entity.Worklog;
+import lombok.RequiredArgsConstructor;
 import net.java.ao.DBParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -18,15 +18,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class WorklogBackupServiceImpl implements WorklogBackupService {
     private final ActiveObjects ao;
     private final WorklogSQLService worklogSQLService;
-
-    @Autowired
-    public WorklogBackupServiceImpl(ActiveObjects ao, WorklogSQLService worklogSQLService) {
-        this.ao = ao;
-        this.worklogSQLService = worklogSQLService;
-    }
 
     @Override
     public void makeBackup(Long projectId, @Nullable Date from, @Nullable Date to) {

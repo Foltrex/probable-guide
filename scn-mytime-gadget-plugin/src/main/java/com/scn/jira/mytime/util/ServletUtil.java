@@ -10,7 +10,7 @@ public final class ServletUtil {
 		}
 		try {
 			return Integer.parseInt(param);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException ignored) {
 		}
 		return defaultValue;
 	}

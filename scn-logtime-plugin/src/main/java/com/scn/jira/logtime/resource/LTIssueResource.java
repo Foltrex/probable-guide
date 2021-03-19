@@ -4,14 +4,12 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.scn.jira.logtime.store.IExtWorklogLogtimeStore;
 import com.scn.jira.logtime.util.TextFormatUtil;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -26,24 +24,13 @@ import java.util.regex.Matcher;
 
 @Named
 @Path("/getIssues")
+@RequiredArgsConstructor
 public class LTIssueResource extends BaseResource {
     private final ProjectManager projectManager;
     private final PermissionManager permissionManager;
     private final IExtWorklogLogtimeStore iExtWorklogLogtimeStore;
 
-    @Inject
-    public LTIssueResource(JiraAuthenticationContext authenticationContext,
-                           ProjectManager projectManager,
-                           PermissionManager permissionManager,
-                           IExtWorklogLogtimeStore iExtWorklogLogtimeStore) {
-        this.iExtWorklogLogtimeStore = iExtWorklogLogtimeStore;
-        this.authenticationContext = authenticationContext;
-        this.projectManager = projectManager;
-        this.permissionManager = permissionManager;
-    }
-
     @GET
-    @AnonymousAllowed
     @Produces({"application/json", "application/xml"})
     public Response getIssues(@Context HttpServletRequest request, @QueryParam("projectId") String projectId) {
         Project project = projectManager.getProjectObj(Long.valueOf(projectId.trim()));

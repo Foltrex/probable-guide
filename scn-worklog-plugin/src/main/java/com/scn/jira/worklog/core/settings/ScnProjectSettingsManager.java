@@ -7,7 +7,6 @@ import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.dbc.Assertions;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.google.common.base.Splitter;
 import com.opensymphony.module.propertyset.PropertyException;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
@@ -18,10 +17,15 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@ExportAsService({ScnProjectSettingsManager.class})
 @Named("scnProjectSettingsManager")
 public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
     private final ProjectRoleManager projectRoleManager;
