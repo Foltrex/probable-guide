@@ -21,7 +21,7 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import com.scn.jira.worklog.globalsettings.GlobalSettingsManager;
 import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
-import com.scn.jira.worklog.listener.PluginLauncher;
+import com.scn.jira.worklog.listener.WorklogPluginLauncher;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import com.scn.jira.worklog.settings.IScnProjectSettingsService;
 import com.scn.jira.worklog.settings.ScnProjectSettingsService;
@@ -96,7 +96,7 @@ public class WorklogPluginOsgiServiceConfig {
     }
 
     @Bean
-    public FactoryBean<ServiceRegistration> registerPluginLauncher(final PluginLauncher pluginLauncher) {
+    public FactoryBean<ServiceRegistration> registerPluginLauncher(final WorklogPluginLauncher pluginLauncher) {
         return exportOsgiService(pluginLauncher, null, LifecycleAware.class);
     }
 

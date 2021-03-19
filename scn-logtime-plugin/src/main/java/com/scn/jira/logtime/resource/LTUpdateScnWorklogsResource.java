@@ -80,7 +80,7 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
                     .build();
             }
 
-            userKey = userKey != null ? userKey.toLowerCase() : "";
+            userKey = userKey != null ? userKey : "";
 
             createWorklogS(time, comment, date, userKey, worklogTypeId, issueId);
         }

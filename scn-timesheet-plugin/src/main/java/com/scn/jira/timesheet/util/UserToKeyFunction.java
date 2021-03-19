@@ -6,10 +6,10 @@ import com.google.common.collect.Collections2;
 
 import java.util.Collection;
 
-public class UserToNameFunction implements Function<ApplicationUser, String> {
-    public static final UserToNameFunction INSTANCE = new UserToNameFunction();
+public class UserToKeyFunction implements Function<ApplicationUser, String> {
+    public static final UserToKeyFunction INSTANCE = new UserToKeyFunction();
 
-    private UserToNameFunction() {
+    private UserToKeyFunction() {
     }
 
     public static Collection<String> transform(Collection<ApplicationUser> users) {
@@ -17,6 +17,6 @@ public class UserToNameFunction implements Function<ApplicationUser, String> {
     }
 
     public String apply(ApplicationUser from) {
-        return from.getName();
+        return from.getKey();
     }
 }

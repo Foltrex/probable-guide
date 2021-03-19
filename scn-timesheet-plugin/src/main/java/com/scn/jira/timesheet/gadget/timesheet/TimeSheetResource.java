@@ -1,6 +1,5 @@
 package com.scn.jira.timesheet.gadget.timesheet;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
@@ -8,6 +7,7 @@ import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverterImpl;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.DateFieldFormatImpl;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.jira.util.velocity.VelocityRequestContext;
@@ -17,6 +17,7 @@ import com.atlassian.velocity.VelocityManager;
 import com.opensymphony.util.TextUtils;
 import com.scn.jira.timesheet.gadget.rest.error.ErrorCollection;
 import com.scn.jira.timesheet.report.timesheet.TimeSheet;
+import com.scn.jira.timesheet.report.timesheet.TimeSheetDto;
 import com.scn.jira.timesheet.util.CalendarUtil;
 import com.scn.jira.timesheet.util.ServletUtil;
 import com.scn.jira.timesheet.util.TextUtil;
@@ -37,7 +38,6 @@ import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Named
 @Path("/timesheet")
@@ -48,6 +48,7 @@ public class TimeSheetResource {
     private final DateTimeFormatterFactory fFactory;
     private final FieldVisibilityManager fieldVisibilityManager;
     private final TimeSheet timeSheet;
+    private final UserManager userManager;
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -58,7 +59,7 @@ public class TimeSheetResource {
 
         ApplicationUser targetUser = this.authenticationContext.getLoggedInUser();
         if ((targetUserName != null) && (targetUserName.length() != 0)) {
-            targetUser = ComponentAccessor.getUserManager().getUserByName(targetUserName);
+            targetUser = userManager.getUserByName(targetUserName);
         }
 
         VelocityManager vm = ComponentAccessor.getVelocityManager();
@@ -66,7 +67,7 @@ public class TimeSheetResource {
             return Response
                 .ok(new TimeSheetRepresentation(vm.getBody("templates/scn/timesheetportlet/",
                     "timesheet-portlet.vm",
-                    getVelocityParams(request, numOfWeeks, reportingDay, Objects.requireNonNull(targetUser).getDirectoryUser()))))
+                    getVelocityParams(request, numOfWeeks, reportingDay, targetUser))))
                 .cacheControl(getNoCacheControl()).build();
         } catch (VelocityException e) {
             e.printStackTrace();
@@ -75,7 +76,7 @@ public class TimeSheetResource {
     }
 
     private Map<String, Object> getVelocityParams(HttpServletRequest request, int numOfWeeks, int reportingDay,
-                                                  User targetUser) {
+                                                  ApplicationUser targetUser) {
         Map<String, Object> params = getVelocityParams(numOfWeeks, reportingDay, targetUser);
         params.put("i18n", this.authenticationContext.getI18nHelper());
         params.put("textutils", new TextUtils());
@@ -87,7 +88,7 @@ public class TimeSheetResource {
         return params;
     }
 
-    private Map<String, Object> getVelocityParams(int numOfWeeks, int reportingDay, User targetUser) {
+    private Map<String, Object> getVelocityParams(int numOfWeeks, int reportingDay, ApplicationUser targetUser) {
         Map<String, Object> params = new HashMap<>();
         ApplicationUser user = this.authenticationContext.getLoggedInUser();
 
@@ -105,18 +106,18 @@ public class TimeSheetResource {
         try {
             params.put("targetUser", targetUser);
 
-            timeSheet.getTimeSpents(user, startDate.getTime(), endDate.getTime(), targetUser.getName(), false, null, null,
+            TimeSheetDto timeSheetDto = timeSheet.getTimeSpents(user, startDate.getTime(), endDate.getTime(), targetUser.getKey(), false, null, null,
                 null, null, null, null, null, null);
 
-            params.put("weekDays", timeSheet.getWeekDays());
-            params.put("weekWorkLog", timeSheet.getWeekWorkLogShort());
-            params.put("weekTotalTimeSpents", timeSheet.getWeekTotalTimeSpents());
+            params.put("weekDays", timeSheetDto.getWeekDays());
+            params.put("weekWorkLog", timeSheetDto.getWeekWorkLogShort());
+            params.put("weekTotalTimeSpents", timeSheetDto.getWeekTotalTimeSpents());
             params.put("fieldVisibility", this.fieldVisibilityManager);
             DatePickerConverter dpc = new DatePickerConverterImpl(this.authenticationContext,
                 new DateFieldFormatImpl(this.fFactory));
             params.put("dpc", dpc);
             params.put("startDate", startDate.getTime());
-            endDate.add(6, -1);
+            endDate.add(Calendar.DAY_OF_YEAR, -1);
 
             params.put("endDate", endDate.getTime());
             params.put("textUtil", new TextUtil(i18nBean));

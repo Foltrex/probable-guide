@@ -287,7 +287,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
 
     public Map<String, String> getAssignableUsers() {
         try {
-            List<ApplicationUser> users = new ArrayList<ApplicationUser>(ComponentAccessor.getPermissionSchemeManager().getUsers(ProjectPermissions.WORK_ON_ISSUES,
+            List<ApplicationUser> users = new ArrayList<>(ComponentAccessor.getPermissionSchemeManager().getUsers(ProjectPermissions.WORK_ON_ISSUES,
                 ComponentAccessor.getPermissionContextFactory().getPermissionContext(getIssueObject())));
 
             if (CollectionUtils.isEmpty(users))
@@ -297,7 +297,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
             @SuppressWarnings("unchecked") final Map<String, String> assignableUsers = new ListOrderedMap();
             for (ApplicationUser user : users) {
                 if (scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject())) {
-                    assignableUsers.put(user.getName(), user.getDisplayName());
+                    assignableUsers.put(user.getKey(), user.getDisplayName());
                 }
             }
             return assignableUsers;

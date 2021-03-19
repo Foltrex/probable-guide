@@ -6,6 +6,7 @@ import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.bc.issue.util.VisibilityValidator;
 import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.bc.issue.worklog.WorklogService;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.FeatureManager;
 import com.atlassian.jira.config.IssueTypeSchemeService;
@@ -22,11 +23,13 @@ import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.fields.option.OptionSetManager;
+import com.atlassian.jira.issue.fields.screen.FieldScreenRendererFactory;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.util.AggregateTimeTrackingCalculatorFactory;
 import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
 import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.jql.util.JqlLocalDateSupport;
+import com.atlassian.jira.mention.MentionService;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -39,9 +42,12 @@ import com.atlassian.jira.template.VelocityTemplatingEngine;
 import com.atlassian.jira.user.UserProjectHistoryManager;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.admin.translation.TranslationManager;
+import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
+import com.atlassian.jira.web.bean.ProjectDescriptionRendererBean;
 import com.atlassian.jira.web.bean.TimeTrackingGraphBeanFactory;
 import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.plugin.web.WebFragmentHelper;
@@ -63,6 +69,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public ActiveObjects activeObjects() {
         return importOsgiService(ActiveObjects.class);
+    }
+
+    @Bean
+    public AttachmentHelper attachmentHelper() {
+        return importOsgiService(AttachmentHelper.class);
     }
 
     @Bean
@@ -116,6 +127,11 @@ public class WorklogPluginBeanConfig {
     }
 
     @Bean
+    public FieldScreenRendererFactory fieldScreenRendererFactory() {
+        return importOsgiService(FieldScreenRendererFactory.class);
+    }
+
+    @Bean
     public FieldVisibilityManager fieldVisibilityManager() {
         return importOsgiService(FieldVisibilityManager.class);
     }
@@ -161,6 +177,11 @@ public class WorklogPluginBeanConfig {
     }
 
     @Bean
+    public JiraDurationUtils jiraDurationUtils() {
+        return ComponentAccessor.getComponent(JiraDurationUtils.class);
+    }
+
+    @Bean
     public JiraAuthenticationContext jiraAuthenticationContext() {
         return importOsgiService(JiraAuthenticationContext.class);
     }
@@ -178,6 +199,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public LocaleManager localeManager() {
         return importOsgiService(LocaleManager.class);
+    }
+
+    @Bean
+    public MentionService mentionService() {
+        return importOsgiService(MentionService.class);
     }
 
     @Bean
@@ -208,6 +234,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public ProjectManager projectManager() {
         return importOsgiService(ProjectManager.class);
+    }
+
+    @Bean
+    public RendererManager rendererManager() {
+        return importOsgiService(RendererManager.class);
     }
 
     @Bean
@@ -258,11 +289,6 @@ public class WorklogPluginBeanConfig {
     @Bean
     public XsrfTokenGenerator xsrfTokenGenerator() {
         return importOsgiService(XsrfTokenGenerator.class);
-    }
-
-    @Bean
-    public RendererManager rendererManager() {
-        return importOsgiService(RendererManager.class);
     }
 
     @Bean

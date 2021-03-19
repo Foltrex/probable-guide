@@ -135,9 +135,9 @@
 						#foreach ($item in $assignableUsers.entrySet())
 	                    <option value="$item.key"
 	                        #if($createWorklog)
-	                            #if ($item.key == $jiraServiceContext.loggedInUser.name) selected="selected" #end
+	                            #if ($item.key == $jiraServiceContext.loggedInUser.key) selected="selected" #end
 	                        #else
-	                            #if ($worklog && $item.key.toLowerCase() == $worklog.author ) selected="selected" #end
+	                            #if ($worklog && $item.key == $worklog.author) selected="selected" #end
 	                        #end
 	                        >$item.value
 	                    </option>
