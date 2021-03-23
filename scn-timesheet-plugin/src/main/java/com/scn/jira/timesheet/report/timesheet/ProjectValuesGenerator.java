@@ -1,33 +1,34 @@
 package com.scn.jira.timesheet.report.timesheet;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.atlassian.jira.user.ApplicationUser;
-import org.apache.commons.collections.map.ListOrderedMap;
-
 import com.atlassian.configurable.ValuesGenerator;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
-import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.PermissionManager;
 import com.scn.jira.timesheet.util.TextUtil;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.map.ListOrderedMap;
+import org.springframework.stereotype.Component;
 
-@SuppressWarnings("rawtypes")
-public class ProjectValuesGenerator implements ValuesGenerator {
-	@Override
-	public Map<String, String> getValues(Map params) {
-		final ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-		Collection<Project> projectGVs = ComponentAccessor.getPermissionManager()
-				.getProjects(ProjectPermissions.BROWSE_PROJECTS, user);
-		@SuppressWarnings("unchecked")
-		Map<String, String> projects = ListOrderedMap.decorate(new HashMap<String, String>(projectGVs.size()));
+import java.util.Map;
+import java.util.stream.Collectors;
 
-		projects.put("", "All Projects");
-		for (Project project : projectGVs) {
-			projects.put(project.getId().toString(), TextUtil.getUnquotedString(project.getName()));
-		}
+@Component
+@RequiredArgsConstructor
+public class ProjectValuesGenerator implements ValuesGenerator<String> {
+    private final JiraAuthenticationContext jiraAuthenticationContext;
+    private final PermissionManager permissionManager;
 
-		return projects;
-	}
+    @Override
+    public Map<String, String> getValues(Map params) {
+        ListOrderedMap<String, String> projects = permissionManager.getProjects(ProjectPermissions.BROWSE_PROJECTS, jiraAuthenticationContext.getLoggedInUser())
+            .stream().collect(Collectors.toMap(
+                project -> project.getId().toString(),
+                project -> TextUtil.getUnquotedString(project.getName()),
+                (oldValue, newValue) -> oldValue,
+                ListOrderedMap::new
+            ));
+        projects.put(0, "", "All Projects");
+
+        return projects;
+    }
 }
