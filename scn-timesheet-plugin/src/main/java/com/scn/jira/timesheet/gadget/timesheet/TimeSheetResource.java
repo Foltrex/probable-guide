@@ -36,6 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,7 +107,7 @@ public class TimeSheetResource {
         try {
             params.put("targetUser", targetUser);
 
-            TimeSheetDto timeSheetDto = timeSheet.getTimeSpents(user, startDate.getTime(), endDate.getTime(), targetUser.getKey(), false, null, null,
+            TimeSheetDto timeSheetDto = timeSheet.getTimeSpents(user, startDate.getTime(), endDate.getTime(), Collections.singletonList(targetUser.getKey()), false, null, null,
                 null, null, null, null, null, null);
 
             params.put("weekDays", timeSheetDto.getWeekDays());

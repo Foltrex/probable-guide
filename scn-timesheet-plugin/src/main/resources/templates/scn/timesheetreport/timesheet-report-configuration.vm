@@ -1,0 +1,246 @@
+#macro (isChecked $field) #if ($!req.getParameter($field) == 'true') checked #end #end
+#macro (options $field $optsMap $defaultValue)
+    #set($values = $!action.getParamValues($field))
+    #foreach($entry in $optsMap.entrySet())
+    <option value="$entry.key" #if ($entry.key == $defaultValue || $values.contains($entry.key)) selected #end>$entry.value</option>
+    #end
+#end
+
+$webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+$webResourceManager.requireResource("com.atlassian.auiplugin:aui-date-picker")
+$webResourceManager.requireResource("com.atlassian.auiplugin:aui-select2")
+<html>
+<head>
+    <title>$action.getText('admin.common.words.configure') - $report.name</title>
+    <meta content="atl.general" name="decorator"/>
+    <style>
+        form.aui .field-group > label {
+            width: 150px;
+            margin-left: -165px;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+    AJS.$(document).ready(function() {
+        AJS.$('#configure-report').submit(function() {
+            var n, selection, html = '';
+
+            selection = AJS.$('#targetGroup').auiSelect2('data');
+            for (n = 0; n < selection.length; n++) {
+                html += '<input type="hidden" name="targetGroup" value="' + selection[n].name + '"/>';
+            }
+
+            selection = AJS.$('#excludeTargetGroup').auiSelect2('data');
+            for (n = 0; n < selection.length; n++) {
+                html += '<input type="hidden" name="excludeTargetGroup" value="' + selection[n].name + '"/>';
+            }
+
+            AJS.$(this).append(html);
+
+            if (AJS.$('#startDate').val() || AJS.$('#endDate').val()) {
+                AJS.$('#numOfWeeks').val('');
+            }
+        });
+
+        AJS.$('#startDate, #endDate').each(function() {
+            AJS.$(this).datePicker({
+                overrideBrowserDefault: true,
+                firstDay: $currentCalendar.firstDayOfWeek - 1
+            });
+        });
+
+        // multi selects
+        AJS.$("#projectid, #moreFields").each(function() {
+            AJS.$(this).auiSelect2();
+        });
+
+        // single selects
+        AJS.$("#projectRoleId, #filterid, #rep_priority, #rep_sum, #groupByField, #sortBy, #sortDir").each(function() {
+            AJS.$(this).auiSelect2();
+        });
+
+        AJS.$("#targetUser").auiSelect2({
+            multiple: true,
+            ajax: {
+                url: contextPath + "/rest/api/2/user/picker",
+                type: "GET",
+                dataType: 'json',
+                cache: true,
+                data: function(term) {
+                    return {
+                        query: term || '%',
+                        maxResults: 100
+                    };
+                },
+                results: function(data) {
+                    return {
+                        results: data.users
+                    };
+                }
+            },
+            id: function(user) {
+                return user.name;
+            },
+            initSelection: function (element, callback) {
+                callback(AJS.$(element).data('init'));
+            },
+            formatSelection: function(user) {
+                return Select2.util.escapeMarkup(user.displayName);
+            },
+            formatResult: function(user) {
+                return user.html;
+            }
+        });
+
+        AJS.$("#targetGroup, #excludeTargetGroup").each(function() {
+            var isTargetGroup = this.id === 'targetGroup';
+            AJS.$(this).auiSelect2({
+                multiple: true,
+                ajax: {
+                    url: contextPath + "/rest/api/2/groups/picker",
+                    type: "GET",
+                    dataType: 'json',
+                    cache: true,
+                    data: function(term) {
+                        return {
+                            query: term,
+                            maxResults: 100
+                        };
+                    },
+                    results: function(data) {
+                        return {
+                            results: data.groups
+                        };
+                    }
+                },
+                id: function(group) {
+                    return group.name;
+                },
+                initSelection: function (element, callback) {
+                    callback(AJS.$(element).data('init'));
+                },
+                formatSelection: function(group) {
+                    var text = group.name === '@any' ? group.html : group.name;
+                    return Select2.util.escapeMarkup(text);
+                },
+                formatResult: function(group) {
+                    return group.html;
+                }
+            });
+        });
+    });
+</script>
+
+<header class="aui-page-header">
+    <div class="aui-page-header-inner">
+        <div class="aui-page-header-main">
+            <h1>$action.getText('admin.common.words.configure') - $report.name</h1>
+        </div>
+    </div>
+</header>
+
+<div class="aui-page-panel">
+    <div class="aui-page-panel-inner">
+        <section class="aui-page-panel-content">
+            <h2>$action.getText("common.concepts.report"): $report.label</h2>
+
+            #if ($action.hasAnyErrors())
+                #foreach ($error in $action.getErrorMessages())
+                    <div class="aui-message error">
+                        <p>${error}</p>
+                    </div>
+                #end
+            #end
+
+            <form id="configure-report" class="aui" name="jiraform" action="ScnTimesheetReport.jspa" method="get">
+                ## prevent focus on first element, otherwise date picker will automatically popup on page load
+                <input type="text" style="position: fixed; left: -999px;"/>
+                <input type="hidden" name="reportKey" value="$!reportKey"/>
+                #if ($selectedProjectId)
+                    <input type="hidden" name="selectedProjectId" value="$selectedProjectId"/>
+                #end
+                #set ($numOfWeeks = $!req.getParameter('numOfWeeks'))
+                #if ($numOfWeeks)
+                    <input type="hidden" id="numOfWeeks" name="numOfWeeks" value="$numOfWeeks"/>
+                #end
+                #set ($reportingDay = $!req.getParameter('reportingDay'))
+                #if ($reportingDay)
+                    <input type="hidden" name="reportingDay" value="$reportingDay"/>
+                #end
+
+                <p>
+                    <b>$action.getText("common.concepts.description"):</b><br/> $report.description
+                </p>
+
+                <div class="field-group">
+                    <label for="startDate">$i18n.getText('report.timesheet.startdate')</label>
+                    <input class="text aui-date-picker" id="startDate" name="startDate" type="date" value="$!req.getParameter('startDate')" autocomplete="off"/>
+                    <div class="description">$i18n.getText('report.timesheet.startdate.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="endDate">$i18n.getText('report.timesheet.enddate')</label>
+                    <input class="text aui-date-picker" id="endDate" name="endDate" type="date" value="$!req.getParameter('endDate')" autocomplete="off"/>
+                    <div class="description">$i18n.getText('report.timesheet.enddate.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="targetUser">$i18n.getText('report.timesheet.targetuser')</label>
+                    <input class="text" id="targetUser" name="targetUser" type="text" value="$!req.getParameter('targetUser')" data-init="$!action.getTargetUsersJson()"/>
+                    <div class="description">$i18n.getText('report.timesheet.targetuser.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="targetGroup">$i18n.getText('report.timesheet.targetgroup')</label>
+                    <input class="text" id="targetGroup" type="text" value="$!req.getParameter('targetGroup')" data-init="$!action.getTargetGroupsJson()"/>
+                    <div class="description">$i18n.getText('report.timesheet.targetgroup.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="rep_priority">$i18n.getText('report.timesheet.priority.label')</label>
+                    <select class="select" id="rep_priority" name="priority">
+                        #options('priority', $action.getPriorities())
+                    </select>
+                    <div class="description">$i18n.getText('report.timesheet.priority.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="projectid">$i18n.getText('report.timesheet.projects.label')</label>
+                    <select class="multi-select"  id="projectid" name="project" multiple>
+                        #options('project', $action.getProjects(), $req.getParameter('selectedProjectId'))
+                    </select>
+                    <div class="description">$i18n.getText('report.timesheet.projects.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="filterid">$i18n.getText('report.timesheet.filterid.name')</label>
+                    <select class="select" id="filterid" name="filterid">
+                        #options('filterid', $action.getFilters())
+                    </select>
+                    <div class="description">$i18n.getText('report.timesheet.filterid.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="weekends">$i18n.getText('report.timesheet.weekends.label')</label>
+                    <input class="checkbox" id="weekends" name="weekends" type="checkbox" value="true" #isChecked('weekends')/>
+                    <div class="description">$i18n.getText('report.timesheet.weekends.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="showUsers">$i18n.getText('report.timesheet.showusers.label')</label>
+                    <input class="checkbox" id="showUsers" name="showUsers" type="checkbox" value="true" #isChecked('showUsers')/>
+                    <div class="description">$i18n.getText('report.timesheet.showusers.description')</div>
+                </div>
+                <div class="field-group">
+                    <label for="groupByField">$i18n.getText('report.timesheet.groupbyfield.label')</label>
+                    <select class="select" id="groupByField" name="groupByField">
+                        #options('groupByField', $action.getGroupByFields())
+                    </select>
+                    <div class="description">$i18n.getText('report.timesheet.groupbyfield.description')</div>
+                </div>
+
+                <div class="buttons-container">
+                    <div class="buttons">
+                        <input class="aui-button" id="next_submit" type="submit" name="$i18n.getText('common.forms.next')" value="$i18n.getText('common.forms.next')"/>
+                        <a class="aui-button aui-button-link" id="cancelButton" href="BrowseProject.jspa?atl_token=$atl_token">$i18n.getText('common.forms.cancel')</a>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>
