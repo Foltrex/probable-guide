@@ -45,6 +45,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,8 +132,8 @@ public class ProjectPivotSummaryResource {
                 this.projectRoleManager, this.scnGlobalPermissionManager);
 
             pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(),
-                (project != null) ? project.getId() : null, (filterId == 0L) ? null : filterId,
-                targetGroup, false);
+                (project != null) ? Collections.singletonList(project.getId()) : null, (filterId == 0L) ? null : filterId,
+                StringUtils.isNotBlank(targetGroup) ? Collections.singletonList(targetGroup) : null, false);
 
             DateFieldFormat dateFieldFormat = new DateFieldFormatImpl(this.fFactory);
 

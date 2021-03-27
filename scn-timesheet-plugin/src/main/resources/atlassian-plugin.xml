@@ -149,6 +149,7 @@
 				  location="templates/scn/pivotreport/pivot-report-excel.vm"/>
 		<resource type="i18n" name="i18n"
 				  location="com.scn.jira.timesheet.report.pivot.pivot_report"/>
+		<url><![CDATA[/secure/ScnProjectPivotReport!default.jspa]]></url>
 		<properties>
 			<property>
 				<key>projectid</key>
@@ -194,6 +195,10 @@
 					roles-required="use">
 				<view name="input">/templates/scn/timesheetreport/timesheet-report-configuration.vm</view>
 			</action>
+			<action name="com.scn.jira.timesheet.impl.webaction.ReportConfigurationAction" alias="ScnProjectPivotReport"
+					roles-required="use">
+				<view name="input">/templates/scn/pivotreport/pivot-report-configuration.vm</view>
+			</action>
 		</actions>
 	</webwork1>
 
@@ -204,6 +209,7 @@
 			<param-name>mappings</param-name>
 			<param-value>
 				com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report=ScnTimesheetReport
+				com.scn.jira.plugin.scn-timesheet-plugin:scn-projectpivot=ScnProjectPivotReport
 			</param-value>
 		</init-param>
 		<dispatcher>REQUEST</dispatcher>
