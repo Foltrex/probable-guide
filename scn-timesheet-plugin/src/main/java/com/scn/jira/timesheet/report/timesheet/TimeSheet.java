@@ -10,13 +10,12 @@ import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.comparator.IssueKeyComparator;
-import com.atlassian.jira.issue.search.DocumentWithId;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchQuery;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.issue.search.SearchRequestManager;
-import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.jql.query.IssueIdCollector;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.plugin.report.impl.AbstractReport;
 import com.atlassian.jira.project.Project;
@@ -25,11 +24,11 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.ParameterUtils;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.ProjectActionSupport;
 import com.atlassian.jira.web.bean.I18nBean;
-import com.atlassian.jira.web.bean.PagerFilter;
 import com.scn.jira.timesheet.report.pivot.Pivot;
 import com.scn.jira.timesheet.util.TextUtil;
 import com.scn.jira.timesheet.util.UserToKeyFunction;
@@ -106,6 +105,26 @@ public class TimeSheet extends AbstractReport {
         return generateReport(action, params, true);
     }
 
+    @Override
+    public void validate(ProjectActionSupport action, Map params) {
+        Date startDate = null;
+        Date endDate = null;
+        I18nBean i18nBean = new I18nBean(action.getLoggedInUser());
+        try {
+            endDate = Pivot.getEndDate(params, formatter);
+        } catch (IllegalArgumentException e) {
+            action.addError("endDate", "Format date error!", ErrorCollection.Reason.VALIDATION_FAILED);
+        }
+        try {
+            startDate = Pivot.getStartDate(params, formatter, endDate);
+        } catch (IllegalArgumentException e) {
+            action.addError("startDate", "Format date error!", ErrorCollection.Reason.VALIDATION_FAILED);
+        }
+        if ((startDate == null) || (endDate == null) || (!endDate.before(startDate)))
+            return;
+        action.addError("endDate", i18nBean.getText("report.pivot.before.startdate"), ErrorCollection.Reason.VALIDATION_FAILED);
+    }
+
     public TimeSheetDto getTimeSpents(ApplicationUser appUser, Date startDate, Date endDate, List<String> targetUserKeys,
                                       boolean excelView, String priority, List<String> targetGroups, List<Long> projectIds, Long filterId, Boolean showWeekends,
                                       Boolean showUsers, String groupByField, DateTimeFormatter formatter) throws SearchException {
@@ -130,15 +149,12 @@ public class TimeSheet extends AbstractReport {
             log.info("Using filter: " + filterId);
             SearchRequest filter = this.searchRequestManager.getSearchRequestById(appUser, filterId);
             if (filter != null) {
-
                 SearchQuery searchQuery = SearchQuery.create(filter.getQuery(), appUser);
-                SearchResults<DocumentWithId> issues = this.searchProvider.search(searchQuery,
-                    PagerFilter.getUnlimitedFilter());
-                for (Object result : issues.getResults()) {
-                    if (result instanceof Issue) {
-                        filteredIssues.add(((Issue) result).getId());
-                    }
-                }
+                IssueIdCollector issueIdCollector = new IssueIdCollector();
+                this.searchProvider.search(searchQuery, issueIdCollector);
+                issueIdCollector.getIssueIds().forEach((id) -> {
+                    filteredIssues.add(Long.parseLong(id));
+                });
             }
         }
 
@@ -340,7 +356,7 @@ public class TimeSheet extends AbstractReport {
         List<String> projectStringList = ParameterUtils.getListParam(params, "project") == null
             ? Collections.singletonList(ParameterUtils.getStringParam(params, "project"))
             : ParameterUtils.getListParam(params, "project");
-        List<Long> projectIds = projectStringList.stream().filter(s -> !"".equals(s)).map(Long::parseLong).collect(Collectors.toList());
+        List<Long> projectIds = projectStringList.stream().filter(StringUtils::isNotBlank).map(Long::parseLong).collect(Collectors.toList());
 
         Long filterId = ParameterUtils.getLongParam(params, "filterid");
 

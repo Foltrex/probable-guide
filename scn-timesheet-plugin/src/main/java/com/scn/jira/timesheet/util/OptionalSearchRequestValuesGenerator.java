@@ -14,7 +14,6 @@ public class OptionalSearchRequestValuesGenerator extends SearchRequestValuesGen
 
     public Map<String, String> getValues(Map arg0) {
         Map<String, String> values = super.getValues(arg0);
-        values.put("", "");
         return values;
     }
 }

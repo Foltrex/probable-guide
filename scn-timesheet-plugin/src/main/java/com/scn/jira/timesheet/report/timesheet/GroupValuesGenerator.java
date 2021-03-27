@@ -26,7 +26,6 @@ public class GroupValuesGenerator implements ValuesGenerator<String> {
     public Map<String, String> getValues(Map params) {
         final ApplicationUser user = jiraAuthenticationContext.getLoggedInUser();
         Map<String, String> values = new TreeMap<>();
-        values.put("", "");
         if (globalPermissionManager.hasPermission(GlobalPermissionKey.USER_PICKER, user)) {
             Collection<Group> groups = groupPickerSearchService.findGroups("");
             for (Group group : groups)
