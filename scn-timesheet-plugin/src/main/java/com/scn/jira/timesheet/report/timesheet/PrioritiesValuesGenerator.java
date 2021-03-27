@@ -20,7 +20,7 @@ public class PrioritiesValuesGenerator implements ValuesGenerator<String> {
     @Override
     public Map<String, String> getValues(Map arg0) {
         Map<String, String> values = new TreeMap<>();
-        values.put("", "");
+        values.put("", "None");
 
         Collection<Priority> priorities = constantsManager.getPriorities();
 

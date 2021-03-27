@@ -63,6 +63,7 @@ public class ReportConfigurationAction extends ProjectActionSupport {
 
     @Override
     protected void doValidation() {
+        this.parameters = this.makeReportParams();
         this.getReportModule().validate(this, this.parameters);
     }
 
@@ -185,7 +186,6 @@ public class ReportConfigurationAction extends ProjectActionSupport {
 
     public Map<String, String> getProjects() {
         Map<String, String> result = projectValuesGenerator.getValues(ImmutableMap.of("User", this.getLoggedInUser()));
-        result.remove("");
         return result;
     }
 

@@ -2,7 +2,6 @@ package com.scn.jira.timesheet.util;
 
 import com.atlassian.configurable.ValuesGenerator;
 import com.atlassian.jira.bc.filter.SearchRequestService;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -26,6 +25,7 @@ public class SearchRequestValuesGenerator implements ValuesGenerator<String> {
         final ApplicationUser user = jiraAuthenticationContext.getLoggedInUser();
         Collection<SearchRequest> savedFiltersList = searchRequestService.getFavouriteFilters(user);
         Map<String, String> savedFilters = new ListOrderedMap<>();
+        savedFilters.put("", "None");
         for (SearchRequest request : savedFiltersList) {
             savedFilters.put(request.getId().toString(), request.getName());
         }

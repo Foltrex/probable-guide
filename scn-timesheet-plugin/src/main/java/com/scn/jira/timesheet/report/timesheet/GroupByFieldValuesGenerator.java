@@ -7,7 +7,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.SearchableField;
 import com.scn.jira.timesheet.util.TextUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -25,9 +25,8 @@ public class GroupByFieldValuesGenerator implements ValuesGenerator<String> {
 
     @Override
     public Map<String, String> getValues(Map arg0) {
-        Map<String, String> values = new LinkedMap();
-        values.put("", "");
-
+        Map<String, String> values = new ListOrderedMap<>();
+        values.put("", "None");
         Set<SearchableField> fields = fieldManager.getAllSearchableFields();
 
         Set<SearchableField> sortedFields = new TreeSet<>(Comparator.comparing(Field::getName));

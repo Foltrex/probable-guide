@@ -27,7 +27,6 @@ public class ProjectValuesGenerator implements ValuesGenerator<String> {
                 (oldValue, newValue) -> oldValue,
                 ListOrderedMap::new
             ));
-        projects.put(0, "", "All Projects");
 
         return projects;
     }

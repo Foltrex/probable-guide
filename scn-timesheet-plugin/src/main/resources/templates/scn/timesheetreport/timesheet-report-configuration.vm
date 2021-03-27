@@ -5,6 +5,11 @@
     <option value="$entry.key" #if ($entry.key == $defaultValue || $values.contains($entry.key)) selected #end>$entry.value</option>
     #end
 #end
+#macro(fieldValidation $id $name $error)
+    #if($error)
+    <div id="${id}-error" data-field="$name" class="error">$error</div>
+    #end
+#end
 
 $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
 $webResourceManager.requireResource("com.atlassian.auiplugin:aui-date-picker")
@@ -176,11 +181,13 @@ $webResourceManager.requireResource("com.atlassian.auiplugin:aui-select2")
                 <div class="field-group">
                     <label for="startDate">$i18n.getText('report.timesheet.startdate')</label>
                     <input class="text aui-date-picker" id="startDate" name="startDate" type="date" value="$!req.getParameter('startDate')" autocomplete="off"/>
+                    #fieldValidation("startDate" "startDate" $errors.startDate)
                     <div class="description">$i18n.getText('report.timesheet.startdate.description')</div>
                 </div>
                 <div class="field-group">
                     <label for="endDate">$i18n.getText('report.timesheet.enddate')</label>
                     <input class="text aui-date-picker" id="endDate" name="endDate" type="date" value="$!req.getParameter('endDate')" autocomplete="off"/>
+                    #fieldValidation("endDate" "endDate" $errors.endDate)
                     <div class="description">$i18n.getText('report.timesheet.enddate.description')</div>
                 </div>
                 <div class="field-group">
