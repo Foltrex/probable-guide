@@ -23,6 +23,7 @@ import com.scn.jira.timesheet.util.OptionalSearchRequestValuesGenerator;
 import org.apache.commons.lang.StringUtils;
 import webwork.action.ActionContext;
 
+import javax.inject.Named;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Named
 public class ReportConfigurationAction extends ProjectActionSupport {
     private final GroupByFieldValuesGenerator groupByFieldValuesGenerator;
     private final OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator;
