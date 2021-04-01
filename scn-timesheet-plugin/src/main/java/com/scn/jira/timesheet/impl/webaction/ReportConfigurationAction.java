@@ -36,7 +36,7 @@ import java.util.Map;
 
 @Named
 public class ReportConfigurationAction extends ProjectActionSupport {
-    private final GroupByFieldValuesGenerator groupByFieldValuesGenerator;
+    private final GroupByFieldValuesGenerator groupByFieldValuesGenerator = new GroupByFieldValuesGenerator();
     private final OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator;
     private final PrioritiesValuesGenerator prioritiesValuesGenerator;
     private final ProjectValuesGenerator projectValuesGenerator;
@@ -47,11 +47,11 @@ public class ReportConfigurationAction extends ProjectActionSupport {
     private String reportKey;
     private Report report;
 
-    public ReportConfigurationAction(ProjectManager projectManager, PermissionManager permissionManager, GroupByFieldValuesGenerator groupByFieldValuesGenerator,
-                                     OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator, PrioritiesValuesGenerator prioritiesValuesGenerator,
+    public ReportConfigurationAction(ProjectManager projectManager, PermissionManager permissionManager,
+                                     OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator,
+                                     PrioritiesValuesGenerator prioritiesValuesGenerator,
                                      ProjectValuesGenerator projectValuesGenerator, PluginAccessor pluginAccessor, EventPublisher eventPublisher) {
         super(projectManager, permissionManager);
-        this.groupByFieldValuesGenerator = groupByFieldValuesGenerator;
         this.optionalSearchRequestValuesGenerator = optionalSearchRequestValuesGenerator;
         this.prioritiesValuesGenerator = prioritiesValuesGenerator;
         this.projectValuesGenerator = projectValuesGenerator;

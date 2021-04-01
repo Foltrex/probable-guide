@@ -1,6 +1,7 @@
 package com.scn.jira.timesheet.report.timesheet;
 
 import com.atlassian.configurable.ValuesGenerator;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -20,8 +21,8 @@ import java.util.TreeSet;
 @Component
 @RequiredArgsConstructor
 public class GroupByFieldValuesGenerator implements ValuesGenerator<String> {
-    private final FieldManager fieldManager;
-    private final ApplicationProperties applicationProperties;
+    private final FieldManager fieldManager = ComponentAccessor.getFieldManager();
+    private final ApplicationProperties applicationProperties = ComponentAccessor.getApplicationProperties();
 
     @Override
     public Map<String, String> getValues(Map arg0) {

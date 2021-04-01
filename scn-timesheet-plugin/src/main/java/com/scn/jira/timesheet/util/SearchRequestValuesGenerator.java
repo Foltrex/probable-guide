@@ -7,7 +7,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.map.ListOrderedMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -16,7 +15,6 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class SearchRequestValuesGenerator implements ValuesGenerator<String> {
-    @Autowired
     private final SearchRequestService searchRequestService;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
