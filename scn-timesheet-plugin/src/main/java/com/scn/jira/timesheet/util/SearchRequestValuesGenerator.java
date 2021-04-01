@@ -2,6 +2,7 @@ package com.scn.jira.timesheet.util;
 
 import com.atlassian.configurable.ValuesGenerator;
 import com.atlassian.jira.bc.filter.SearchRequestService;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -15,8 +16,8 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class SearchRequestValuesGenerator implements ValuesGenerator<String> {
-    private final SearchRequestService searchRequestService;
-    private final JiraAuthenticationContext jiraAuthenticationContext;
+    private final SearchRequestService searchRequestService = ComponentAccessor.getComponent(SearchRequestService.class);
+    private final JiraAuthenticationContext jiraAuthenticationContext = ComponentAccessor.getJiraAuthenticationContext();
 
     @Override
     public Map<String, String> getValues(Map params) {

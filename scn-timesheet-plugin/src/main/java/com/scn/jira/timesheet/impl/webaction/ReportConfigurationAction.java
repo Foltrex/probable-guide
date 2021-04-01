@@ -27,19 +27,14 @@ import javax.inject.Named;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Named
 public class ReportConfigurationAction extends ProjectActionSupport {
     private final GroupByFieldValuesGenerator groupByFieldValuesGenerator = new GroupByFieldValuesGenerator();
-    private final OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator;
-    private final PrioritiesValuesGenerator prioritiesValuesGenerator;
-    private final ProjectValuesGenerator projectValuesGenerator;
+    private final OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator = new OptionalSearchRequestValuesGenerator();
+    private final PrioritiesValuesGenerator prioritiesValuesGenerator = new PrioritiesValuesGenerator();
+    private final ProjectValuesGenerator projectValuesGenerator = new ProjectValuesGenerator();
     private final PluginAccessor pluginAccessor;
     private final EventPublisher eventPublisher;
     private Map<String, Object> parameters;
@@ -48,13 +43,8 @@ public class ReportConfigurationAction extends ProjectActionSupport {
     private Report report;
 
     public ReportConfigurationAction(ProjectManager projectManager, PermissionManager permissionManager,
-                                     OptionalSearchRequestValuesGenerator optionalSearchRequestValuesGenerator,
-                                     PrioritiesValuesGenerator prioritiesValuesGenerator,
-                                     ProjectValuesGenerator projectValuesGenerator, PluginAccessor pluginAccessor, EventPublisher eventPublisher) {
+                                     PluginAccessor pluginAccessor, EventPublisher eventPublisher) {
         super(projectManager, permissionManager);
-        this.optionalSearchRequestValuesGenerator = optionalSearchRequestValuesGenerator;
-        this.prioritiesValuesGenerator = prioritiesValuesGenerator;
-        this.projectValuesGenerator = projectValuesGenerator;
         this.pluginAccessor = pluginAccessor;
         this.eventPublisher = eventPublisher;
     }
