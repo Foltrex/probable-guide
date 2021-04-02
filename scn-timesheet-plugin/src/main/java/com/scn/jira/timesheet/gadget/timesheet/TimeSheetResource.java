@@ -2,13 +2,12 @@ package com.scn.jira.timesheet.gadget.timesheet;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
-import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
-import com.atlassian.jira.issue.customfields.converters.DatePickerConverterImpl;
+import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.DateFieldFormatImpl;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.jira.util.velocity.VelocityRequestContext;
 import com.atlassian.jira.web.FieldVisibilityManager;
@@ -46,10 +45,11 @@ import java.util.Map;
 public class TimeSheetResource {
     private final JiraAuthenticationContext authenticationContext;
     private final ApplicationProperties applicationProperties;
-    private final DateTimeFormatterFactory fFactory;
     private final FieldVisibilityManager fieldVisibilityManager;
     private final TimeSheet timeSheet;
     private final UserManager userManager;
+    private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class)
+        .formatter().forLoggedInUser().withSystemZone().withStyle(DateTimeStyle.ISO_8601_DATE);
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -114,13 +114,11 @@ public class TimeSheetResource {
             params.put("weekWorkLog", timeSheetDto.getWeekWorkLogShort());
             params.put("weekTotalTimeSpents", timeSheetDto.getWeekTotalTimeSpents());
             params.put("fieldVisibility", this.fieldVisibilityManager);
-            DatePickerConverter dpc = new DatePickerConverterImpl(this.authenticationContext,
-                new DateFieldFormatImpl(this.fFactory));
-            params.put("dpc", dpc);
-            params.put("startDate", startDate.getTime());
+            params.put("formatter", formatter);
+            params.put("startDate", formatter.format(startDate.getTime()));
             endDate.add(Calendar.DAY_OF_YEAR, -1);
 
-            params.put("endDate", endDate.getTime());
+            params.put("endDate", formatter.format(endDate.getTime()));
             params.put("textUtil", new TextUtil(i18nBean));
         } catch (Exception e) {
             e.printStackTrace();

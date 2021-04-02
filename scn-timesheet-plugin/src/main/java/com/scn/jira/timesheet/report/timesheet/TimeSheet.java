@@ -82,7 +82,8 @@ public class TimeSheet extends AbstractReport {
     private final GroupManager groupManager;
     private final SearchRequestManager searchRequestManager;
     private final FieldVisibilityManager fieldVisibilityManager;
-    private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class).formatter().forLoggedInUser().withSystemZone().withStyle(DateTimeStyle.ISO_8601_DATE);
+    private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class)
+        .formatter().forLoggedInUser().withSystemZone().withStyle(DateTimeStyle.ISO_8601_DATE);
 
     @Override
     public boolean showReport() {
