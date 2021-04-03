@@ -1,3 +1,5 @@
+#parse('/templates/common/excel-decimal-styles.vm')
+
 <table class=tableBorder border="1" cellpadding="0" cellspacing="0" width="100%"><tr><td>
 <table border="1" cellpadding="3" cellspacing="1" width="100%">
     <tr class=rowHeader>
@@ -50,4 +52,3 @@
     #end
 </table>
 </td></tr></table>
-    

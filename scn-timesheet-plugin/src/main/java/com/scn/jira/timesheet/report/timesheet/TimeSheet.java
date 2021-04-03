@@ -43,8 +43,10 @@ import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.EntityCondition;
 import org.ofbiz.core.entity.EntityExpr;
 import org.ofbiz.core.entity.GenericValue;
+import webwork.action.ActionContext;
 
 import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -103,7 +105,14 @@ public class TimeSheet extends AbstractReport {
 
     @Override
     public String generateReportExcel(ProjectActionSupport action, Map params) throws Exception {
-        return generateReport(action, params, true);
+        StringBuilder contentDispositionValue = new StringBuilder(50);
+        contentDispositionValue.append("attachment;filename=\"").append(this.getDescriptor().getName()).append(".xls\";");
+        HttpServletResponse response = ActionContext.getResponse();
+        if (response != null) {
+            response.addHeader("Content-Disposition", contentDispositionValue.toString());
+        }
+
+        return "<meta charset=\"utf-8\"/>\n" + generateReport(action, params, true);
     }
 
     @Override
