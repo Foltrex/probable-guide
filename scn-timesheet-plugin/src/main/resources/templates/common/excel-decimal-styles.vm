@@ -1,0 +1,33 @@
+<style>
+        #set ($decimalSeparator = '\.')
+        #set ($thousandSeparator = '\,')
+
+        #if($decimalSymbol)
+            #if ($decimalSymbol == '.')
+                #set ($decimalSeparator = '\.')
+                #set ($thousandSeparator = '\,')
+            #else if
+            ($decimalSymbol =
+            =
+            ','
+            )
+                #set ($decimalSeparator = '\,')
+                #set ($thousandSeparator = '\.')
+            #end
+        #end
+
+    <!--
+    br {
+        mso-data-placement: same-cell;
+    }
+
+    -->
+    <!--
+    table {
+        mso-displayed-decimal-separator: "$decimalSeparator";
+        mso-displayed-thousand-separator: "$thousandSeparator";
+    }
+
+    -->
+
+</style>

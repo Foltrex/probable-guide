@@ -53,7 +53,7 @@
 			        <tr class="rowHeader">
                         <th class="colHeaderLink" colspan="4">
                             $i18n.getText("scn.portlet.timesheet.summary", $targetUser.displayName)
-                            &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$dpc.getString($startDate)&endDate=$dpc.getString($endDate)#if ($targetUser)&targetUser=$targetUser.name#end&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report&weekends=true&showUsers=true">$i18n.getText("portlet.timesheet.details")</a></font>)
+                            &nbsp;(<font size="1"><a href="$req.contextPath/secure/ConfigureReport.jspa?startDate=$startDate&endDate=$endDate#if ($targetUser)&targetUser=$targetUser.name#end&reportKey=com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report&weekends=true&showUsers=true">$i18n.getText("portlet.timesheet.details")</a></font>)
                         </th>
                     #foreach ($weekDay in $weekDays)
                         <th class="colHeaderLink day $weekDay.getWeekDayCSS()" align="center" title="$formatter.format($weekDay.getWeekDayDate())">$textUtil.getWeekDay($weekDay.getWeekDayDate()) <br/> $textUtil.formatDate($weekDay.getWeekDayDate())</th>
