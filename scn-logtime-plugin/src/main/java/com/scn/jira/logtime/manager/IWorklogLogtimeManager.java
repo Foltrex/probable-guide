@@ -14,10 +14,10 @@ public interface IWorklogLogtimeManager {
 			Date startDate, Date endDate, boolean scnWlCheck, boolean extWlCheck, boolean assignedCh, String user)
 			throws DataAccessException;
 
-	public List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate)
+	List<Long> getProjectIdsWithScnWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate)
 			throws DataAccessException;
 	
-	public List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate)
+	List<Long> getProjectIdsWithExtWorklogsBetweenDates(List<Long> projectIds, List<String> users, Date startDate, Date endDate)
 			throws DataAccessException;
 
 	void setCalendarMap(Map<String, Map<String, Integer>> calendarMap);
