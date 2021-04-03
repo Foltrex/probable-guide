@@ -15,8 +15,6 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.util.DateFieldFormat;
-import com.atlassian.jira.util.DateFieldFormatImpl;
 import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.jira.util.velocity.VelocityRequestContext;
 import com.atlassian.jira.web.FieldVisibilityManager;
@@ -45,6 +43,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,10 +62,9 @@ public class ProjectPivotSummaryResource {
     private final SearchRequestManager searchRequestManager;
     private final GroupManager groupManager;
     private final ProjectRoleManager projectRoleManager;
-    private final DateTimeFormatterFactory fFactory;
     private final IGlobalSettingsManager scnGlobalPermissionManager;
-    private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class).formatter().forLoggedInUser()
-        .withSystemZone().withStyle(DateTimeStyle.DATE_PICKER);
+    private final DateTimeFormatter formatter = ComponentAccessor.getComponent(DateTimeFormatterFactory.class)
+        .formatter().forLoggedInUser().withSystemZone().withStyle(DateTimeStyle.ISO_8601_DATE);
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -131,15 +129,13 @@ public class ProjectPivotSummaryResource {
                 this.projectRoleManager, this.scnGlobalPermissionManager);
 
             pivot.getTimeSpents(user, startDate.getTime(), endDate.getTime(),
-                (project != null) ? project.getId() : null, (filterId == 0L) ? null : filterId,
-                targetGroup, false);
-
-            DateFieldFormat dateFieldFormat = new DateFieldFormatImpl(this.fFactory);
+                (project != null) ? Collections.singletonList(project.getId()) : null, (filterId == 0L) ? null : filterId,
+                StringUtils.isNotBlank(targetGroup) ? Collections.singletonList(targetGroup) : null, false);
 
             params.put("filter", pivot.filter);
             params.put("project", project);
-            params.put("startDate", dateFieldFormat.formatDatePicker(startDate.getTime()));
-            params.put("endDate", dateFieldFormat.formatDatePicker(endDate.getTime()));
+            params.put("startDate", formatter.format(startDate.getTime()));
+            params.put("endDate", formatter.format(endDate.getTime()));
             params.put("formatter", formatter);
 
             params.put("fieldVisibility", this.fieldVisibilityManager);

@@ -49,8 +49,6 @@ public class WorklogPluginLauncher implements LifecycleAware {
     @Override
     public void onStart() {
         log.warn(worklogPluginComponent.getName() + " has been started.");
-        migrateIncorrectScnWorklogs();
-        migrateIncorrectWorklogs();
     }
 
     @Override
@@ -71,7 +69,7 @@ public class WorklogPluginLauncher implements LifecycleAware {
                     long id = resultSet.getLong("id");
                     String author = resultSet.getString("author");
                     String user_key = resultSet.getString("user_key");
-                    if (!StringUtils.equals(author, user_key)){
+                    if (!StringUtils.equals(author, user_key)) {
                         GenericValue scnWorklog = delegator.findByPrimaryKey("ScnWorklog", id);
                         scnWorklog.set("author", user_key);
                         scnWorklog.set("updateauthor", user_key);
@@ -98,7 +96,7 @@ public class WorklogPluginLauncher implements LifecycleAware {
                     long id = resultSet.getLong("id");
                     String author = resultSet.getString("author");
                     String user_key = resultSet.getString("user_key");
-                    if (!StringUtils.equals(author, user_key)){
+                    if (!StringUtils.equals(author, user_key)) {
                         GenericValue scnWorklog = delegator.findByPrimaryKey("Worklog", id);
                         scnWorklog.set("author", user_key);
                         scnWorklog.set("updateauthor", user_key);

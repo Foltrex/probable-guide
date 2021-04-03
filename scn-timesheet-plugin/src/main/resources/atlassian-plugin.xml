@@ -58,14 +58,10 @@
 			class="com.scn.jira.timesheet.report.timesheet.TimeSheet">
 		<description key="scn.report.timesheet.description"/>
 		<label key="scn.report.timesheet.label"/>
-
-		<resource type="velocity" name="view"
-				  location="templates/scn/timesheetreport/timesheet-report.vm"/>
-		<resource type="velocity" name="excel"
-				  location="templates/scn/timesheetreport/timesheet-report-excel.vm"/>
-		<resource type="i18n" name="i18n"
-				  location="com.scn.jira.timesheet.report.timesheet.timesheet_report"/>
-
+		<resource type="velocity" name="view" location="templates/scn/timesheetreport/timesheet-report.vm"/>
+		<resource type="velocity" name="excel" location="templates/scn/timesheetreport/timesheet-report-excel.vm"/>
+		<resource type="i18n" name="i18n" location="com.scn.jira.timesheet.report.timesheet.timesheet_report"/>
+		<url><![CDATA[/secure/ScnTimesheetReport!default.jspa]]></url>
 		<properties>
 			<property>
 				<key>startDate</key>
@@ -153,6 +149,7 @@
 				  location="templates/scn/pivotreport/pivot-report-excel.vm"/>
 		<resource type="i18n" name="i18n"
 				  location="com.scn.jira.timesheet.report.pivot.pivot_report"/>
+		<url><![CDATA[/secure/ScnProjectPivotReport!default.jspa]]></url>
 		<properties>
 			<property>
 				<key>projectid</key>
@@ -191,4 +188,30 @@
 			</property>
 		</properties>
 	</report>
+
+	<webwork1 key="scn-timesheet-plugin-webwork" name="Scn Timesheet* Plugin Actions" class="java.lang.Object">
+		<actions>
+			<action name="com.scn.jira.timesheet.impl.webaction.ReportConfigurationAction" alias="ScnTimesheetReport"
+					roles-required="use">
+				<view name="input">/templates/scn/timesheetreport/timesheet-report-configuration.vm</view>
+			</action>
+			<action name="com.scn.jira.timesheet.impl.webaction.ReportConfigurationAction" alias="ScnProjectPivotReport"
+					roles-required="use">
+				<view name="input">/templates/scn/pivotreport/pivot-report-configuration.vm</view>
+			</action>
+		</actions>
+	</webwork1>
+
+	<servlet-filter name="Scn Report configuration mapping filter" key="scn-reportmappingfilter"
+					class="com.scn.jira.timesheet.impl.filter.ReportMappingFilter" location="before-dispatch">
+		<url-pattern>/secure/ConfigureReport*</url-pattern>
+		<init-param>
+			<param-name>mappings</param-name>
+			<param-value>
+				com.scn.jira.plugin.scn-timesheet-plugin:scn-timesheet-report=ScnTimesheetReport
+				com.scn.jira.plugin.scn-timesheet-plugin:scn-projectpivot=ScnProjectPivotReport
+			</param-value>
+		</init-param>
+		<dispatcher>REQUEST</dispatcher>
+	</servlet-filter>
 </atlassian-plugin>
