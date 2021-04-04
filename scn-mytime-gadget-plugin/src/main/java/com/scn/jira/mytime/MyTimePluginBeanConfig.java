@@ -6,6 +6,7 @@ import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.ModuleFactoryBean;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.PluginAccessorBean;
 import com.scn.jira.worklog.wl.OverridedWorklogManager;
@@ -49,5 +50,10 @@ public class MyTimePluginBeanConfig {
     @Bean
     public ProjectRoleManager projectRoleManager() {
         return importOsgiService(ProjectRoleManager.class);
+    }
+
+    @Bean
+    public UserManager userManager() {
+        return importOsgiService(UserManager.class);
     }
 }
