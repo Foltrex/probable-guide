@@ -1,30 +1,42 @@
 package com.scn.jira.logtime.manager;
 
+import com.atlassian.jira.user.util.UserManager;
 import com.scn.jira.logtime.representation.WicketRepresentation;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import org.apache.log4j.Logger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 
 import javax.inject.Named;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Named
+@Log4j
+@RequiredArgsConstructor
 public class WicketManager {
-    private static final Logger LOGGER = Logger.getLogger(WicketManager.class);
-
     private final static String driverName1 = "net.sourceforge.jtds.jdbc.Driver";
     private final static String connection1 = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
     private final static String loginTatsi1 = "sps-training-admin";
     private final static String password1 = "06#$XPvf";
+
+    private final UserManager userManager;
 
     public WicketRepresentation gerUserWicketTimeForthePeriod(String login, Date startDate, Date endDate) {
         ArrayList<String> times = new ArrayList<>();
         Map<String, Long> timesMap = new HashMap<>();
 
         List<String> datesForList = DateUtils.getDatesList(startDate, endDate, DateUtils.formatStringDay);
-        WicketRepresentation wicketRepresentation = new WicketRepresentation();
+        WicketRepresentation wicketRepresentation;
 
         try {
             Class.forName(driverName1);
@@ -57,7 +69,7 @@ public class WicketManager {
             con.close();
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
         } finally {
             long total = 0;
             for (String dateFor : datesForList) {
@@ -73,14 +85,13 @@ public class WicketManager {
         return wicketRepresentation;
     }
 
-    public Map<String, WicketRepresentation> gerUserWicketTimeForthePeriods(List<String> logins, Date startDate,
+    public Map<String, WicketRepresentation> gerUserWicketTimeForthePeriods(List<String> userKeys, Date startDate,
                                                                             Date endDate) {
         Map<String, WicketRepresentation> wicketRepMap = new HashMap<>();
 
-        for (String login : logins) {
-            login = login.trim();
-            WicketRepresentation wick = gerUserWicketTimeForthePeriod(login, startDate, endDate);
-            wicketRepMap.put(login, wick);
+        for (String userKey : userKeys) {
+            WicketRepresentation wick = gerUserWicketTimeForthePeriod(Objects.requireNonNull(userManager.getUserByKey(userKey)).getUsername(), startDate, endDate);
+            wicketRepMap.put(userKey, wick);
         }
 
         return wicketRepMap;
@@ -93,12 +104,10 @@ public class WicketManager {
             Connection con = DriverManager.getConnection(connection1, loginTatsi1, password1);
             Statement s = con.createStatement();
 
-            String sql = "SELECT TOP 1000 [login] FROM [Jira_DWH].[dbo].[wicket_managers]" + " where login ='" + login
-                + "'";
+            String sql = "SELECT TOP 1000 [login] FROM [Jira_DWH].[dbo].[wicket_managers]" + " where login ='" + login + "'";
 
             ResultSet rs = s.executeQuery(sql);
             while (rs.next()) {
-                //String person = rs.getString("login");
                 result = true;
             }
 
@@ -107,19 +116,18 @@ public class WicketManager {
             con.close();
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
         }
 
         return result;
     }
 
-    public Map<String, Map<String, Integer>> gerUsersCalendar(List<String> logins, Date startDate, Date endDate) {
+    public Map<String, Map<String, Integer>> gerUsersCalendar(List<String> userKeys, Date startDate, Date endDate) {
         Map<String, Map<String, Integer>> usersCalMap = new HashMap<>();
 
-        for (String login : logins) {
-            login = login.trim();
-            Map<String, Integer> userCalMap = gerUserCalendar(login, startDate, endDate);
-            usersCalMap.put(login, userCalMap);
+        for (String userKey : userKeys) {
+            Map<String, Integer> userCalMap = gerUserCalendar(Objects.requireNonNull(userManager.getUserByKey(userKey)).getUsername(), startDate, endDate);
+            usersCalMap.put(userKey, userCalMap);
         }
         return usersCalMap;
     }
@@ -146,11 +154,11 @@ public class WicketManager {
                 rs.close();
                 pstmt.close();
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                log.error(e.getMessage());
             }
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
         }
         return calendarMap;
     }
