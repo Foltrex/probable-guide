@@ -73,7 +73,7 @@ public class LTProjectsResource extends BaseResource {
 
         List<String> selectedProjects = (prjList != null && !prjList.equals("")) ? Arrays.asList(prjList.split(","))
             : new ArrayList<>();
-        List<String> selectedUsers = (usersSelected != null && !usersSelected.isEmpty())
+        List<String> selectedUserKeys = (usersSelected != null && !usersSelected.isEmpty())
             ? Arrays.stream(usersSelected.split(",")).map(String::trim).map(String::toLowerCase).distinct()
             .map(userManager::getUserByName).filter(Objects::nonNull).map(ApplicationUser::getKey).collect(
                 Collectors.toList())
@@ -83,7 +83,7 @@ public class LTProjectsResource extends BaseResource {
         try {
             response = Response
                 .ok(new LogTimeRepresentation(vm.getBody("template/", "logtime.vm", getVelocityParams(request,
-                    selectedProjects, scnWl, extWl, selectedUsers, viewType))))
+                    selectedProjects, scnWl, extWl, selectedUserKeys, viewType))))
                 .cacheControl(getNoCacheControl()).build();
         } catch (VelocityException e) {
             log.error(e.getMessage());
@@ -93,14 +93,14 @@ public class LTProjectsResource extends BaseResource {
     }
 
     private Map<String, Object> getVelocityParams(HttpServletRequest request, List<String> projectIds, int scnWlCheck,
-                                                  int extWlCheck, List<String> users, String viewType) {
+                                                  int extWlCheck, List<String> userKeys, String viewType) {
         int currentPeriod = ServletUtil.getIntParam(request, "currentPeriod", 0);
         int currentslideStep = ServletUtil.getIntParam(request, "currentslideStep", 0);
 
         ApplicationUser appuser = getLoggedInUser();
 
         Map<String, Object> params = getVelocityParams(appuser, projectIds, scnWlCheck, extWlCheck,
-            users, viewType, currentPeriod, currentslideStep);
+            userKeys, viewType, currentPeriod, currentslideStep);
 
         params.put("i18n", this.authenticationContext.getI18nHelper());
         params.put("req", request);
@@ -109,7 +109,7 @@ public class LTProjectsResource extends BaseResource {
     }
 
     private Map<String, Object> getVelocityParams(ApplicationUser loggeduser, List<String> projectIds, int scnWlCheck,
-                                                  int extWlCheck, List<String> users, String viewType, int currentperiod,
+                                                  int extWlCheck, List<String> userKeys, String viewType, int currentperiod,
                                                   int currentslideStep) {
         Date date = new Date();
 
@@ -146,7 +146,7 @@ public class LTProjectsResource extends BaseResource {
                 endDate = DateUtils.getMonthEndDate(currentslideStep, date);
             }
         }
-        Map<String, Map<String, Integer>> calendarMap = wicketManager.gerUsersCalendar(users, startDate, endDate);
+        Map<String, Map<String, Integer>> calendarMap = wicketManager.gerUsersCalendar(userKeys, startDate, endDate);
         iWorklogLogtimeManager.setCalendarMap(calendarMap);
         Collection<WorklogType> wlTypes = extendedConstantsManager.getWorklogTypeObjects();
         List<String> datesWeekString = DateUtils.getStringListDate(startDate, endDate);
@@ -161,10 +161,10 @@ public class LTProjectsResource extends BaseResource {
         params.put("weekDaysString", datesWeekString);
         params.put("startDate", startDate.getTime());
         params.put("endDate", endDate.getTime());
-        Map<String, WicketRepresentation> userWickets = wicketManager.gerUserWicketTimeForthePeriods(users, startDate,
+        Map<String, WicketRepresentation> userWickets = wicketManager.gerUserWicketTimeForthePeriods(userKeys, startDate,
             endDate);
         params.put("userWickets", userWickets);
-        params.put("wicketPermission", wicketManager.gerUserWicketPermission(Objects.requireNonNull(loggeduser).getKey()));
+        params.put("wicketPermission", wicketManager.gerUserWicketPermission(Objects.requireNonNull(loggeduser).getUsername()));
 
         boolean hasScnWLPermission = scnGlobalPermissionManager.hasPermission(SCN_TIMETRACKING, loggeduser);
         if (!hasScnWLPermission) {
@@ -173,7 +173,7 @@ public class LTProjectsResource extends BaseResource {
         params.put("scnWlCheck", scnWlCh);
         params.put("extWlCheck", extWlCh);
         List<LTProjectsRepresentation> ltProjectsRepresentations = getLTProjectRepresentation(loggeduser, projectIds,
-            startDate, endDate, scnWlCh, extWlCh, users, calendarMap);
+            startDate, endDate, scnWlCh, extWlCh, userKeys, calendarMap);
         ltProjectsRepresentations.sort((o1, o2) -> {
             if (o1.getUserName() != null && o2.getUserName() != null) {
                 return o1.getUserName().compareTo(o2.getUserName());
@@ -219,7 +219,7 @@ public class LTProjectsResource extends BaseResource {
 
     private List<LTProjectsRepresentation> getLTProjectRepresentation(ApplicationUser loggedUser,
                                                                       List<String> projectIds, Date startDate, Date endDate, boolean scnWlCheck, boolean extWlCheck,
-                                                                      List<String> users, Map<String, Map<String, Integer>> calendarMap) {
+                                                                      List<String> userKeys, Map<String, Map<String, Integer>> calendarMap) {
         List<LTProjectsRepresentation> representations = new ArrayList<>();
         List<Long> projectIdsLong = (projectIds.size() != 0)
             ? projectIds.stream().filter(x -> x != null && !x.isEmpty()).map(x -> Long.valueOf(x.trim()))
@@ -229,11 +229,11 @@ public class LTProjectsResource extends BaseResource {
         List<Project> projects = projectManager
             .convertToProjectObjects(Stream.of(
                 scnWlCheck
-                    ? iWorklogLogtimeManager.getProjectIdsWithScnWorklogsBetweenDates(projectIdsLong, users,
+                    ? iWorklogLogtimeManager.getProjectIdsWithScnWorklogsBetweenDates(projectIdsLong, userKeys,
                     DateUtils.getStartDate(-28, startDate), DateUtils.getEndDate(28, endDate))
                     : new ArrayList<Long>(),
                 extWlCheck
-                    ? iWorklogLogtimeManager.getProjectIdsWithExtWorklogsBetweenDates(projectIdsLong, users,
+                    ? iWorklogLogtimeManager.getProjectIdsWithExtWorklogsBetweenDates(projectIdsLong, userKeys,
                     DateUtils.getStartDate(-28, startDate), DateUtils.getEndDate(28, endDate))
                     : new ArrayList<Long>())
                 .flatMap(List::stream).distinct().collect(Collectors.toList()))
@@ -243,7 +243,7 @@ public class LTProjectsResource extends BaseResource {
                 : 0)
             .collect(Collectors.toList());
 
-        for (String userString : users) {
+        for (String userString : userKeys) {
             userString = userString.trim();
             LTProjectsRepresentation ltProjectsRepresentation = new LTProjectsRepresentation();
             Map<String, Integer> userMap = null;
