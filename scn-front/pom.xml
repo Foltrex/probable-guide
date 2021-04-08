@@ -16,6 +16,10 @@
 	<packaging>pom</packaging>
 	<version>${revision}</version>
 
+	<properties>
+		<skipCopyJarPlugins>true</skipCopyJarPlugins>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -77,6 +81,11 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration combine.self="override"/>
 			</plugin>
 		</plugins>
 	</build>
