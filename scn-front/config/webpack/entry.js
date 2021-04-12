@@ -2,11 +2,11 @@ module.exports = (target) => {
     switch (target) {
         case "scn-automation-plugin":
             return {
-                "autotimetracking-table": ["@babel/polyfill", "./AutoTT.tsx"],
-                "worklog-backup": ["@babel/polyfill", "./WorklogBackup.tsx"],
+                "autotimetracking-table": "./AutoTT.tsx",
+                "worklog-backup": "./WorklogBackup.tsx",
             };
         case "scn-logtime-plugin":
-            return { test: ["@babel/polyfill", "./test.ts"] };
+            return { test: "./test.ts" };
         default:
             return {};
     }
