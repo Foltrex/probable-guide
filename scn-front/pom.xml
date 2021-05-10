@@ -45,7 +45,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<arguments>install --max-old-space-size</arguments>
+							<arguments>install</arguments>
 						</configuration>
 					</execution>
 					<execution>
@@ -55,7 +55,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<arguments>package --max-old-space-size</arguments>
+							<arguments>package</arguments>
 						</configuration>
 					</execution>
 				</executions>
