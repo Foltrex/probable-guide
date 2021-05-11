@@ -16,6 +16,7 @@ module.exports = (target = "") => {
                         __dirname,
                         "../../target",
                         "scn-automation-plugin",
+                        "compiled-front",
                         "META-INF",
                         "plugin-descriptors",
                         "wr-defs.xml"
@@ -27,12 +28,12 @@ module.exports = (target = "") => {
             plugins.push(
                 new WrmPlugin({
                     pluginKey: "com.scn.jira.scn-logtime-plugin",
-                    locationPrefix: "build/js",
                     watch: true,
                     xmlDescriptors: path.resolve(
                         __dirname,
                         "../../target",
                         "scn-logtime-plugin",
+                        "compiled-front",
                         "META-INF",
                         "plugin-descriptors",
                         "wr-defs.xml"

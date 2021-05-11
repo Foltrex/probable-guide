@@ -67,7 +67,7 @@
 				<directory>${project.basedir}/src/main/resources</directory>
 			</resource>
 			<resource>
-				<directory>${project.basedir}/../compiled-front/scn-logtime-plugin</directory>
+				<directory>${project.basedir}/compiled-front</directory>
 			</resource>
 		</resources>
 		<plugins>

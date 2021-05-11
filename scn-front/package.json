@@ -6,9 +6,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "cross-env NODE_ENV=development webpack --mode development",
+    "build": "cross-env NODE_ENV=development webpack --config ./webpack/jira.plugin.config.js --mode development",
     "start": "cross-env NODE_ENV=development webpack serve --config ./webpack/local.config.js --open --liveReload",
-    "package": "cross-env NODE_ENV=production webpack --mode production"
+    "package": "cross-env NODE_ENV=production webpack --config ./webpack/jira.plugin.config.js --mode production"
   },
   "eslintConfig": {
     "extends": "react-app"

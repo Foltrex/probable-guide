@@ -65,13 +65,13 @@
 				<version>${maven-resources-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>copy-scn-automation-plugin</id>
+						<id>copy-scn-front</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/../compiled-front</outputDirectory>
+							<outputDirectory>${basedir}/..</outputDirectory>
 							<resources>
 								<resource>
 									<directory>target</directory>
@@ -85,7 +85,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<configuration combine.self="override"/>
+				<configuration combine.self="override">
+					<filesets>
+						<fileset>
+							<directory>${basedir}/..</directory>
+							<includes>
+								<include>**/compiled-front/**</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

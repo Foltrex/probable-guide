@@ -14,4 +14,4 @@ scn-front/target/
 scn-integration-plugin/target/
 node_modules/
 scn-front/node/
-/compiled-front/
+compiled-front/
