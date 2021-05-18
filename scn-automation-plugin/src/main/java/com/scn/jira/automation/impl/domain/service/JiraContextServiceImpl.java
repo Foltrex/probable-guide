@@ -41,13 +41,13 @@ public class JiraContextServiceImpl implements JiraContextService {
     @Override
     public UserDto getUserDto() {
         ApplicationUser user = this.getCurrentUser();
-        return new UserDto(user.getKey(), user.getDisplayName());
+        return new UserDto(user.getKey(), user.getDisplayName(), user.getUsername());
     }
 
     @Override
     public UserDto getUserDto(String userKey) {
         ApplicationUser user = userManager.getUserByKey(userKey);
-        return user == null ? null : new UserDto(user.getKey(), user.getDisplayName());
+        return user == null ? null : new UserDto(user.getKey(), user.getDisplayName(), user.getUsername());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JiraContextServiceImpl implements JiraContextService {
     public boolean isCurrentUserAdmin() {
         return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, this.getCurrentUser())
             || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, this.getCurrentUser())
-            || this.getCurrentUser().getKey().equals("akalaputs");
+            || this.getCurrentUser().getUsername().equals("akalaputs");
     }
 
     @Override

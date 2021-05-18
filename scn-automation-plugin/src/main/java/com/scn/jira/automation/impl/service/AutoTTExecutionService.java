@@ -1,6 +1,5 @@
 package com.scn.jira.automation.impl.service;
 
-import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.configurable.ObjectConfiguration;
 import com.atlassian.configurable.ObjectConfigurationException;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -48,9 +47,8 @@ public class AutoTTExecutionService extends AbstractService {
         return this.getObjectConfiguration("AutoTTExecutionService", "services/AutoTTExecutionService.xml", null);
     }
 
-    @Transactional
     private void doTimeTracking(@Nonnull AutoTTDto autoTTDto, Date from, Date to) {
-        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTTDto.getUser().getKey(), from, to);
+        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTTDto.getUser().getUsername(), from, to);
         Set<Date> workedDays = worklogContextService.getWorkedDays(autoTTDto.getUser().getKey(), from, to);
         userCalendar.forEach((date, dayType) -> {
             if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
