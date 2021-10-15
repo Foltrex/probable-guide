@@ -42,8 +42,8 @@ public class LTUpdateScnWorklogResource extends BaseResource {
     @GET
     @Produces({"application/json", "application/xml"})
     public Response getWorklogForUpdate(@Context HttpServletRequest request, @QueryParam("complexWLId") String complexWLId,
-                                        @QueryParam("complexId2") String complexId2, @QueryParam("newValue") String newValue, @QueryParam("newWLType") String newWLType,
-                                        @QueryParam("comment") String comment) {
+                                        @QueryParam("complexId2") String complexId2, @QueryParam("newValue") String newValue,
+                                        @QueryParam("newWLType") String newWLType, @QueryParam("comment") String comment) {
         long issueId = getWlIdFromRequestParameter(complexWLId, 0).equals("") ? -1 : Integer.parseInt(getWlIdFromRequestParameter(complexWLId, 0));
         long worklogId = getWlIdFromRequestParameter(complexWLId, 2).equals("") ? -1 : Integer.parseInt(getWlIdFromRequestParameter(complexWLId, 2));
         String worklogTypeId = String.valueOf(getWlIdFromRequestParameter(complexWLId, 1).equals("") ? "" : Integer

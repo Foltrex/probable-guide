@@ -179,7 +179,7 @@ public class LTUpdateExtWorklogResource extends BaseResource {
                     validatedWorklog.getTimeSpent(),
                     validatedWorklog.getRoleLevel()),
                 newEstimate,
-                false);
+                true);
             extendedWorklogManager.createExtWorklogType(worklog, _worklogType);
             return worklog.getId();
         }
@@ -196,14 +196,14 @@ public class LTUpdateExtWorklogResource extends BaseResource {
             .build();
         WorklogResult result = worklogService.validateUpdate(new JiraServiceContextImpl(getLoggedInUser()), parameters);
         if (result != null) {
-            worklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(getLoggedInUser()), result, false);
+            worklogService.updateAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(getLoggedInUser()), result, true);
             extendedWorklogManager.updateExtWorklogType(_worklogId, _worklogType);
         }
     }
 
     private void deleteExtWorklog(Long worklogId) {
         WorklogResult result = worklogService.validateDelete(new JiraServiceContextImpl(getLoggedInUser()), worklogId);
-        if (result != null && worklogService.deleteAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(getLoggedInUser()), result, false))
+        if (result != null && worklogService.deleteAndAutoAdjustRemainingEstimate(new JiraServiceContextImpl(getLoggedInUser()), result, true))
             extendedWorklogManager.deleteExtWorklogType(worklogId);
     }
 

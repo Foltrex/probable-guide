@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <atlassian-plugin key="${project.groupId}.${project.artifactId}-tests" name="${project.name} Tests" plugins-version="2">
 	<plugin-info>
 		<description>${project.description}</description>
@@ -7,7 +5,30 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
+	<!-- from Integration Plugin -->
 	<component-import key="integrationPluginComponent" interface="com.scn.jira.integration.IntegrationPluginComponent"/>
-<!--	<component-import key="cloneProjectPluginComponent" interface="com.scn.jira.cloneproject.CloneProjectPluginComponent"/>-->
 	<component-import key="testComponent" interface="com.scn.jira.integration.TestComponent"/>
+
+	<!-- from Clone Project Plugin -->
+<!--	<component-import key="cloneProjectPluginComponent"-->
+<!--					  interface="com.scn.jira.cloneproject.CloneProjectPluginComponent"/>-->
+
+	<!-- from the product container -->
+	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+	<component-import key="avatarManager" interface="com.atlassian.jira.avatar.AvatarManager"/>
+<!--	<component-import key="fieldLayoutManager" interface="com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager"/>-->
+<!--	<component-import key="issueSecuritySchemeManager" interface="com.atlassian.jira.issue.security.IssueSecuritySchemeManager"/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
+<!--	<component-import key="" interface=""/>-->
 </atlassian-plugin>

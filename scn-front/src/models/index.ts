@@ -1,6 +1,7 @@
 export interface UserDto {
   key: string;
   name?: string;
+  username?: string;
 }
 
 export interface ProjectDto {

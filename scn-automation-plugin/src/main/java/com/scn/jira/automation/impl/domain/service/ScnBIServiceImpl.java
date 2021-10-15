@@ -24,14 +24,14 @@ public class ScnBIServiceImpl implements ScnBIService {
     private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public Map<Date, DayType> getUserCalendar(String userKey, Date from, Date to) {
+    public Map<Date, DayType> getUserCalendar(String username, Date from, Date to) {
         Map<Date, DayType> result = new HashMap<>();
         try {
             Class.forName(DRIVER_NAME);
             Connection con = DriverManager.getConnection(CONNECTION, LOGIN, PASSWORD);
             try {
                 PreparedStatement pstmt = con.prepareStatement("{call dbo.GetCalendar(?,?,?)}");
-                pstmt.setString(1, userKey);
+                pstmt.setString(1, username);
                 pstmt.setString(2, from.toInstant().atZone(ZoneId.systemDefault()).format(DATE_FORMATTER));
                 pstmt.setString(3, to.toInstant().atZone(ZoneId.systemDefault()).format(DATE_FORMATTER));
                 ResultSet rs = pstmt.executeQuery();

@@ -199,7 +199,6 @@
 		<order>20</order>
 		<sortable>true</sortable>
 		<supports-ajax-load>true</supports-ajax-load>
-		<!-- <condition class="NewCondition" /> -->
 	</issue-tabpanel>
 	<issue-tabpanel key="scn-worklog-tab-panel"
 					i18n-name-key="scn.scnworklog.issuepanel.name"
@@ -212,7 +211,6 @@
 		<resource type="velocity" name="view"
 				  location="templates/scn/worklog/panels/worklog-scn-tab.vm"/>
 		<supports-ajax-load>true</supports-ajax-load>
-		<!--<condition class="NewCondition*" /> -->
 	</issue-tabpanel>
 	<!-- ISSUE SCREEN GRAPH PANELS, LINKS -->
 	<!-- OVERRIDE "WORK LOG" ISSUE GRAPH PANEL -->

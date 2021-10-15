@@ -74,9 +74,9 @@
 					<compressResources>${compressResources}</compressResources>
 					<enableQuickReload>true</enableQuickReload>
 					<jvmArgs>-Xms4g -Xmx8g</jvmArgs>
-                    <skipITs>${skipTests}</skipITs>
-                    <skipUTs>${skipTests}</skipUTs>
-                    <skipAllPrompts>${skipTests}</skipAllPrompts>
+                    <skipITs>true</skipITs>
+                    <skipUTs>true</skipUTs>
+                    <skipAllPrompts>true</skipAllPrompts>
 					<extractDependencies>false</extractDependencies>
 					<skipManifestValidation>true</skipManifestValidation>
 					<systemProperties>

@@ -120,13 +120,13 @@ const AutoTTTable: React.FC<ComponentProps> = ({
               <Avatar
                 src={getUserAvatarURL(item.user.key)}
                 target="_blank"
-                href={getUserProfileURL(item.user.key)}
+                href={getUserProfileURL(item.user.username)}
                 name={item.user.name}
                 size="medium"
               />
             </AvatarWrapper>
-            <a target="_blank" href={getUserProfileURL(item.user.key)}>
-              {`${item.user.name} (${item.user.key})`}
+            <a target="_blank" href={getUserProfileURL(item.user.username)}>
+              {`${item.user.name} (${item.user.username})`}
             </a>
           </NameWrapper>
         ),
@@ -159,8 +159,8 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       {
         key: `createdby-${item.id}`,
         content: (
-          <a target="_blank" href={getUserProfileURL(item.author.key)}>
-            {item.author.key}
+          <a target="_blank" href={getUserProfileURL(item.author.username)}>
+            {item.author.username}
           </a>
         ),
       },
@@ -171,8 +171,11 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       {
         key: `updatedby-${item.id}`,
         content: (
-          <a target="_blank" href={getUserProfileURL(item.updateAuthor.key)}>
-            {item.updateAuthor.key}
+          <a
+            target="_blank"
+            href={getUserProfileURL(item.updateAuthor.username)}
+          >
+            {item.updateAuthor.username}
           </a>
         ),
       },

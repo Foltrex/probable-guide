@@ -31,6 +31,7 @@ import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.jql.util.JqlLocalDateSupport;
 import com.atlassian.jira.mention.MentionService;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
+import com.atlassian.jira.plugin.userformat.UserFormats;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -47,7 +48,6 @@ import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.action.admin.translation.TranslationManager;
 import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
-import com.atlassian.jira.web.bean.ProjectDescriptionRendererBean;
 import com.atlassian.jira.web.bean.TimeTrackingGraphBeanFactory;
 import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.plugin.web.WebFragmentHelper;
@@ -299,6 +299,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public UserProjectHistoryManager userProjectHistoryManager() {
         return importOsgiService(UserProjectHistoryManager.class);
+    }
+
+    @Bean
+    public UserFormats userFormats() {
+        return importOsgiService(UserFormats.class);
     }
 
     @Bean

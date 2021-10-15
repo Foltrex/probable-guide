@@ -16,6 +16,10 @@
 	<packaging>pom</packaging>
 	<version>${revision}</version>
 
+	<properties>
+		<skipCopyJarPlugins>true</skipCopyJarPlugins>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -41,7 +45,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<arguments>install --max-old-space-size</arguments>
+							<arguments>install</arguments>
 						</configuration>
 					</execution>
 					<execution>
@@ -51,7 +55,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<arguments>package --max-old-space-size</arguments>
+							<arguments>package</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -61,13 +65,13 @@
 				<version>${maven-resources-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>copy-scn-automation-plugin</id>
+						<id>copy-scn-front</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/../compiled-front</outputDirectory>
+							<outputDirectory>${basedir}/..</outputDirectory>
 							<resources>
 								<resource>
 									<directory>target</directory>
@@ -77,6 +81,21 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration combine.self="override">
+					<filesets>
+						<fileset>
+							<directory>${basedir}/..</directory>
+							<includes>
+								<include>**/compiled-front/**</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
