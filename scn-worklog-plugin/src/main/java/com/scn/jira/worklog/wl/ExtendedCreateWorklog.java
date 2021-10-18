@@ -22,8 +22,6 @@ import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.mention.MentionService;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.security.plugin.ProjectPermissionKey;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserUtil;
@@ -49,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ExtendedCreateWorklog extends CreateWorklog {
     private static final long serialVersionUID = -4594446887729353135L;
@@ -233,11 +232,10 @@ public class ExtendedCreateWorklog extends CreateWorklog {
     }
 
     public Collection<WorklogType> getWorklogTypeObjects() {
-        Collection<WorklogType> worklogTypes = this.extendedConstantsManager.getWorklogTypeObjects();
         Collection<WorklogType> excludedWorklogTypes = this.psManager.getExcludedWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
-        excludedWorklogTypes.forEach(worklogTypes::remove);
-
-        return worklogTypes;
+        return this.extendedConstantsManager.getWorklogTypeObjects().stream()
+            .filter(worklogTypeObject -> !excludedWorklogTypes.contains(worklogTypeObject))
+            .collect(Collectors.toList());
     }
 
     public boolean isWorklogTypeSelected(String worklogType) {

@@ -8,7 +8,7 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 
 public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     private static final long serialVersionUID = -7662358199449964631L;
@@ -20,11 +20,11 @@ public class DeleteScnWorklogAction extends AbstractScnWorklogAction {
     public DeleteScnWorklogAction(CommentService commentService,
                                   ProjectRoleManager projectRoleManager,
                                   GroupManager groupManager,
-                                  IScnWorklogService scnWorklogService) {
+                                  IScnWorklogService scnWorklogService,
+                                  ExtendedConstantsManager extendedConstantsManager) {
         super(commentService, projectRoleManager, ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
             new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
-            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
-            new DefaultExtendedConstantsManager());
+            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager), extendedConstantsManager);
     }
 
     @Override

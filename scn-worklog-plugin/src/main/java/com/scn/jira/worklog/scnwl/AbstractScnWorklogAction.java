@@ -27,7 +27,15 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction {
     private static final long serialVersionUID = -7430574077126963463L;
@@ -269,11 +277,10 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
     }
 
     public Collection<WorklogType> getWorklogTypeObjects() {
-        Collection<WorklogType> worklogTypes = this.extendedConstantsManager.getWorklogTypeObjects();
         Collection<WorklogType> excludedWorklogTypes = this.projectSettignsManager.getExcludedWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
-        excludedWorklogTypes.forEach(worklogTypes::remove);
-
-        return worklogTypes;
+        return this.extendedConstantsManager.getWorklogTypeObjects().stream()
+            .filter(worklogTypeObject -> !excludedWorklogTypes.contains(worklogTypeObject))
+            .collect(Collectors.toList());
     }
 
     public boolean isWorklogTypeSelected(String worklogType) {
