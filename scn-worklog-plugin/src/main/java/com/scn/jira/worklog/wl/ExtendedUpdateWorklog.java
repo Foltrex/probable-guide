@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ExtendedUpdateWorklog extends UpdateWorklog {
     private static final long serialVersionUID = -7219473321948115788L;
@@ -226,11 +227,10 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
     }
 
     public Collection<WorklogType> getWorklogTypeObjects() {
-        Collection<WorklogType> worklogTypes = this.extendedConstantsManager.getWorklogTypeObjects();
         Collection<WorklogType> excludedWorklogTypes = this.psManager.getExcludedWorklogTypes(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
-        excludedWorklogTypes.forEach(worklogTypes::remove);
-
-        return worklogTypes;
+        return this.extendedConstantsManager.getWorklogTypeObjects().stream()
+            .filter(worklogTypeObject -> !excludedWorklogTypes.contains(worklogTypeObject))
+            .collect(Collectors.toList());
     }
 
     public boolean isWorklogTypeSelected(String worklogType) {

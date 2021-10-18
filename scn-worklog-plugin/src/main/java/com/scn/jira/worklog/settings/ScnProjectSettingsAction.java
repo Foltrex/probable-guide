@@ -3,7 +3,7 @@ package com.scn.jira.worklog.settings;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 
 import java.util.Calendar;
@@ -26,9 +26,10 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
     private Collection<WorklogType> excludedWLTypes;
     private boolean unspecifiedWLTypeOption;
 
-    public ScnProjectSettingsAction(ProjectRoleManager prManager, ProjectRoleManager projectRoleManager) {
-        super(prManager, new DefaultExtendedConstantsManager());
-        this.psService = new ScnProjectSettingsService(new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
+    public ScnProjectSettingsAction(ProjectRoleManager prManager, ProjectRoleManager projectRoleManager,
+                                    ExtendedConstantsManager extendedConstantsManager) {
+        super(prManager, extendedConstantsManager);
+        this.psService = new ScnProjectSettingsService(new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager));
     }
 
     @Override

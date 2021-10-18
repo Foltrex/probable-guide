@@ -12,7 +12,7 @@ import com.atlassian.jira.web.FieldVisibilityManager;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
 import org.apache.commons.lang.StringUtils;
 
@@ -32,12 +32,12 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
 
     public CreateScnWorklogAction(ProjectRoleManager projectRoleManager,
                                   GroupManager groupManager,
-                                  IScnWorklogService scnWorklogService) {
+                                  IScnWorklogService scnWorklogService,
+                                  ExtendedConstantsManager extendedConstantsManager) {
         super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager,
             ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
             new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
-            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
-            new DefaultExtendedConstantsManager());
+            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager), extendedConstantsManager);
         this.fvManager = ComponentAccessor.getComponent(FieldVisibilityManager.class);
     }
 

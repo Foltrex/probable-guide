@@ -1,10 +1,9 @@
 package com.scn.jira.worklog.core.wl;
 
 import com.atlassian.jira.issue.IssueConstant;
+import org.ofbiz.core.entity.GenericValue;
 
 import java.util.Collection;
-
-import org.ofbiz.core.entity.GenericValue;
 
 public interface ExtendedConstantsManager {
     String WORKLOGTYPE_CONSTANT_TYPE = "WorklogType";

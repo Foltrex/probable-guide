@@ -1,7 +1,7 @@
 package com.scn.jira.worklog.core.wl;
 
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueConstant;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -12,42 +12,38 @@ import com.atlassian.jira.util.velocity.DefaultVelocityRequestContextFactory;
 import com.atlassian.jira.web.action.admin.translation.TranslationManager;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.lazyloading.LazyLoadingCache;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.EntityUtil;
 import org.ofbiz.core.entity.GenericValue;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Named;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Named("defaultExtendedConstantsManager")
+@Component("defaultExtendedConstantsManager")
+@RequiredArgsConstructor
 public class DefaultExtendedConstantsManager implements ExtendedConstantsManager {
     // private List worklogTypes;
     // private Map worklogTypeObjectsMap;
-    private ConstantsManager constantsManager;
-    private JiraAuthenticationContext authenticationContext;
+    private final ConstantsManager constantsManager;
+    private final JiraAuthenticationContext authenticationContext;
     private final TranslationManager translationManager;
-    private OfBizDelegator ofBizDelegator;
-    private final LazyLoadingCache<ConstantsCache<WorklogType>> worklogTypeCache = new LazyLoadingCache<ConstantsCache<WorklogType>>(
+    private final OfBizDelegator ofBizDelegator;
+    private final ApplicationProperties applicationProperties;
+    private final LazyLoadingCache<ConstantsCache<WorklogType>> worklogTypeCache = new LazyLoadingCache<>(
         new WorklogTypeCacheLoader());
 
     protected static final List<String> ORDER_BY_LIST = Lists.newArrayList("sequence ASC");
-
-    public DefaultExtendedConstantsManager() {
-        this.translationManager = ComponentAccessor.getTranslationManager();
-        this.authenticationContext = ComponentAccessor.getJiraAuthenticationContext();
-        this.ofBizDelegator = ComponentAccessor.getOfBizDelegator();
-        this.constantsManager = ComponentAccessor.getConstantsManager();
-    }
 
     public GenericValue getConstant(String constantType, String id) {
         if ("WorklogType".equalsIgnoreCase(constantType))
             return getWorklogType(id);
 
-        throw null;
+        throw new IllegalArgumentException("Not supported constant type");
     }
 
     public IssueConstant getConstantObject(String constantType, String id) {
@@ -68,15 +64,15 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
     }
 
     public WorklogType getWorklogTypeObject(String id) {
-        return (WorklogType) ((ConstantsCache<WorklogType>) this.worklogTypeCache.getData()).getObject(id);
+        return this.worklogTypeCache.getData().getObject(id);
     }
 
     public Collection<GenericValue> getWorklogTypes() {
-        return ((ConstantsCache<WorklogType>) this.worklogTypeCache.getData()).getGenericValues();
+        return this.worklogTypeCache.getData().getGenericValues();
     }
 
     public Collection<WorklogType> getWorklogTypeObjects() {
-        return ((ConstantsCache<WorklogType>) this.worklogTypeCache.getData()).getObjects();
+        return this.worklogTypeCache.getData().getObjects();
     }
 
     public GenericValue getWorklogType(String id) {
@@ -116,7 +112,7 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
 
     protected ConstantsCache<? extends IssueConstant> getConstantsCache(String constantType) {
         if ("WorklogType".equalsIgnoreCase(constantType))
-            return (ConstantsCache<WorklogType>) this.worklogTypeCache.getData();
+            return this.worklogTypeCache.getData();
 
         throw new IllegalArgumentException("Unknown constant type '" + constantType + "'.");
     }
@@ -150,10 +146,10 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
 
         public DefaultExtendedConstantsManager.ConstantsCache<WorklogType> loadData() {
             List<GenericValue> worklogTypes = DefaultExtendedConstantsManager.this.getConstants("WorklogType");
-            Map<String, WorklogType> priorityObjectsMap = new LinkedHashMap<String, WorklogType>();
+            Map<String, WorklogType> priorityObjectsMap = new LinkedHashMap<>();
             // haven't found other way to retrieve it
             BaseUrl baseUrl = new DefaultBaseUrl(
-                new DefaultVelocityRequestContextFactory(ComponentAccessor.getApplicationProperties()));
+                new DefaultVelocityRequestContextFactory(DefaultExtendedConstantsManager.this.applicationProperties));
             for (GenericValue priorityGV : worklogTypes) {
                 WorklogTypeImpl worklogType = new WorklogTypeImpl(priorityGV,
                     DefaultExtendedConstantsManager.this.translationManager,
@@ -161,7 +157,7 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
                 priorityObjectsMap.put(priorityGV.getString("id"), worklogType);
             }
 
-            return new DefaultExtendedConstantsManager.ConstantsCache<WorklogType>(worklogTypes, priorityObjectsMap);
+            return new DefaultExtendedConstantsManager.ConstantsCache<>(worklogTypes, priorityObjectsMap);
         }
     }
 
@@ -183,7 +179,7 @@ public class DefaultExtendedConstantsManager implements ExtendedConstantsManager
         }
 
         T getObject(String id) {
-            return (T) this.idObjectMap.get(id);
+            return this.idObjectMap.get(id);
         }
     }
 }

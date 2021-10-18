@@ -11,7 +11,7 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.OfBizScnExtendedIssueStore;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
+import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Objects;
@@ -24,12 +24,12 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
 
     public UpdateScnWorklogAction(ProjectRoleManager projectRoleManager,
                                   GroupManager groupManager,
-                                  IScnWorklogService scnWorklogService) {
+                                  IScnWorklogService scnWorklogService,
+                                  ExtendedConstantsManager extendedConstantsManager) {
         super(ComponentAccessor.getComponent(CommentService.class), projectRoleManager,
             ComponentAccessor.getComponent(JiraDurationUtils.class), groupManager,
             new OfBizScnExtendedIssueStore(ComponentAccessor.getOfBizDelegator()),
-            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()),
-            new DefaultExtendedConstantsManager());
+            scnWorklogService, new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager), extendedConstantsManager);
     }
 
     @Override

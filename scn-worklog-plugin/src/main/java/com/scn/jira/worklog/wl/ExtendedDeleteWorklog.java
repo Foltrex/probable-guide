@@ -19,7 +19,6 @@ import com.atlassian.jira.web.action.issue.DeleteWorklog;
 import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
-import com.scn.jira.worklog.core.wl.DefaultExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManagerImpl;
 import com.scn.jira.worklog.core.wl.WorklogType;
@@ -42,12 +41,13 @@ public class ExtendedDeleteWorklog extends DeleteWorklog {
                                  FieldLayoutManager fieldLayoutManager, RendererManager rendererManager,
                                  @Qualifier("overridedWorklogManager") WorklogManager worklogManager, UserUtil userUtil,
                                  JiraDurationUtils jiraDurationUtils, SubTaskManager subTaskManager, FieldScreenRendererFactory fieldScreenRendererFactory,
-                                 FieldManager fieldManager, AttachmentHelper attachmentHelper, MentionService mentionService) {
+                                 FieldManager fieldManager, AttachmentHelper attachmentHelper, MentionService mentionService,
+                                 ExtendedConstantsManager extendedConstantsManager) {
         super(worklogService, commentService, projectRoleManager, jiraDurationUtils, dateTimeFormatterFactory, fieldVisibilityManager, fieldLayoutManager, rendererManager, worklogManager, userUtil,
             subTaskManager, fieldScreenRendererFactory, fieldManager, attachmentHelper, mentionService);
-        this.worklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager()));
-        this.extendedConstantsManager = new DefaultExtendedConstantsManager();
-        this.psManager = new ScnProjectSettingsManager(projectRoleManager, new DefaultExtendedConstantsManager());
+        this.worklogService = new ExtendedWorklogService(new ExtendedWorklogManagerImpl(), new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager));
+        this.extendedConstantsManager = extendedConstantsManager;
+        this.psManager = new ScnProjectSettingsManager(projectRoleManager, extendedConstantsManager);
     }
 
     public boolean shouldDisplay() {
