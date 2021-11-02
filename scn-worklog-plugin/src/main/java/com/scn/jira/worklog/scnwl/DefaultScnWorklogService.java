@@ -460,7 +460,6 @@ public class DefaultScnWorklogService implements IScnWorklogService {
             } else {
                 errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.no.edit.permission.no.user"));
             }
-            jiraServiceContext.getErrorCollection().addErrorCollection(errorCollection);
             return false;
         }
 
