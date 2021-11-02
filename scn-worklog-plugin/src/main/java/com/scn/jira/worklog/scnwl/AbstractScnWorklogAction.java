@@ -303,7 +303,7 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
             users.sort(new UserBestNameComparator(getJiraServiceContext().getI18nBean().getLocale()));
             @SuppressWarnings("unchecked") final Map<String, String> assignableUsers = new ListOrderedMap();
             for (ApplicationUser user : users) {
-                if (scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject())) {
+                if (scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), null)) {
                     assignableUsers.put(user.getKey(), user.getDisplayName());
                 }
             }

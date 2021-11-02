@@ -96,7 +96,7 @@ public class LTUpdateScnWorklogResource extends BaseResource {
         } else if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)
             || (worklogId != 0 && isValueEmplty && !scnWorklogService.hasPermissionToDelete(serviceContext, scnWorklog))
             || (worklogId != 0 && !isValueEmplty && !scnWorklogService.hasPermissionToUpdate(serviceContext, scnWorklog))
-            || (worklogId == 0) && !isValueEmplty && !scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
+            || (worklogId == 0) && !isValueEmplty && !scnWorklogService.hasPermissionToCreate(serviceContext, issue, userCreated)) {
             return Response.serverError()
                 .entity(new ErrorEntity(
                     ErrorEntity.ErrorReason.APPLICATION_PERMISSION_DENIED,

@@ -4,6 +4,7 @@ import com.atlassian.core.util.DateUtils;
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.bc.issue.worklog.WorklogInputParametersImpl;
 import com.atlassian.jira.bc.issue.worklog.WorklogNewEstimateResult;
+import com.atlassian.jira.bc.issue.worklog.WorklogResult;
 import com.atlassian.jira.bc.issue.worklog.WorklogResultFactory;
 import com.atlassian.jira.bc.issue.worklog.WorklogService;
 import com.atlassian.jira.component.ComponentAccessor;
@@ -121,7 +122,7 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
             .timeSpent(getTimeLogged()).startDate(getParsedStartDate()).comment(getComment())
             .groupLevel(visibility.getGroupLevel()).roleLevelId(visibility.getRoleLevel());
 
-        if ("new".equalsIgnoreCase(this.adjustEstimate)) {
+        if (ADJUST_ESTIMATE_NEW.equalsIgnoreCase(this.adjustEstimate)) {
             WorklogNewEstimateResult worklogNewEstimateResult = this.worklogService.validateUpdateWithNewEstimate(
                 getJiraServiceContext(), paramBuilder.newEstimate(getNewEstimate()).buildNewEstimate());
 
@@ -130,13 +131,17 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
                 this.newEstimateLong = worklogNewEstimateResult.getNewEstimate();
             }
         } else {
-            this.worklog = this.worklogService.validateUpdate(getJiraServiceContext(), paramBuilder.build()).getWorklog();
+            WorklogResult worklogResult = this.worklogService.validateUpdate(getJiraServiceContext(), paramBuilder.build());
+
+            if (worklogResult != null) {
+                this.worklog = worklogResult.getWorklog();
+            }
         }
 
         if (psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId()) && StringUtils.isBlank(getWorklogType()))
             getJiraServiceContext()
                 .getErrorCollection().addError("worklogType",
-                getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+                    getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
 
         if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(), getIssueObject().getProjectObject(),
             false)) return;

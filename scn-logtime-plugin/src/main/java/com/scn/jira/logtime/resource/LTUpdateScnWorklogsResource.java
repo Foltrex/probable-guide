@@ -45,7 +45,7 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
         ApplicationUser appUser = getLoggedInUser();
         final JiraServiceContext serviceContext = new JiraServiceContextImpl(appUser);
         Long projectId = Objects.requireNonNull(issue.getProjectObject()).getId();
-        if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue)) {
+        if (!scnWorklogService.hasPermissionToCreate(serviceContext, issue, null)) {
             return Response.serverError()
                 .entity(new ErrorEntity(
                     ErrorEntity.ErrorReason.APPLICATION_PERMISSION_DENIED,

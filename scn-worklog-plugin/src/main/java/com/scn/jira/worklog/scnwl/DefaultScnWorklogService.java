@@ -354,7 +354,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         IScnWorklog worklog = null;
         ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();// .getDirectoryUser();
 
-        if (hasPermissionToCreate(jiraServiceContext, issue)) {
+        if (hasPermissionToCreate(jiraServiceContext, issue, null)) {
             String authorKey = (user == null) ? null : user.getKey();
             worklog = validateParamsAndCreateWorklog(jiraServiceContext, issue, authorKey, groupLevel, roleLevelId, timeSpent,
                 startDate, null, comment, null, null, null, null, worklogTypeId);
@@ -433,7 +433,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         return create(jiraServiceContext, worklog, newEstimate, newLinkedEstimate, dispatchEvent, isLinkedWL);
     }
 
-    public boolean hasPermissionToCreate(JiraServiceContext jiraServiceContext, Issue issue) {
+    public boolean hasPermissionToCreate(JiraServiceContext jiraServiceContext, Issue issue, String authorKey) {
         ApplicationUser user = jiraServiceContext.getLoggedInApplicationUser();
         ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
 
@@ -450,6 +450,17 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         if (!isIssueInEditableWorkflowState(issue)) {
             errorCollection
                 .addErrorMessage(getText(jiraServiceContext, "worklog.service.error.issue.not.editable.workflow.state"));
+            return false;
+        }
+
+        if (forbiddenCreateWorklog(user, issue, authorKey)) {
+            if (user != null) {
+                errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.no.edit.permission",
+                    user.getDisplayName()));
+            } else {
+                errorCollection.addErrorMessage(getText(jiraServiceContext, "worklog.service.error.no.edit.permission.no.user"));
+            }
+            jiraServiceContext.getErrorCollection().addErrorCollection(errorCollection);
             return false;
         }
 
@@ -731,7 +742,7 @@ public class DefaultScnWorklogService implements IScnWorklogService {
 
         IScnWorklog newWorklog = null;
         try {
-            if (hasPermissionToCreate(jiraServiceContext, worklog.getIssue())) {
+            if (hasPermissionToCreate(jiraServiceContext, worklog.getIssue(), null)) {
                 newWorklog = scnWorklogManager.create(user, worklog, newEstimate, newLinkedEstimate, dispatchEvent, isLinkedWL);
             }
         } catch (DataAccessException e) {
@@ -794,6 +805,10 @@ public class DefaultScnWorklogService implements IScnWorklogService {
             && isSameAuthor(user, worklog);
     }
 
+    protected boolean forbiddenCreateWorklog(ApplicationUser user, Issue issue, String authorKey) {
+        return authorKey != null && isNotSameAuthor(user, authorKey) && !permissionManager.hasPermission(ProjectPermissions.EDIT_ALL_WORKLOGS, issue, user);
+    }
+
     protected boolean hasEditAllPermission(ApplicationUser user, Issue issue) {
         return scnGlobalPermissionManager.hasPermission(IGlobalSettingsManager.SCN_TIMETRACKING, user)
             && permissionManager.hasPermission(ProjectPermissions.EDIT_ALL_WORKLOGS, issue, user);
@@ -824,6 +839,14 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         }
 
         return (user == null) && (worklog.getAuthorKey() == null);
+    }
+
+    protected boolean isNotSameAuthor(ApplicationUser user, String authorKey) {
+        if (user != null) {
+            return !Objects.equals(user.getKey(), authorKey);
+        }
+
+        return authorKey != null;
     }
 
     protected Long getAutoAdjustNewEstimateOnUpdate(Long timeEstimate, Long newTimeSpent, Long originalTimeSpent) {
