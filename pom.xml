@@ -15,7 +15,7 @@
 
 	<organization>
 		<name>ScienceSoft</name>
-		<url>http://www.scnsoft.com</url>
+		<url>https://www.scnsoft.com</url>
 	</organization>
 
 	<dependencyManagement>
@@ -123,9 +123,9 @@
 	</dependencyManagement>
 
 	<properties>
-		<revision>4.2.1-RC4</revision>
+		<revision>4.2.1-RC5</revision>
 		<jira.version>8.14.1</jira.version>
-		<amps.version>8.1.0</amps.version>
+		<amps.version>8.1.2</amps.version>
 		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
 		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>

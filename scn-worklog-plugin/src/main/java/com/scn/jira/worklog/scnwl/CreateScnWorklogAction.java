@@ -51,7 +51,7 @@ public class CreateScnWorklogAction extends AbstractScnWorklogAction {
             return ERROR;
         }
 
-        if (!scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject())) {
+        if (!scnWorklogService.hasPermissionToCreate(getJiraServiceContext(), getIssueObject(), null)) {
             return SECURITY_BREACH;
         }
 

@@ -55,7 +55,7 @@ public interface IScnWorklogService {
 
     IScnWorklog createAndAutoAdjustRemainingEstimate(JiraServiceContext paramJiraServiceContext, IScnWorklog paramWorklog, boolean paramBoolean, boolean isLinkedWL);
 
-    boolean hasPermissionToCreate(JiraServiceContext paramJiraServiceContext, Issue paramIssue);
+    boolean hasPermissionToCreate(JiraServiceContext paramJiraServiceContext, Issue paramIssue, String authorKey);
 
     IScnWorklog getById(JiraServiceContext paramJiraServiceContext, Long paramLong);
 
