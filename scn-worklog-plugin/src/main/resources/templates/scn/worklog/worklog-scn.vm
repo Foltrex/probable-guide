@@ -130,7 +130,6 @@
 				#fieldFooter("${pageId}-time-logged" "timeLogged" $errors.timeLogged $i18n.getText('logwork.example', '3w 4d 12h') "${baseurl}/secure/ShowTimeTrackingHelp.jspa?decorator=popup#LogWork" $i18n.getText('logwork.timespent.desc.short'))
 				
 				## reporter
-                <div hidden>
 				#fieldHeader("${pageId}-wl-reporter" $i18n.getText('logwork.reporter.label') true "field-group")
 					<select class="select" id="${pageId}-wl-reporter" name="inputReporter" type="text">
 						#foreach ($item in $assignableUsers.entrySet())
@@ -145,7 +144,6 @@
 		                #end
 					</select>
 				#fieldFooter("${pageId}-wl-reporter" "inputReporter" $errors.inputReporter '' '' '')
-                </div>
 
 				## worklog types
 				#fieldHeader("${pageId}-wl-type" $i18n.getText('logwork.worklogtype') $wlTypeRequired "field-group")
