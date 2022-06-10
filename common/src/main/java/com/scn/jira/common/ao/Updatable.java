@@ -1,8 +1,8 @@
-package com.scn.jira.automation.impl.domain.entity;
+package com.scn.jira.common.ao;
 
 import java.sql.Timestamp;
 
-interface Updatable extends WithId {
+public interface Updatable extends WithId {
     String getAuthorKey();
 
     void setAuthorKey(String authorKey);

@@ -12,6 +12,7 @@ scn-worklog-plugin/target
 scn-automation-plugin/target/
 scn-front/target/
 scn-integration-plugin/target/
+common/target/
 node_modules/
 scn-front/node/
 compiled-front/
