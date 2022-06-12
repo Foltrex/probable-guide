@@ -29,8 +29,7 @@ public class ScnBIServiceImpl implements ScnBIService {
         try {
             Class.forName(DRIVER_NAME);
             Connection con = DriverManager.getConnection(CONNECTION, LOGIN, PASSWORD);
-            try {
-                PreparedStatement pstmt = con.prepareStatement("{call dbo.GetCalendar(?,?,?)}");
+            try (PreparedStatement pstmt = con.prepareStatement("{call dbo.GetCalendar(?,?,?)}");) {
                 pstmt.setString(1, username);
                 pstmt.setString(2, from.toInstant().atZone(ZoneId.systemDefault()).format(DATE_FORMATTER));
                 pstmt.setString(3, to.toInstant().atZone(ZoneId.systemDefault()).format(DATE_FORMATTER));
@@ -44,7 +43,6 @@ public class ScnBIServiceImpl implements ScnBIService {
                         DayType.getByIndex(rs.getInt("StatusId")));
                 }
                 rs.close();
-                pstmt.close();
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

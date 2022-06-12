@@ -15,9 +15,6 @@ public interface AutoTTService {
     @Nullable
     AutoTTDto get(Long id);
 
-    @Nullable
-    AutoTTDto getByUserKey(String key);
-
     AutoTTDto add(AutoTTDto autoTTDto);
 
     AutoTTDto update(AutoTTDto autoTTDto);

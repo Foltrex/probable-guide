@@ -12,17 +12,8 @@ import java.util.Set;
 
 @PublicApi
 public interface WorklogContextService {
-    WorklogTypeDto getWorklogType(String id);
 
     List<WorklogTypeDto> getAllWorklogTypes();
-
-    String getFormattedTime(Long time);
-
-    Long getParsedTime(String formattedTime);
-
-    boolean isValidFormattedTime(String formattedTime);
-
-    boolean isBlankFormattedTime(String formattedTime);
 
     Set<Date> getWorkedDays(String userKey, @Nonnull Date from, @Nonnull Date to);
 

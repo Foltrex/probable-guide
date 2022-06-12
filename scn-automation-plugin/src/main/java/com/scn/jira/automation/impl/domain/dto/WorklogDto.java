@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @NoArgsConstructor
@@ -16,7 +17,9 @@ import java.sql.Timestamp;
 @Setter
 @ToString
 @JsonAutoDetect
-public class WorklogDto {
+public class WorklogDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private WorklogKind worklogKind;
     private Long id;
     private Long issueId;

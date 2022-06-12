@@ -37,9 +37,9 @@ public class AutoTTExecutionService extends AbstractService {
 
     @Override
     public void run() {
-        Date from = Date.from(LocalDate.now().minusDays(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant()),
-            to = Date.from(LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        autoTTService.getAllActive().forEach(record -> doTimeTracking(record, from, to));
+        Date from = Date.from(LocalDate.now().minusDays(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date to = Date.from(LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        autoTTService.getAllActive().forEach(value -> doTimeTracking(value, from, to));
     }
 
     @Override
