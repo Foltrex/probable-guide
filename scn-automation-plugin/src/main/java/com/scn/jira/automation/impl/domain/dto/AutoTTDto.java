@@ -1,5 +1,6 @@
 package com.scn.jira.automation.impl.domain.dto;
 
+import com.scn.jira.common.json.FormattedDuration;
 import com.scn.jira.common.json.LocalDateDeserializer;
 import com.scn.jira.common.json.LocalDateSerializer;
 import lombok.Getter;
@@ -39,6 +40,7 @@ public class AutoTTDto implements Serializable {
     @Valid
     private WorklogTypeDto worklogType;
     @NotBlank
+    @FormattedDuration
     private String ratedTime;
     @NotNull
     @JsonSerialize(using = LocalDateSerializer.class)
