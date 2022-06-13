@@ -44,26 +44,29 @@ const AutoTTTable: React.FC<ComponentProps> = ({
         key: "user",
         content: "User",
         shouldTruncate: true,
-        isSortable: true,
         width: undefined,
       },
       {
         key: "project",
         content: "Project",
         shouldTruncate: true,
-        isSortable: true,
         width: undefined,
       },
       {
         key: "issue",
         content: "Issue",
         shouldTruncate: true,
-        isSortable: true,
         width: undefined,
       },
       {
         key: "ratedtime",
         content: "Rated Time",
+        shouldTruncate: true,
+        width: undefined,
+      },
+      {
+        key: "startdate",
+        content: "Starting date",
         shouldTruncate: true,
         width: undefined,
       },
@@ -82,7 +85,6 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       {
         key: "created",
         content: "Created",
-        isSortable: true,
         shouldTruncate: true,
         width: undefined,
       },
@@ -95,7 +97,6 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       {
         key: "updated",
         content: "Updated",
-        isSortable: true,
         shouldTruncate: true,
         width: undefined,
       },
@@ -151,6 +152,10 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       {
         key: `ratedtime-${item.id}`,
         content: item.ratedTime,
+      },
+      {
+        key: `startdate-${item.id}`,
+        content: new Date(item.startDate!).toLocaleDateString(),
       },
       {
         key: `worklogtype-${item.id}`,
@@ -226,8 +231,6 @@ const AutoTTTable: React.FC<ComponentProps> = ({
       head={head}
       rows={rows}
       loadingSpinnerSize="large"
-      defaultSortOrder="DESC"
-      defaultSortKey="updated"
     />
   );
 };

@@ -37,9 +37,10 @@ const FlagServiceWithoutProvider: React.FC = ({ children }) => {
     showError: (message: string) =>
       showFlag({
         id: flagCount.current++,
-        title: message,
+        title: "An error has occurred",
         icon: <ErrorIcon label="Error" size="medium" primaryColor="red" />,
         isAutoDismiss: true,
+        description: message,
       }),
   };
 

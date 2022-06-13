@@ -73,8 +73,10 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(addItemAction(result.data));
           showSuccess("Created");
         } catch (error) {
-          if (error.response && error.response.status === Config.BAD_REQUEST) {
+          if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
+          } else if (error.response?.data?.errorMessages?.length) {
+            showError(error.response.data.errorMessages.join());
           } else {
             showError(error.message);
           }
@@ -91,8 +93,10 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(updateItemAction(result.data));
           showSuccess("Updated");
         } catch (error) {
-          if (error.response && error.response.status === Config.BAD_REQUEST) {
+          if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
+          } else if (error.response?.data?.errorMessages?.length) {
+            showError(error.response.data.errorMessages.join());
           } else {
             showError(error.message);
           }

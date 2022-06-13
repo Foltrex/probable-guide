@@ -8,17 +8,8 @@ window.addEventListener(
 );
 
 axios.interceptors.response.use(
-  (response) => {
-    return Promise.resolve(response);
-  },
-
-  (error) => {
-    if (error.response.status === Config.FORBIDDEN) {
-      return Promise.reject(new Error(error.response.data.errorMessages));
-    }
-
-    return Promise.reject(error);
-  }
+  (response) => Promise.resolve(response),
+  (error) => Promise.reject(error)
 );
 
 export function request<T>(options: AxiosRequestConfig) {
