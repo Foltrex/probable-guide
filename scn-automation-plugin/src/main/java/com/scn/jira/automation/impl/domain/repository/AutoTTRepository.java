@@ -1,5 +1,6 @@
 package com.scn.jira.automation.impl.domain.repository;
 
+import com.atlassian.annotations.PublicApi;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.common.ao.AbstractRepository;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import java.util.Optional;
 
 import static net.java.ao.Query.select;
 
+@PublicApi
 @Repository
 public class AutoTTRepository extends AbstractRepository<AutoTT, Long> {
 

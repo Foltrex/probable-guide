@@ -10,8 +10,6 @@ import java.util.List;
 public interface AutoTTService {
     List<AutoTTDto> getAll();
 
-    List<AutoTTDto> getAllActive();
-
     @Nullable
     AutoTTDto get(Long id);
 

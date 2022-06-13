@@ -4,16 +4,19 @@ import com.atlassian.configurable.ObjectConfiguration;
 import com.atlassian.configurable.ObjectConfigurationException;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.service.AbstractService;
+import com.atlassian.jira.transaction.Transaction;
+import com.atlassian.jira.transaction.Txn;
 import com.opensymphony.module.propertyset.PropertySet;
-import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.ScnBIService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
-import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
+import com.scn.jira.automation.impl.domain.entity.AutoTT;
+import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
+import com.scn.jira.common.exception.InternalRuntimeException;
 import lombok.extern.log4j.Log4j;
 
 import javax.annotation.Nonnull;
+import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -22,24 +25,22 @@ import java.util.Set;
 public class AutoTTExecutionService extends AbstractService {
     public static final String DEFAULT_NAME = "Auto time tracking";
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 * * * ?";
-    public static final Long WORKED_TIME = 28800L;
 
-    private AutoTTService autoTTService;
+    private AutoTTRepository autoTTRepository;
     private ScnBIService scnBIService;
     private WorklogContextService worklogContextService;
 
     @Override
     public void init(PropertySet props, long configurationIdentifier) throws ObjectConfigurationException {
-        autoTTService = ComponentAccessor.getOSGiComponentInstanceOfType(AutoTTService.class);
+        autoTTRepository = ComponentAccessor.getOSGiComponentInstanceOfType(AutoTTRepository.class);
         scnBIService = ComponentAccessor.getOSGiComponentInstanceOfType(ScnBIService.class);
         worklogContextService = ComponentAccessor.getOSGiComponentInstanceOfType(WorklogContextService.class);
     }
 
     @Override
     public void run() {
-        Date from = Date.from(LocalDate.now().minusDays(1).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date to = Date.from(LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        autoTTService.getAllActive().forEach(value -> doTimeTracking(value, from, to));
+        LocalDate to = LocalDate.now().minusDays(1);
+        autoTTRepository.findAllByActiveTrue().forEach(value -> doTimeTracking(value, to));
     }
 
     @Override
@@ -47,14 +48,24 @@ public class AutoTTExecutionService extends AbstractService {
         return this.getObjectConfiguration("AutoTTExecutionService", "services/AutoTTExecutionService.xml", null);
     }
 
-    private void doTimeTracking(@Nonnull AutoTTDto autoTTDto, Date from, Date to) {
-        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTTDto.getUser().getUsername(), from, to);
-        Set<Date> workedDays = worklogContextService.getWorkedDays(autoTTDto.getUser().getKey(), from, to);
-        userCalendar.forEach((date, dayType) -> {
-            if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
-                worklogContextService.createScnWorklog(autoTTDto, date);
-                log.debug(autoTTDto + " for date: " + date);
-            }
-        });
+    private void doTimeTracking(@Nonnull AutoTT autoTT, LocalDate to) {
+        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTT.getUserKey(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
+        Set<Date> workedDays = worklogContextService.getWorkedDays(autoTT.getUserKey(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
+        Transaction txn = Txn.begin();
+        try {
+            userCalendar.forEach((date, dayType) -> {
+                if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
+                    worklogContextService.createScnWorklog(autoTT, date);
+                }
+            });
+            autoTT.setStartDate(Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
+            autoTTRepository.save(autoTT);
+            txn.commit();
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage(), e);
+            throw new InternalRuntimeException(e.getLocalizedMessage(), e);
+        } finally {
+            txn.finallyRollbackIfNotCommitted();
+        }
     }
 }

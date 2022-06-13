@@ -36,13 +36,8 @@ public class AutoTTServiceImpl implements AutoTTService {
         return autoTTRepository.findAll().stream()
             .map(autoTTMapper::map)
             .filter(dto -> permissionProvider.hasPermission(PermissionKey.READ, dto))
-            .sorted(Comparator.comparing(AutoTTDto::getUpdated))
+            .sorted(Comparator.comparing(AutoTTDto::getUpdated, Comparator.reverseOrder()))
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<AutoTTDto> getAllActive() {
-        return autoTTRepository.findAllByActiveTrue().stream().map(autoTTMapper::map).collect(Collectors.toList());
     }
 
     @Override

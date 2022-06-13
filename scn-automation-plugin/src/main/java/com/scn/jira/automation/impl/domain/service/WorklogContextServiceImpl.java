@@ -12,10 +12,9 @@ import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.Lists;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
-import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
-import com.scn.jira.automation.impl.domain.mapper.JiraDataMapper;
+import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
@@ -53,7 +53,6 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final JiraAuthenticationContext authenticationContext;
     private final IScnProjectSettingsManager projectSettingsManager;
     private final IScnWorklogService scnDefaultWorklogService;
-    private final JiraDataMapper jiraDataMapper;
     private final WorklogManager worklogManager;
     private final ExtendedWorklogManager extendedWorklogManager;
     private final UserManager userManager;
@@ -67,13 +66,10 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     }
 
     @Override
-    public Set<Date> getWorkedDays(String userKey, @Nonnull Date from, @Nonnull Date to) {
+    public Set<Date> getWorkedDays(String userKey, @Nonnull LocalDate from, @Nonnull LocalDate to) {
         List<EntityCondition> conditions = Lists.newArrayList();
-        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, new Timestamp(from.getTime())));
-        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO,
-            Timestamp.valueOf(
-                to.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(1).minusNanos(1)
-            )));
+        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, Timestamp.valueOf(from.atStartOfDay())));
+        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO, Timestamp.valueOf(to.atStartOfDay().plusDays(1).minusNanos(1))));
         conditions.add(new EntityExpr("author", EQUALS, userKey));
         EntityCondition conditionList = new EntityConditionList(conditions, EntityOperator.AND);
 
@@ -86,16 +82,16 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     }
 
     @Override
-    public void createScnWorklog(@Nonnull AutoTTDto autoTTDto, Date date) {
-        Issue issue = issueManager.getIssueObject(autoTTDto.getIssue().getId());
+    public void createScnWorklog(@Nonnull AutoTT autoTT, Date date) {
+        Issue issue = issueManager.getIssueObject(autoTT.getIssueId());
         if (issue != null) {
-            IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTTDto.getUser().getKey(),
+            IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTT.getUserKey(),
                 "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
-                jiraDataMapper.mapTime(autoTTDto.getRatedTime()),
-                autoTTDto.getWorklogType() == null ? "0" : autoTTDto.getWorklogType().getId());
-            boolean isAutoCopy = isWlAutoCopy(autoTTDto);
+                autoTT.getRatedTime(),
+                autoTT.getWorklogTypeId() == null ? "0" : autoTT.getWorklogTypeId());
+            boolean isAutoCopy = isWlAutoCopy(autoTT);
             scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
-                new JiraServiceContextImpl(userManager.getUserByKey(autoTTDto.getUser().getKey())),
+                new JiraServiceContextImpl(userManager.getUserByKey(autoTT.getUserKey())),
                 worklog, true, isAutoCopy);
         }
     }
@@ -127,12 +123,12 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         }
     }
 
-    private boolean isWlAutoCopy(@Nonnull AutoTTDto autoTTDto) {
-        return projectSettingsManager.isWLAutoCopyEnabled(autoTTDto.getProject().getId())
-            && (autoTTDto.getWorklogType() == null ?
-            projectSettingsManager.isUnspecifiedWLTypeAutoCopyEnabled(autoTTDto.getProject().getId())
-            : projectSettingsManager.getWorklogTypes(autoTTDto.getProject().getId()).stream()
-            .anyMatch(worklogType -> worklogType.getId().equals(autoTTDto.getWorklogType().getId()))
+    private boolean isWlAutoCopy(@Nonnull AutoTT autoTT) {
+        return projectSettingsManager.isWLAutoCopyEnabled(autoTT.getProjectId())
+            && (autoTT.getWorklogTypeId() == null ?
+            projectSettingsManager.isUnspecifiedWLTypeAutoCopyEnabled(autoTT.getProjectId())
+            : projectSettingsManager.getWorklogTypes(autoTT.getProjectId()).stream()
+            .anyMatch(worklogType -> worklogType.getId().equals(autoTT.getWorklogTypeId()))
         );
     }
 }

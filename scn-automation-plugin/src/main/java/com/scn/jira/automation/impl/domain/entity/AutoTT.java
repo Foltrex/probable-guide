@@ -5,6 +5,8 @@ import net.java.ao.Preload;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.Unique;
 
+import java.sql.Timestamp;
+
 @Preload
 public interface AutoTT extends Updatable {
     @Unique
@@ -30,6 +32,11 @@ public interface AutoTT extends Updatable {
     Long getRatedTime();
 
     void setRatedTime(Long ratedTime);
+
+    @NotNull
+    Timestamp getStartDate();
+
+    void setStartDate(Timestamp startDate);
 
     boolean getActive();
 
