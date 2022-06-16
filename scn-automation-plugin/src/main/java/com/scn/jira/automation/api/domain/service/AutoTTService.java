@@ -4,6 +4,7 @@ import com.atlassian.annotations.PublicApi;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 @PublicApi
@@ -17,5 +18,15 @@ public interface AutoTTService {
 
     AutoTTDto update(AutoTTDto autoTTDto);
 
+    void updateByUserKey(String userKey);
+
     void remove(Long id);
+
+    void removeAllByIssueId(Long issueId);
+
+    void removeAllByProjectId(Long projectId);
+
+    void removeAllByUsernames(Collection<String> username);
+
+    void removeAllByInvalidConstraint();
 }

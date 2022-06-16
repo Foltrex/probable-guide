@@ -49,7 +49,7 @@ public class AutoTTExecutionService extends AbstractService {
     }
 
     private void doTimeTracking(@Nonnull AutoTT autoTT, LocalDate to) {
-        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTT.getUserKey(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
+        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTT.getUsername(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
         Set<Date> workedDays = worklogContextService.getWorkedDays(autoTT.getUserKey(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
         Transaction txn = Txn.begin();
         try {
@@ -63,7 +63,7 @@ public class AutoTTExecutionService extends AbstractService {
             txn.commit();
         } catch (Exception e) {
             log.error(e.getLocalizedMessage(), e);
-            throw new InternalRuntimeException(e.getLocalizedMessage(), e);
+            throw new InternalRuntimeException(e);
         } finally {
             txn.finallyRollbackIfNotCommitted();
         }

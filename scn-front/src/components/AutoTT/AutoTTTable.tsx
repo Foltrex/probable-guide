@@ -68,6 +68,7 @@ const AutoTTTable: React.FC<ComponentProps> = ({
         key: "startdate",
         content: "Starting date",
         shouldTruncate: true,
+        isSortable: true,
         width: undefined,
       },
       {

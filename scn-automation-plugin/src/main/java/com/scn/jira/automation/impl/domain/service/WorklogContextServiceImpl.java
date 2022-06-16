@@ -15,6 +15,7 @@ import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
+import com.scn.jira.common.exception.InternalRuntimeException;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
@@ -90,9 +91,12 @@ public class WorklogContextServiceImpl implements WorklogContextService {
                 autoTT.getRatedTime(),
                 autoTT.getWorklogTypeId() == null ? "0" : autoTT.getWorklogTypeId());
             boolean isAutoCopy = isWlAutoCopy(autoTT);
-            scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
+            IScnWorklog createdWorklog = scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
                 new JiraServiceContextImpl(userManager.getUserByKey(autoTT.getUserKey())),
                 worklog, true, isAutoCopy);
+            if (createdWorklog == null) {
+                throw new InternalRuntimeException("Error when creating auto worklog for user " + autoTT.getUsername());
+            }
         }
     }
 

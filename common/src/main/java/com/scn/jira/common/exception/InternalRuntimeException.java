@@ -5,9 +5,9 @@ import javax.ws.rs.core.Response;
 public class InternalRuntimeException extends RuntimeException {
     protected final ErrorResult errorResult;
 
-    public InternalRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-        errorResult = new ErrorResult(message);
+    public InternalRuntimeException(Throwable cause) {
+        super(cause);
+        errorResult = new ErrorResult(cause.getLocalizedMessage());
     }
 
     public InternalRuntimeException(String message) {

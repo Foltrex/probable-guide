@@ -38,7 +38,7 @@ public class JiraDataMapper {
         if (user == null) {
             throw new EntityNotFoundException(ApplicationUser.class, "key", userKey);
         }
-        return new UserDto(user.getKey(), user.getDisplayName(), user.getUsername());
+        return new UserDto(user.getKey(), user.getDisplayName(), user.getUsername(), user.isActive());
     }
 
     public ProjectDto mapProjectById(Long id) {
@@ -82,7 +82,7 @@ public class JiraDataMapper {
             return jiraDurationUtils.parseDuration(time, Locale.ENGLISH);
         } catch (InvalidDurationException e) {
             log.error(e.getLocalizedMessage(), e);
-            throw new InternalRuntimeException(e.getLocalizedMessage(), e);
+            throw new InternalRuntimeException(e);
         }
     }
 }

@@ -27,16 +27,14 @@ public class ScnBIServiceImpl implements ScnBIService {
     private static final String LOGIN = "sps-training-admin";
     private static final String PASSWORD = "06#$XPvf";
 
-    private final JiraDataMapper jiraDataMapper;
-
     @Override
-    public Map<Date, DayType> getUserCalendar(String userKey, @Nonnull LocalDate from, @Nonnull LocalDate to) {
+    public Map<Date, DayType> getUserCalendar(String username, @Nonnull LocalDate from, @Nonnull LocalDate to) {
         Map<Date, DayType> result = new HashMap<>();
         try {
             Class.forName(DRIVER_NAME);
             Connection con = DriverManager.getConnection(CONNECTION, LOGIN, PASSWORD);
             try (PreparedStatement pstmt = con.prepareStatement("{call dbo.GetCalendar(?,?,?)}");) {
-                pstmt.setString(1, jiraDataMapper.mapUserByKey(userKey).getUsername());
+                pstmt.setString(1, username);
                 pstmt.setString(2, from.toString());
                 pstmt.setString(3, to.toString());
                 ResultSet rs = pstmt.executeQuery();
@@ -55,7 +53,7 @@ public class ScnBIServiceImpl implements ScnBIService {
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new InternalRuntimeException(e.getLocalizedMessage(), e);
+            throw new InternalRuntimeException(e);
         }
 
         return result;

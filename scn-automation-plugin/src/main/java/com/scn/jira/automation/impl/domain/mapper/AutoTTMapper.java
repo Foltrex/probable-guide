@@ -43,6 +43,7 @@ public class AutoTTMapper {
         }
         Timestamp currentDate = new Timestamp(new Date().getTime());
         entity.setUserKey(dto.getUser().getKey());
+        entity.setUsername(jiraDataMapper.mapUserByKey(dto.getUser().getKey()).getUsername());
         entity.setProjectId(dto.getProject().getId());
         entity.setIssueId(dto.getIssue().getId());
         entity.setWorklogTypeId(dto.getWorklogType() == null ? null : dto.getWorklogType().getId());
@@ -64,8 +65,10 @@ public class AutoTTMapper {
             return new DBParam[]{};
         }
         return new DBParam[]{new DBParam("USER_KEY", dto.getUser().getKey()),
+            new DBParam("USERNAME", jiraDataMapper.mapUserByKey(dto.getUser().getKey()).getUsername()),
             new DBParam("PROJECT_ID", dto.getProject().getId()),
             new DBParam("ISSUE_ID", dto.getIssue().getId()),
+            new DBParam("WORKLOG_TYPE_ID", dto.getWorklogType().getId()),
             new DBParam("RATED_TIME", jiraDataMapper.mapTime(dto.getRatedTime())),
             new DBParam("START_DATE", Timestamp.valueOf(dto.getStartDate().atStartOfDay()))};
     }

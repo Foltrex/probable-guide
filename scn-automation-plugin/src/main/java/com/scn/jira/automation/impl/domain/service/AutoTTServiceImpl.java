@@ -5,20 +5,22 @@ import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.PermissionProvider;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
+import com.scn.jira.automation.impl.domain.dto.UserDto;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.automation.impl.domain.mapper.AutoTTMapper;
 import com.scn.jira.automation.impl.domain.mapper.JiraDataMapper;
 import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
 import com.scn.jira.common.ao.Transactional;
 import com.scn.jira.common.exception.EntityNotFoundException;
-import com.scn.jira.common.exception.InternalRuntimeException;
 import com.scn.jira.common.exception.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +36,14 @@ public class AutoTTServiceImpl implements AutoTTService {
     @Override
     public List<AutoTTDto> getAll() {
         return autoTTRepository.findAll().stream()
-            .map(autoTTMapper::map)
+            .map(autoTT -> {
+                try {
+                    return autoTTMapper.map(autoTT);
+                } catch (EntityNotFoundException e) {
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
             .filter(dto -> permissionProvider.hasPermission(PermissionKey.READ, dto))
             .sorted(Comparator.comparing(AutoTTDto::getUpdated, Comparator.reverseOrder()))
             .collect(Collectors.toList());
@@ -55,10 +64,7 @@ public class AutoTTServiceImpl implements AutoTTService {
             autoTTDto.setIssue(jiraDataMapper.mapIssueByKey(autoTTDto.getIssue().getKey()));
         }
         permissionProvider.checkPermission(PermissionKey.CREATE, autoTTDto);
-        autoTTRepository.findByUserKey(autoTTDto.getUser().getKey()).ifPresent(autoTT -> {
-            throw new InternalRuntimeException("Current user auto time tracking configuration already exists");
-        });
-        AutoTT autoTT = autoTTRepository.create(autoTTMapper.map(autoTTDto));
+        AutoTT autoTT = autoTTRepository.findByUserKey(autoTTDto.getUser().getKey()).orElseGet(() -> autoTTRepository.create(autoTTMapper.map(autoTTDto)));
         return autoTTMapper.map(autoTTRepository.save(autoTTMapper.map(autoTTDto, autoTT, authenticationContext.getLoggedInUser().getKey())));
     }
 
@@ -78,9 +84,46 @@ public class AutoTTServiceImpl implements AutoTTService {
     }
 
     @Override
+    public void updateByUserKey(String userKey) {
+        autoTTRepository.findByUserKey(userKey).ifPresent(autoTT -> {
+            UserDto userDto = jiraDataMapper.mapUserByKey(userKey);
+            autoTT.setUsername(userDto.getUsername());
+            autoTT.setActive(autoTT.getActive() && userDto.isActive());
+            autoTTRepository.save(autoTT);
+        });
+    }
+
+    @Override
     public void remove(Long id) {
         AutoTT autoTT = autoTTRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(AutoTT.class, id));
         permissionProvider.checkPermission(PermissionKey.DELETE, autoTTMapper.map(autoTT));
         autoTTRepository.delete(autoTT);
+    }
+
+    @Override
+    public void removeAllByIssueId(Long issueId) {
+        autoTTRepository.deleteAllByIssueId(issueId);
+    }
+
+    @Override
+    public void removeAllByProjectId(Long projectId) {
+        autoTTRepository.deleteAllByProjectId(projectId);
+    }
+
+    @Override
+    public void removeAllByUsernames(Collection<String> username) {
+        autoTTRepository.deleteAllByUsernameIn(username);
+    }
+
+    @Override
+    public void removeAllByInvalidConstraint() {
+        autoTTRepository.deleteAll(autoTTRepository.findAll().stream().map(autoTT -> {
+            try {
+                autoTTMapper.map(autoTT);
+                return null;
+            } catch (EntityNotFoundException e) {
+                return autoTT;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList()));
     }
 }

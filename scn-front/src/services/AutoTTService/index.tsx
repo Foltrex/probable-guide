@@ -42,7 +42,13 @@ const AutoTTService: React.FC = ({ children }) => {
           });
           dispatch(setItemsAction(result.data));
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessages?.length) {
+            showError(error.response.data.errorMessages.join());
+          } else {
+            showError(error.message);
+          }
         }
         dispatch(hideLoaderAction());
       },
@@ -55,7 +61,13 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(setItemAction(result.data));
           return result.data;
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessages?.length) {
+            showError(error.response.data.errorMessages.join());
+          } else {
+            showError(error.message);
+          }
         }
         return null;
       },
@@ -110,7 +122,13 @@ const AutoTTService: React.FC = ({ children }) => {
           });
           dispatch(removeItemAction({ id }));
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessages?.length) {
+            showError(error.response.data.errorMessages.join());
+          } else {
+            showError(error.message);
+          }
         }
       },
     }),

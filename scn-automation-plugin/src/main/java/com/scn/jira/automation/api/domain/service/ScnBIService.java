@@ -9,7 +9,7 @@ import java.util.Map;
 
 @PublicApi
 public interface ScnBIService {
-    Map<Date, DayType> getUserCalendar(String userKey, @Nonnull LocalDate from,  @Nonnull LocalDate to);
+    Map<Date, DayType> getUserCalendar(String username, @Nonnull LocalDate from,  @Nonnull LocalDate to);
 
     enum DayType {
         WORKING(1),

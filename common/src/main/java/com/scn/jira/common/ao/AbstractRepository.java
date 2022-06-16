@@ -44,8 +44,7 @@ public abstract class AbstractRepository<E extends RawEntity<I>, I> {
     }
 
     public boolean existsById(@Nonnull I id) {
-        E entity = ao.get(entityClass, id);
-        return entity != null;
+        return findById(id).isPresent();
     }
 
     public List<E> findAll() {
@@ -56,6 +55,10 @@ public abstract class AbstractRepository<E extends RawEntity<I>, I> {
     public List<E> findAll(@Nonnull Query query) {
         E[] autoTTs = ao.find(entityClass, query);
         return Arrays.asList(autoTTs);
+    }
+
+    public long count(@Nonnull Query query) {
+        return ao.count(entityClass, query);
     }
 
     public long count() {

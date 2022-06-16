@@ -15,6 +15,11 @@ public interface AutoTT extends Updatable {
     void setUserKey(String userKey);
 
     @NotNull
+    String getUsername();
+
+    void setUsername(String username);
+
+    @NotNull
     Long getProjectId();
 
     void setProjectId(Long projectID);
@@ -24,6 +29,7 @@ public interface AutoTT extends Updatable {
 
     void setIssueId(Long issueID);
 
+    @NotNull
     String getWorklogTypeId();
 
     void setWorklogTypeId(String worklogTypeId);
