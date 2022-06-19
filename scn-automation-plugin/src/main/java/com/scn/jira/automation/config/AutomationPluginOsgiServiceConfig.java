@@ -2,9 +2,6 @@ package com.scn.jira.automation.config;
 
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
-import com.scn.jira.automation.api.domain.service.ScnBIService;
-import com.scn.jira.automation.api.domain.service.WorklogContextService;
-import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
 import com.scn.jira.automation.impl.listener.PluginLauncher;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.FactoryBean;
@@ -21,22 +18,7 @@ public class AutomationPluginOsgiServiceConfig {
     }
 
     @Bean
-    public FactoryBean<ServiceRegistration> registerWorklogContextService(final WorklogContextService worklogContextService) {
-        return exportOsgiService(worklogContextService, null, WorklogContextService.class);
-    }
-
-    @Bean
     public FactoryBean<ServiceRegistration> registerAutoTTService(final AutoTTService autoTTService) {
         return exportOsgiService(autoTTService, null, AutoTTService.class);
-    }
-
-    @Bean
-    public FactoryBean<ServiceRegistration> registerAutoTTRepository(final AutoTTRepository autoTTRepository) {
-        return exportOsgiService(autoTTRepository, null, AutoTTRepository.class);
-    }
-
-    @Bean
-    public FactoryBean<ServiceRegistration> registerScnBIService(final ScnBIService scnBIService) {
-        return exportOsgiService(scnBIService, null, ScnBIService.class);
     }
 }

@@ -7,6 +7,7 @@ import styled from "styled-components";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import CopyIcon from "@atlaskit/icon/glyph/copy";
+import ArrowRightIcon from "@atlaskit/icon/glyph/arrow-right";
 import { AutoTTDto } from "../../models";
 import {
   getProjectOrIssueURL,
@@ -20,6 +21,7 @@ interface ComponentProps {
   onEdit(id: number): void;
   onCopy(id: number): void;
   onDelete(id: number): void;
+  onStartJob(id: number): void;
 }
 
 const AvatarWrapper = styled.div`
@@ -37,6 +39,7 @@ const AutoTTTable: React.FC<ComponentProps> = ({
   onEdit,
   onCopy,
   onDelete,
+  onStartJob,
 }) => {
   const head = {
     cells: [
@@ -68,7 +71,7 @@ const AutoTTTable: React.FC<ComponentProps> = ({
         key: "startdate",
         content: "Starting date",
         shouldTruncate: true,
-        isSortable: true,
+        isSortable: false,
         width: undefined,
       },
       {
@@ -105,6 +108,7 @@ const AutoTTTable: React.FC<ComponentProps> = ({
         key: "active",
         content: "Active",
         shouldTruncate: true,
+        isSortable: false,
         width: undefined,
       },
       { key: "actions", content: "Actions", shouldTruncate: true },
@@ -204,6 +208,13 @@ const AutoTTTable: React.FC<ComponentProps> = ({
               title="Edit"
             >
               <EditIcon label="Edit" />
+            </Button>
+            <Button
+              onClick={onStartJob.bind(this, item.id)}
+              appearance="link"
+              title="Start job"
+            >
+              <ArrowRightIcon label="Start job" />
             </Button>
             <Button
               onClick={onCopy.bind(this, item.id)}

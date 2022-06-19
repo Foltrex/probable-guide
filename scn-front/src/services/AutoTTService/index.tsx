@@ -44,8 +44,8 @@ const AutoTTService: React.FC = ({ children }) => {
         } catch (error) {
           if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
-          } else if (error.response?.data?.errorMessages?.length) {
-            showError(error.response.data.errorMessages.join());
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -63,8 +63,8 @@ const AutoTTService: React.FC = ({ children }) => {
         } catch (error) {
           if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
-          } else if (error.response?.data?.errorMessages?.length) {
-            showError(error.response.data.errorMessages.join());
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -87,8 +87,8 @@ const AutoTTService: React.FC = ({ children }) => {
         } catch (error) {
           if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
-          } else if (error.response?.data?.errorMessages?.length) {
-            showError(error.response.data.errorMessages.join());
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -107,8 +107,8 @@ const AutoTTService: React.FC = ({ children }) => {
         } catch (error) {
           if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
-          } else if (error.response?.data?.errorMessages?.length) {
-            showError(error.response.data.errorMessages.join());
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -124,8 +124,22 @@ const AutoTTService: React.FC = ({ children }) => {
         } catch (error) {
           if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
-          } else if (error.response?.data?.errorMessages?.length) {
-            showError(error.response.data.errorMessages.join());
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
+          } else {
+            showError(error.message);
+          }
+        }
+      },
+      async startAutoTTJob(id: number): Promise<void> {
+        try {
+          await request<AutoTTDto>({
+            url: `${Config.API}/autotimetracking/user/${id}/job`,
+            method: "POST",
+          });
+        } catch (error) {
+          if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }

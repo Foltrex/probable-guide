@@ -20,6 +20,10 @@ public interface AutoTTService {
 
     void updateByUserKey(String userKey);
 
+    void startJob();
+
+    void startJob(Long id);
+
     void remove(Long id);
 
     void removeAllByIssueId(Long issueId);

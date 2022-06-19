@@ -9,8 +9,11 @@ import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.transaction.Transaction;
+import com.atlassian.jira.transaction.Txn;
 import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.Lists;
+import com.scn.jira.automation.api.domain.service.ScnBIService;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
@@ -37,6 +40,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,6 +61,7 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final WorklogManager worklogManager;
     private final ExtendedWorklogManager extendedWorklogManager;
     private final UserManager userManager;
+    private final ScnBIService scnBIService;
 
     @Override
     public List<WorklogTypeDto> getAllWorklogTypes() {
@@ -64,40 +69,6 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         return worklogTypes.stream()
             .map(value -> new WorklogTypeDto(value.getId(), value.getName()))
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public Set<Date> getWorkedDays(String userKey, @Nonnull LocalDate from, @Nonnull LocalDate to) {
-        List<EntityCondition> conditions = Lists.newArrayList();
-        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, Timestamp.valueOf(from.atStartOfDay())));
-        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO, Timestamp.valueOf(to.atStartOfDay().plusDays(1).minusNanos(1))));
-        conditions.add(new EntityExpr("author", EQUALS, userKey));
-        EntityCondition conditionList = new EntityConditionList(conditions, EntityOperator.AND);
-
-        return ofBizDelegator.findByCondition("ScnWorklog", conditionList, Lists.newArrayList("startdate", "timeworked"))
-            .stream().filter(gv -> gv.getTimestamp("startdate") != null && gv.getLong("timeworked") != null && gv.getLong("timeworked") > 0L)
-            .map(gv -> Date.from(
-                gv.getTimestamp("startdate").toLocalDateTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
-            ))
-            .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void createScnWorklog(@Nonnull AutoTT autoTT, Date date) {
-        Issue issue = issueManager.getIssueObject(autoTT.getIssueId());
-        if (issue != null) {
-            IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTT.getUserKey(),
-                "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
-                autoTT.getRatedTime(),
-                autoTT.getWorklogTypeId() == null ? "0" : autoTT.getWorklogTypeId());
-            boolean isAutoCopy = isWlAutoCopy(autoTT);
-            IScnWorklog createdWorklog = scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
-                new JiraServiceContextImpl(userManager.getUserByKey(autoTT.getUserKey())),
-                worklog, true, isAutoCopy);
-            if (createdWorklog == null) {
-                throw new InternalRuntimeException("Error when creating auto worklog for user " + autoTT.getUsername());
-            }
-        }
     }
 
     @Override
@@ -124,6 +95,57 @@ public class WorklogContextServiceImpl implements WorklogContextService {
             Long newEstimate = oldEstimate + timeSpend;
             worklogManager.delete(authenticationContext.getLoggedInUser(), worklog, newEstimate, false);
             extendedWorklogManager.deleteExtWorklogType(id);
+        }
+    }
+
+    @Override
+    public void doAutoTimeTracking(@Nonnull AutoTT autoTT, LocalDate to) {
+        Map<Date, ScnBIService.DayType> userCalendar = scnBIService.getUserCalendar(autoTT.getUsername(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
+        Set<Date> workedDays = getWorkedDays(autoTT.getUserKey(), autoTT.getStartDate().toLocalDateTime().toLocalDate(), to);
+        Transaction txn = Txn.begin();
+        try {
+            userCalendar.forEach((date, dayType) -> {
+                if (dayType.equals(ScnBIService.DayType.WORKING) && !workedDays.contains(date)) {
+                    createScnWorklog(autoTT, date);
+                }
+            });
+            txn.commit();
+        } catch (Exception e) {
+            throw new InternalRuntimeException(e);
+        } finally {
+            txn.finallyRollbackIfNotCommitted();
+        }
+    }
+
+    private Set<Date> getWorkedDays(String userKey, @Nonnull LocalDate from, @Nonnull LocalDate to) {
+        List<EntityCondition> conditions = Lists.newArrayList();
+        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, Timestamp.valueOf(from.atStartOfDay())));
+        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO, Timestamp.valueOf(to.atStartOfDay().plusDays(1).minusNanos(1))));
+        conditions.add(new EntityExpr("author", EQUALS, userKey));
+        EntityCondition conditionList = new EntityConditionList(conditions, EntityOperator.AND);
+
+        return ofBizDelegator.findByCondition("ScnWorklog", conditionList, Lists.newArrayList("startdate", "timeworked"))
+            .stream().filter(gv -> gv.getTimestamp("startdate") != null && gv.getLong("timeworked") != null && gv.getLong("timeworked") > 0L)
+            .map(gv -> Date.from(
+                gv.getTimestamp("startdate").toLocalDateTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()
+            ))
+            .collect(Collectors.toSet());
+    }
+
+    private void createScnWorklog(@Nonnull AutoTT autoTT, Date date) {
+        Issue issue = issueManager.getIssueObject(autoTT.getIssueId());
+        if (issue != null) {
+            IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTT.getUserKey(),
+                "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
+                autoTT.getRatedTime(),
+                autoTT.getWorklogTypeId() == null ? "0" : autoTT.getWorklogTypeId());
+            boolean isAutoCopy = isWlAutoCopy(autoTT);
+            IScnWorklog createdWorklog = scnDefaultWorklogService.createAndAutoAdjustRemainingEstimate(
+                new JiraServiceContextImpl(userManager.getUserByKey(autoTT.getUserKey())),
+                worklog, true, isAutoCopy);
+            if (createdWorklog == null) {
+                throw new InternalRuntimeException("Error when creating auto worklog for user " + autoTT.getUsername());
+            }
         }
     }
 

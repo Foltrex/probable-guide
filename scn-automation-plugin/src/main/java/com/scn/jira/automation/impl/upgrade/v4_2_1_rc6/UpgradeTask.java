@@ -51,6 +51,7 @@ public class UpgradeTask implements ActiveObjectsUpgradeTask {
             if (StringUtils.isBlank(value.getUsername())) {
                 value.setUsername(user.getUsername());
             }
+            value.setActive(value.getActive() && user.isActive());
             value.save();
         }
         ao.migrate(com.scn.jira.automation.impl.domain.entity.AutoTT.class);

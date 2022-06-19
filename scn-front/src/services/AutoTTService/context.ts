@@ -9,6 +9,7 @@ type ContextProps = AutoTTState & {
   createAutoTT(data: AutoTTDto): Promise<void | Object>;
   updateAutoTT(data: AutoTTDto): Promise<void | Object>;
   deleteAutoTT(id: number): Promise<void>;
+  startAutoTTJob(id: number): Promise<void>;
 };
 
 export const AutoTTContext = createContext<ContextProps>(null);

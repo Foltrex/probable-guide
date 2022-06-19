@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UpgradeTaskFlow {
-    V4_2_1_RC6(ModelVersion.valueOf("4"));
+    V4_2_1_RC6(ModelVersion.valueOf("5"));
 
     private final ModelVersion modelVersion;
 }

@@ -3,6 +3,7 @@ package com.scn.jira.automation.impl.domain.service;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.PermissionProvider;
+import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import com.scn.jira.automation.impl.domain.dto.PermissionKey;
 import com.scn.jira.automation.impl.domain.dto.UserDto;
@@ -14,9 +15,12 @@ import com.scn.jira.common.ao.Transactional;
 import com.scn.jira.common.exception.EntityNotFoundException;
 import com.scn.jira.common.exception.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -25,9 +29,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j
 public class AutoTTServiceImpl implements AutoTTService {
     private final AutoTTRepository autoTTRepository;
     private final JiraAuthenticationContext authenticationContext;
+    private final WorklogContextService worklogContextService;
     private final AutoTTMapper autoTTMapper;
     private final JiraDataMapper jiraDataMapper;
     private final PermissionProvider permissionProvider;
@@ -91,6 +97,29 @@ public class AutoTTServiceImpl implements AutoTTService {
             autoTT.setActive(autoTT.getActive() && userDto.isActive());
             autoTTRepository.save(autoTT);
         });
+    }
+
+    @Override
+    public void startJob() {
+        LocalDate to = LocalDate.now().minusDays(1);
+        autoTTRepository.findAllByActiveTrueAndStartDateBefore(Timestamp.valueOf(to.plusDays(1).atStartOfDay())).forEach(value -> {
+            try {
+                worklogContextService.doAutoTimeTracking(value, to);
+                value.setStartDate(Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
+                autoTTRepository.save(value);
+            } catch (Exception e) {
+                log.error(e.getLocalizedMessage(), e);
+            }
+        });
+    }
+
+    @Override
+    public void startJob(Long id) {
+        AutoTT autoTT = autoTTRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(AutoTT.class, id));
+        LocalDate to = LocalDate.now().minusDays(1);
+        worklogContextService.doAutoTimeTracking(autoTT, to);
+        autoTT.setStartDate(Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
+        autoTTRepository.save(autoTT);
     }
 
     @Override

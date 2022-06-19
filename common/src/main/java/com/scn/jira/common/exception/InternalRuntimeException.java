@@ -15,11 +15,6 @@ public class InternalRuntimeException extends RuntimeException {
         errorResult = new ErrorResult(message);
     }
 
-    protected InternalRuntimeException() {
-        super();
-        errorResult = new ErrorResult();
-    }
-
     public Response getResponse() {
         return Response.status(getResponseStatus()).entity(errorResult).build();
     }

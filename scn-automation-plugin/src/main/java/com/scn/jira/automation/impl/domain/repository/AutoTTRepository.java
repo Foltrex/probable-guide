@@ -1,23 +1,22 @@
 package com.scn.jira.automation.impl.domain.repository;
 
-import com.atlassian.annotations.PublicApi;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.common.ao.AbstractRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nonnull;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static net.java.ao.Query.select;
 
-@PublicApi
 @Repository
 public class AutoTTRepository extends AbstractRepository<AutoTT, Long> {
 
-    public List<AutoTT> findAllByActiveTrue() {
-        return findAll(select().where("ACTIVE = ?", true));
+    public List<AutoTT> findAllByActiveTrueAndStartDateBefore(Timestamp startDate) {
+        return findAll(select().where("ACTIVE = ? AND START_DATE < ?", true, startDate));
     }
 
     public Optional<AutoTT> findByUserKey(String key) {

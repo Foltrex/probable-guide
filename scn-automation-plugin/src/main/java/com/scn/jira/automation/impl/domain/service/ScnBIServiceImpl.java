@@ -1,10 +1,8 @@
 package com.scn.jira.automation.impl.domain.service;
 
 import com.scn.jira.automation.api.domain.service.ScnBIService;
-import com.scn.jira.automation.impl.domain.mapper.JiraDataMapper;
 import com.scn.jira.common.exception.InternalRuntimeException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -20,7 +18,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Log4j
 public class ScnBIServiceImpl implements ScnBIService {
     private static final String DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
     private static final String CONNECTION = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
@@ -48,11 +45,9 @@ public class ScnBIServiceImpl implements ScnBIService {
                 }
                 rs.close();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw e;
+                throw new InternalRuntimeException(e);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             throw new InternalRuntimeException(e);
         }
 

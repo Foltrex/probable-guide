@@ -52,4 +52,11 @@ public class AutoTTResource {
         autoTTService.remove(id);
         return Response.noContent().build();
     }
+
+    @POST
+    @Path("/{id}/job")
+    public Response launchJob(@PathParam("id") Long id) {
+        autoTTService.startJob(id);
+        return Response.status(Response.Status.CREATED).build();
+    }
 }

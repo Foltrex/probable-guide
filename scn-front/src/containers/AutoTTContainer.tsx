@@ -16,6 +16,7 @@ const AutoTTContainer: React.FC = () => {
     createAutoTT,
     updateAutoTT,
     deleteAutoTT,
+    startAutoTTJob,
   } = useAutoTTService();
   const [searchText, setSearchText] = useState("");
 
@@ -39,6 +40,10 @@ const AutoTTContainer: React.FC = () => {
     fetchAutoTT(id).then((value) =>
       setAutoTT({ ...value, id: null, user: null })
     );
+  };
+
+  const onStartJob = (id: number) => {
+    startAutoTTJob(id).then(() => fetchAllAutoTT());
   };
 
   const onSubmit = (data: AutoTTDto) =>
@@ -72,6 +77,7 @@ const AutoTTContainer: React.FC = () => {
         onEdit={onEdit}
         onCopy={onCopy}
         onDelete={deleteAutoTT}
+        onStartJob={onStartJob}
       />
     </>
   );
