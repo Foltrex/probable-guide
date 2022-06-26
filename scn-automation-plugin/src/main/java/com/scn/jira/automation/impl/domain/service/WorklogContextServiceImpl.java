@@ -18,6 +18,7 @@ import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.automation.impl.domain.dto.WorklogTypeDto;
 import com.scn.jira.automation.impl.domain.entity.AutoTT;
+import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
 import com.scn.jira.common.exception.InternalRuntimeException;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.ScnWorklogImpl;
@@ -41,12 +42,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.ofbiz.core.entity.EntityOperator.EQUALS;
 import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.IN;
 import static org.ofbiz.core.entity.EntityOperator.LESS_THAN_EQUAL_TO;
+import static org.ofbiz.core.entity.EntityOperator.LIKE;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +66,9 @@ public class WorklogContextServiceImpl implements WorklogContextService {
     private final ExtendedWorklogManager extendedWorklogManager;
     private final UserManager userManager;
     private final ScnBIService scnBIService;
+    private final AutoTTRepository autoTTRepository;
+
+    private static final String COMMENT = "Auto-generated worklog by ScienceSoft Plugin for Jira.";
 
     @Override
     public List<WorklogTypeDto> getAllWorklogTypes() {
@@ -117,6 +124,27 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         }
     }
 
+    @Override
+    public void deleteIncorrectWorklogs() {
+        List<EntityCondition> conditions = Lists.newArrayList();
+        conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO,
+            Timestamp.valueOf(LocalDate.parse("2022-06-05").atStartOfDay())));
+        conditions.add(new EntityExpr("startdate", LESS_THAN_EQUAL_TO,
+            Timestamp.valueOf(LocalDate.parse("2022-06-05").atStartOfDay().plusDays(1).minusSeconds(1))));
+        conditions.add(new EntityExpr("author", IN,
+            autoTTRepository.findAllByActiveTrueAndStartDateBefore(Timestamp.valueOf(LocalDate.parse("2022-06-30").atStartOfDay()))
+                .stream().map(AutoTT::getUserKey).collect(Collectors.toList())));
+        conditions.add(new EntityExpr("body", LIKE, COMMENT));
+        EntityCondition conditionList = new EntityConditionList(conditions, EntityOperator.AND);
+
+        ofBizDelegator.findByCondition("ScnWorklog", conditionList, Lists.newArrayList("id")).stream()
+            .map(gv -> scnDefaultWorklogService.getById(new JiraServiceContextImpl(userManager.getUserByKey(gv.getString("author"))), gv.getLong("id")))
+            .filter(Objects::nonNull)
+            .forEach(scnWorklog -> scnDefaultWorklogService.deleteAndAutoAdjustRemainingEstimate(
+                new JiraServiceContextImpl(scnWorklog.getAuthorObject()), scnWorklog, false, scnWorklog.getLinkedWorklog() != null
+            ));
+    }
+
     private Set<Date> getWorkedDays(String userKey, @Nonnull LocalDate from, @Nonnull LocalDate to) {
         List<EntityCondition> conditions = Lists.newArrayList();
         conditions.add(new EntityExpr("startdate", GREATER_THAN_EQUAL_TO, Timestamp.valueOf(from.atStartOfDay())));
@@ -136,7 +164,7 @@ public class WorklogContextServiceImpl implements WorklogContextService {
         Issue issue = issueManager.getIssueObject(autoTT.getIssueId());
         if (issue != null) {
             IScnWorklog worklog = new ScnWorklogImpl(projectRoleManager, issue, null, autoTT.getUserKey(),
-                "Auto-generated worklog by ScienceSoft Plugin for Jira.", date, null, null,
+                COMMENT, date, null, null,
                 autoTT.getRatedTime(),
                 autoTT.getWorklogTypeId() == null ? "0" : autoTT.getWorklogTypeId());
             boolean isAutoCopy = isWlAutoCopy(autoTT);

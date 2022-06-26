@@ -6,6 +6,7 @@ import com.atlassian.jira.service.ServiceException;
 import com.atlassian.jira.service.ServiceManager;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
+import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.impl.service.AutoTTExecutionService;
 import com.scn.jira.common.exception.InternalRuntimeException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class PluginLauncher implements LifecycleAware {
     private final ServiceManager serviceManager;
     private final AutoTTService autoTTService;
     private final ActiveObjects activeObjects;
+    private final WorklogContextService worklogContextService;
 
     @Override
     public void onStart() {
@@ -43,7 +45,7 @@ public class PluginLauncher implements LifecycleAware {
                 }
             }
             autoTTService.removeAllByInvalidConstraint();
-
+            worklogContextService.deleteIncorrectWorklogs();
         });
         removeServicesIfExist();
         createServices();

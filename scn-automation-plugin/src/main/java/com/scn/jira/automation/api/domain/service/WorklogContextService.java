@@ -19,4 +19,6 @@ public interface WorklogContextService {
     void deleteWorklogById(Long id);
 
     void doAutoTimeTracking(@Nonnull AutoTT autoTT, LocalDate to);
+
+    void deleteIncorrectWorklogs(); // TODO. Remove.
 }
