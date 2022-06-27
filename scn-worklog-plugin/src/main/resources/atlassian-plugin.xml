@@ -176,6 +176,17 @@
 		<resource type="velocity" name="edit"
 				  location="/templates/scn/worklog/customfields/timetracking-scn-edit.vm"/>
 	</customfield-type>
+    <customfield-type
+        key="scn-time-spent-custom-field-type"
+        name="SCN Time Spent* Custom Field (view)"
+        i18n-name-key="scn.scnworklog.customfield.time.spent.name"
+        class="com.scn.jira.worklog.customfield.ScnTimeSpentCFType">
+        <description
+            key="scn.scnworklog.customfield.time.spent.descr">Allows user to view Time Spent* for issue
+        </description>
+        <resource type="velocity" name="view"
+                  location="/templates/scn/worklog/customfields/time-spent-scn.vm"/>
+    </customfield-type>
 	<customfield-searcher
 		key="scn-timetracking-custom-field-searcher"
 		name="SCN Time Tracking* Custom Field Searcher"

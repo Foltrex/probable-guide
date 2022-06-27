@@ -18,7 +18,10 @@ import com.atlassian.jira.event.issue.IssueEventBundleFactory;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.customfields.manager.GenericConfigManager;
+import com.atlassian.jira.issue.customfields.persistence.CustomFieldValuePersister;
+import com.atlassian.jira.issue.customfields.searchers.transformer.CustomFieldInputHelper;
 import com.atlassian.jira.issue.fields.FieldManager;
+import com.atlassian.jira.issue.fields.TextFieldCharacterLengthValidator;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
@@ -27,6 +30,7 @@ import com.atlassian.jira.issue.fields.screen.FieldScreenRendererFactory;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.util.AggregateTimeTrackingCalculatorFactory;
 import com.atlassian.jira.issue.worklog.TimeTrackingIssueUpdater;
+import com.atlassian.jira.jql.operand.JqlOperandResolver;
 import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.jql.util.JqlLocalDateSupport;
 import com.atlassian.jira.mention.MentionService;
@@ -99,6 +103,16 @@ public class WorklogPluginBeanConfig {
     @Bean
     public ConstantsManager constantsManager() {
         return importOsgiService(ConstantsManager.class);
+    }
+
+    @Bean
+    public CustomFieldInputHelper customFieldInputHelper() {
+        return importOsgiService(CustomFieldInputHelper.class);
+    }
+
+    @Bean
+    public CustomFieldValuePersister customFieldValuePersister() {
+        return importOsgiService(CustomFieldValuePersister.class);
     }
 
     @Bean
@@ -197,6 +211,11 @@ public class WorklogPluginBeanConfig {
     }
 
     @Bean
+    public JqlOperandResolver jqlOperandResolver() {
+        return importOsgiService(JqlOperandResolver.class);
+    }
+
+    @Bean
     public LocaleManager localeManager() {
         return importOsgiService(LocaleManager.class);
     }
@@ -239,6 +258,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public RendererManager rendererManager() {
         return importOsgiService(RendererManager.class);
+    }
+
+    @Bean
+    public TextFieldCharacterLengthValidator textFieldCharacterLengthValidator() {
+        return importOsgiService(TextFieldCharacterLengthValidator.class);
     }
 
     @Bean
