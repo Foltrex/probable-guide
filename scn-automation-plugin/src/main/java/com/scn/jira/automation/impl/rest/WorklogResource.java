@@ -1,10 +1,10 @@
 package com.scn.jira.automation.impl.rest;
 
-import com.scn.jira.automation.api.domain.service.JiraContextService;
+import com.scn.jira.automation.api.domain.service.PermissionProvider;
 import com.scn.jira.automation.api.domain.service.WorklogContextService;
 import com.scn.jira.automation.api.domain.service.WorklogSQLService;
-import com.scn.jira.automation.impl.domain.dto.Validator;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
+import com.scn.jira.common.exception.ErrorResult;
 import lombok.RequiredArgsConstructor;
 
 import javax.inject.Named;
@@ -29,7 +29,7 @@ import java.util.List;
 public class WorklogResource extends BaseResource {
     private final WorklogContextService worklogContextService;
     private final WorklogSQLService worklogSQLService;
-    private final JiraContextService contextService;
+    private final PermissionProvider permissionProvider;
 
     @GET
     @Path("/type")
@@ -42,9 +42,9 @@ public class WorklogResource extends BaseResource {
     public Response copyFromScnWorklogs(@QueryParam("pid") final Long pid,
                                         @QueryParam("from") final String from,
                                         @QueryParam("to") final String to) throws ParseException {
-        if (!this.contextService.isCurrentUserAdmin()) {
+        if (!this.permissionProvider.isCurrentUserAdmin()) {
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No permissions to create WL from WL*.")).build();
+                .entity(new ErrorResult("No permissions to create WL from WL*.")).build();
         }
         List<WorklogDto> worklogs = worklogSQLService.getAllByProject(
             pid, this.parseDate(from), this.parseDate(to)

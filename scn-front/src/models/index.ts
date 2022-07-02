@@ -25,11 +25,12 @@ export interface WorklogTypeDto {
 export interface AutoTTDto {
   id: number;
   user?: UserDto;
-  active?: boolean;
+  active: boolean;
   project?: ProjectDto;
   issue?: IssueDto;
   worklogType?: WorklogTypeDto;
-  ratedTime?: string;
+  ratedTime: string;
+  startDate?: string;
   author?: UserDto;
   updateAuthor?: UserDto;
   created?: number;

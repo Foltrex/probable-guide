@@ -123,14 +123,14 @@
 	</dependencyManagement>
 
 	<properties>
-		<revision>4.2.1-RC5</revision>
+		<revision>4.2.1-RC6</revision>
 		<jira.version>8.14.1</jira.version>
 		<amps.version>8.1.2</amps.version>
 		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
 		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
 		<osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
-		<spring.version>4.2.5.RELEASE</spring.version>
+		<spring.version>5.1.18.RELEASE</spring.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
 		<testkit.version>6.3.11</testkit.version>
 		<atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
@@ -158,6 +158,7 @@
 	</properties>
 
 	<modules>
+		<module>common</module>
 		<module>scn-front</module>
 		<module>scn-worklog-plugin</module>
 		<module>scn-logtime-plugin</module>

@@ -42,7 +42,13 @@ const AutoTTService: React.FC = ({ children }) => {
           });
           dispatch(setItemsAction(result.data));
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
+          } else {
+            showError(error.message);
+          }
         }
         dispatch(hideLoaderAction());
       },
@@ -55,7 +61,13 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(setItemAction(result.data));
           return result.data;
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
+          } else {
+            showError(error.message);
+          }
         }
         return null;
       },
@@ -73,8 +85,10 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(addItemAction(result.data));
           showSuccess("Created");
         } catch (error) {
-          if (error.response && error.response.status === Config.BAD_REQUEST) {
+          if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -91,8 +105,10 @@ const AutoTTService: React.FC = ({ children }) => {
           dispatch(updateItemAction(result.data));
           showSuccess("Updated");
         } catch (error) {
-          if (error.response && error.response.status === Config.BAD_REQUEST) {
+          if (Object.keys(error.response?.data?.errors).length) {
             return error.response.data.errors;
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
           } else {
             showError(error.message);
           }
@@ -106,7 +122,27 @@ const AutoTTService: React.FC = ({ children }) => {
           });
           dispatch(removeItemAction({ id }));
         } catch (error) {
-          showError(error.message);
+          if (Object.keys(error.response?.data?.errors).length) {
+            return error.response.data.errors;
+          } else if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
+          } else {
+            showError(error.message);
+          }
+        }
+      },
+      async startAutoTTJob(id: number): Promise<void> {
+        try {
+          await request<AutoTTDto>({
+            url: `${Config.API}/autotimetracking/user/${id}/job`,
+            method: "POST",
+          });
+        } catch (error) {
+          if (error.response?.data?.errorMessage) {
+            showError(error.response.data.errorMessage);
+          } else {
+            showError(error.message);
+          }
         }
       },
     }),

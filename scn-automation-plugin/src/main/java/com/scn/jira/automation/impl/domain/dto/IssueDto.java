@@ -8,7 +8,7 @@ import lombok.ToString;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,12 +17,11 @@ import javax.xml.bind.annotation.XmlElement;
 @ToString
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IssueDto {
-    @XmlElement
+public class IssueDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long id;
-    @XmlElement
     private String key;
-    @XmlElement
     private String name;
 }
 

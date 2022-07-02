@@ -1,9 +1,9 @@
 package com.scn.jira.automation.impl.rest;
 
-import com.scn.jira.automation.api.domain.service.JiraContextService;
+import com.scn.jira.automation.api.domain.service.PermissionProvider;
 import com.scn.jira.automation.api.domain.service.WorklogBackupService;
-import com.scn.jira.automation.impl.domain.dto.Validator;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
+import com.scn.jira.common.exception.ErrorResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
@@ -32,15 +32,15 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class BackupResource extends BaseResource {
     private final WorklogBackupService worklogBackupService;
-    private final JiraContextService contextService;
+    private final PermissionProvider permissionProvider;
 
     @POST
     public Response doBackup(@QueryParam("pid") Long pid,
                              @QueryParam("from") String from,
                              @QueryParam("to") String to) throws ParseException {
-        if (!this.contextService.isCurrentUserAdmin()) {
+        if (!this.permissionProvider.isCurrentUserAdmin()) {
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new Validator("No permissions to backup.")).build();
+                .entity(new ErrorResult("No permissions to backup.")).build();
         }
         worklogBackupService.makeBackup(pid,
             from == null ? null : this.parseDate(from),

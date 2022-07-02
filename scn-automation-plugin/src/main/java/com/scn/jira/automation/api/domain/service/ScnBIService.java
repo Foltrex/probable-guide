@@ -3,12 +3,13 @@ package com.scn.jira.automation.api.domain.service;
 import com.atlassian.annotations.PublicApi;
 
 import javax.annotation.Nonnull;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
 @PublicApi
 public interface ScnBIService {
-    Map<Date, DayType> getUserCalendar(String userKey, Date from, Date to);
+    Map<Date, DayType> getUserCalendar(String username, @Nonnull LocalDate from,  @Nonnull LocalDate to);
 
     enum DayType {
         WORKING(1),

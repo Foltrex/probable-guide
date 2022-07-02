@@ -68,7 +68,7 @@
 		<entity>com.scn.jira.automation.impl.domain.entity.AutoTT</entity>
 		<entity>com.scn.jira.automation.impl.domain.entity.Worklog</entity>
 		<entity>com.scn.jira.automation.impl.domain.entity.ScnWorklog</entity>
-		<upgradeTask>com.scn.jira.automation.impl.upgrade.V1.PluginUpgradeTask01</upgradeTask>
+		<upgradeTask>com.scn.jira.automation.impl.upgrade.v4_2_1_rc6.UpgradeTask</upgradeTask>
 	</ao>
 
 	<rest name="ScienceSoft Automation Plagin Resource"

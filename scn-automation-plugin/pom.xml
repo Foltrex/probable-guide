@@ -41,6 +41,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.scn.jira</groupId>
+			<artifactId>common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 		</dependency>
@@ -107,6 +112,7 @@
 							org.eclipse.gemini.blueprint.*;resolution:="optional",
 							*;resolution:="optional"
 						</Import-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
 						<Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
 					</instructions>
 				</configuration>

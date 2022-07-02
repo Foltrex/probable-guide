@@ -9,7 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
-import java.sql.*;
+import javax.annotation.Nullable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +26,7 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
     private final OfBizConnectionFactory ofBizConnectionFactory = DefaultOfBizConnectionFactory.getInstance();
 
     @Override
-    public List<WorklogDto> getAllByProject(Long projectId, Date from, Date to) {
+    public List<WorklogDto> getAllByProject(@Nonnull Long projectId, Date from, Date to) {
         List<WorklogDto> result = new ArrayList<>();
         String querySQL = "select " +
             "worklog.*, " +
@@ -33,14 +38,18 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
             "left join worklog_worklogtype_scn " +
             "on worklog.id = worklog_worklogtype_scn.id " +
             "where jiraissue.project = ?" +
-            (from == null ? " and ? is null" : " and worklog.startdate >= ?") +
-            (to == null ? " and ? is null" : " and worklog.startdate <= ?");
+            (from == null ? "" : " and worklog.startdate >= ?") +
+            (to == null ? "" : " and worklog.startdate <= ?");
 
         try (Connection connection = ofBizConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(querySQL)) {
             preparedStatement.setLong(1, projectId);
-            preparedStatement.setTimestamp(2, from == null ? null : getTimestampFrom(from));
-            preparedStatement.setTimestamp(3, to == null ? null : getTimestampTo(to));
+            if (from != null) {
+                preparedStatement.setTimestamp(2, getTimestampFrom(from));
+            }
+            if (to != null) {
+                preparedStatement.setTimestamp(from == null ? 2 : 3, getTimestampTo(to));
+            }
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     WorklogDto worklog = new WorklogDto();
@@ -50,7 +59,7 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Couldn't get worklogs by SQL query.");
+            throw new RuntimeException("Couldn't get worklogs by SQL query.", e);
         }
 
         return result;
@@ -66,14 +75,18 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
             "left join jiraissue " +
             "on worklog_scn.issueid = jiraissue.id " +
             "where jiraissue.project = ?" +
-            (from == null ? " and ? is null" : " and worklog_scn.startdate >= ?") +
-            (to == null ? " and ? is null" : " and worklog_scn.startdate <= ?");
+            (from == null ? "" : " and worklog_scn.startdate >= ?") +
+            (to == null ? "" : " and worklog_scn.startdate <= ?");
 
         try (Connection connection = ofBizConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(querySQL)) {
             preparedStatement.setLong(1, projectId);
-            preparedStatement.setTimestamp(2, from == null ? null : getTimestampFrom(from));
-            preparedStatement.setTimestamp(3, to == null ? null : getTimestampTo(to));
+            if (from != null) {
+                preparedStatement.setTimestamp(2, getTimestampFrom(from));
+            }
+            if (to != null) {
+                preparedStatement.setTimestamp(from == null ? 2 : 3, getTimestampTo(to));
+            }
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     WorklogDto worklog = new WorklogDto();
@@ -84,15 +97,18 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Couldn't get scnWorklogs by SQL query.");
+            throw new RuntimeException("Couldn't get scnWorklogs by SQL query.", e);
         }
 
         return result;
     }
 
-    @Nonnull
     @Override
-    public Timestamp getTimestampFrom(@Nonnull Date from) {
+    @Nullable
+    public Timestamp getTimestampFrom(Date from) {
+        if (from == null) {
+            return null;
+        }
         return Timestamp.from(
             from.toInstant()
                 .atZone(ZoneId.systemDefault())
@@ -101,9 +117,12 @@ public class WorklogSQLServiceImpl implements WorklogSQLService {
                 .toInstant());
     }
 
-    @Nonnull
     @Override
-    public Timestamp getTimestampTo(@Nonnull Date to) {
+    @Nullable
+    public Timestamp getTimestampTo(Date to) {
+        if (to == null) {
+            return null;
+        }
         return Timestamp.from(
             to.toInstant()
                 .atZone(ZoneId.systemDefault())

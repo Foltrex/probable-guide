@@ -2,6 +2,7 @@ package com.scn.jira.automation.config;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.event.api.EventPublisher;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
@@ -12,9 +13,12 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.service.ServiceManager;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.ModuleFactoryBean;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.PluginAccessorBean;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
+import com.scn.jira.common.ao.TransactionalMethodProxyFactory;
+import com.scn.jira.common.exception.ObjectValidator;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
@@ -73,8 +77,23 @@ public class AutomationPluginBeanConfig {
     }
 
     @Bean
+    public JiraDurationUtils jiraDurationUtils() {
+        return ComponentAccessor.getComponent(JiraDurationUtils.class);
+    }
+
+    @Bean
+    public ObjectValidator objectValidator() {
+        return new ObjectValidator();
+    }
+
+    @Bean
     public OfBizDelegator ofBizDelegator() {
         return importOsgiService(OfBizDelegator.class);
+    }
+
+    @Bean
+    public TransactionalMethodProxyFactory transactionalMethodProxyFactory() {
+        return new TransactionalMethodProxyFactory();
     }
 
     @Bean

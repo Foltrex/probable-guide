@@ -10,6 +10,7 @@ import { AutoTTDto } from "../../models";
 import { IdField, ProjectIssueField, UserField } from "../fields";
 import WorklogTypeField from "../fields/WorklogTypeField";
 import Textfield from "@atlaskit/textfield";
+import {DatePicker} from "@atlaskit/datetime-picker";
 
 interface ComponentProps {
   data: AutoTTDto;
@@ -54,14 +55,14 @@ const AutoTTForm: React.FC<ComponentProps> = ({ data, onSubmit, onClose }) => {
           }}
         >
           <IdField value={data.id ? data.id : 0} />
-          <UserField label="User" name="user" value={data.user}></UserField>
+          <UserField label="User" name="user" value={data.user}/>
           <ProjectIssueField
             label="Issue"
             name="issue"
             issue={data.issue}
             project={data.project}
           />
-          <Field<string>
+          <Field
             label="Rated Time"
             name="ratedTime"
             isRequired={true}
@@ -74,7 +75,20 @@ const AutoTTForm: React.FC<ComponentProps> = ({ data, onSubmit, onClose }) => {
               </>
             )}
           </Field>
-
+          <Field
+              label="Starting date"
+              name="startDate"
+              isRequired={true}
+              defaultValue={data.startDate}
+          >
+            {({ fieldProps, error }) => (
+                <>
+                  <DatePicker {...fieldProps}
+                  />
+                  {error && <ErrorMessage>{error}</ErrorMessage>}
+                </>
+            )}
+          </Field>
           <WorklogTypeField
             label="Worklog type"
             name="worklogType"

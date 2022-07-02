@@ -1,5 +1,6 @@
 package com.scn.jira.automation.impl.domain.entity;
 
+import com.scn.jira.common.ao.Updatable;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 

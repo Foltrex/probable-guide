@@ -1,8 +1,11 @@
 package com.scn.jira.automation.impl.domain.entity;
 
+import com.scn.jira.common.ao.Updatable;
 import net.java.ao.Preload;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.Unique;
+
+import java.sql.Timestamp;
 
 @Preload
 public interface AutoTT extends Updatable {
@@ -10,6 +13,11 @@ public interface AutoTT extends Updatable {
     String getUserKey();
 
     void setUserKey(String userKey);
+
+    @NotNull
+    String getUsername();
+
+    void setUsername(String username);
 
     @NotNull
     Long getProjectId();
@@ -21,6 +29,7 @@ public interface AutoTT extends Updatable {
 
     void setIssueId(Long issueID);
 
+    @NotNull
     String getWorklogTypeId();
 
     void setWorklogTypeId(String worklogTypeId);
@@ -29,6 +38,11 @@ public interface AutoTT extends Updatable {
     Long getRatedTime();
 
     void setRatedTime(Long ratedTime);
+
+    @NotNull
+    Timestamp getStartDate();
+
+    void setStartDate(Timestamp startDate);
 
     boolean getActive();
 
