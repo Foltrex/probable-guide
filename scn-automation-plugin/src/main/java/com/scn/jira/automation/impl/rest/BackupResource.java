@@ -7,7 +7,6 @@ import com.scn.jira.common.exception.ErrorResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
-import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Path("/worklog/backup")
-@Named
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor

@@ -1,5 +1,6 @@
 package com.scn.jira.common.ao;
 
+import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.transaction.Transaction;
 import com.atlassian.jira.transaction.Txn;
 import org.aopalliance.intercept.MethodInterceptor;

@@ -1,5 +1,6 @@
 package com.scn.jira.automation.impl.domain.service;
 
+import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.api.domain.service.PermissionProvider;
@@ -11,7 +12,6 @@ import com.scn.jira.automation.impl.domain.entity.AutoTT;
 import com.scn.jira.automation.impl.domain.mapper.AutoTTMapper;
 import com.scn.jira.automation.impl.domain.mapper.JiraDataMapper;
 import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
-import com.scn.jira.common.ao.Transactional;
 import com.scn.jira.common.exception.EntityNotFoundException;
 import com.scn.jira.common.exception.ObjectValidator;
 import lombok.RequiredArgsConstructor;

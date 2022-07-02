@@ -1,6 +1,7 @@
 package com.scn.jira.automation.impl.rest.mapper;
 
 import com.scn.jira.common.exception.ErrorResult;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.Produces;
@@ -16,6 +17,7 @@ public class CommonExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(@Nonnull Exception e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-            .entity(new ErrorResult(e.getLocalizedMessage())).build();
+            .entity(new ErrorResult(StringUtils.isNotBlank(e.getLocalizedMessage()) ? e.getLocalizedMessage() : e.getClass().toString()))
+            .build();
     }
 }
