@@ -13,7 +13,6 @@ import com.scn.jira.automation.impl.domain.mapper.AutoTTMapper;
 import com.scn.jira.automation.impl.domain.mapper.JiraDataMapper;
 import com.scn.jira.automation.impl.domain.repository.AutoTTRepository;
 import com.scn.jira.common.exception.EntityNotFoundException;
-import com.scn.jira.common.exception.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,6 @@ public class AutoTTServiceImpl implements AutoTTService {
     private final AutoTTMapper autoTTMapper;
     private final JiraDataMapper jiraDataMapper;
     private final PermissionProvider permissionProvider;
-    private final ObjectValidator objectValidator;
 
     @Override
     public List<AutoTTDto> getAll() {
@@ -65,7 +63,6 @@ public class AutoTTServiceImpl implements AutoTTService {
     @Override
     @Transactional
     public AutoTTDto add(@Nonnull AutoTTDto autoTTDto) {
-        objectValidator.validate(autoTTDto);
         if (autoTTDto.getIssue().getId() == null) {
             autoTTDto.setIssue(jiraDataMapper.mapIssueByKey(autoTTDto.getIssue().getKey()));
         }
@@ -77,7 +74,6 @@ public class AutoTTServiceImpl implements AutoTTService {
     @Override
     @Transactional
     public AutoTTDto update(@Nonnull AutoTTDto autoTTDto) {
-        objectValidator.validate(autoTTDto);
         if (autoTTDto.getIssue().getId() == null) {
             autoTTDto.setIssue(jiraDataMapper.mapIssueByKey(autoTTDto.getIssue().getKey()));
         }

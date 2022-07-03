@@ -1,8 +1,8 @@
 package com.scn.jira.automation.impl.domain.dto;
 
-import com.scn.jira.common.json.FormattedDuration;
-import com.scn.jira.common.json.LocalDateDeserializer;
-import com.scn.jira.common.json.LocalDateSerializer;
+import com.scn.jira.common.map.deser.LocalDateDeserializer;
+import com.scn.jira.common.map.ser.LocalDateSerializer;
+import com.scn.jira.common.validation.constraints.FormattedDuration;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

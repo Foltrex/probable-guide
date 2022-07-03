@@ -1,4 +1,4 @@
-package com.scn.jira.common.json;
+package com.scn.jira.common.validation.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

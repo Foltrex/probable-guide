@@ -3,6 +3,7 @@ package com.scn.jira.automation.impl.rest;
 import com.scn.jira.automation.api.domain.service.AutoTTService;
 import com.scn.jira.automation.impl.domain.dto.AutoTTDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import javax.ws.rs.ext.Provider;
 
 @Path("/autotimetracking/user")
 @Provider
+@Component
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
 @RequiredArgsConstructor
@@ -37,7 +39,7 @@ public class AutoTTResource {
     }
 
     @POST
-    public Response create(AutoTTDto autoTTDto) {
+    public Response create(@Valid AutoTTDto autoTTDto) {
         return Response.status(Response.Status.CREATED).entity(autoTTService.add(autoTTDto)).build();
     }
 
