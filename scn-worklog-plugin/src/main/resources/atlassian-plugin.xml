@@ -185,8 +185,63 @@
             key="scn.scnworklog.customfield.time.spent.descr">Allows user to view Time Spent* for issue
         </description>
         <resource type="velocity" name="view"
-                  location="/templates/scn/worklog/customfields/time-spent-scn.vm"/>
+                  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
     </customfield-type>
+	<customfield-type
+		key="scn-original-estimate-custom-field-type"
+		name="SCN Original Estimate* Custom Field (view)"
+		i18n-name-key="scn.scnworklog.customfield.original.estimate.name"
+		class="com.scn.jira.worklog.customfield.ScnOriginalEstimateCFType">
+		<description
+			key="scn.scnworklog.customfield.original.estimate.descr">Allows user to view Original Estimate* for issue
+		</description>
+		<resource type="velocity" name="view"
+				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+	</customfield-type>
+	<customfield-type
+		key="scn-remaining-estimate-custom-field-type"
+		name="SCN Remaining Estimate* Custom Field (view)"
+		i18n-name-key="scn.scnworklog.customfield.remaining.estimate.name"
+		class="com.scn.jira.worklog.customfield.ScnRemainingEstimateCFType">
+		<description
+			key="scn.scnworklog.customfield.remaining.estimate.descr">Allows user to view Remaining Estimate* for issue
+		</description>
+		<resource type="velocity" name="view"
+				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+	</customfield-type>
+	<customfield-type
+		key="scn-aggregate-time-spent-custom-field-type"
+		name="SCN Σ Time Spent* Custom Field (view)"
+		i18n-name-key="scn.scnworklog.customfield.aggregate.time.spent.name"
+		class="com.scn.jira.worklog.customfield.ScnAggregateTimeSpentCFType">
+		<description
+			key="scn.scnworklog.customfield.aggregate.time.spent.descr">Allows user to view Σ Time Spent* for issue
+		</description>
+		<resource type="velocity" name="view"
+				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+	</customfield-type>
+	<customfield-type
+		key="scn-aggregate-original-estimate-custom-field-type"
+		name="SCN Σ Original Estimate* Custom Field (view)"
+		i18n-name-key="scn.scnworklog.customfield.aggregate.original.estimate.name"
+		class="com.scn.jira.worklog.customfield.ScnAggregateOriginalEstimateCFType">
+		<description
+			key="scn.scnworklog.customfield.aggregate.original.estimate.descr">Allows user to view Σ Original Estimate* for issue
+		</description>
+		<resource type="velocity" name="view"
+				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+	</customfield-type>
+	<customfield-type
+		key="scn-aggregate-remaining-estimate-custom-field-type"
+		name="SCN Σ Remaining Estimate* Custom Field (view)"
+		i18n-name-key="scn.scnworklog.customfield.aggregate.remaining.estimate.name"
+		class="com.scn.jira.worklog.customfield.ScnAggregateRemainingEstimateCFType">
+		<description
+			key="scn.scnworklog.customfield.aggregate.remaining.estimate.descr">Allows user to view Σ Remaining Estimate* for issue
+		</description>
+		<resource type="velocity" name="view"
+				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+	</customfield-type>
 	<customfield-searcher
 		key="scn-timetracking-custom-field-searcher"
 		name="SCN Time Tracking* Custom Field Searcher"

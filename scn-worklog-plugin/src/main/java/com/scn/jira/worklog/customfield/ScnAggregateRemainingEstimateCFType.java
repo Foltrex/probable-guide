@@ -13,9 +13,9 @@ import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 
 import java.util.Objects;
 
-public class ScnTimeSpentCFType extends AbstractScnTimeCFType {
+public class ScnAggregateRemainingEstimateCFType extends AbstractScnTimeCFType {
 
-    public ScnTimeSpentCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, TextFieldCharacterLengthValidator textFieldCharacterLengthValidator, JiraAuthenticationContext jiraAuthenticationContext, IScnExtendedIssueStore store, JiraDurationUtils durationUtils, IssueManager issueManager, IGlobalSettingsManager settingsManager) {
+    public ScnAggregateRemainingEstimateCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, TextFieldCharacterLengthValidator textFieldCharacterLengthValidator, JiraAuthenticationContext jiraAuthenticationContext, IScnExtendedIssueStore store, JiraDurationUtils durationUtils, IssueManager issueManager, IGlobalSettingsManager settingsManager) {
         super(customFieldValuePersister, genericConfigManager, textFieldCharacterLengthValidator, jiraAuthenticationContext, store, durationUtils, issueManager, settingsManager);
     }
 
@@ -27,7 +27,7 @@ public class ScnTimeSpentCFType extends AbstractScnTimeCFType {
         return extIssue.getIssue().getSubTaskObjects().stream()
             .map(store::getByIssue)
             .filter(Objects::nonNull)
-            .map(IScnExtendedIssue::getTimeSpent)
-            .reduce(extIssue.getTimeSpent(), AggregateTimeTrackingBean::addAndPreserveNull);
+            .map(IScnExtendedIssue::getEstimate)
+            .reduce(extIssue.getEstimate(), AggregateTimeTrackingBean::addAndPreserveNull);
     }
 }
