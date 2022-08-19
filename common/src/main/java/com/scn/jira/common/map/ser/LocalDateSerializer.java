@@ -1,4 +1,4 @@
-package com.scn.jira.common.json;
+package com.scn.jira.common.map.ser;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;

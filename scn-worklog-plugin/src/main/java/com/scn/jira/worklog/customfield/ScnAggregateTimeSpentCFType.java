@@ -13,9 +13,9 @@ import com.scn.jira.worklog.globalsettings.IGlobalSettingsManager;
 
 import java.util.Objects;
 
-public class ScnTimeSpentCFType extends AbstractScnTimeCFType {
+public class ScnAggregateTimeSpentCFType extends AbstractScnTimeCFType {
 
-    public ScnTimeSpentCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, TextFieldCharacterLengthValidator textFieldCharacterLengthValidator, JiraAuthenticationContext jiraAuthenticationContext, IScnExtendedIssueStore store, JiraDurationUtils durationUtils, IssueManager issueManager, IGlobalSettingsManager settingsManager) {
+    public ScnAggregateTimeSpentCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, TextFieldCharacterLengthValidator textFieldCharacterLengthValidator, JiraAuthenticationContext jiraAuthenticationContext, IScnExtendedIssueStore store, JiraDurationUtils durationUtils, IssueManager issueManager, IGlobalSettingsManager settingsManager) {
         super(customFieldValuePersister, genericConfigManager, textFieldCharacterLengthValidator, jiraAuthenticationContext, store, durationUtils, issueManager, settingsManager);
     }
 

@@ -1,4 +1,4 @@
-package com.scn.jira.common.json;
+package com.scn.jira.common.map.deser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParser;

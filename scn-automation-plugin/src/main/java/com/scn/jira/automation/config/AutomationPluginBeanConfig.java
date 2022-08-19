@@ -17,8 +17,6 @@ import com.atlassian.jira.util.JiraDurationUtils;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.ModuleFactoryBean;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.PluginAccessorBean;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
-import com.scn.jira.common.ao.TransactionalMethodProxyFactory;
-import com.scn.jira.common.exception.ObjectValidator;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
@@ -82,18 +80,8 @@ public class AutomationPluginBeanConfig {
     }
 
     @Bean
-    public ObjectValidator objectValidator() {
-        return new ObjectValidator();
-    }
-
-    @Bean
     public OfBizDelegator ofBizDelegator() {
         return importOsgiService(OfBizDelegator.class);
-    }
-
-    @Bean
-    public TransactionalMethodProxyFactory transactionalMethodProxyFactory() {
-        return new TransactionalMethodProxyFactory();
     }
 
     @Bean

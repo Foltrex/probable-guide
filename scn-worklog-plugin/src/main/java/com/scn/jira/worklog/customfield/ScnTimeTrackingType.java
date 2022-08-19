@@ -27,7 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Named;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Named
 public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estimate> {
@@ -165,17 +169,19 @@ public class ScnTimeTrackingType extends AbstractCustomFieldType<Estimate, Estim
         }
         IScnExtendedIssue oldEstimate = issueStore.getByIssue(issue);
         Long originalEstimate = null;
-        if (estimate.getOriginal() != null)
+        if (estimate != null && estimate.getOriginal() != null) {
             originalEstimate = estimate.getOriginal();
+        }
         Long remainingEstimate = null;
-        if (estimate.getRemaining() != null)
+        if (estimate != null && estimate.getRemaining() != null) {
             remainingEstimate = estimate.getRemaining();
-
+        }
         if (isLegacyBehaviorEnabled()) {
-            if (hasWorkStarted(issue))
+            if (hasWorkStarted(issue)) {
                 originalEstimate = (oldEstimate == null) ? null : oldEstimate.getOriginalEstimate();
-            else
+            } else {
                 remainingEstimate = originalEstimate;
+            }
         } else {
             if (originalEstimate != null && remainingEstimate == null) {
                 remainingEstimate = originalEstimate;

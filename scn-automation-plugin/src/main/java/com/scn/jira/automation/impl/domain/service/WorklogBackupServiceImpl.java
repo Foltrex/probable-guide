@@ -1,5 +1,6 @@
 package com.scn.jira.automation.impl.domain.service;
 
+import com.atlassian.activeobjects.tx.Transactional;
 import com.scn.jira.automation.api.domain.service.WorklogBackupService;
 import com.scn.jira.automation.api.domain.service.WorklogSQLService;
 import com.scn.jira.automation.impl.domain.dto.WorklogDto;
@@ -7,7 +8,6 @@ import com.scn.jira.automation.impl.domain.entity.ScnWorklog;
 import com.scn.jira.automation.impl.domain.entity.Worklog;
 import com.scn.jira.automation.impl.domain.repository.ScnWorklogBackupRepository;
 import com.scn.jira.automation.impl.domain.repository.WorklogBackupRepository;
-import com.scn.jira.common.ao.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

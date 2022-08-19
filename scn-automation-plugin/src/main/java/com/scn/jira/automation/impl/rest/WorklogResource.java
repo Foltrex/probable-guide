@@ -7,7 +7,6 @@ import com.scn.jira.automation.impl.domain.dto.WorklogDto;
 import com.scn.jira.common.exception.ErrorResult;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,7 +20,6 @@ import java.text.ParseException;
 import java.util.List;
 
 @Path("/worklog")
-@Named
 @Provider
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})

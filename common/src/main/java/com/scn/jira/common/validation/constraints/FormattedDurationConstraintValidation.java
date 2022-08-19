@@ -1,4 +1,4 @@
-package com.scn.jira.common.json;
+package com.scn.jira.common.validation.constraints;
 
 import com.atlassian.core.util.InvalidDurationException;
 import com.atlassian.jira.component.ComponentAccessor;
