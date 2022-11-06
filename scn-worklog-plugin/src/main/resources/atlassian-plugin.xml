@@ -186,6 +186,8 @@
         </description>
         <resource type="velocity" name="view"
                   location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
     </customfield-type>
 	<customfield-type
 		key="scn-original-estimate-custom-field-type"
@@ -197,6 +199,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
 	<customfield-type
 		key="scn-remaining-estimate-custom-field-type"
@@ -208,6 +212,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
 	<customfield-type
 		key="scn-aggregate-time-spent-custom-field-type"
@@ -219,6 +225,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
 	<customfield-type
 		key="scn-aggregate-original-estimate-custom-field-type"
@@ -230,6 +238,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
 	<customfield-type
 		key="scn-aggregate-remaining-estimate-custom-field-type"
@@ -241,6 +251,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="xml"
+			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
 	<customfield-searcher
 		key="scn-timetracking-custom-field-searcher"

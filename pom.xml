@@ -128,7 +128,7 @@
 		<amps.version>8.1.2</amps.version>
 		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
-		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
+		<plugin.testrunner.version>2.0.2</plugin.testrunner.version>
 		<osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
 		<spring.version>5.1.18.RELEASE</spring.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
@@ -167,6 +167,7 @@
 		<module>scn-clone-project-plugin</module>
 		<module>scn-automation-plugin</module>
 		<module>scn-integration-plugin</module>
+		<module>confluence</module>
 	</modules>
 
 	<build>
