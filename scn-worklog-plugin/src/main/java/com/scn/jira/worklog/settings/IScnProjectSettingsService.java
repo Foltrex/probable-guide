@@ -32,6 +32,10 @@ public interface IScnProjectSettingsService {
 
     void setDefaultWorklogType(JiraServiceContext srvContext, Long projectId, String worklogTypeId);
 
+    boolean isWLCommentRequired(JiraServiceContext srvContext, Long projectId);
+
+    void setWLCommentRequired(JiraServiceContext srvContext, Long projectId, boolean value);
+
     Date getWLBlockingDate(JiraServiceContext srvContext, Long projectId);
 
     void setWLBlockingDate(JiraServiceContext srvContext, Long projectId, Date value);

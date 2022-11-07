@@ -216,7 +216,7 @@
 			#end
 				
 				#set($fieldId = 'comment')
-				#fieldHeader($fieldId $i18n.getText('logwork.workdesc') false "field-group")
+				#fieldHeader($fieldId $i18n.getText('logwork.workdesc') $wlCommentRequired "field-group")
 					<div class="wiki-edit">
 					    <div id="${fieldId}-wiki-edit" class="wiki-edit-content">
 					        #if($!class) #set ($class = " ${class}") #else #set ($class = '') #end

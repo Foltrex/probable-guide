@@ -353,4 +353,8 @@ public abstract class AbstractScnWorklogAction extends AbstractIssueSelectAction
     public boolean isWlTypeRequired() {
         return projectSettignsManager.isWLTypeRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
+
+    public boolean isWlCommentRequired() {
+        return projectSettignsManager.isWLCommentRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
+    }
 }

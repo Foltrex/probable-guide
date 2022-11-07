@@ -11,12 +11,6 @@ import com.google.common.base.Splitter;
 import com.opensymphony.module.propertyset.PropertyException;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
-import org.apache.commons.lang.StringUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,9 +19,15 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.apache.commons.lang.StringUtils;
 
 @Named("scnProjectSettingsManager")
 public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
+
     private final ProjectRoleManager projectRoleManager;
     private final ExtendedConstantsManager ecManager;
     private final PropertiesManager propertiesManager;
@@ -167,6 +167,16 @@ public class ScnProjectSettingsManager implements IScnProjectSettingsManager {
     @Override
     public void setDefaultWorklogType(@Nonnull Long projectId, String worklogTypeId) throws PropertyException {
         propertiesManager.getPropertySet().setString(DEFAULT_WL_TYPE + projectId, worklogTypeId);
+    }
+
+    @Override
+    public boolean isWLCommentRequired(@Nonnull Long projectId) throws PropertyException {
+        return propertiesManager.getPropertySet().getBoolean(WL_COMMENT_REQUIRED + projectId);
+    }
+
+    @Override
+    public void setWlCommentRequired(@Nonnull Long projectId, boolean value) throws PropertyException {
+        propertiesManager.getPropertySet().setBoolean(WL_COMMENT_REQUIRED + projectId, value);
     }
 
     @Nullable

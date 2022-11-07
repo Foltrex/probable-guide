@@ -22,6 +22,7 @@ import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedWorklogManager;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -112,6 +113,12 @@ public class LTUpdateExtWorklogResource extends BaseResource {
             return Response.serverError()
                 .entity(new ErrorEntity(
                     ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                .status(Response.Status.FORBIDDEN)
+                .build();
+        } else if (projectSettignsManager.isWLCommentRequired(projectId) && StringUtils.isBlank(comment)) {
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Comment has to be set"))
                 .status(Response.Status.FORBIDDEN)
                 .build();
         } else if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)

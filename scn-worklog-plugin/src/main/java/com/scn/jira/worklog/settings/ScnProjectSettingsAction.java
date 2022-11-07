@@ -5,11 +5,14 @@ import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.scn.jira.worklog.core.settings.ScnProjectSettingsManager;
 import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.core.wl.WorklogType;
-
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
     private static final long serialVersionUID = 3458031703740979391L;
 
@@ -20,6 +23,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
     private Date worklogBlockingDate;
     private boolean wlAutoCopy;
     private boolean wlTypeRequired;
+    private boolean wlCommentRequired;
     private String defaultWorklogType;
     private Collection<ProjectRole> projectRolesToViewWL;
     private Collection<WorklogType> wlTypes;
@@ -48,6 +52,7 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         final boolean wlAutoCopy = psService.isWLAutoCopyEnabled(getJiraServiceContext(), pid);
         boolean isWLTypeRequired = psService.isWLTypeRequired(getJiraServiceContext(), pid);
         WorklogType defaultWorklogType = psService.getDefaultWorklogType(getJiraServiceContext(), pid);
+        this.setWlCommentRequired(psService.isWLCommentRequired(getJiraServiceContext(), pid));
         final Collection<ProjectRole> selectedProjectRoles = psService.getProjectRolesToViewWL(getJiraServiceContext(), pid);
         final Collection<WorklogType> selectedWorklogTypes = psService.getWorklogTypes(getJiraServiceContext(), pid);
         final Collection<WorklogType> selectedExcludedWorklogTypes = psService.getExcludedWorklogTypes(getJiraServiceContext(), pid);
@@ -81,12 +86,13 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         psService.setWLAutoCopy(getJiraServiceContext(), pid, isWlAutoCopy());
 //        psService.setWLTypeRequired(getJiraServiceContext(), pid, isWLTypeRequired());
         psService.setDefaultWorklogType(getJiraServiceContext(), pid, getDefaultWorklogType());
+        psService.setWLCommentRequired(getJiraServiceContext(), pid, isWlCommentRequired());
         psService.setWLBlockingDate(getJiraServiceContext(), pid, getBlockingDate());
         psService.setWLWorklogBlockingDate(getJiraServiceContext(), pid, getWorklogBlockingDate());
         psService.setProjectRolesToViewWL(getJiraServiceContext(), pid, getProjectRolesToViewWL());
         psService.setWorklogTypes(getJiraServiceContext(), pid, getWlTypes());
         psService.setExcludedWorklogTypes(getJiraServiceContext(), pid, getExcludedWLTypes());
-        psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, getUnspecifiedWLType());
+        psService.setUnspecifiedWorklogTypeOption(getJiraServiceContext(), pid, isUnspecifiedWLTypeOption());
         getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
             getProjectObject());
 
@@ -104,31 +110,15 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
         setBlockingDate(getParsedBlockingDate());
         setWorklogBlockingDate(getParsedWorklogBlockingDate());
         setWlAutoCopy(Boolean.parseBoolean(getInputWLAutoCopy()));
-        setWLTypeRequired(Boolean.parseBoolean(getInputWLTypeRequired()));
+        setWlTypeRequired(Boolean.parseBoolean(getInputWLTypeRequired()));
         setDefaultWorklogType(getInputDefaultWorklogType());
         setProjectRolesToViewWL(getSelectedProjectRolesToViewWL());
         setWlTypes(getSelectedWorklogTypes());
         setExcludedWLTypes(getSelectedExcludedWorklogTypes());
-        setUnspecifiedWLType(isInputUnspecifiedWorklogType());
+        setUnspecifiedWLTypeOption(isInputUnspecifiedWorklogType());
         getHttpRequest().setAttribute("com.atlassian.jira.projectconfig.util.ServletRequestProjectConfigRequestCache:project",
             getProjectObject());
 
-    }
-
-    public Long getPid() {
-        return pid;
-    }
-
-    public void setPid(Long pid) {
-        this.pid = pid;
-    }
-
-    public Date getBlockingDate() {
-        return blockingDate;
-    }
-
-    public Date getWorklogBlockingDate() {
-        return worklogBlockingDate;
     }
 
     public void setBlockingDate(Date blockingDate) {
@@ -155,61 +145,5 @@ public class ScnProjectSettingsAction extends AbstractScnProjectSettingsAction {
 
             this.worklogBlockingDate = cal.getTime();
         }
-    }
-
-    public boolean isWlAutoCopy() {
-        return wlAutoCopy;
-    }
-
-    public void setWlAutoCopy(boolean wlAutoCopy) {
-        this.wlAutoCopy = wlAutoCopy;
-    }
-
-    public boolean isWLTypeRequired() {
-        return wlTypeRequired;
-    }
-
-    public void setWLTypeRequired(boolean wlTypeRequired) {
-        this.wlTypeRequired = wlTypeRequired;
-    }
-
-    public String getDefaultWorklogType() {
-        return defaultWorklogType;
-    }
-
-    public void setDefaultWorklogType(String defaultWorklogType) {
-        this.defaultWorklogType = defaultWorklogType;
-    }
-
-    public Collection<ProjectRole> getProjectRolesToViewWL() {
-        return projectRolesToViewWL;
-    }
-
-    public void setProjectRolesToViewWL(Collection<ProjectRole> projectRolesToViewWL) {
-        this.projectRolesToViewWL = projectRolesToViewWL;
-    }
-
-    public Collection<WorklogType> getWlTypes() {
-        return wlTypes;
-    }
-
-    public void setWlTypes(Collection<WorklogType> wlTypes) {
-        this.wlTypes = wlTypes;
-    }
-
-    public Collection<WorklogType> getExcludedWLTypes() {
-        return excludedWLTypes;
-    }
-
-    public void setExcludedWLTypes(Collection<WorklogType> excludedWLTypes) {
-        this.excludedWLTypes = excludedWLTypes;
-    }
-
-    public boolean getUnspecifiedWLType() {
-        return this.unspecifiedWLTypeOption;
-    }
-
-    public void setUnspecifiedWLType(boolean value) {
-        this.unspecifiedWLTypeOption = value;
     }
 }

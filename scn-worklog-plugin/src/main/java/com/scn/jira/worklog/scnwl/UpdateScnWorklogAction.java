@@ -75,10 +75,15 @@ public class UpdateScnWorklogAction extends AbstractScnWorklogAction {
                 visibility.getRoleLevel(), getWorklogType());
         }
 
-        if (projectSettignsManager.isWLTypeRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId())
-            && StringUtils.isBlank(getWorklogType()))
+        if (isWlTypeRequired() && StringUtils.isBlank(getWorklogType())) {
             getJiraServiceContext().getErrorCollection().addError("worklogType",
                 getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+        }
+
+        if (isWlCommentRequired() && StringUtils.isBlank(getComment())) {
+            getJiraServiceContext().getErrorCollection().addError("comment",
+                getJiraServiceContext().getI18nBean().getText("logwork.comment.error.null"));
+        }
 
         ApplicationUser reporter = null;
         if (!StringUtils.isBlank(getInputReporter())) {

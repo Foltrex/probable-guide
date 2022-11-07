@@ -193,7 +193,7 @@
 				#fieldsetFooter( ) <!-- // .group -->
 				
 				#set($fieldId = 'comment')
-				#fieldHeader($fieldId $i18n.getText('logwork.workdesc') false "field-group")
+				#fieldHeader($fieldId $i18n.getText('logwork.workdesc') $wlCommentRequired "field-group")
 					$!{workDescriptionEditHtml}
 					#set($rolesPresent = !$action.roleLevels.empty)
 				    #set($groupsPresent = !$action.groupLevels.empty)
@@ -226,7 +226,7 @@
 						</select>
 						<span class="current-level">$!{selectedLevelName}</span>
 					</div>
-				#fieldFooter($fieldId $fieldId '' '' '' '')
+				#fieldFooter("${pageId}-logwork-comment" "logwork-comment" $errors.comment '' '' '')
 			#fieldsetFooter( )
 	    </div>
 	    
