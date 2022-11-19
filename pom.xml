@@ -145,7 +145,6 @@
 		<jtds.version>1.3.1</jtds.version>
 		<lombok.version>1.18.12</lombok.version>
 		<junit>4.11</junit>
-		<skipCopyJarPlugins>true</skipCopyJarPlugins>
 		<!-- Maven project settings -->
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
@@ -175,32 +174,6 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>${maven-resources-plugin.version}</version>
-					<executions>
-						<execution>
-							<id>copy-jar-plugins</id>
-							<phase>package</phase>
-							<goals>
-								<goal>copy-resources</goal>
-							</goals>
-							<configuration>
-								<outputDirectory>${basedir}/../plugins/${revision}</outputDirectory>
-								<resources>
-									<resource>
-										<directory>target</directory>
-										<includes>
-											<include>${project.artifactId}-${project.version}.jar</include>
-										</includes>
-									</resource>
-								</resources>
-								<skip>${skipCopyJarPlugins}</skip>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>${maven-clean-plugin.version}</version>
 					<configuration>
@@ -226,7 +199,6 @@
 			<properties>
 				<atlassian.dev.mode>true</atlassian.dev.mode>
 				<compressResources>true</compressResources>
-				<skipCopyJarPlugins>false</skipCopyJarPlugins>
 			</properties>
 		</profile>
 	</profiles>

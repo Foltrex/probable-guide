@@ -75,10 +75,6 @@
 		</dependency>
 	</dependencies>
 
-	<properties>
-		<skipCopyJarPlugins>true</skipCopyJarPlugins>
-	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
