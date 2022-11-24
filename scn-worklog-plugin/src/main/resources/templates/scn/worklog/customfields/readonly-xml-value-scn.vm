@@ -1,6 +1,6 @@
 #disable_html_escaping()
 #if ($value)
-<customfieldvalue>
-    $value
+<customfieldvalue value="$value">
+    ${formatNormalValue.apply($value)}
 </customfieldvalue>
 #end

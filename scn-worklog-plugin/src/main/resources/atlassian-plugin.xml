@@ -186,6 +186,8 @@
         </description>
         <resource type="velocity" name="view"
                   location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
     </customfield-type>
@@ -199,6 +201,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
@@ -212,6 +216,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
@@ -225,6 +231,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
@@ -238,6 +246,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>
@@ -251,6 +261,8 @@
 		</description>
 		<resource type="velocity" name="view"
 				  location="/templates/scn/worklog/customfields/readonly-value-scn.vm"/>
+		<resource type="velocity" name="column-view"
+			location="/templates/scn/worklog/customfields/readonly-column-value-scn.vm"/>
 		<resource type="velocity" name="xml"
 			location="/templates/scn/worklog/customfields/readonly-xml-value-scn.vm"/>
 	</customfield-type>

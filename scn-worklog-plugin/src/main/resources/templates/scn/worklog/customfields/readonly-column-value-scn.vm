@@ -1,0 +1,3 @@
+#if ($value)
+    ${formatNormalValue.apply($value)}
+#end
