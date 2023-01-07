@@ -20,6 +20,7 @@ public interface IScnProjectSettingsManager {
     String UNSPECIFIED_WORKLOG_TYPE = "scn_wl_unspecified_worklog_type_";
     String WL_TYPE_REQUIRED = "scn_wl_type_required_";
     String DEFAULT_WL_TYPE = "scn_default_wl_type_";
+    String WL_COMMENT_REQUIRED = "scn_wl_comment_required_";
 
     boolean isWLAutoCopyEnabled(Long projectId) throws PropertyException;
 
@@ -40,6 +41,10 @@ public interface IScnProjectSettingsManager {
     WorklogType getDefaultWorklogType(@Nonnull Long projectId) throws PropertyException;
 
     void setDefaultWorklogType(@Nonnull Long projectId, String worklogTypeId) throws PropertyException;
+
+    boolean isWLCommentRequired(@Nonnull Long projectId) throws PropertyException;
+
+    void setWlCommentRequired(@Nonnull Long projectId, boolean value) throws PropertyException;
 
     Date getWLBlockingDate(Long projectId) throws PropertyException;
 

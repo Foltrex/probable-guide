@@ -14,6 +14,7 @@ import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
 import com.scn.jira.worklog.core.scnwl.IScnWorklog;
 import com.scn.jira.worklog.core.scnwl.IScnWorklogManager;
+import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 @Named
 @Path("/updateScnWorklog")
@@ -38,6 +40,7 @@ public class LTUpdateScnWorklogResource extends BaseResource {
     private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
     private final IScnWorklogService scnWorklogService;
     private final PermissionManager permissionManager;
+    private final IScnProjectSettingsManager projectSettignsManager;
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -91,6 +94,12 @@ public class LTUpdateScnWorklogResource extends BaseResource {
             return Response.serverError()
                 .entity(new ErrorEntity(
                     ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                .status(Response.Status.FORBIDDEN)
+                .build();
+        } else if (projectSettignsManager.isWLCommentRequired(projectId) && StringUtils.isBlank(comment)) {
+            return Response.serverError()
+                .entity(new ErrorEntity(
+                    ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Comment has to be set"))
                 .status(Response.Status.FORBIDDEN)
                 .build();
         } else if (isBlocked || !permissionManager.hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user)

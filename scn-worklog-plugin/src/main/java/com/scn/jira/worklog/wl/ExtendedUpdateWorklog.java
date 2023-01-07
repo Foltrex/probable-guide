@@ -138,10 +138,17 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
             }
         }
 
-        if (psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId()) && StringUtils.isBlank(getWorklogType()))
+        if (isWlTypeRequired() && StringUtils.isBlank(getWorklogType())) {
             getJiraServiceContext()
                 .getErrorCollection().addError("worklogType",
                     getJiraServiceContext().getI18nBean().getText("logwork.worklogtype.error.null"));
+        }
+
+        if (isWlCommentRequired() && StringUtils.isBlank(getComment())) {
+            getJiraServiceContext()
+                .getErrorCollection().addError("comment",
+                    getJiraServiceContext().getI18nBean().getText("logwork.comment.error.null"));
+        }
 
         if (extWorklogService.isDateExpired(getJiraServiceContext(), getParsedStartDate(), getIssueObject().getProjectObject(),
             false)) return;
@@ -272,7 +279,11 @@ public class ExtendedUpdateWorklog extends UpdateWorklog {
     }
 
     public boolean isWlTypeRequired() {
-        return psManager.isWLTypeRequired(getIssueObject().getProjectObject().getId());
+        return psManager.isWLTypeRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
+    }
+
+    public boolean isWlCommentRequired() {
+        return psManager.isWLCommentRequired(Objects.requireNonNull(getIssueObject().getProjectObject()).getId());
     }
 
     public String getInputReporter() {

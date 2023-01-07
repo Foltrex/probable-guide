@@ -151,6 +151,27 @@ public class ScnProjectSettingsService implements IScnProjectSettingsService {
         }
     }
 
+    public boolean isWLCommentRequired(JiraServiceContext srvContext, Long projectId) {
+        if (isNotValid(srvContext, projectId)) return false;
+
+        try {
+            return psManager.isWLCommentRequired(projectId);
+        } catch (Exception e) {
+            addErrorMessage(srvContext, "scn.transaction.failure");
+            return false;
+        }
+    }
+
+    public void setWLCommentRequired(JiraServiceContext srvContext, Long projectId, boolean value) {
+        if (isNotValid(srvContext, projectId)) return;
+
+        try {
+            psManager.setWlCommentRequired(projectId, value);
+        } catch (Exception e) {
+            addErrorMessage(srvContext, "scn.transaction.failure");
+        }
+    }
+
     public Date getWLBlockingDate(JiraServiceContext srvContext, Long projectId) {
         if (isNotValid(srvContext, projectId)) return null;
 

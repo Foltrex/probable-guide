@@ -95,6 +95,10 @@
         </table>
         #controlFooter ($action "" false)
 
+        #controlHeader($action "wlCommentRequired" $i18n.getText("scn.project_settings.wl_comment_required.label") true false)
+            <input type="checkbox" value="true" name="wlCommentRequired" id="wlCommentRequired" #if($wlCommentRequired) checked #end >
+        #controlFooter ($action "" false)
+
         #controlHeader($action "wlTypeRequired" $i18n.getText("scn.project_settings.wl_type_required.label") true false)
 	       	<input type="checkbox" value="true" name="inputWLTypeRequired" id="inputWLTypeRequired" #if($inputWLTypeRequired == "true") checked #end disabled="disabled" >
 	    #controlFooter ($action "" false)

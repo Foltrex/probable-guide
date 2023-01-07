@@ -9,6 +9,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.scn.jira.logtime.store.IScnWorklogLogtimeStore;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
+import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 @Named
 @Path("/updateScnWorklogs")
@@ -33,6 +35,7 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
     private final IssueManager issueManager;
     private final IScnWorklogLogtimeStore iScnWorklogLogtimeStore;
     private final IScnWorklogService scnWorklogService;
+    private final IScnProjectSettingsManager projectSettignsManager;
 
     @GET
     @Produces({"application/json", "application/xml"})
@@ -76,6 +79,12 @@ public class LTUpdateScnWorklogsResource extends BaseResource {
                 return Response.serverError()
                     .entity(new ErrorEntity(
                         ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Type has to be set"))
+                    .status(Response.Status.FORBIDDEN)
+                    .build();
+            } else if (projectSettignsManager.isWLCommentRequired(projectId) && StringUtils.isBlank(comment)) {
+                return Response.serverError()
+                    .entity(new ErrorEntity(
+                        ErrorEntity.ErrorReason.ILLEGAL_ARGUMENT, "Comment has to be set"))
                     .status(Response.Status.FORBIDDEN)
                     .build();
             }

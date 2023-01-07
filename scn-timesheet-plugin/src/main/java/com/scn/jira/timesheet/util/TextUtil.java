@@ -23,6 +23,7 @@ import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.customfields.statistics.CustomFieldStattable;
 import com.atlassian.jira.issue.fields.AffectedVersionsSystemField;
+import com.atlassian.jira.issue.fields.AssigneeSystemField;
 import com.atlassian.jira.issue.fields.ComponentsSystemField;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.Field;
@@ -138,7 +139,11 @@ public class TextUtil {
 			fieldValue = getMultiValue(issue.getFixVersions());
 		} else if (groupByField instanceof IssueTypeSystemField) {
 			fieldValue = issue.getIssueType().getNameTranslation();
-		} else {
+        } else if (groupByField instanceof AssigneeSystemField) {
+            fieldValue = issue.getAssignee() != null
+                ? issue.getAssignee().getDisplayName()
+                : issue.getString(groupByFieldID);
+        } else {
 			try {
 				fieldValue = issue.getString(groupByFieldID);
 			} catch (RuntimeException e) {

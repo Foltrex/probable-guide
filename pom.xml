@@ -123,12 +123,12 @@
 	</dependencyManagement>
 
 	<properties>
-		<revision>4.2.1-RC7</revision>
+		<revision>4.2.1-RC8</revision>
 		<jira.version>8.14.1</jira.version>
 		<amps.version>8.1.2</amps.version>
 		<jira.servicedesk.application.version>4.14.1</jira.servicedesk.application.version>
 		<atlassian-rest-common>5.0.1</atlassian-rest-common>
-		<plugin.testrunner.version>2.0.1</plugin.testrunner.version>
+		<plugin.testrunner.version>2.0.2</plugin.testrunner.version>
 		<osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
 		<spring.version>5.1.18.RELEASE</spring.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
@@ -145,7 +145,6 @@
 		<jtds.version>1.3.1</jtds.version>
 		<lombok.version>1.18.12</lombok.version>
 		<junit>4.11</junit>
-		<skipCopyJarPlugins>true</skipCopyJarPlugins>
 		<!-- Maven project settings -->
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
@@ -167,37 +166,12 @@
 		<module>scn-clone-project-plugin</module>
 		<module>scn-automation-plugin</module>
 		<module>scn-integration-plugin</module>
+		<module>confluence</module>
 	</modules>
 
 	<build>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>${maven-resources-plugin.version}</version>
-					<executions>
-						<execution>
-							<id>copy-jar-plugins</id>
-							<phase>package</phase>
-							<goals>
-								<goal>copy-resources</goal>
-							</goals>
-							<configuration>
-								<outputDirectory>${basedir}/../plugins/${revision}</outputDirectory>
-								<resources>
-									<resource>
-										<directory>target</directory>
-										<includes>
-											<include>${project.artifactId}-${project.version}.jar</include>
-										</includes>
-									</resource>
-								</resources>
-								<skip>${skipCopyJarPlugins}</skip>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
@@ -225,7 +199,6 @@
 			<properties>
 				<atlassian.dev.mode>true</atlassian.dev.mode>
 				<compressResources>true</compressResources>
-				<skipCopyJarPlugins>false</skipCopyJarPlugins>
 			</properties>
 		</profile>
 	</profiles>

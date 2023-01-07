@@ -16,10 +16,6 @@
 	<packaging>pom</packaging>
 	<version>${revision}</version>
 
-	<properties>
-		<skipCopyJarPlugins>true</skipCopyJarPlugins>
-	</properties>
-
 	<build>
 		<plugins>
 			<plugin>

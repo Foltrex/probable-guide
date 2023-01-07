@@ -13,6 +13,7 @@ scn-automation-plugin/target/
 scn-front/target/
 scn-integration-plugin/target/
 common/target/
+confluence/scn-smart-permissions-manager-plugin/target/
 node_modules/
 scn-front/node/
 compiled-front/
