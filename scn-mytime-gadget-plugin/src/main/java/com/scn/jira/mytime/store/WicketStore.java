@@ -1,13 +1,18 @@
 package com.scn.jira.mytime.store;
 
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.jira.user.util.UserManager;
 import com.scn.jira.mytime.util.DateUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.InitializingBean;
 
 import javax.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
@@ -15,23 +20,50 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 @Named
 @Log4j
-@RequiredArgsConstructor
-public class WicketStore {
-    private static final String driverName = "net.sourceforge.jtds.jdbc.Driver";
-    private static final String connection = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
-    private static final String loginTatsi = "sps-training-admin";
-    private static final String password = "06#$XPvf";
+public class WicketStore implements InitializingBean {
+    private final String driverName;
+    private final String connection;
+    private final String login;
+    private final String password;
     private final UserManager userManager;
+
+    public WicketStore(UserManager userManager, JiraHome jiraHome) {
+        this.userManager = userManager;
+        Properties props = new Properties();
+        try (InputStream inputStream = new FileInputStream(new File(jiraHome.getHome(), "scn-bi.properties"))) {
+            props.load(inputStream);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Cannot load scn-bi.properties");
+        }
+        driverName = props.getProperty("driver-name");
+        connection = props.getProperty("connection");
+        login = props.getProperty("login");
+        password = props.getProperty("password");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Class.forName(driverName);
+        try (Connection con = DriverManager.getConnection(connection, login, password);
+             PreparedStatement ps = con.prepareStatement("select 1")) {
+            ps.execute();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Cannot connect to the SCN BI database");
+        }
+    }
 
     public Map<String, Long> gerUserWicketTimeForthePeriod(String userKey, Date startDate, Date endDate) {
         Map<String, Long> timesMap = new HashMap<>();
 
         try {
             Class.forName(driverName);
-            Connection con = DriverManager.getConnection((connection), loginTatsi, password);
+            Connection con = DriverManager.getConnection((connection), login, password);
             Statement s = con.createStatement();
 
             List<String> dates = DateUtils.getDatesList(startDate, endDate, DateUtils.formatStringDateDb);

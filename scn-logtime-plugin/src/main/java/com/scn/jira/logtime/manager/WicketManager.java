@@ -1,13 +1,17 @@
 package com.scn.jira.logtime.manager;
 
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.jira.user.util.UserManager;
 import com.scn.jira.logtime.representation.WicketRepresentation;
 import com.scn.jira.logtime.util.DateUtils;
 import com.scn.jira.logtime.util.TextFormatUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.InitializingBean;
 
 import javax.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,17 +23,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 @Named
 @Log4j
-@RequiredArgsConstructor
-public class WicketManager {
-    private final static String driverName1 = "net.sourceforge.jtds.jdbc.Driver";
-    private final static String connection1 = "jdbc:jtds:sqlserver://SRV-BI:1433;DatabaseName=Jira_DWH;domain=MAIN";
-    private final static String loginTatsi1 = "sps-training-admin";
-    private final static String password1 = "06#$XPvf";
+public class WicketManager implements InitializingBean {
+    private final String driverName;
+    private final String connection;
+    private final String login;
+    private final String password;
 
     private final UserManager userManager;
+
+    public WicketManager(UserManager userManager, JiraHome jiraHome) {
+        this.userManager = userManager;
+        Properties props = new Properties();
+        try (InputStream inputStream = new FileInputStream(new File(jiraHome.getHome(), "scn-bi.properties"))) {
+            props.load(inputStream);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Cannot load scn-bi.properties");
+        }
+        driverName = props.getProperty("driver-name");
+        connection = props.getProperty("connection");
+        login = props.getProperty("login");
+        password = props.getProperty("password");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Class.forName(driverName);
+        try (Connection con = DriverManager.getConnection(connection, login, password);
+             PreparedStatement ps = con.prepareStatement("select 1")) {
+            ps.execute();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Cannot connect to the SCN BI database");
+        }
+    }
 
     public WicketRepresentation gerUserWicketTimeForthePeriod(String login, Date startDate, Date endDate) {
         ArrayList<String> times = new ArrayList<>();
@@ -39,8 +70,8 @@ public class WicketManager {
         WicketRepresentation wicketRepresentation;
 
         try {
-            Class.forName(driverName1);
-            Connection con = DriverManager.getConnection(connection1, loginTatsi1, password1);
+            Class.forName(driverName);
+            Connection con = DriverManager.getConnection(connection, this.login, password);
             Statement s = con.createStatement();
 
             List<String> dates = DateUtils.getDatesList(startDate, endDate, DateUtils.formatStringDateDb);
@@ -100,8 +131,8 @@ public class WicketManager {
     public boolean gerUserWicketPermission(String login) {
         boolean result = false;
         try {
-            Class.forName(driverName1);
-            Connection con = DriverManager.getConnection(connection1, loginTatsi1, password1);
+            Class.forName(driverName);
+            Connection con = DriverManager.getConnection(connection, this.login, password);
             Statement s = con.createStatement();
 
             String sql = "SELECT TOP 1000 [login] FROM [Jira_DWH].[dbo].[wicket_managers]" + " where login ='" + login + "'";
@@ -139,8 +170,8 @@ public class WicketManager {
         String endDay = DateUtils.stringDate(endDate, DateUtils.formatStringDay);
 
         try {
-            Class.forName(driverName1);
-            Connection con = DriverManager.getConnection(connection1, loginTatsi1, password1);
+            Class.forName(driverName);
+            Connection con = DriverManager.getConnection(connection, this.login, password);
             try {
                 PreparedStatement pstmt = con.prepareStatement("{call dbo.GetCalendar(?,?,?)}");
                 pstmt.setString(1, login);

@@ -3,6 +3,7 @@ package com.scn.jira.automation.config;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
@@ -77,6 +78,11 @@ public class AutomationPluginBeanConfig {
     @Bean
     public JiraDurationUtils jiraDurationUtils() {
         return ComponentAccessor.getComponent(JiraDurationUtils.class);
+    }
+
+    @Bean
+    public JiraHome jiraHome() {
+        return importOsgiService(JiraHome.class);
     }
 
     @Bean
