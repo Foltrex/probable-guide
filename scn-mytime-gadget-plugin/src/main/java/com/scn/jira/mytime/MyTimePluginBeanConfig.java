@@ -1,5 +1,6 @@
 package com.scn.jira.mytime;
 
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -35,6 +36,11 @@ public class MyTimePluginBeanConfig {
     @Bean
     public JiraAuthenticationContext jiraAuthenticationContext() {
         return importOsgiService(JiraAuthenticationContext.class);
+    }
+
+    @Bean
+    public JiraHome jiraHome() {
+        return importOsgiService(JiraHome.class);
     }
 
     @Bean

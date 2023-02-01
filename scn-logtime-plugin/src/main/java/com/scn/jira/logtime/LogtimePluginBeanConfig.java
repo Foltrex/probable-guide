@@ -2,6 +2,7 @@ package com.scn.jira.logtime;
 
 import com.atlassian.jira.bc.issue.worklog.WorklogService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.config.util.JiraHome;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.project.ProjectManager;
@@ -70,6 +71,11 @@ public class LogtimePluginBeanConfig {
     @Bean
     public JiraAuthenticationContext jiraAuthenticationContext() {
         return importOsgiService(JiraAuthenticationContext.class);
+    }
+
+    @Bean
+    public JiraHome jiraHome() {
+        return importOsgiService(JiraHome.class);
     }
 
     @Bean
