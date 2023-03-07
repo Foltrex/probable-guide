@@ -15,6 +15,7 @@ import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.datetime.DateTimeFormatterFactory;
 import com.atlassian.jira.event.issue.IssueEventBundleFactory;
+import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.customfields.manager.GenericConfigManager;
@@ -108,6 +109,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public CustomFieldInputHelper customFieldInputHelper() {
         return importOsgiService(CustomFieldInputHelper.class);
+    }
+
+    @Bean
+    public CustomFieldManager customFieldManager() {
+        return importOsgiService(CustomFieldManager.class);
     }
 
     @Bean

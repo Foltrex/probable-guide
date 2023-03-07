@@ -1,0 +1,45 @@
+#disable_html_escaping()
+<tr>
+    <td class="fieldLabelArea">
+        $i18n.getText("scn.postfunction.create-scn-worklog-function.input.field"):
+    </td>
+    <td nowrap>
+        <select name="fieldId" id="updateFieldId">
+            #foreach ($field in ${fields})
+                <option value="$field.id"
+                    #if ($field.id.equals($fieldId))
+                        SELECTED
+                    #end
+                >${descriptor.getText($field.nameKey)}</option>
+            #end
+        </select>
+        <br/><span class="subText">$i18n.getText("scn.postfunction.create-scn-worklog-function.input.field")</span>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea">
+        $i18n.getText("scn.postfunction.create-scn-worklog-function.input.worklogtype"):
+    </td>
+    <td nowrap>
+        <select name="worklogTypeId" id="updateWorklogTypeId">
+            #foreach ($worklogType in ${worklogTypes})
+                <option value="$worklogType.id"
+                    #if ($worklogType.id.equals($worklogTypeId))
+                        SELECTED
+                    #end
+                >${worklogType.name}</option>
+            #end
+        </select>
+        <br/><span class="subText">$i18n.getText("scn.postfunction.create-scn-worklog-function.input.worklogtype")</span>
+    </td>
+</tr>
+
+<tr>
+    <td colspan="2">
+        <div style="width: 60%;" class="aui-message aui-message-info">
+            $i18n.getText("scn.postfunction.create-scn-worklog-function.input.info.message")
+        </div>
+    </td>
+</tr>
+

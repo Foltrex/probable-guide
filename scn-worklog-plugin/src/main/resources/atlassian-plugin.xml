@@ -536,6 +536,22 @@
 		<resource type="velocity" name="view"
 				  location="templates/scn/postfunctions/postfunction.vm"/>
 	</workflow-function>
+	<workflow-function
+		key="create-scn-worklog-function"
+		name="Create Scn Worklog Function"
+		class="com.scn.jira.worklog.workflow.CreateScnWorklogFunctionPluginFactory">
+		<description>The post function creates scn worklog for reporter copying Number Field value.</description>
+		<function-class>com.scn.jira.worklog.workflow.CreateScnWorklogFunction</function-class>
+		<orderable>true</orderable>
+		<unique>false</unique>
+		<deletable>true</deletable>
+		<resource type="velocity" name="view"
+			location="templates/scn/postfunctions/create-scn-worklog-function-view.vm"/>
+		<resource type="velocity" name="input-parameters"
+			location="templates/scn/postfunctions/create-scn-worklog-function-input-params.vm"/>
+		<resource type="velocity" name="edit-parameters"
+			location="templates/scn/postfunctions/create-scn-worklog-function-input-params.vm"/>
+	</workflow-function>
 	<!-- Subtask panel -->
 	<web-panel key="view-subtasks"
 			   location="atl.jira.view.issue.left.context" weight="700">
