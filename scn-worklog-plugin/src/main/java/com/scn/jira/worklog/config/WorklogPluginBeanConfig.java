@@ -46,6 +46,7 @@ import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.security.xsrf.XsrfTokenGenerator;
 import com.atlassian.jira.template.VelocityTemplatingEngine;
 import com.atlassian.jira.user.UserProjectHistoryManager;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.JiraDurationUtils;
@@ -324,6 +325,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public UserUtil userUtil() {
         return importOsgiService(UserUtil.class);
+    }
+
+    @Bean
+    public UserManager userManager() {
+        return importOsgiService(UserManager.class);
     }
 
     @Bean
