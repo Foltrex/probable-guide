@@ -1,0 +1,2 @@
+#disable_html_escaping()
+$i18n.getText("scn.postfunction.create-scn-worklog-function.view", "<b>${descriptor.getText($fieldId)}</b>" )
