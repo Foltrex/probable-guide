@@ -41,5 +41,5 @@ public interface ScnWorklog extends Updatable {
     String getComment();
 
     @NotNull
-    Issue getIssue();
+    Long getIssueId();
 }
