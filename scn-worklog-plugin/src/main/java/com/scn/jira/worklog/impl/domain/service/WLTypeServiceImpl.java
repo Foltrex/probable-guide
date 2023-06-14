@@ -24,8 +24,8 @@ public class WLTypeServiceImpl implements WLTypeService {
     private final WLTypeMapper wlTypeMapper = new WLTypeMapper();
 
     @Override
-    public List<WLTypeDto> getAll() {
-        return wlTypeRepository.findAll()
+    public List<WLTypeDto> getAll(String column, String order) {
+        return wlTypeRepository.findAllSortedByColumnInOrder(column, order)
             .stream()
             .map(wlTypeMapper::mapToWLTypeDto)
             .collect(Collectors.toList());

@@ -21,8 +21,11 @@ public class WLTypeResource {
     private final WLTypeService wlTypeService;
 
     @GET
-    public Response getAll() {
-        return Response.ok(wlTypeService.getAll()).build();
+    public Response getAll(
+        @QueryParam("sort_by") @DefaultValue("sequence") String column,
+        @QueryParam("order_by") @DefaultValue("asc") String order
+    ) {
+        return Response.ok(wlTypeService.getAll(column, order)).build();
     }
 
     @GET

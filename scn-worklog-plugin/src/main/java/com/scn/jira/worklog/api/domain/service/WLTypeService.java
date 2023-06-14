@@ -12,7 +12,7 @@ import java.util.List;
 @PublicApi
 @Validated
 public interface WLTypeService {
-    List<WLTypeDto> getAll();
+    List<WLTypeDto> getAll(String column, String order);
 
     WLTypeDto get(Long id);
 
