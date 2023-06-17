@@ -10,7 +10,6 @@ public class WLTypeMapper {
 
     public WLType mapToWLType(WLTypeDto wlTypeDto, @Nonnull WLType wlType) {
         wlType.setName(wlTypeDto.getName());
-        wlType.setSequence(wlTypeDto.getSequence());
         wlType.setDescription(wlTypeDto.getDescription());
         wlType.setIconUri(wlTypeDto.getIconUri());
         wlType.setStatusColor(wlType.getStatusColor());
@@ -21,7 +20,6 @@ public class WLTypeMapper {
         return WLTypeDto.builder()
             .id(wlType.getId())
             .name(wlType.getName())
-            .sequence(wlType.getSequence())
             .description(wlType.getDescription())
             .iconUri(wlType.getIconUri())
             .statusColor(wlType.getStatusColor())
@@ -36,7 +34,6 @@ public class WLTypeMapper {
         return new DBParam[] {
             new DBParam("ID", wlTypeDto.getId()),
             new DBParam("NAME", wlTypeDto.getName()),
-            new DBParam("SEQUENCE", wlTypeDto.getSequence()),
             new DBParam("DESCRIPTION", wlTypeDto.getDescription()),
             new DBParam("ICON_URI", wlTypeDto.getIconUri()),
             new DBParam("STATUS_COLOR", wlTypeDto.getStatusColor())

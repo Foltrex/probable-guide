@@ -1,10 +1,7 @@
 package com.scn.jira.worklog.impl.domain.entity;
 
 import com.scn.jira.common.ao.WithId;
-import net.java.ao.schema.NotNull;
-import net.java.ao.schema.PrimaryKey;
-import net.java.ao.schema.StringLength;
-import net.java.ao.schema.Unique;
+import net.java.ao.schema.*;
 
 public interface WLType extends WithId {
 

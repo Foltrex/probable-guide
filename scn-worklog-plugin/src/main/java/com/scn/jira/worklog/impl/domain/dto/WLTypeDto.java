@@ -13,7 +13,6 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 public class WLTypeDto {
     private Long id;
     private String name;
-    private int sequence;
     private String description;
     private String iconUri;
     private String statusColor;

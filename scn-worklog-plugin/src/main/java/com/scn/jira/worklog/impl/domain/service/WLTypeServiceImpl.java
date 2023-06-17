@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,8 +41,11 @@ public class WLTypeServiceImpl implements WLTypeService {
 
     @Override
     public WLTypeDto create(WLTypeDto wlTypeDto) {
+        Random random = new Random();
+
         DBParam[] wlTypeDBParams = wlTypeMapper.mapToDBParam(wlTypeDto);
         WLType createdWlType = wlTypeRepository.create(wlTypeDBParams);
+        createdWlType.setSequence(random.nextInt());
         WLType persistedWLType = wlTypeRepository.save(createdWlType);
         return wlTypeMapper.mapToWLTypeDto(persistedWLType);
     }
