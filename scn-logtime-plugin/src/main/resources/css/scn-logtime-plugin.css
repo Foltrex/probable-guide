@@ -192,11 +192,6 @@ button.addWorklog {
     height: 25px;
 }
 
-#myFieldId_container.ajax_autocomplete.atlassian-autocomplete {
-    font-size: 12px;
-
-}
-
 table.table-filter {
     width: 1000px;
 }
