@@ -52,7 +52,7 @@
         <tbody>
             <tr>
                 <td nowrap style="padding-left:10px;">
-                    <div id="projects_picker_gadget_container"/>
+                    <div id="projects_picker_gadget_container" style="width: 300px"/>
                 </td>
                 <td id="wlsc" class="filterCheck" nowrap style="padding-left:10px">
                     <div style="width: 100%; display: flex;">
@@ -72,7 +72,7 @@
                 </td>
 
                 <td class="filterUser" nowrap>
-                    <div id="users_picker_gadget_container"/>
+                    <div id="users_picker_gadget_container" style="width: 300px"/>
                 </td>
             </tr>
             <tr>
@@ -274,7 +274,7 @@
                             ajaxOptions: function() {
                             	var gadget = this;
                             	if (needUpdateProps) {
-                            		$projectsPicker.val(gadget.getPref('projectlist')).trigger('change');
+                            		$projectsPicker.val(gadget.getPref('projectlist') == '0' ? null : gadget.getPref('projectlist')).trigger('change');
                             		$usersPicker.val(gadget.getPref('userslist')).trigger('change');
 									document.getElementById('ScnWl').checked = (gadget.getPref('wlScnCheck') == 'true');
 									document.getElementById('ExtWl').checked = (gadget.getPref('wlExtCheck') == 'true');
@@ -356,7 +356,8 @@
 					parentDiv.append(AJS.$("<input/>").attr({
 						id: projectUserPref,
 						name: projectUserPref,
-						value: projectUserPrefValue
+						value: (projectUserPrefValue == '0' ? null : projectUserPrefValue),
+						style: "width: 100%"
 					}).addClass('textfield text'));
 					AJS.$.ajax({
 					  url: "/rest/logtime-gadget/1.0/projectsuser.json",
@@ -387,8 +388,9 @@
 							id: userPref,
 							name: userPref,
 							type: "text",
-							value: userPrefValue
-						}).addClass('textfield text long-text'));
+							value: userPrefValue,
+							style: "width: 100%"
+						}).addClass('textfield text'));
 
 						AJS.$("#"+userPref).auiSelect2({
 							placeholder: 'Select users',
