@@ -21,4 +21,6 @@ public interface WLTypeService {
     WLTypeDto update(Long id, @Valid WLTypeDto wlTypeDto);
 
     void deleteById(Long id);
+
+    void deleteAll();
 }

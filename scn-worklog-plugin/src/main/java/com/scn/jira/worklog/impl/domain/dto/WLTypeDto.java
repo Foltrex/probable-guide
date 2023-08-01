@@ -9,6 +9,7 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 @Setter
 @Builder
 @ToString
+@EqualsAndHashCode
 @JsonAutoDetect
 public class WLTypeDto {
     private Long id;

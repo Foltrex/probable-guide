@@ -45,6 +45,11 @@ public class WLTypeResource {
         return Response.ok(wlTypeService.update(id, wlTypeDto)).build();
     }
 
+    @DELETE
+    public Response deleteAll() {
+        wlTypeService.deleteAll();
+        return Response.noContent().build();
+    }
 
     @DELETE
     @Path("/{id}")

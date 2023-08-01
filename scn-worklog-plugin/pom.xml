@@ -18,6 +18,11 @@
 	<packaging>atlassian-plugin</packaging>
 	<version>${revision}</version>
 
+	<properties>
+		<jersey.version>2.26</jersey.version>
+		<baseurl>http://localhost:2990/jira</baseurl>
+	</properties>
+
 	<dependencies>
 <!--		<dependency>-->
 <!--			<groupId>com.atlassian.jira.plugins</groupId>-->
@@ -84,6 +89,46 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins.rest</groupId>
+			<artifactId>atlassian-rest-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wink</groupId>
+			<artifactId>wink-client</artifactId>
+			<version>1.1.3-incubating</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+<!--			<version>4.13.2</version>-->
+<!--			<scope>test</scope>-->
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins</groupId>
+			<artifactId>atlassian-plugins-osgi-testrunner</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -94,12 +139,24 @@
 				<version>${amps.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+
 					<applications>
 						<application>
 							<applicationKey>jira-software</applicationKey>
 							<version>${jira.version}</version>
 						</application>
 					</applications>
+<!--					<testGroups>-->
+<!--						<testGroup>-->
+<!--							<id>jira-integration</id>-->
+<!--							<productIds>-->
+<!--								<productId>jira</productId>-->
+<!--							</productIds>-->
+<!--							<includes>-->
+<!--								<include>it/**/*Test.java</include>-->
+<!--							</includes>-->
+<!--						</testGroup>-->
+<!--					</testGroups>-->
 					<productVersion>${jira.version}</productVersion>
 					<productDataVersion>${jira.version}</productDataVersion>
 					<compressResources>${compressResources}</compressResources>
@@ -114,6 +171,9 @@
 						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
 						<atlassian.dev.mode>${atlassian.dev.mode}</atlassian.dev.mode>
 					</systemProperties>
+					<systemPropertyVariables>
+						<baseurl>${baseurl}</baseurl>
+					</systemPropertyVariables>
 					<instructions>
 						<Atlassian-Plugin-Key>${project.groupId}.${project.artifactId}</Atlassian-Plugin-Key>
 						<Spring-Context>*</Spring-Context>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}"
+				  name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<description>My Plugin Test Description</description>
+		<version>1.0.0</version>
+		<vendor name="${project.organization.name}"
+				url="${project.organization.url}"/>
+	</plugin-info>
+
+<!--	<test-data key="my-test-data">-->
+<!--		<entity-engine-xml file-name="testdata.xml"/>-->
+<!--	</test-data>-->
+
+<!--	<test-utils>-->
+<!--		<test-util key="my-test-utils" class="com.example.MyTestUtils"/>-->
+<!--	</test-utils>-->
+
+	<atlassian-plugin>
+		<base-url>http://localhost:2990/jira</base-url>
+	</atlassian-plugin>
+</atlassian-plugin>

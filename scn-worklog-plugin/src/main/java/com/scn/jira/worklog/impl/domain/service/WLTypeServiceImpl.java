@@ -63,4 +63,9 @@ public class WLTypeServiceImpl implements WLTypeService {
     public void deleteById(Long id) {
         wlTypeRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        wlTypeRepository.deleteAll();
+    }
 }
