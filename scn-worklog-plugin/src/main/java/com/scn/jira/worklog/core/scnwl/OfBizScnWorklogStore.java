@@ -1,8 +1,13 @@
 package com.scn.jira.worklog.core.scnwl;
 
 import com.atlassian.core.ofbiz.util.CoreTransactionUtil;
+import com.atlassian.crowd.embedded.api.Directory;
+import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.crowd.exception.DirectoryNotFoundException;
+import com.atlassian.crowd.manager.directory.DirectoryManager;
 import com.atlassian.instrumentation.utils.dbc.Assertions;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.DataAccessException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
@@ -11,7 +16,12 @@ import com.atlassian.jira.issue.worklog.WorklogImpl;
 import com.atlassian.jira.issue.worklog.WorklogManager;
 import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.timezone.TimeZoneManager;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.UserPropertyManager;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.collect.MapBuilder;
 import com.google.common.collect.Lists;
 import com.scn.jira.worklog.core.settings.IScnProjectSettingsManager;
@@ -27,14 +37,13 @@ import org.ofbiz.core.entity.GenericValue;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 import static org.ofbiz.core.entity.EntityOperator.EQUALS;
 import static org.ofbiz.core.entity.EntityOperator.GREATER_THAN_EQUAL_TO;
@@ -48,19 +57,24 @@ public class OfBizScnWorklogStore implements IScnWorklogStore {
     private final WorklogManager worklogManager;
     private final ExtendedWorklogManagerImpl extWorklogManager;
     private final IScnProjectSettingsManager scnProjectSettingsManager;
+    private final JiraAuthenticationContext authenticationContext;
+
+    private final ZoneId minskZoneId = ZoneId.of("Europe/Minsk");
 
     @Inject
     public OfBizScnWorklogStore(OfBizDelegator ofBizDelegator,
                                 IssueManager issueManager,
                                 ProjectRoleManager projectRoleManager,
                                 ExtendedWorklogManagerImpl extendedWorklogManager,
-                                IScnProjectSettingsManager scnProjectSettingsManager) {
+                                IScnProjectSettingsManager scnProjectSettingsManager,
+                                JiraAuthenticationContext authenticationContext) {
         this.ofBizDelegator = ofBizDelegator;
         this.issueManager = issueManager;
         this.projectRoleManager = projectRoleManager;
         this.worklogManager = ComponentAccessor.getComponent(WorklogManager.class);
         this.extWorklogManager = extendedWorklogManager;
         this.scnProjectSettingsManager = scnProjectSettingsManager;
+        this.authenticationContext = authenticationContext;
     }
 
     protected IScnWorklog update(IScnWorklog worklog) throws DataAccessException {
@@ -266,11 +280,24 @@ public class OfBizScnWorklogStore implements IScnWorklogStore {
         fields.put("grouplevel", worklog.getGroupLevel());
         fields.put("rolelevel", worklog.getRoleLevelId());
         fields.put("timeworked", worklog.getTimeSpent());
-        fields.put("startdate", new Timestamp(worklog.getStartDate().getTime()));
+
+        Timestamp startDate = getCorrectedStarDateWithTimezone(worklog);
+        fields.put("startdate", startDate);
         fields.put("created", new Timestamp(worklog.getCreated().getTime()));
         fields.put("updated", new Timestamp(worklog.getUpdated().getTime()));
         return fields;
     }
+
+    private Timestamp getCorrectedStarDateWithTimezone(Worklog worklog) {
+        Instant instant = worklog.getStartDate().toInstant();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, minskZoneId);
+        ZonedDateTime minskDateTime = localDateTime
+            .atZone(minskZoneId)
+            .withHour(12)
+            .withMinute(0);
+        return Timestamp.valueOf(minskDateTime.toLocalDateTime());
+    }
+
 
     public IScnWorklog getById(Long id) throws DataAccessException {
         GenericValue worklogGV = ofBizDelegator.findByPrimaryKey(SCN_WORKLOG_ENTITY, MapBuilder.build("id", id));
