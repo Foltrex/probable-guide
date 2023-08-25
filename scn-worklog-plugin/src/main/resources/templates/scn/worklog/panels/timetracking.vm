@@ -48,35 +48,63 @@
     #end
 
     #if ($aggregateTimeTrackingGraphBean || $aggregateTimeTrackingGraphBeanWithTasks || $aggregateTimeTrackingGraphBeanWithSubtasks || $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
-        <div id="$!{scn}tt_info_single">
+        <div id="$!{scn}tt_info_single" class="$!{scn}graph">
             #renderInfo ('tt_single' $timeTrackingGraphBean)
         </div>
-    	<div id="$!{scn}tt_info_aggregate" style="display:none;">
+    	<div id="$!{scn}tt_info_aggregate" style="display:none;" class="$!{scn}graph">
             #renderInfo ('tt_aggregate' $aggregateTimeTrackingGraphBean)
         </div>
-        <div id="$!{scn}tt_info_with_tasks" style="display:none;">
+        <div id="$!{scn}tt_info_with_tasks" style="display:none;" class="$!{scn}graph">
             #renderInfo ('tt_with_tasks' $aggregateTimeTrackingGraphBeanWithTasks)
         </div>
-        <div id="$!{scn}tt_info_with_subtasks" style="display:none;">
-            #renderInfo ('tt_with_tasks' $aggregateTimeTrackingGraphBeanWithSubtasks)
-        </div>
-        <div id="$!{scn}tt_info_with_tasks_and_subtasks" style="display:none;">
+        <div id="$!{scn}tt_info_with_tasks_and_subtasks" style="display:none;" class="$!{scn}graph">
             #renderInfo ('tt_with_tasks_and_subtasks' $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
         </div>
 
         #if ($isEpicIssue)
             <div id="$!{scn}tt_include_tasks" title="${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks.tooltip')}">
-                <input id="$!{scn}cb_include_tasks" type="checkbox"/><label for="$!{scn}cb_include_tasks" #if($scn)style="margin-left: 0.5em;"#end>${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks')}</label>
+                <input id="$!{scn}cb_include_tasks" type="checkbox"/><label for="$!{scn}cb_include_tasks" style="margin-left: 0.5em;">${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks')}</label>
             </div>
         #end
 
         <div id="$!{scn}tt_include_subtasks" title="${i18n.getText('timetracking.include.subtasks.tooltip')}">
             <input id="$!{scn}cb_include_subtasks" type="checkbox" /><label for="$!{scn}cb_include_subtasks" #if($scn)style="margin-left: 0.5em;"#end>${i18n.getText('timetracking.include.subtasks')}</label>
         </div>
-        #if($scn)
-            #if (!$isEpicIssue)
+
+        #if ($scn)
+            #if ($isEpicIssue)
                 <script language="JavaScript">
-	                jQuery(function () {
+                    jQuery(function () {
+                        jQuery("#scn_tt_include_tasks input").click(function(e){
+                            jQuery(".scn_graph").hide();
+                            if (jQuery(this).is(":checked") && jQuery("#scn_tt_include_subtasks input").is(":checked")){
+                                jQuery("#scn_tt_info_with_tasks_and_subtasks").show();
+                            } else if (jQuery(this).is(":checked") && !jQuery("#scn_tt_include_subtasks input").is(":checked")) {
+                                jQuery("#scn_tt_info_with_tasks").show();
+                            } else if (!jQuery(this).is(":checked") && jQuery("#scn_tt_include_subtasks input").is(":checked")) {
+                                jQuery("#scn_tt_info_aggregate").show();
+                            } else {
+                                jQuery("#scn_tt_info_single").show();
+                            }
+                        });
+
+                        jQuery("#scn_tt_include_subtasks input").click(function(e){
+                            jQuery(".scn_graph").hide();
+                            if (jQuery(this).is(":checked") && jQuery("#scn_tt_include_tasks input").is(":checked")){
+                                jQuery("#scn_tt_info_with_tasks_and_subtasks").show();
+                            } else if (jQuery(this).is(":checked") && !jQuery("#scn_tt_include_tasks input").is(":checked")) {
+                                jQuery("#scn_tt_info_aggregate").show();
+                            } else if (!jQuery(this).is(":checked") && jQuery("#scn_tt_include_tasks input").is(":checked")) {
+                                jQuery("#scn_tt_info_with_tasks").show();
+                            } else {
+                                jQuery("#scn_tt_info_single").show();
+                            }
+                        });
+                    });
+                </script>
+            #else
+                <script language="JavaScript">
+                    jQuery(function () {
                         jQuery("#scn_tt_include_subtasks input").click(function(e){
                             if (jQuery(this).is(":checked")){
                                 jQuery("#scn_tt_info_single").hide();
@@ -88,61 +116,55 @@
                         });
                     });
                 </script>
-            #else
+            #end
+        #else
+            #if ($isEpicIssue)
                 <script language="JavaScript">
-	                jQuery(function () {
-                        jQuery("#scn_tt_include_tasks input").click(function(e){
-                            if (jQuery(this).is(":checked") && jQuery("#scn_tt_include_subtasks input").is(":checked")){
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").show();
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
-                            } else if (jQuery(this).is(":checked") && !jQuery("#scn_tt_include_subtasks input").is(":checked")) {
-                                jQuery("#scn_tt_info_with_tasks").show();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
-                            } else if (!jQuery(this).is(":checked") && jQuery("#scn_tt_include_subtasks input").is(":checked")) {
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").show();
+                    jQuery(function() {
+                        jQuery("#tt_include_tasks input").click(function(e){
+                            jQuery(".graph").hide();
+                            if (jQuery(this).is(":checked") && jQuery("#tt_include_subtasks input").is(":checked")){
+                                jQuery("#tt_info_with_tasks_and_subtasks").show();
+                            } else if (jQuery(this).is(":checked") && !jQuery("#tt_include_subtasks input").is(":checked")) {
+                                jQuery("#tt_info_with_tasks").show();
+                            } else if (!jQuery(this).is(":checked") && jQuery("#tt_include_subtasks input").is(":checked")) {
+                                jQuery("#tt_info_aggregate").show();
                             } else {
-                                jQuery("#scn_tt_info_single").show();
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
+                                jQuery("#tt_info_single").show();
                             }
                         });
 
-                        jQuery("#scn_tt_include_subtasks input").click(function(e){
-                            if (jQuery(this).is(":checked") && jQuery("#scn_tt_include_tasks input").is(":checked")){
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").show();
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
-                            } else if (jQuery(this).is(":checked") && !jQuery("#scn_tt_include_tasks input").is(":checked")) {
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").show();
-                            } else if (!jQuery(this).is(":checked") && jQuery("#scn_tt_include_tasks input").is(":checked")) {
-                                jQuery("#scn_tt_info_with_tasks").show();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_single").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
+                        jQuery("#tt_include_subtasks input").click(function(e){
+                            jQuery(".graph").hide();
+
+                            if (jQuery(this).is(":checked") && jQuery("#tt_include_tasks input").is(":checked")){
+                                jQuery("#tt_info_with_tasks_and_subtasks").show();
+                            } else if (jQuery(this).is(":checked") && !jQuery("#tt_include_tasks input").is(":checked")) {
+                                jQuery("#tt_info_aggregate").show();
+                            } else if (!jQuery(this).is(":checked") && jQuery("#tt_include_tasks input").is(":checked")) {
+                                jQuery("#tt_info_with_tasks").show();
                             } else {
-                                jQuery("#scn_tt_info_single").show();
-                                jQuery("#scn_tt_info_with_tasks").hide();
-                                jQuery("#scn_tt_info_with_tasks_and_subtasks").hide();
-                                jQuery("#scn_tt_info_aggregate").hide();
+                                jQuery("#tt_info_single").show();
+                            }
+                        });
+                    });
+                </script>
+            #else
+                <script language="JavaScript">
+                    jQuery(function () {
+                        jQuery("#tt_include_subtasks input").click(function(e){
+                            if (jQuery(this).is(":checked")){
+                                jQuery("#tt_info_single").hide();
+                                jQuery("#tt_info_aggregate").show();
+                            } else {
+                                jQuery("#tt_info_aggregate").hide();
+                                jQuery("#tt_info_single").show();
                             }
                         });
                     });
                 </script>
             #end
         #end
-    #else
-        #renderInfo ('tt_single' $timeTrackingGraphBean)
     #end
 #end
+
