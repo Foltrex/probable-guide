@@ -23,12 +23,15 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.atlassian.jira.issue.util.AggregateTimeTrackingBean.addAndPreserveNull;
 
 @Named
 public class TimetrackingHelper {
+    private static final String HAS_DATA = "hasData";
+
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final JiraDurationUtils utils;
     private final IScnExtendedIssueStore issueStore;
@@ -47,7 +50,7 @@ public class TimetrackingHelper {
     }
 
 
-    public AggregateTimeTrackingBean getAggregateTimeTrackingBeanWithTasks(IScnExtendedIssue extIssue) {
+    private AggregateTimeTrackingBean getAggregateTimeTrackingBeanWithTasks(IScnExtendedIssue extIssue) {
         Assertions.notNull("extended issue", extIssue);
         Assertions.notNull("issue", extIssue.getIssue());
 
@@ -69,7 +72,7 @@ public class TimetrackingHelper {
         return bean;
     }
 
-    public AggregateTimeTrackingBean getAggregateTimeTrackingBeanWithTasksAndSubtask(IScnExtendedIssue extIssue) {
+    private AggregateTimeTrackingBean getAggregateTimeTrackingBeanWithTasksAndSubtask(IScnExtendedIssue extIssue) {
         Assertions.notNull("extended issue", extIssue);
         Assertions.notNull("issue", extIssue.getIssue());
 
@@ -79,10 +82,8 @@ public class TimetrackingHelper {
         final Collection<Issue> subTasks = extIssue.getIssue().getSubTaskObjects();
 
         int subTaskCount = 0;
-        for (Issue subTask : subTasks)
-        {
-            if (permissionManager.hasPermission(Permissions.BROWSE, subTask, jiraAuthenticationContext.getUser()))
-            {
+        for (Issue subTask : subTasks) {
+            if (permissionManager.hasPermission(Permissions.BROWSE, subTask, jiraAuthenticationContext.getUser())) {
                 final IScnExtendedIssue extSubTask = getExtendedIssue(subTask);
 
                 bean.setRemainingEstimate(addAndPreserveNull(extSubTask.getEstimate(), bean.getRemainingEstimate()));
@@ -116,12 +117,10 @@ public class TimetrackingHelper {
         return bean;
     }
 
-    public IScnExtendedIssue getExtendedIssue(Issue issue)
-    {
+    public IScnExtendedIssue getExtendedIssue(Issue issue) {
         IScnExtendedIssue extIssue = issueStore.getByIssue(issue);
 
-        if (extIssue == null)
-        {
+        if (extIssue == null) {
             extIssue = new ScnExtendedIssue(issue, null, null, null, null);
         }
 
@@ -129,8 +128,7 @@ public class TimetrackingHelper {
     }
 
     @Nonnull
-    public TimeTrackingGraphBean getGraphBean(Long originalEstimate, Long remainingEstimate, Long timeSpent)
-    {
+    private TimeTrackingGraphBean getGraphBean(Long originalEstimate, Long remainingEstimate, Long timeSpent) {
         Locale locale = jiraAuthenticationContext.getI18nHelper().getLocale();
         TimeTrackingGraphBeanFactory.Style style = TimeTrackingGraphBeanFactory.Style.SHORT;
 
@@ -147,47 +145,32 @@ public class TimetrackingHelper {
         return new TimeTrackingGraphBean(params);
     }
 
-    public List<Issue> getIssuesInEpic(Long epicId) {
+    private List<Issue> getIssuesInEpic(Long epicId) {
         IssueLinkManager issueLinkManager = ComponentAccessor.getIssueLinkManager();
-        return issueLinkManager.getIssueLinks(epicId)
+        return issueLinkManager.getOutwardLinks(epicId)
             .stream()
             .map(IssueLink::getDestinationObject)
             .collect(Collectors.toList());
     }
 
 
-    public AggregateTimeTrackingBean getAggregateTimeTrackingBean(IScnExtendedIssue extIssue)
-    {
-        Assertions.notNull("extended issue", extIssue);
-        Assertions.notNull("issue", extIssue.getIssue());
+    public void putEpicTimetrackingBeansIntoContext(Map<String, Object> context, IScnExtendedIssue extIssue) {
+        context.put("isEpicIssue", true);
 
-        final AggregateTimeTrackingBean bean = new AggregateTimeTrackingBean(
-            extIssue.getOriginalEstimate(), extIssue.getEstimate(), extIssue.getTimeSpent(), 0);
-        if (extIssue.getIssue().isSubTask())
-            return bean;
+        AggregateTimeTrackingBean aggBeanWithTasks = getAggregateTimeTrackingBeanWithTasks(extIssue);
+        TimeTrackingGraphBean aggGraphBeanWithTasks = getGraphBean(
+            aggBeanWithTasks.getOriginalEstimate(),
+            aggBeanWithTasks.getRemainingEstimate(),
+            aggBeanWithTasks.getTimeSpent());
+        context.put("aggregateTimeTrackingGraphBeanWithTasks", aggGraphBeanWithTasks);
 
-        final Collection<Issue> subTasks = extIssue.getIssue().getSubTaskObjects();
-        if (subTasks == null || subTasks.isEmpty())
-            return bean;
+        AggregateTimeTrackingBean aggBeanWithTaskAdnSubtasks = getAggregateTimeTrackingBeanWithTasksAndSubtask(extIssue);
+        TimeTrackingGraphBean aggGraphBeanWithTasksAndSubtasks = getGraphBean(
+            aggBeanWithTaskAdnSubtasks.getOriginalEstimate(),
+            aggBeanWithTaskAdnSubtasks.getRemainingEstimate(),
+            aggBeanWithTaskAdnSubtasks.getTimeSpent());
+        context.put("aggregateTimeTrackingGraphBeanWithTasksAndSubtasks", aggGraphBeanWithTasksAndSubtasks);
 
-        int subTaskCount = 0;
-        for (Issue subTask : subTasks)
-        {
-            if (permissionManager.hasPermission(Permissions.BROWSE, subTask, jiraAuthenticationContext.getUser()))
-            {
-                final IScnExtendedIssue extSubTask = getExtendedIssue(subTask);
-
-                bean.setRemainingEstimate(addAndPreserveNull(extSubTask.getEstimate(), bean.getRemainingEstimate()));
-                bean.setOriginalEstimate(addAndPreserveNull(extSubTask.getOriginalEstimate(), bean.getOriginalEstimate()));
-                bean.setTimeSpent(addAndPreserveNull(extSubTask.getTimeSpent(), bean.getTimeSpent()));
-                bean.bumpGreatestSubTaskEstimate(extSubTask.getOriginalEstimate(), extSubTask.getEstimate(), extSubTask.getTimeSpent());
-
-                subTaskCount++;
-            }
-        }
-        bean.setSubTaskCount(subTaskCount);
-
-        return bean;
+        context.put(HAS_DATA, aggGraphBeanWithTasks.hasData() || aggGraphBeanWithTasksAndSubtasks.hasData());
     }
-
 }
