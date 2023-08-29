@@ -41,12 +41,13 @@ public class TimetrackingHelper {
     public TimetrackingHelper(
         JiraAuthenticationContext jiraAuthenticationContext,
         PermissionManager permissionManager,
-        IScnExtendedIssueStore issueStore
+        IScnExtendedIssueStore issueStore,
+        JiraDurationUtils jiraDurationUtils
     ) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.permissionManager = permissionManager;
         this.issueStore = issueStore;
-        this.utils = Assertions.notNull("utils", ComponentAccessor.getComponent(JiraDurationUtils.class));
+        this.utils = jiraDurationUtils;
     }
 
 
@@ -150,6 +151,7 @@ public class TimetrackingHelper {
         return issueLinkManager.getOutwardLinks(epicId)
             .stream()
             .map(IssueLink::getDestinationObject)
+            .filter(issue -> !issue.isSubTask())
             .collect(Collectors.toList());
     }
 
