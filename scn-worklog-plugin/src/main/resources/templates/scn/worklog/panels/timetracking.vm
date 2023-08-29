@@ -51,19 +51,19 @@
         <div id="$!{scn}tt_info_single" style="display:none" class="$!{scn}graph">
             #renderInfo ('tt_single' $timeTrackingGraphBean)
         </div>
-    	<div id="$!{scn}tt_info_aggregate" class="$!{scn}graph">
+    	<div id="$!{scn}tt_info_aggregate" class="$!{scn}graph" #if($isEpicIssue)style="display:none;"#end>
             #renderInfo ('tt_aggregate' $aggregateTimeTrackingGraphBean)
         </div>
         <div id="$!{scn}tt_info_with_tasks" style="display:none;" class="$!{scn}graph">
             #renderInfo ('tt_with_tasks' $aggregateTimeTrackingGraphBeanWithTasks)
         </div>
-        <div id="$!{scn}tt_info_with_tasks_and_subtasks" style="display:none;" class="$!{scn}graph">
+        <div id="$!{scn}tt_info_with_tasks_and_subtasks" #if (!$isEpicIssue)style="display:none;"#end class="$!{scn}graph">
             #renderInfo ('tt_with_tasks_and_subtasks' $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
         </div>
 
         #if ($isEpicIssue)
             <div id="$!{scn}tt_include_tasks" title="${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks.tooltip')}">
-                <input id="$!{scn}cb_include_tasks" type="checkbox"/><label for="$!{scn}cb_include_tasks" style="margin-left: 0.5em;">${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks')}</label>
+                <input id="$!{scn}cb_include_tasks" type="checkbox" checked/><label for="$!{scn}cb_include_tasks" style="margin-left: 0.5em;">${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks')}</label>
             </div>
         #end
 
