@@ -18,7 +18,6 @@ import java.util.Map;
 @Named
 public class CustomTimeTrackingViewIssueContextProvider extends TimeTrackingViewIssueContextProvider {
 
-    private static final String HAS_DATA = "hasData";
     private static final String EPIC_ISSUE_TYPE_NAME = "Epic";
 
     private final JiraAuthenticationContext jaContext;

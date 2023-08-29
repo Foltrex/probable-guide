@@ -1,7 +1,9 @@
 package com.scn.jira.worklog.helper;
 
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.link.IssueLink;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.util.AggregateTimeTrackingBean;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.atlassian.jira.issue.util.AggregateTimeTrackingBean.addAndPreserveNull;
@@ -31,23 +30,27 @@ import static com.atlassian.jira.issue.util.AggregateTimeTrackingBean.addAndPres
 @Named
 public class TimetrackingHelper {
     private static final String HAS_DATA = "hasData";
+    private static final String EPIC_LINK_CUSTOM_FIELD_NAME = "Epic Link";
 
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final JiraDurationUtils utils;
     private final IScnExtendedIssueStore issueStore;
     private final PermissionManager permissionManager;
+    private final CustomFieldManager customFieldManager;
 
     @Inject
     public TimetrackingHelper(
         JiraAuthenticationContext jiraAuthenticationContext,
         PermissionManager permissionManager,
         IScnExtendedIssueStore issueStore,
-        JiraDurationUtils jiraDurationUtils
+        JiraDurationUtils jiraDurationUtils,
+        CustomFieldManager customFieldManager
     ) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.permissionManager = permissionManager;
         this.issueStore = issueStore;
         this.utils = jiraDurationUtils;
+        this.customFieldManager = customFieldManager;
     }
 
 
@@ -151,7 +154,16 @@ public class TimetrackingHelper {
         return issueLinkManager.getOutwardLinks(epicId)
             .stream()
             .map(IssueLink::getDestinationObject)
-            .filter(issue -> !issue.isSubTask())
+            .filter(issue -> {
+                CustomField epicLinkField = customFieldManager
+                    .getCustomFieldObjectsByName(EPIC_LINK_CUSTOM_FIELD_NAME)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(NoSuchElementException::new);
+
+                Object epicLinkValue = issue.getCustomFieldValue(epicLinkField);
+                return epicLinkValue != null;
+            })
             .collect(Collectors.toList());
     }
 
