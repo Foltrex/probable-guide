@@ -47,7 +47,7 @@
         </div>
     #end
 
-    #if ($aggregateTimeTrackingGraphBean || $aggregateTimeTrackingGraphBeanWithTasks || $aggregateTimeTrackingGraphBeanWithSubtasks || $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
+    #if ($aggregateTimeTrackingGraphBean || $aggregateTimeTrackingGraphBeanWithTasks || $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
         <div id="$!{scn}tt_info_single" style="display:none" class="$!{scn}graph">
             #renderInfo ('tt_single' $timeTrackingGraphBean)
         </div>
@@ -116,7 +116,8 @@
                 });
             </script>
         #end
-       
+    #else
+        #renderInfo ('tt_single' $timeTrackingGraphBean)
     #end
 #end
 
