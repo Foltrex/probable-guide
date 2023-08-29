@@ -17,7 +17,6 @@ import com.atlassian.jira.web.bean.TimeTrackingGraphBeanFactory;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssue;
 import com.scn.jira.worklog.core.scnwl.IScnExtendedIssueStore;
 import com.scn.jira.worklog.core.scnwl.ScnExtendedIssue;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -65,7 +64,7 @@ public class TimetrackingHelper {
             0
         );
 
-        for (Issue issueInEpic : getIssuesInEpic(extIssue.getIssue().getId())) {
+        for (Issue issueInEpic : getIssuesInEpic(extIssue.getIssue())) {
             final IScnExtendedIssue extTask = getExtendedIssue(issueInEpic);
             if (permissionManager.hasPermission(Permissions.BROWSE, extTask.getIssue(), jiraAuthenticationContext.getLoggedInUser())) {
                 bean.setTimeSpent(addAndPreserveNull(extTask.getTimeSpent(), bean.getTimeSpent()));
@@ -100,7 +99,7 @@ public class TimetrackingHelper {
         }
         bean.setSubTaskCount(subTaskCount);
 
-        for (Issue issueInEpic : getIssuesInEpic(extIssue.getIssue().getId())) {
+        for (Issue issueInEpic : getIssuesInEpic(extIssue.getIssue())) {
             final IScnExtendedIssue extTask = getExtendedIssue(issueInEpic);
             if (permissionManager.hasPermission(Permissions.BROWSE, extTask.getIssue(), jiraAuthenticationContext.getLoggedInUser())) {
                 bean.setTimeSpent(addAndPreserveNull(extTask.getTimeSpent(), bean.getTimeSpent()));
@@ -149,20 +148,21 @@ public class TimetrackingHelper {
         return new TimeTrackingGraphBean(params);
     }
 
-    private List<Issue> getIssuesInEpic(Long epicId) {
+    private List<Issue> getIssuesInEpic(Issue epicIssue) {
         IssueLinkManager issueLinkManager = ComponentAccessor.getIssueLinkManager();
-        return issueLinkManager.getOutwardLinks(epicId)
+        CustomField epicLinkField = customFieldManager
+            .getCustomFieldObjectsByName(EPIC_LINK_CUSTOM_FIELD_NAME)
+            .stream()
+            .findFirst()
+            .orElseThrow(NoSuchElementException::new);
+
+        return issueLinkManager.getOutwardLinks(epicIssue.getId())
             .stream()
             .map(IssueLink::getDestinationObject)
             .filter(issue -> {
-                CustomField epicLinkField = customFieldManager
-                    .getCustomFieldObjectsByName(EPIC_LINK_CUSTOM_FIELD_NAME)
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(NoSuchElementException::new);
-
                 Object epicLinkValue = issue.getCustomFieldValue(epicLinkField);
-                return epicLinkValue != null;
+                String issueEpicKey = Objects.toString(epicLinkValue);
+                return Objects.equals(epicIssue.getKey(), issueEpicKey);
             })
             .collect(Collectors.toList());
     }
