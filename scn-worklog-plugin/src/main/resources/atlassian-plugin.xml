@@ -29,12 +29,8 @@
 	<!-- ACTIVEOBJECTS CONFIG -->
 	<ao key="ao-module" name="Plugin Active Objects">
 		<description>AO entities and upgrade tasks Configuration</description>
-<!--		<entity>com.scn.jira.worklog.wltypes.dal.WLTypeEntity</entity>-->
-<!--		<upgradeTask>com.scn.jira.worklog.wltypes.dal.upgrades.v1.Upgrade001</upgradeTask>-->
-		<entity>com.scn.jira.worklog.impl.domain.entity.ScnWorklog</entity>
-		<entity>com.scn.jira.worklog.impl.domain.entity.WLType</entity>
-		<entity>com.scn.jira.worklog.impl.domain.entity.ScnIssueTime</entity>
-		<entity>com.scn.jira.worklog.impl.domain.entity.WorklogWLType</entity>
+		<entity>com.scn.jira.worklog.wltypes.dal.WLTypeEntity</entity>
+		<upgradeTask>com.scn.jira.worklog.wltypes.dal.upgrades.v1.Upgrade001</upgradeTask>
 	</ao>
 	<!-- REST SERVICE -->
 	<rest key="rest-service" name="Plugin Global REST Service"
