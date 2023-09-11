@@ -19,24 +19,6 @@
 	<version>${revision}</version>
 
 	<dependencies>
-<!--		<dependency>-->
-<!--			<groupId>com.atlassian.jira.plugins</groupId>-->
-<!--			<artifactId>jira-greenhopper-plugin</artifactId>-->
-<!--			<version>${jira.version}</version>-->
-<!--			<scope>provided</scope>-->
-<!--		</dependency>-->
-
-		<dependency>
-			<groupId>com.scn.jira</groupId>
-			<artifactId>common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>javax.persistence</groupId>-->
-<!--			<artifactId>persistence-api</artifactId>-->
-<!--			<version>1.0.2</version>-->
-<!--			<scope>provided</scope>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-api</artifactId>
