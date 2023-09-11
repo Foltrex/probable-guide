@@ -16,7 +16,7 @@
     #macro (renderSection $name $sectionName $labelKey $tooltip $estimateStr $graph)
     <dl>
         <dt id="$!{scn}${name}_text_${sectionName}" class="tt_text" title="${tooltip}">
-            $i18n.getText($labelKey)#if($scn)*#end:
+            $i18n.getText($labelKey)#if($scn == "scn_")*#end:
         </dt>
         <dd id="$!{scn}${name}_values_${sectionName}" class="tt_values" title="${tooltip}">
             #if ($estimateStr)
@@ -47,32 +47,77 @@
         </div>
     #end
 
-    #if ($aggregateTimeTrackingGraphBean)
-    	<div id="$!{scn}tt_info_aggregate">
-            #renderInfo ('tt_aggregate' $aggregateTimeTrackingGraphBean)
-        </div>
-        <div id="$!{scn}tt_info_single" style="display:none;">
+    #if ($aggregateTimeTrackingGraphBean || $aggregateTimeTrackingGraphBeanWithTasks || $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
+        <div id="$!{scn}tt_info_single" style="display:none" class="$!{scn}graph">
             #renderInfo ('tt_single' $timeTrackingGraphBean)
         </div>
-        <div id="$!{scn}tt_include_subtasks" title="${i18n.getText('timetracking.include.subtasks.tooltip')}">
-            <input id="$!{scn}cb_include_subtasks" type="checkbox" checked="CHECKED"/><label for="$!{scn}cb_include_subtasks" #if($scn)style="margin-left: 0.5em;"#end>${i18n.getText('timetracking.include.subtasks')}</label>
+    	<div id="$!{scn}tt_info_aggregate" class="$!{scn}graph" #if($isEpicIssue)style="display:none;"#end>
+            #renderInfo ('tt_aggregate' $aggregateTimeTrackingGraphBean)
         </div>
-        #if($scn)
-        <script language="JavaScript">
-	        jQuery(function () {
-			    jQuery("#scn_tt_include_subtasks input").click(function(e){
-					if (jQuery(this).is(":checked")){
-						jQuery("#scn_tt_info_single").hide();
-						jQuery("#scn_tt_info_aggregate").show();
-					} else {
-						jQuery("#scn_tt_info_aggregate").hide();
-						jQuery("#scn_tt_info_single").show();
-					}
-				});
-			});
-		</script>
+        <div id="$!{scn}tt_info_with_tasks" style="display:none;" class="$!{scn}graph">
+            #renderInfo ('tt_with_tasks' $aggregateTimeTrackingGraphBeanWithTasks)
+        </div>
+        <div id="$!{scn}tt_info_with_tasks_and_subtasks" #if (!$isEpicIssue)style="display:none;"#end class="$!{scn}graph">
+            #renderInfo ('tt_with_tasks_and_subtasks' $aggregateTimeTrackingGraphBeanWithTasksAndSubtasks)
+        </div>
+
+        #if ($isEpicIssue)
+            <div id="$!{scn}tt_include_tasks" title="${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks.tooltip')}">
+                <input id="$!{scn}cb_include_tasks" type="checkbox" checked/><label for="$!{scn}cb_include_tasks" style="margin-left: 0.5em;">${i18n.getText('scn.scnworklog.customfield.timetracking.include.tasks')}</label>
+            </div>
+        #end
+
+        <div id="$!{scn}tt_include_subtasks" title="${i18n.getText('timetracking.include.subtasks.tooltip')}">
+            <input id="$!{scn}cb_include_subtasks" type="checkbox" checked /><label for="$!{scn}cb_include_subtasks" #if($scn)style="margin-left: 0.5em;"#end>${i18n.getText('timetracking.include.subtasks')}</label>
+        </div>
+
+        #if ($isEpicIssue)
+            <script language="JavaScript">
+                jQuery(function () {
+                    jQuery("#$!{scn}tt_include_tasks input").click(function(e){
+                        jQuery(".$!{scn}graph").hide();
+                        if (jQuery(this).is(":checked") && jQuery("#$!{scn}tt_include_subtasks input").is(":checked")){
+                            jQuery("#$!{scn}tt_info_with_tasks_and_subtasks").show();
+                        } else if (jQuery(this).is(":checked") && !jQuery("#$!{scn}tt_include_subtasks input").is(":checked")) {
+                            jQuery("#$!{scn}tt_info_with_tasks").show();
+                        } else if (!jQuery(this).is(":checked") && jQuery("#$!{scn}tt_include_subtasks input").is(":checked")) {
+                            jQuery("#$!{scn}tt_info_aggregate").show();
+                        } else {
+                            jQuery("#$!{scn}tt_info_single").show();
+                        }
+                    });
+
+                    jQuery("#$!{scn}tt_include_subtasks input").click(function(e){
+                        jQuery(".$!{scn}graph").hide();
+                        if (jQuery(this).is(":checked") && jQuery("#$!{scn}tt_include_tasks input").is(":checked")){
+                            jQuery("#$!{scn}tt_info_with_tasks_and_subtasks").show();
+                        } else if (jQuery(this).is(":checked") && !jQuery("#$!{scn}tt_include_tasks input").is(":checked")) {
+                            jQuery("#$!{scn}tt_info_aggregate").show();
+                        } else if (!jQuery(this).is(":checked") && jQuery("#$!{scn}tt_include_tasks input").is(":checked")) {
+                            jQuery("#$!{scn}tt_info_with_tasks").show();
+                        } else {
+                            jQuery("#$!{scn}tt_info_single").show();
+                        }
+                    });
+                });
+            </script>
+        #else
+            <script language="JavaScript">
+                jQuery(function () {
+                    jQuery("#$!{scn}tt_include_subtasks input").click(function(e){
+                        if (jQuery(this).is(":checked")){
+                            jQuery("#$!{scn}tt_info_single").hide();
+                            jQuery("#$!{scn}tt_info_aggregate").show();
+                        } else {
+                            jQuery("#$!{scn}tt_info_aggregate").hide();
+                            jQuery("#$!{scn}tt_info_single").show();
+                        }
+                    });
+                });
+            </script>
         #end
     #else
         #renderInfo ('tt_single' $timeTrackingGraphBean)
     #end
 #end
+
