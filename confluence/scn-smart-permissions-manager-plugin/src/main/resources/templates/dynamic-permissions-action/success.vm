@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+    <title>Manage Space Permissions</title>
+    <meta name="decorator" content="atl.general"/>
+    $webResourceManager.requireResource("com.scn.confluence.scn-smart-permissions-manager-plugin:scn-smart-permissions-manager-plugin")
+</head>
+<body>
+<div id="scn-smart-permissions-manager-root">
+    <form class="aui">
+        <div class="field-group top-label">
+            <label for="space-key">Space Key</label>
+            <input list="spaces" class="text long-field" type="text" id="space-key" name="space-key">
+            <datalist id="spaces">
+                #foreach( $spaceKey in $spaceKeys )
+                    <option value="$spaceKey">
+                #end
+            </datalist>
+            <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
+        </div>
+    </form>
+    <table id="user-table">
+<!--        class="aui" -->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th id="username">User</th>-->
+<!--                <th id="permission-level">Permission Level</th>-->
+<!--                <th id="action">Action</th>-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--            <td headers="username">admin@admin.com</td>-->
+<!--            <td headers="permission-level">-->
+<!--                <button class="aui-button aui-dropdown2-trigger" aria-controls="permission-dropdown">-->
+<!--                    Can View-->
+<!--                </button>-->
+<!--                <aui-dropdown-menu id="permission-dropdown">-->
+<!--                    <aui-section>-->
+<!--                        <aui-item-link href="http://atlassian.com">Can wiew</aui-item-link>-->
+<!--                        <aui-item-link href="http://news.ycombinator.com">Can view and edit</aui-item-link>-->
+<!--                    </aui-section>-->
+<!--                </aui-dropdown-menu>-->
+<!--            </td>-->
+<!--            <td headers="action">-->
+<!--                <ul class="menu">-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="aui-icon aui-icon-small aui-iconfont-edit-filled">Edit</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="aui-icon aui-icon-small aui-iconfont-check">Save changes</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="#">-->
+<!--                            <span class="aui-icon aui-icon-small aui-iconfont-trash">Insert meaningful text here for accessibility</span>-->
+<!--                        </a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </td>-->
+<!--        </tbody>-->
+    </table>
+</div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</body>
+</html>
