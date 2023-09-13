@@ -6,18 +6,23 @@ import com.atlassian.confluence.core.SpaceContentEntityObject;
 import com.atlassian.confluence.core.persistence.ContentEntityObjectDao;
 import com.atlassian.confluence.security.ContentPermission;
 import com.atlassian.confluence.security.ContentPermissionSet;
+import com.atlassian.confluence.security.SpacePermission;
 import com.atlassian.confluence.spaces.Space;
 import com.atlassian.confluence.spaces.SpaceManager;
 import com.atlassian.confluence.spaces.SpaceStatus;
+import com.atlassian.confluence.user.ConfluenceUser;
 import com.google.common.base.Strings;
 import com.scn.confluence.spm.api.domain.service.SpacePermissionService;
 import com.scn.confluence.spm.impl.domain.dto.SpacePermissionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -58,31 +63,70 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
 
     @Override
     public List<SpacePermissionDto> getSpacePermissions() {
+        List<SpacePermissionDto> spacePermissionDtos = new ArrayList<>();
         List<Space> spaces = spaceManager.getAllSpaces();
         for (Space space : spaces) {
                 String statusName = SpaceStatus.CURRENT.name();
                 List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 10);
                 for (SpaceContentEntityObject spaceContentEntityObject : contentEntityObjects) {
-                    List<ContentPermission> viewContentPermissionSetList = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.VIEW_PERMISSION)
+                    Stream<ContentPermission> viewContentPermissionStream = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.VIEW_PERMISSION)
                         .stream()
-                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream())
-                        .collect(Collectors.toList());
-                    List<ContentPermission> editContentPermissionSetList = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.EDIT_PERMISSION)
+                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream());
+                    Stream<ContentPermission> editContentPermissionStream = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.EDIT_PERMISSION)
                         .stream()
-                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream())
-                        .collect(Collectors.toList());
-                    System.out.println(editContentPermissionSetList);
+                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream());
+//
+                    Map<ConfluenceUser, List<String>> permissionsPerUser = Stream.concat(
+                            viewContentPermissionStream,
+                            editContentPermissionStream
+                        )
+                        .collect(
+                            Collectors.groupingBy(
+                                ContentPermission::getUserSubject,
+                                Collectors.mapping(ContentPermission::getType, Collectors.toList())
+                            )
+                        );
+//
+//                    permissionsPerUser.keySet()
+//                        .forEach(confluenceUser -> {
+//                            List<String> userPermissions = permissionsPerUser.get(confluenceUser);
+//                            SpacePermissionDto spacePermissionDto;
+//                            if (userPermissions.contains(ContentPermission.EDIT_PERMISSION)) {
+//                                spacePermissionDto = SpacePermissionDto.builder()
+//                                    .spaceId(space.getId())
+//                                    .spaceKey(space.getKey())
+//                                    .username(confluenceUser.getEmail())
+//                                    .permissionLevel("VIEW-EDIT")
+//                                    .build();
+//
+//                            } else {
+//                                spacePermissionDto = SpacePermissionDto.builder()
+//                                    .spaceId(space.getId())
+//                                    .spaceKey(space.getKey())
+//                                    .username(confluenceUser.getEmail())
+//                                    .permissionLevel("VIEW")
+//                                    .build();
+//
+//                            }
+//                            spacePermissionDtos.add(spacePermissionDto);
+//                        });
                 }
         }
 
-//        return spaceManager.getAllSpaces()
-//            .stream()
-//            .map(space -> {
-//                contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId());
-//                contentEntityObjectDao.find
-//            })
-//            .collect(Collectors.toList());
-//        Space space = spaceManager.getSpace("NS");
+//
+//        System.out.println(spacePermissionDtos);
+
+////        return spaceManager.getAllSpaces()
+////            .stream()
+////            .map(space -> {
+////                contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId());
+////                contentEntityObjectDao.find
+////            })
+////            .collect(Collectors.toList());
+////        Space space = spaceManager.getSpace("NS");
+////        return Collections.emptyList();
+
+//        return spacePermissionDtos;
         return Collections.emptyList();
     }
 }

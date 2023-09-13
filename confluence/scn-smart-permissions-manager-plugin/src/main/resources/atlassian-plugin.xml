@@ -28,11 +28,6 @@
 			</action>
 		</package>
 	</xwork>
-	<web-resource key="scn-smart-permissions-manager-plugin">
-		<resource name="scn-smart-permissions-manager-plugin.js" type="download" location="/js/scn-smart-permissions-manager-plugin.js" />
-		<dependency>com.atlassian.auiplugin:ajs</dependency>
-		<dependency>com.atlassian.auiplugin:aui-experimental-restfultable</dependency>
-	</web-resource>
 	<!-- DYNAMIC PERMISSIONS -->
 <!--	<web-item key="scn-smartpermission-manager-webitem" name="Space Permissions" section="system.top.navigation.bar"-->
 <!--			  weight="200">-->
@@ -62,6 +57,7 @@
 	<!-- add our web resources -->
 	<web-resource key="scn-smart-permissions-manager-plugin-resources" name="scn-smart-permissions-manager-plugin Web Resources">
 		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<dependency>com.atlassian.auiplugin:aui-experimental-restfultable</dependency>
 
 		<resource type="download" name="scn-smart-permissions-manager-plugin.css" location="/css/scn-smart-permissions-manager-plugin.css"/>
 		<resource type="download" name="scn-smart-permissions-manager-plugin.js" location="/js/scn-smart-permissions-manager-plugin.js"/>
