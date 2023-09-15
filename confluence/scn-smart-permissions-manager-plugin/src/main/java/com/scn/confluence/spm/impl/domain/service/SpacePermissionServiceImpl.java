@@ -17,10 +17,7 @@ import com.scn.confluence.spm.impl.domain.dto.SpacePermissionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,100 +30,46 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
 
     @Override
     public List<SpacePermissionDto> getSpacePermissionBySpaceKey(String spaceKey) {
+        List<Space> spaces = new ArrayList<>();
+        List<SpacePermissionDto> spacePermissionDtos = new ArrayList<>();
+
         if (Strings.isNullOrEmpty(spaceKey)) {
-            List<Space> spaces = spaceManager.getAllSpaces();
+            spaces.addAll(spaceManager.getAllSpaces());
         } else {
-            Space spaces = spaceManager.getSpace(spaceKey);
+            spaces.add(spaceManager.getSpace(spaceKey));
         }
-//        for (String superAdminName : superAdminNames) {
-//            ConfluenceUser user = userAccessor.getUserByName(superAdminName);
-//            boolean isSuperUser = userAccessor.hasMembership(UserAccessor.GROUP_CONFLUENCE_ADMINS, superAdminName);
-//            if (!contentPermissionManager.hasContentLevelPermission(user, ContentPermission.VIEW_PERMISSION, contentPermissionEvent.getContent())
-//                && user != null
-//            ) {
-//                ContentPermission permission = ContentPermission.createUserPermission(ContentPermission.VIEW_PERMISSION, user);
-//                contentPermissionManager.addContentPermission(permission, contentPermissionEvent.getContent());
-//            }
-//        }
-//        superAdminNames.forEach(superAdminName -> {
-//            ConfluenceUser user = userAccessor.getUserByName(superAdminName);
-//            boolean isSuperUser = userAccessor.hasMembership(UserAccessor.GROUP_CONFLUENCE_ADMINS, superAdminName);
-//            if (!contentPermissionManager.hasContentLevelPermission(user, ContentPermission.VIEW_PERMISSION, contentPermissionEvent.getContent())
-//                && user != null
-//            ) {
-//                ContentPermission permission = ContentPermission.createUserPermission(ContentPermission.VIEW_PERMISSION, user);
-//                contentPermissionManager.addContentPermission(permission, contentPermissionEvent.getContent());
-//            }
-//        });
-        return Collections.emptyList();
+
+        for (Space space : spaces) {
+            String statusName = SpaceStatus.CURRENT.name();
+            List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 10);
+            for (SpaceContentEntityObject spaceContentEntityObject : contentEntityObjects) {
+
+                List<ContentPermission> contentPermissions = spaceContentEntityObject.getPermissions();
+                Map<ConfluenceUser, ContentPermission> mainPermissions = new HashMap<>();
+                for (ContentPermission contentPermission : contentPermissions) {
+                    ContentPermission mainPermission = mainPermissions.get(contentPermission.getUserSubject());
+                    if (mainPermission == null || Objects.equals(mainPermission.getType(), ContentPermission.VIEW_PERMISSION)) {
+                        mainPermissions.put(contentPermission.getUserSubject(), contentPermission);
+                    }
+                }
+
+                mainPermissions.forEach((confluenceUser, contentPermission) -> {
+                    SpacePermissionDto spacePermissionDto = SpacePermissionDto.builder()
+                        .spaceId(space.getId())
+                        .spaceKey(space.getKey())
+                        .permissionLevel(contentPermission.getType())
+                        .username(confluenceUser.getEmail())
+                        .build();
+                    spacePermissionDtos.add(spacePermissionDto);
+                });
+            }
+        }
+
+        return spacePermissionDtos;
     }
 
     @Override
     public List<SpacePermissionDto> getSpacePermissions() {
-        List<SpacePermissionDto> spacePermissionDtos = new ArrayList<>();
-        List<Space> spaces = spaceManager.getAllSpaces();
-        for (Space space : spaces) {
-                String statusName = SpaceStatus.CURRENT.name();
-                List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 10);
-                for (SpaceContentEntityObject spaceContentEntityObject : contentEntityObjects) {
-                    Stream<ContentPermission> viewContentPermissionStream = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.VIEW_PERMISSION)
-                        .stream()
-                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream());
-                    Stream<ContentPermission> editContentPermissionStream = contentPermissionManager.getContentPermissionSets(spaceContentEntityObject, ContentPermission.EDIT_PERMISSION)
-                        .stream()
-                        .flatMap(contentPermissionSet -> contentPermissionSet.contentPermissionsCopy().stream());
-//
-                    Map<ConfluenceUser, List<String>> permissionsPerUser = Stream.concat(
-                            viewContentPermissionStream,
-                            editContentPermissionStream
-                        )
-                        .collect(
-                            Collectors.groupingBy(
-                                ContentPermission::getUserSubject,
-                                Collectors.mapping(ContentPermission::getType, Collectors.toList())
-                            )
-                        );
-//
-//                    permissionsPerUser.keySet()
-//                        .forEach(confluenceUser -> {
-//                            List<String> userPermissions = permissionsPerUser.get(confluenceUser);
-//                            SpacePermissionDto spacePermissionDto;
-//                            if (userPermissions.contains(ContentPermission.EDIT_PERMISSION)) {
-//                                spacePermissionDto = SpacePermissionDto.builder()
-//                                    .spaceId(space.getId())
-//                                    .spaceKey(space.getKey())
-//                                    .username(confluenceUser.getEmail())
-//                                    .permissionLevel("VIEW-EDIT")
-//                                    .build();
-//
-//                            } else {
-//                                spacePermissionDto = SpacePermissionDto.builder()
-//                                    .spaceId(space.getId())
-//                                    .spaceKey(space.getKey())
-//                                    .username(confluenceUser.getEmail())
-//                                    .permissionLevel("VIEW")
-//                                    .build();
-//
-//                            }
-//                            spacePermissionDtos.add(spacePermissionDto);
-//                        });
-                }
-        }
-
-//
-//        System.out.println(spacePermissionDtos);
-
-////        return spaceManager.getAllSpaces()
-////            .stream()
-////            .map(space -> {
-////                contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId());
-////                contentEntityObjectDao.find
-////            })
-////            .collect(Collectors.toList());
-////        Space space = spaceManager.getSpace("NS");
-////        return Collections.emptyList();
-
-//        return spacePermissionDtos;
-        return Collections.emptyList();
+        return getSpacePermissionBySpaceKey("");
     }
 }
