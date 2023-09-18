@@ -12,9 +12,9 @@
 		<description>REST endpoint for the Plugin</description>
 	</rest>
 
-	<web-item name="manage-space-permissions-web-item" key="manage-space-permissions-web-item" section="system.header/spaces-menu" weight="10">
-		<description key="item.manage-space-permissions-web-item.link.desc">Manage Space Permissions</description>
-		<label key="Manage Space Permissions"/>
+	<web-item name="manage-space-permissions-web-item" key="manage-space-permissions-web-item" section="system.space" weight="10">
+		<description key="item.manage-space-permissions-web-item.link.desc">Manage Space Restrictions</description>
+		<label key="Manage Space Restrictions"/>
 		<link linkId="manage-space-permissions-action">/plugins/manage-space-permissions.action</link>
 	</web-item>
 

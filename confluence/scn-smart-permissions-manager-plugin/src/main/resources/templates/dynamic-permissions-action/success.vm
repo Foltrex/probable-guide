@@ -2,7 +2,7 @@
 <head>
     <title>Manage Space Permissions</title>
     <meta name="decorator" content="atl.general"/>
-    $webResourceManager.requireResource("com.scn.confluence.scn-smart-permissions-manager-plugin:scn-smart-permissions-manager-plugin")
+    $webResourceManager.requireResource("com.scn.confluence.scn-smart-permissions-manager-plugin:scn-smart-permissions-manager-plugin-resources")
 </head>
 <body>
 <div id="scn-smart-permissions-manager-root">
