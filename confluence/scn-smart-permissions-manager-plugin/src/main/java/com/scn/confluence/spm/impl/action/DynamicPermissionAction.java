@@ -1,5 +1,7 @@
 package com.scn.confluence.spm.impl.action;
 
+import com.atlassian.confluence.api.impl.service.content.SpaceServiceImpl;
+import com.atlassian.confluence.api.service.content.SpacePropertyService;
 import com.atlassian.confluence.core.ConfluenceActionSupport;
 import com.atlassian.confluence.pages.AbstractPage;
 import com.atlassian.confluence.pages.Page;
@@ -28,6 +30,8 @@ public class DynamicPermissionAction extends ConfluenceActionSupport {
 
     @Override
     public String execute() throws Exception {
+        SpaceServiceImpl spaceServiceImpl;
+        SpacePropertyService spacePropertyService;
         spaceKeys = spaceManager.getAllSpaces()
             .stream()
             .map(Space::getKey)

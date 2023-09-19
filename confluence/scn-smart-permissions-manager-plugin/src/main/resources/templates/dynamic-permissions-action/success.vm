@@ -6,16 +6,18 @@
 </head>
 <body>
 <div id="scn-smart-permissions-manager-root">
-    <form class="aui">
+    <form class="aui" id="space-key-form">
         <div class="field-group top-label">
             <label for="space-key">Space Key</label>
-            <input list="spaces" class="text long-field" type="text" id="space-key" name="space-key">
+            <input list="spaces" class="text long-field" type="search" id="space-key" name="space-key">
             <datalist id="spaces">
                 #foreach( $spaceKey in $spaceKeys )
                     <option value="$spaceKey">
                 #end
             </datalist>
-            <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
+            <button id="search-button">
+                <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
+            </button>
         </div>
     </form>
     <table id="user-table">

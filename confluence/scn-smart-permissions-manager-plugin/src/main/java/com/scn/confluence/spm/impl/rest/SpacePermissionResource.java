@@ -25,9 +25,8 @@ public class SpacePermissionResource {
             .build();
     }
 
-
     @GET
-    @Path("self/{key}")
+    @Path("all/{key}")
     public Response getSpacePermissionsBySpaceKey(@PathParam("key") @DefaultValue("") String key) {
         return Response
             .ok(spacePermissionService.getSpacePermissionBySpaceKey(key))

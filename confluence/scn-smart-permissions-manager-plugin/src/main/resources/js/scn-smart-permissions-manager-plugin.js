@@ -9,21 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 AJS.$(document).ready(function () {
-    const spaceSearchInput = AJS.$("#space-key");
-    console.log(spaceSearchInput);
-    spaceSearchInput.change(() => {
-        const spaceSearchInputText = spaceSearchInput.text();
-        console.log("hiii" + spaceSearchInputText);
-    })
+    AJS.$("#space-key-form").submit(function (event) {
+        event.preventDefault();
+    });
 
-    let table;
-    function refreshTable() {
-        if (table) {
-            table.refresh();
-        }
-    }
-
-    table = new AJS.RestfulTable({
+    const initTableObject = {
         autoFocus: false,
         el: jQuery("#user-table"),
         allowReorder: true,
@@ -31,10 +21,10 @@ AJS.$(document).ready(function () {
             all: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/all",
             self: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/self"
         },
-        deleteConfirmationCallback: function(model) {
+        deleteConfirmationCallback: function (model) {
             AJS.$("#restful-table-model")[0].innerHTML = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
             AJS.dialog2("#delete-confirmation-dialog").show();
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 AJS.$("#dialog-submit-button").on('click', function (e) {
                     resolve();
                     e.preventDefault();
@@ -58,8 +48,39 @@ AJS.$(document).ready(function () {
             },
             {
                 id: "permissionLevel",
-                header: "Permission Level"
+                header: "Permission Level",
+                editView: AJS.RestfulTable.CustomEditView.extend({
+                    render: function (self) {
+                        var $select = $("<select name='group' class='select'>" +
+                                "<option value='Friends'>Friends</option>" +
+                                "<option value='Family'>Family</option>" +
+                                "<option value='Work'>Work</option>" +
+                                "</select>");
+            
+                        $select.val(self.value); // select currently selected
+                        return $select;
+                    }
+                })
             }
         ]
+    };
+    let table;
+
+    const searchButton = AJS.$("#search-button");
+    const spaceSearchInput = AJS.$("#space-key");
+    searchButton.click(() => {
+        AJS.$("#user-table").empty();
+        AJS.$(".aui-restfultable-init").remove();
+        const spaceSearchInputText = spaceSearchInput.val();
+        table = new AJS.RestfulTable({
+            ...initTableObject,
+            resources: {
+                all: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/all/" + spaceSearchInputText,
+                self: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/self"
+            },
+
+        })
     });
+
+    table = new AJS.RestfulTable(initTableObject);
 });
