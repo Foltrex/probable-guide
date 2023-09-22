@@ -7,20 +7,27 @@
 <body>
 <div id="scn-smart-permissions-manager-root">
     <form class="aui" id="space-key-form">
-        <div class="field-group top-label">
+        <div class="field-group">
             <label for="space-key">Space Key</label>
-            <input list="spaces" class="text long-field" type="search" id="space-key" name="space-key">
-            <datalist id="spaces">
-                #foreach( $spaceKey in $spaceKeys )
-                    <option value="$spaceKey">
-                #end
-            </datalist>
-            <button id="search-button">
-                <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
-            </button>
+            <div class="text long-field">
+                <input list="spaces" type="search" id="space-key" name="space-key">
+                <datalist id="spaces">
+                    #foreach( $spaceKey in $spaceKeys )
+                        <option value="$spaceKey">
+                    #end
+                </datalist>
+                <button id="search-button">
+                    <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
+                </button>
+            </div>
         </div>
     </form>
     <table id="user-table">
+        <datalist id='usernames'>
+            #foreach( $username in $usernames )
+                <option value="$username">
+            #end
+        </datalist>
 <!--        class="aui" -->
 <!--        <thead>-->
 <!--            <tr>-->

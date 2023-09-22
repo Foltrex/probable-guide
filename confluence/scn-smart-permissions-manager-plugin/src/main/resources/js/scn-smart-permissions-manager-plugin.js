@@ -40,28 +40,111 @@ AJS.$(document).ready(function () {
         columns: [
             {
                 id: "spaceKey",
-                header: "Space Key"
+                header: "Space Key",
+                allowEdit: false,
+                createView: AJS.RestfulTable.CustomCreateView.extend({
+                    render: _ => {
+                        const spaceKeyDataList = AJS.$("#spaces").clone();
+                        const randomNumber = Math.floor(Math.random());
+                        spaceKeyDataList.attr('id', `spaces-${randomNumber}`)
+                        return $(`
+                            <input name='spaceKey' type='text' class='text' list='spaces-${randomNumber}' />
+                            ${spaceKeyDataList.prop('outerHTML')}
+
+                        `);
+                    }
+                }),
+                readView: AJS.RestfulTable.CustomReadView.extend({
+                    render: self => $(`<span>${self.value}</span>`)
+                })
             },
             {
                 id: "username",
-                header: "Username"
+                header: "Username",
+                allowEdit: false,
+                createView: AJS.RestfulTable.CustomCreateView.extend({
+                    render: _ => {
+                        const usernameDatalist = AJS.$("#usernames").clone();
+                        const randomNumber = Math.floor(Math.random());
+                        usernameDatalist.attr('id', `usernames-${randomNumber}`)
+                        return $(`
+                            <input name='username' type='text' class='text' list='usernames-${randomNumber}'/>
+                            ${usernameDatalist.prop('outerHTML')}
+                        `)
+                    }
+                }),
+                readView: AJS.RestfulTable.CustomReadView.extend({
+                    render: self => $(`<span>${self.value}</span>`)
+                })
             },
             {
                 id: "permissionLevel",
                 header: "Permission Level",
+                createView: AJS.RestfulTable.CustomCreateView.extend({
+                    render: function (self) {
+                        return $(`
+                            <select name='permissionLevel' class='select'>
+                                <option value='View'>Can view</option>
+                                <option value='Edit'>Can view and edit</option>
+                            </select>
+                        `);
+                    }
+                }),
                 editView: AJS.RestfulTable.CustomEditView.extend({
                     render: function (self) {
-                        var $select = $("<select name='group' class='select'>" +
-                                "<option value='Friends'>Friends</option>" +
-                                "<option value='Family'>Family</option>" +
-                                "<option value='Work'>Work</option>" +
-                                "</select>");
-            
-                        $select.val(self.value); // select currently selected
+                        var $select = $(`
+                            <select name='permissionLevel' class='select'>
+                                <option value='View'>Can view</option>
+                                <option value='Edit'>Can view and edit</option>
+                            </select>
+                        `);
+
+                        $select.val(self.value);
+                        return $select;
+                    }
+                }),
+                readView: AJS.RestfulTable.CustomReadView.extend({
+                    render: function (self) {
+                        var $select = $(`
+                            <select name='permissionLevel' class='select'>
+                                <option value='View'>Can view</option>
+                                <option value='Edit'>Can view and edit</option>
+                            </select>
+                        `);
+
+                        $select.val(self.value);
                         return $select;
                     }
                 })
-            }
+            },
+            // {
+            //     id: "date",
+            //     header: "Event date",
+            //     createView: AJS.RestfulTable.CustomCreateView.extend({
+            //         render: function (self) {
+            //             var $field = AJS.$('<input type="date" class="text aui-date-picker" name="date">');
+            //             // $field.datePicker({'overrideBrowserDefault': true});
+            //             return $field;
+            //         }
+            //     }),
+            //     editView: AJS.RestfulTable.CustomEditView.extend({
+            //         render: function (self) {
+            //             var $field = AJS.$('<input type="date" class="text aui-date-picker" name="date">');
+            //             // $field.datePicker({'overrideBrowserDefault': true});
+            //             if (!_.isUndefined(self.value)) {
+            //                 $field.val(new Date(self.value).print("%Y-%m-%d"));
+            //             }
+            //             return $field;
+            //         }
+            //     }),
+            //     readView: AJS.RestfulTable.CustomReadView.extend({
+            //         render: function (self) {
+            //             // var val = (!_.isUndefined(self.value)) ? new Date(self.value).print("%Y-%m-%d") : undefined;
+            //             var val = self.value;
+            //             return '<span data-field-name="date">' + (val ? val : '') + '</span>';
+            //         }
+            //     })
+            // }
         ]
     };
     let table;

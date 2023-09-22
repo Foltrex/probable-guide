@@ -1,0 +1,25 @@
+.aui-iconfont-edit {
+    display: none;
+}
+
+.aui-restfultable-readonly .aui-restfultable-editable {
+    padding: 0;
+}
+
+div.text.long-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.text.long-field input {
+    flex-grow: 1;
+    border: 0;
+    display: block;
+}
+
+#search-button {
+    border: 0;
+    background-color: white;
+    display: block;
+}

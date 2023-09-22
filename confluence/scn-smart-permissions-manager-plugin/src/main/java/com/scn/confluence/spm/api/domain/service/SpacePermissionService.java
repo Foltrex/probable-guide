@@ -8,4 +8,8 @@ public interface SpacePermissionService {
     List<SpacePermissionDto> getSpacePermissionBySpaceKey(String spaceKey);
 
     List<SpacePermissionDto> getSpacePermissions();
+
+    SpacePermissionDto createSpacePermission(SpacePermissionDto spacePermissionDto);
+
+    void deleteSpacePermission(SpacePermissionDto spacePermissionDto);
 }

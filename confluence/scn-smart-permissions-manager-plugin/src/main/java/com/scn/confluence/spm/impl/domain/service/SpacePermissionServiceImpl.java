@@ -1,5 +1,6 @@
 package com.scn.confluence.spm.impl.domain.service;
 
+import com.atlassian.confluence.api.service.content.SpaceService;
 import com.atlassian.confluence.core.ContentEntityObject;
 import com.atlassian.confluence.core.ContentPermissionManager;
 import com.atlassian.confluence.core.SpaceContentEntityObject;
@@ -11,6 +12,7 @@ import com.atlassian.confluence.spaces.Space;
 import com.atlassian.confluence.spaces.SpaceManager;
 import com.atlassian.confluence.spaces.SpaceStatus;
 import com.atlassian.confluence.user.ConfluenceUser;
+import com.atlassian.confluence.user.UserAccessor;
 import com.google.common.base.Strings;
 import com.scn.confluence.spm.api.domain.service.SpacePermissionService;
 import com.scn.confluence.spm.impl.domain.dto.SpacePermissionDto;
@@ -25,8 +27,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SpacePermissionServiceImpl implements SpacePermissionService {
     private final SpaceManager spaceManager;
-    private final ContentEntityObjectDao<ContentEntityObject> contentEntityObjectDao;
+    private final UserAccessor userAccessor;
     private final ContentPermissionManager contentPermissionManager;
+    private final ContentEntityObjectDao<ContentEntityObject> contentEntityObjectDao;
 
     @Override
     public List<SpacePermissionDto> getSpacePermissionBySpaceKey(String spaceKey) {
@@ -41,7 +44,8 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
 
         for (Space space : spaces) {
             String statusName = SpaceStatus.CURRENT.name();
-            List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 10);
+//          TODO: Check what is 0 and 10
+            List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 100);
             for (SpaceContentEntityObject spaceContentEntityObject : contentEntityObjects) {
 
                 List<ContentPermission> contentPermissions = spaceContentEntityObject.getPermissions();
@@ -55,10 +59,11 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
 
                 mainPermissions.forEach((confluenceUser, contentPermission) -> {
                     SpacePermissionDto spacePermissionDto = SpacePermissionDto.builder()
+                        .id(String.format("%s-%s", space.getKey(), confluenceUser.getName()))
                         .spaceId(space.getId())
                         .spaceKey(space.getKey())
                         .permissionLevel(contentPermission.getType())
-                        .username(confluenceUser.getEmail())
+                        .username(confluenceUser.getName())
                         .build();
                     spacePermissionDtos.add(spacePermissionDto);
                 });
@@ -72,4 +77,53 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
     public List<SpacePermissionDto> getSpacePermissions() {
         return getSpacePermissionBySpaceKey("");
     }
+
+    @Override
+    public SpacePermissionDto createSpacePermission(SpacePermissionDto spacePermissionDto) {
+        ConfluenceUser user = userAccessor.getUserByName(spacePermissionDto.getUsername());
+        String permissionLevel = spacePermissionDto.getPermissionLevel();
+        List<ContentPermission> contentPermissions = new ArrayList<>();
+        contentPermissions.add(
+            ContentPermission.createUserPermission(permissionLevel, user)
+        );
+        contentPermissions.add(
+            ContentPermission.createUserPermission(ContentPermission.SHARED_PERMISSION, user)
+        );
+        if (permissionLevel.equals(ContentPermission.EDIT_PERMISSION)) {
+           contentPermissions.add(
+               ContentPermission.createUserPermission(ContentPermission.VIEW_PERMISSION, user)
+           );
+        }
+
+        String statusName = SpaceStatus.CURRENT.name();
+        Space space = spaceManager.getSpace(spacePermissionDto.getSpaceKey());
+        List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(space.getId(), statusName.toLowerCase(), 0, 100);
+
+        contentPermissions.forEach(contentPermission -> {
+            contentEntityObjects.forEach(contentEntityObject -> {
+                contentPermissionManager.addContentPermission(contentPermission, contentEntityObject);
+            });
+        });
+
+        return SpacePermissionDto.builder()
+            .id(String.format("%s-%s", space.getKey(), spacePermissionDto.getUsername()))
+            .spaceId(space.getId())
+            .spaceKey(space.getKey())
+            .permissionLevel(spacePermissionDto.getPermissionLevel())
+            .username(spacePermissionDto.getUsername())
+            .build();
+    }
+
+    @Override
+    public void deleteSpacePermission(SpacePermissionDto spacePermissionDto) {
+        String statusName = SpaceStatus.CURRENT.name();
+        List<SpaceContentEntityObject> contentEntityObjects = contentEntityObjectDao.findContentBySpaceIdAndStatus(spacePermissionDto.getSpaceId(), statusName.toLowerCase(), 0, 100);
+        for (SpaceContentEntityObject spaceContentEntityObject : contentEntityObjects) {
+            for (ContentPermission contentPermission : spaceContentEntityObject.getPermissions()) {
+                contentPermissionManager.removeContentPermission(contentPermission);
+            }
+        }
+    }
+
+
 }

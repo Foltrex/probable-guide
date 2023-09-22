@@ -36,7 +36,9 @@ public class SpacePermissionResource {
     @POST
     @Path("self")
     public Response createSpacePermission(SpacePermissionDto bean) {
-        return Response.ok(bean).build();
+        return Response
+            .ok(spacePermissionService.createSpacePermission(bean))
+            .build();
     }
 
     @DELETE
