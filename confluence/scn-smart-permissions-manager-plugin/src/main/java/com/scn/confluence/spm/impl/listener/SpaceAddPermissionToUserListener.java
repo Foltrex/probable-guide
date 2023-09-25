@@ -35,11 +35,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpaceAddPermissionToUserListener implements InitializingBean, DisposableBean {
     private final EventPublisher eventPublisher;
-    private final SpaceManager spaceManager;
     private final ContentPermissionManager contentPermissionManager;
     private final UserAccessor userAccessor;
     private final ContentEntityObjectDao<ContentEntityObject> contentEntityObjectDao;
-    private final PageManager pageManager;
 
     private final List<String> superAdminNames = Arrays.asList("admin", "some");
 
@@ -71,7 +69,6 @@ public class SpaceAddPermissionToUserListener implements InitializingBean, Dispo
 
 
 
-//    при добавлении
     @EventListener
     public void onContentPermissionEvent(ContentPermissionEvent contentPermissionEvent) {
         for (String superAdminName : superAdminNames) {

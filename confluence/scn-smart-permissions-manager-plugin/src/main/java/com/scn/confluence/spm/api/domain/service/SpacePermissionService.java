@@ -11,5 +11,7 @@ public interface SpacePermissionService {
 
     SpacePermissionDto createSpacePermission(SpacePermissionDto spacePermissionDto);
 
-    void deleteSpacePermission(SpacePermissionDto spacePermissionDto);
+    SpacePermissionDto updateSpacePermission(String spaceKey, String username, SpacePermissionDto spacePermissionDto);
+
+    void deleteSpacePermission(String spaceKey, String username);
 }

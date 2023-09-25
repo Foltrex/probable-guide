@@ -22,18 +22,21 @@ AJS.$(document).ready(function () {
             self: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/self"
         },
         deleteConfirmationCallback: function (model) {
-            AJS.$("#restful-table-model")[0].innerHTML = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
-            AJS.dialog2("#delete-confirmation-dialog").show();
+            AJS.$("#user-permission-model").html(`
+                If you do this, there's no going back. 
+                Are you certain that you want to delete ${model.username} access to ${model.spaceKey}?`
+            );
+            AJS.dialog2("#delete-permission-dialog").show();
             return new Promise(function (resolve, reject) {
-                AJS.$("#dialog-submit-button").on('click', function (e) {
+                AJS.$("#delete-permisison-dialog-confirm").on('click', function (e) {
                     resolve();
                     e.preventDefault();
-                    AJS.dialog2("#delete-confirmation-dialog").hide();
+                    AJS.dialog2("#delete-permission-dialog").hide();
                 });
-                AJS.$(".aui-dialog2-header-close, #warning-dialog-cancel").on('click', function (e) {
+                AJS.$("#delete-permission-dialog-cancel").on('click', function (e) {
                     reject();
                     e.preventDefault();
-                    AJS.dialog2("#delete-confirmation-dialog").hide();
+                    AJS.dialog2("#delete-permission-dialog").hide();
                 });
             });
         },

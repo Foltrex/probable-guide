@@ -28,47 +28,32 @@
                 <option value="$username">
             #end
         </datalist>
-<!--        class="aui" -->
-<!--        <thead>-->
-<!--            <tr>-->
-<!--                <th id="username">User</th>-->
-<!--                <th id="permission-level">Permission Level</th>-->
-<!--                <th id="action">Action</th>-->
-<!--            </tr>-->
-<!--        </thead>-->
-<!--        <tbody>-->
-<!--            <td headers="username">admin@admin.com</td>-->
-<!--            <td headers="permission-level">-->
-<!--                <button class="aui-button aui-dropdown2-trigger" aria-controls="permission-dropdown">-->
-<!--                    Can View-->
-<!--                </button>-->
-<!--                <aui-dropdown-menu id="permission-dropdown">-->
-<!--                    <aui-section>-->
-<!--                        <aui-item-link href="http://atlassian.com">Can wiew</aui-item-link>-->
-<!--                        <aui-item-link href="http://news.ycombinator.com">Can view and edit</aui-item-link>-->
-<!--                    </aui-section>-->
-<!--                </aui-dropdown-menu>-->
-<!--            </td>-->
-<!--            <td headers="action">-->
-<!--                <ul class="menu">-->
-<!--                    <li>-->
-<!--                        <a href="#">-->
-<!--                            <span class="aui-icon aui-icon-small aui-iconfont-edit-filled">Edit</span>-->
-<!--                        </a>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <a href="#">-->
-<!--                            <span class="aui-icon aui-icon-small aui-iconfont-check">Save changes</span>-->
-<!--                        </a>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <a href="#">-->
-<!--                            <span class="aui-icon aui-icon-small aui-iconfont-trash">Insert meaningful text here for accessibility</span>-->
-<!--                        </a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </td>-->
-<!--        </tbody>-->
+
+
+        <section
+            id="delete-permission-dialog"
+            class="aui-dialog2 aui-dialog2-small aui-dialog2-warning aui-layer"
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="demo-warning-dialog--heading"
+            aria-describedby="demo-warning-dialog--description"
+            hidden
+            style='display:none'
+        >
+            <header class="aui-dialog2-header">
+                <h1 class="aui-dialog2-header-main" id="demo-warning-dialog--heading">Warning</h1>
+            </header>
+            <div class="aui-dialog2-content" id="demo-warning-dialog--description">
+                <p id='user-permission-model'></p>
+            </div>
+            <footer class="aui-dialog2-footer">
+                <div class="aui-dialog2-footer-actions">
+                    <button id="delete-permisison-dialog-confirm" class="aui-button aui-button-primary">Delete</button>
+                    <button id="delete-permission-dialog-cancel" class="aui-button aui-button-link">Cancel</button>
+                </div>
+            </footer>
+        </section>
     </table>
 </div>
 
