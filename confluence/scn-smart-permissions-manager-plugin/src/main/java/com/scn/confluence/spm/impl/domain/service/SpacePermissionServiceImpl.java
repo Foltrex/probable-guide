@@ -105,7 +105,7 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
                 }
             });
 
-        ConfluenceUser user = userAccessor.getUserByName(spacePermissionDto.getUsername());
+        ConfluenceUser user = userAccessor.getUserByName(username);
         String permissionLevel = spacePermissionDto.getPermissionLevel();
         ContentPermission contentPermission = ContentPermission.createUserPermission(
             permissionLevel, user
@@ -114,10 +114,10 @@ public class SpacePermissionServiceImpl implements SpacePermissionService {
         contentPermissionManager.addContentPermission(contentPermission, homePage);
 
         return SpacePermissionDto.builder()
-            .id(String.format("%s-%s", spacePermissionDto.getSpaceKey(), spacePermissionDto.getUsername()))
-            .spaceKey(spacePermissionDto.getSpaceKey())
+            .id(String.format("%s-%s", spaceKey, username))
+            .spaceKey(spaceKey)
             .permissionLevel(spacePermissionDto.getPermissionLevel())
-            .username(spacePermissionDto.getUsername())
+            .username(username)
             .build();
     }
 

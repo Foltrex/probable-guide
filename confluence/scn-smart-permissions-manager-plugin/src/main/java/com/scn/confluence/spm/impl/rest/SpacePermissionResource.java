@@ -18,7 +18,6 @@ public class SpacePermissionResource {
     private final SecurityUtils securityUtils;
 
     @GET
-    @Path("all")
     public Response getSpacePermissions() {
         return securityUtils.isLoggedInUserSuperAdmin()
             ? Response.ok(spacePermissionService.getSpacePermissions()).build()
@@ -26,7 +25,7 @@ public class SpacePermissionResource {
     }
 
     @GET
-    @Path("all/{key}")
+    @Path("/{key}")
     public Response getSpacePermissionsBySpaceKey(@PathParam("key") @DefaultValue("") String key) {
         return securityUtils.isLoggedInUserSuperAdmin()
             ? Response.ok(spacePermissionService.getSpacePermissionBySpaceKey(key)).build()
@@ -34,7 +33,6 @@ public class SpacePermissionResource {
     }
 
     @POST
-    @Path("self")
     public Response createSpacePermission(SpacePermissionDto bean) {
         return securityUtils.isLoggedInUserSuperAdmin()
             ? Response.ok(spacePermissionService.createSpacePermission(bean)).build()
@@ -42,7 +40,7 @@ public class SpacePermissionResource {
     }
 
     @PUT
-    @Path("self/{id}")
+    @Path("/{id}")
     public Response updateSpacePermission(@PathParam("id") String id, SpacePermissionDto bean) {
         String[] compoundKey = id.split("-");
         String spaceKey = compoundKey[0];
@@ -53,7 +51,7 @@ public class SpacePermissionResource {
     }
 
     @DELETE
-    @Path ("self/{id}")
+    @Path ("/{id}")
     public Response delete(@PathParam ("id") @DefaultValue("0") String id) {
         String[] compoundKey = id.split("-");
         String spaceKey = compoundKey[0];

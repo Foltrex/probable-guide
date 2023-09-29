@@ -1,12 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // const spaceSearchInput = document.getElementById("space-key");
-    // console.log(spaceSearchInput);
-    // spaceSearchInput.addEventListener('change', () => {
-    //     const spaceSearchInputText = spaceSearchInput.innerText;
-    //     console.log(spaceSearchInputText);
-    // })
-    // console.log(spaceSearchInputText);
-})
 
 AJS.$(document).ready(function () {
     AJS.$("#space-key-form").submit(function (event) {
@@ -18,8 +9,8 @@ AJS.$(document).ready(function () {
         el: jQuery("#user-table"),
         allowReorder: true,
         resources: {
-            all: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/all",
-            self: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/self"
+            all: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/",
+            self: AJS.contextPath() + "/rest/scn-smart-permissions-manager-plugin/1.0/space-permission/"
         },
         deleteConfirmationCallback: function (model) {
             AJS.$("#user-permission-model").html(`
