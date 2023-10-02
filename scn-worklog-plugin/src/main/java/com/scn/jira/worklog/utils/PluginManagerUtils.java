@@ -10,14 +10,16 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class PluginManagerUtils {
-    private static final String ISSUE_OPERATIONS_LOG_WORK_MODULE_KEY = "com.atlassian.jira.plugin.system.issueoperations:log-work";
-    private static final String ISSUE_TAB_PANELS_WORKLOG_MODULE_KEY = "com.atlassian.jira.plugin.system.issuetabpanels:worklog-tabpanel";
-    private static final String VIEW_ISSUE_PANELS_TIMETRACKING_MODULE_KEY = "com.atlassian.jira.jira-view-issue-plugin:timetrackingmodule";
 
     private final List<String> moduleKeys = Arrays.asList(
-        ISSUE_OPERATIONS_LOG_WORK_MODULE_KEY,
-        ISSUE_TAB_PANELS_WORKLOG_MODULE_KEY,
-        VIEW_ISSUE_PANELS_TIMETRACKING_MODULE_KEY
+        "com.atlassian.jira.plugin.system.issueoperations:log-work",
+        "com.atlassian.jira.plugin.system.issuetabpanels:worklog-tabpanel",
+        "com.atlassian.jira.jira-view-issue-plugin:timetrackingmodule",
+        "com.atlassian.jira.jira-view-issue-plugin:view-subtasks",
+        "com.atlassian.jira.jira-view-issue-plugin:quick-add-subtask",
+        "com.atlassian.jira.jira-view-issue-plugin:subtask-view-options",
+        "com.atlassian.jira.jira-view-issue-plugin:subtask-view-options-factory",
+        "com.atlassian.jira.jira-view-issue-plugin:subtask-view-progress"
     );
 
     private final PluginController pluginController;
