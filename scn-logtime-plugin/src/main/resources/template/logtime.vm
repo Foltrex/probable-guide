@@ -535,8 +535,8 @@
         #include("template/editdiv.js");
     AJS.$('#periodId').val(moment($startDate).format('YYYY-MM-DD'));
     document.getElementById('periodId').innerHTML = document.getElementById('labelPeriodHidden').value;
-    if (document.getElementById('myFieldId').value === '') {
-        document.getElementById('myFieldId').value = '$loggeduser' + ",";
+    if (!AJS.$('#users_picker_gadget').val()) {
+        AJS.$('#users_picker_gadget').val('$loggeduser').trigger('change');
     }
     document.getElementById('userHidden').value = '$loggeduser' + ",";
     if (document.getElementById('scnWlChShow').value === "false") {

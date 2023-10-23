@@ -71,7 +71,7 @@ public class LTProjectsResource extends BaseResource {
         // Logged in user
         ApplicationUser user = getLoggedInUser();
 
-        List<String> selectedProjects = (prjList != null && !prjList.equals("")) ? Arrays.asList(prjList.split(","))
+        List<String> selectedProjects = (prjList != null && !prjList.equals("") && !prjList.equals("0")) ? Arrays.asList(prjList.split(","))
             : new ArrayList<>();
         List<String> selectedUserKeys = (usersSelected != null && !usersSelected.isEmpty())
             ? Arrays.stream(usersSelected.split(",")).map(String::trim).map(String::toLowerCase).distinct()

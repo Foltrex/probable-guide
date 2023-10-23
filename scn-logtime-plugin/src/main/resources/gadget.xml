@@ -24,15 +24,15 @@
      #supportedLocales("gadget.common")
    
     </ModulePrefs>
-    
-    <UserPref name="isConfigured" datatype="hidden" default_value="true" />   
-	<UserPref name="project"  default_value="1"/>
-	<UserPref name="wlScnCheck"  datatype="bool"  default_value="true"/>
-	<UserPref name="wlExtCheck" datatype="bool" default_value="false"/>
-	<UserPref name="projectlist" datatype="list" default_value="0"/>
-	<UserPref name="userslist" datatype="list" default_value=""/>	
+
+	<UserPref name="isConfigured" datatype="hidden" default_value="true" />
+	<UserPref name="project" datatype="hidden"  default_value="1"/>
+	<UserPref name="wlScnCheck"  datatype="hidden"  default_value="true"/>
+	<UserPref name="wlExtCheck" datatype="hidden" default_value="false"/>
+	<UserPref name="projectlist" datatype="hidden" default_value=""/>
+	<UserPref name="userslist" datatype="hidden" default_value=""/>
 	<UserPref name="refresh" datatype="hidden" default_value="false" />
-	<UserPref name="width" default_value="1200" />
+	<UserPref name="width" datatype="hidden" default_value="1200" />
     <Content type="html" view="profile">
         <![CDATA[
 
@@ -42,6 +42,7 @@
         #requireResource("com.atlassian.jira.gadgets:g-filter-results")
         #requireResource("com.atlassian.auiplugin:ajs")
         #requireResource("com.scn.jira.scn-logtime-plugin:logtime-resources")
+		#requireResource("com.atlassian.auiplugin:aui-select2")
 
         #includeResources()
         
@@ -51,9 +52,7 @@
         <tbody>
             <tr>
                 <td nowrap style="padding-left:10px;">
-                    <select id="s1" multiple="">
-                        <option>All projects</option>
-                    </select>
+                    <div id="projects_picker_gadget_container" style="width: 300px"/>
                 </td>
                 <td id="wlsc" class="filterCheck" nowrap style="padding-left:10px">
                     <div style="width: 100%; display: flex;">
@@ -73,18 +72,7 @@
                 </td>
 
                 <td class="filterUser" nowrap>
-                    <fieldset rel="myFieldId" class="hidden user-picker-params">
-                        <input type="hidden" id="formName" value="jiraform">
-                        <input type="hidden" id="fieldName" value="myFieldId">
-                        <input type="hidden" id="multiSelect" value="true">
-                        <input type="hidden" id="userPickerEnabled" value="true">
-                    </fieldset>
-
-                    <div class="ajax_autocomplete" id="myFieldId_container">
-                        <input type="text" name="myFieldId" id="myFieldId" value="" class="userpickerfield text" size="21"/>
-                        <br/><div id="myFieldId_results" class="ajax_results"></div>
-                        <div id="noUser" style="color:red;display:none;">Please, specify at least one employee </div>
-                    </div>
+                    <div id="users_picker_gadget_container" style="width: 300px"/>
                 </td>
             </tr>
             <tr>
@@ -119,134 +107,23 @@
     					'overrideBrowserDefault': true
     				});
 				});
-			    // Get userprefs
-			   //var prefs = new gadgets.Prefs();
-			
-			   //document.getElementById('ScnWl').checked=prefs.getBool("wlScnCheck"); 
-			   //document.getElementById('ExtWl').checked=prefs.getBool("wlExtCheck");
-			   document.getElementById('ScnWl').checked=true; 
-			   document.getElementById('ExtWl').checked=false; 
-			   
+			   projectsPicker("projects_picker_gadget", null)(AJS.$("#projects_picker_gadget_container"));
+			   var $projectsPicker = AJS.$('#projects_picker_gadget');
+			   usersPicker("users_picker_gadget", null)(AJS.$("#users_picker_gadget_container"));
+			   var $usersPicker = AJS.$('#users_picker_gadget');
+			   document.getElementById('ScnWl').checked=true;
+			   document.getElementById('ExtWl').checked=false;
 			   var usersSelected = "";
-			 // var usersSelected = prefs.getArray("userslist"); 	
-          	           
-			   //document.getElementById('myFieldId').value=usersSelected; 
+
 			   var currentPeriod=0;			 				 		   
 		  	   var slideStep=0;
 		  	   
 		  	   var scnWlCheck=document.getElementById('ScnWl').checked==true?1:0;     
                var extWlCheck=document.getElementById('ExtWl').checked==true?1:0;
                var assignedCheck=0;//document.getElementById('Assigned').checked==true?1:0;
-               
-               
-             //  var buttonNameText=document.getElementById('viewButton').innerHTML;
-               
-             
-               var search_project = "0";//prefs.getString("projectlist");	
-          	
-               var projectArr=[];
-               
-	           var prj_check_list=[];
-	           var prj_check_list_string="";
-	           var prj_check_cnt;
-	           
-	          
-               if(usersSelected==""){
-          	   		//document.getElementById('myFieldId').value=document.getElementById('userHidden').value;
-          	   		usersSelected=document.getElementById('myFieldId').value;
-          	   		
-          	   }
-                // :(
-                setTimeout(function() {
-                    while (true) {
-                        if (jQuery("#myFieldId") && jQuery("#myFieldId")[0] && jQuery._data(jQuery("#myFieldId")[0], "events" ) &&
-                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"] &&
-                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0] &&
-                            jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler
-                            ) {
-                               var keyupaction = jQuery._data(jQuery("#myFieldId")[0], "events" )["keyup"][0].handler;
-                               AJS.$("#myFieldId").off("keyup");
-                               AJS.$("#myFieldId").on("keyup", function() {
-                                    if (AJS.$("#myFieldId").val() && AJS.$("#myFieldId").val().length > 2) {
-                                       keyupaction.apply(null, Array.from(arguments));
-                                    }
-                               });
-                               break;
-                        }
-                    }
-                }, 1000);
 
+               var gadget123 = createGadget(true);
 
-               // AJS.$("#myFieldId").addEventListener("keyup", );
-
-			    // Get the array of search terms entered by the user
-			    
-               var gadget123 = AJS.Gadget({
-                    baseUrl: "__ATLASSIAN_BASE_URL__",
-                    useOauth: "/rest/gadget/1.0/currentUser",                
-					view:{
-                        onResizeAdjustHeight: false,
-                        onResizeReload: false,
-						enableReload: true,
-                        template: function(args) {
-                            var gadget = this;
-							usersSelected=document.getElementById('myFieldId').value;
-
-                            gadget.getView().html(args.projectsobj.html);
-                            	
-                            AJS.$.ajax({
-			            	  url: "/rest/logtime-gadget/1.0/projectsuser.json",
-			            	  timeout: 9*60*1000, // 9 minutes for Alex Murashko
-			            	  type: "GET",
-			            	  dataType: "json",
-			            	  success: function(msg){
-                                var ii=0;
-                                AJS.$.each(msg.projects, function(idx, val) {
-                                    if(search_project=="0" || search_project.lastIndexOf(val.id)!=-1){
-                                        AJS.$('#s1').append("<option value='"+ii+"' selected=\"selected\">"+val.name+"</option>");
-                                    } else {
-                                        AJS.$('#s1').append("<option value='"+ii+"'>"+val.name+"</option>");
-                                    }
-                                    projectArr[ii++]=val.id;
-                                });
-                                AJS.$("#s1").dropdownchecklist({ firstItemChecksAll: true, explicitClose: '...close' });
-                                AJS.$(".ui-dropdownchecklist-dropcontainer").css("max-height", "250px");
-                                AJS.$(".ui-dropdownchecklist-dropcontainer").css("max-width", "300px");
-                                AJS.$(".ui-dropdownchecklist-selector").css("max-width", "300px");
-                            }
-			            	});
-			               
-                        },
-                        args: [
-                        {
-                            key: "projectsobj",
-                            ajaxOptions: function() {
-                                return {
-                                    type: "POST",
-                                    url: "/rest/logtime-gadget/1.0/projectsobj.json",
-                                    timeout: 9*60*1000, // 9 minutes for Alex Murashko
-                                    data: {
-                                        projectId: this.getPref("project"),                                        
-                                        noCache: (new Date()).getTime(),
-                                        scnWl:scnWlCheck,
-                                        extWl:extWlCheck,
-                                        assignedCheck:assignedCheck,
-                                        prjList: prj_check_list_string,
-                                        usersSelected: usersSelected,
-                                        viewType:buttonNameText,
-                                        currentPeriod:currentPeriod,
-                                        currentslideStep: slideStep
-                                    }
-                                };
-                            }
-                        }
-                        ]
-                    }				
-                    
-                }); 
-                   	
-         
-            
             function checkboxScnClick(){
            	  scnWlCheck=document.getElementById('ScnWl').checked==true?1:0;
             }	
@@ -261,15 +138,9 @@
            
                                    
              function checkProjects(prjId){
-              	
-              	for (ii=1; ii<=projectArr.length; ii++)
-            	{
-            		var check_id = "ddcl-s1-i"+ii;
-            		if(projectArr[ii-1]==prjId){
-            			document.getElementById(check_id).checked=true;
-            		}
-            	}
-              	           
+              	if ($projectsPicker.val() && $projectsPicker.val().lastIndexOf(prjId) == -1) {
+              		$projectsPicker.val($projectsPicker.val() + ',' + prjId).trigger('change');
+              	}
              };
             
             function reloadMeClean(){
@@ -277,92 +148,17 @@
             	currentPeriod=0;
             	reloadMe();
             }
-            
-            
-            function reloadMe(){
-            	usersSelected = document.getElementById('myFieldId').value; 
-            	if(usersSelected.replace(" ","")==""){
-          //  		AJS.$( "#noUser" ).css("display","block");  
-          //  		return;          		
-            	}
-            	else
-            	{
-            		AJS.$( "#noUser" ).css("display","none");
-            	}
-            	
-           		AJS.$( ".gadget" ).remove();
-           			
-            	              
-                prj_check_list_string="";
-            	prj_check_cnt = 0;
-            	for (ii=1; ii<=projectArr.length; ii++)
-            	{
-            		var check_id = "ddcl-s1-i"+ii;
-            		if (document.getElementById(check_id).checked==true)
-            		{
-            			prj_check_list[prj_check_cnt++]=projectArr[ii-1];
-            			if(prj_check_list_string==""){
-            				prj_check_list_string=projectArr[ii-1];
-            			}else{            			
-            				prj_check_list_string=prj_check_list_string + ", "+ projectArr[ii-1];
-            			}
-            		} 
-            	}
-            	
-            	//prefs.set("wlScnCheck", document.getElementById('ScnWl').checked);
-            //	prefs.set("wlExtCheck", document.getElementById('ExtWl').checked);
-            //	prefs.setArray("userslist", [usersSelected]);     
-            //	prefs.setArray("projectlist", [prj_check_list_string]);
-             // 	gadget.setPref("width","1200");
-            	
-            	gadget123 = AJS.Gadget({
-                    baseUrl: "__ATLASSIAN_BASE_URL__",
-                    useOauth: "/rest/gadget/1.0/currentUser",                   
-					view:{
-                        onResizeAdjustHeight: false,
-                        onResizeReload: false,
-						enableReload: true,
-                        template: function(args) {
-                            var gadget = this;
 
-                            gadget.getView().html(args.projectsobj.html);
-                        },
-                        args: [
-                        {
-                            key: "projectsobj",
-                            ajaxOptions: function() {
-                                return {
-                                    type: "POST",
-                                    url: "/rest/logtime-gadget/1.0/projectsobj.json",
-                                    timeout: 9*60*1000, // 9 minutes for Alex Murashko
-                                    data: {
-                                        projectId: this.getPref("project"),                                        
-                                        noCache: (new Date()).getTime(),
-                                        scnWl:scnWlCheck,
-                                        extWl:extWlCheck,
-                                        assignedCheck:assignedCheck,
-                                        prjList: prj_check_list_string,
-                                        usersSelected: usersSelected,
-                                        viewType:buttonNameText,
-                                        currentPeriod:currentPeriod,
-                                        currentslideStep: slideStep
-                                    }
-                                };
-                            }
-                        }
-                        ]
-                    }				
-                    
-                }); 
-            //	gadget123.showView(true);
-            	
+            function reloadMe(){
+				if (gadget123) {
+					gadget123.showView(true);
+				} else {
+					AJS.$('.gadget.default').remove();
+					gadget123 = createGadget(false);
+				}
 			};
-			
-	
-			
+
 			 function changeView(){
-           		
-           	
            		if(document.getElementById('viewButton').innerHTML=="Weekly view"){           			
            			document.getElementById('viewButton').innerHTML="Monthly view";
            		}else{
@@ -376,7 +172,6 @@
             	reloadMe();
             	currentPeriod=0;
 			};		
-
 
 			function slideForward(){
 				currentPeriod=0;	
@@ -434,7 +229,221 @@
 				}	
 				
 			}
-			
+
+			function createGadget(isInitial) {
+				var needUpdateProps = isInitial;
+				return AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+                    useOauth: "/rest/gadget/1.0/currentUser",
+                    config: {
+                        descriptor: function (args) {
+                            var gadget = this;
+                            needUpdateProps = true;
+                            return  {
+                                theme: "gdt",
+                                fields: [
+									{
+										id: "picker_projectlist",
+										userpref: "projectlist",
+										label: "Projects",
+										description: "Projects list",
+										type: "callbackBuilder",
+										callback: projectsPicker("projectlist", gadget.getPref("projectlist"))
+									},
+									{
+										id: "picker_userslist",
+										userpref: "userslist",
+										label: "Users",
+										description: "Users list",
+										type: "callbackBuilder",
+										callback: usersPicker("userslist", gadget.getPref("userslist"))
+									},
+									checkbox(gadget, "wlScnCheck", 'Show WL*', gadget.getPref('wlScnCheck') == 'true'),
+									checkbox(gadget, "wlExtCheck", 'Show WL', gadget.getPref('wlExtCheck') == 'true')
+								]
+                            };
+                        }
+                    },
+					view:{
+                        onResizeAdjustHeight: false,
+                        onResizeReload: false,
+						enableReload: true,
+                        template: function(args) {
+                            var gadget = this;
+                            gadget.getView().html(args.projectsobj.html);
+
+                        },
+                        args: [
+                        {
+                            key: "projectsobj",
+                            ajaxOptions: function() {
+                            	var gadget = this;
+                            	if (needUpdateProps) {
+                            		$projectsPicker.val(gadget.getPref('projectlist') == '0' ? null : gadget.getPref('projectlist')).trigger('change');
+                            		$usersPicker.val(gadget.getPref('userslist')).trigger('change');
+									document.getElementById('ScnWl').checked = (gadget.getPref('wlScnCheck') == 'true');
+									document.getElementById('ExtWl').checked = (gadget.getPref('wlExtCheck') == 'true');
+									scnWlCheck = document.getElementById('ScnWl').checked==true ? 1 : 0;
+									extWlCheck = document.getElementById('ExtWl').checked==true ? 1 : 0;
+									needUpdateProps = false;
+								}
+
+                                return {
+                                    type: "POST",
+                                    url: "/rest/logtime-gadget/1.0/projectsobj.json",
+                                    timeout: 9*60*1000, // 9 minutes for Alex Murashko
+                                    data: {
+                                        projectId: this.getPref("project"),
+                                        noCache: (new Date()).getTime(),
+                                        scnWl:scnWlCheck,
+                                        extWl:extWlCheck,
+                                        assignedCheck:assignedCheck,
+                                        prjList: $projectsPicker.val(),
+                                        usersSelected: $usersPicker.val(),
+                                        viewType:buttonNameText,
+                                        currentPeriod:currentPeriod,
+                                        currentslideStep: slideStep
+                                    }
+                                };
+                            }
+                        }
+                        ]
+                    }
+
+                });
+			}
+
+			function checkbox(gadget, checkboxPref, label, selected, description) {
+				return {
+					userpref: checkboxPref,
+					label: gadget.getMsg(label),
+					id: "checkbox_" + checkboxPref,
+					type: "callbackBuilder",
+					callback: function (parentDiv)
+					{
+						// add the checkbox class and wrap with fieldset
+						parentDiv.addClass('checkbox').wrap('<fieldset class="group" />');
+						// remove the label added by the the caller code, as we want the label to appear after the input element
+						parentDiv.parent().siblings('label').remove();
+						// we don't want field-group and fieldset
+						parentDiv.closest('.field-group').removeClass('field-group');
+						// we don't want this legacy class either
+						parentDiv.removeClass('builder-container');
+
+						var checkboxId = checkboxPref+'_checkbox';
+						var checkedHtml = selected ? ' checked' : '';
+						var html = '<input type="checkbox" class="checkbox" id="'+checkboxId+'" '+checkedHtml+' />';
+							html +='<label for="'+checkboxId+'">'+gadget.getMsg(label)+'</label>';
+							html += '<input type="hidden" id="'+checkboxPref+'" name="'+checkboxPref+'" value="'+selected+'" />';
+						parentDiv.append(AJS.$(html));
+
+						// make sure we update the values that get submitted
+						AJS.$('#'+checkboxId, parentDiv).each(function() {
+							var checkbox = this;
+							var $checkbox = AJS.$(checkbox);
+							$checkbox.change(function() {
+								var hiddenInputSelector = '#'+checkboxPref;
+								AJS.$(hiddenInputSelector).attr('value', checkbox.checked);
+							});
+						});
+
+						// add description
+						if (description) {
+							parentDiv.append(AJS.$("<div/>").addClass("description").text(gadget.getMsg(description)));
+						}
+					}
+				};
+			}
+
+			function projectsPicker(projectUserPref, projectUserPrefValue) {
+				return function(parentDiv) {
+					// add a project options box and description. Note that the label has already been added
+					parentDiv.append(AJS.$("<input/>").attr({
+						id: projectUserPref,
+						name: projectUserPref,
+						value: (projectUserPrefValue == '0' ? null : projectUserPrefValue),
+						style: "width: 100%"
+					}).addClass('textfield text'));
+					AJS.$.ajax({
+					  url: "/rest/logtime-gadget/1.0/projectsuser.json",
+					  timeout: 9*60*1000, // 9 minutes for Alex Murashko
+					  type: "GET",
+					  dataType: "json",
+					  success: function(msg) {
+							AJS.$("#"+projectUserPref).auiSelect2({
+							 	placeholder: 'All projects',
+							 	allowClear: true,
+								minimumInputLength: 2,
+								multiple: true,
+								width: 'resolve',
+								data: AJS.$.map(msg.projects, function(val) { return {id: val.id, text: val.name + " (" + val.key + ")", key: val.key}}),
+								formatSelection: function(state) {
+									return state.key;
+								}
+							});
+						}
+					});
+				}
+			}
+
+			function usersPicker(userPref, userPrefValue) {
+				return function(parentDiv) {
+					// add a project options box and description. Note that the label has already been added
+					parentDiv.append(AJS.$("<input/>").attr({
+							id: userPref,
+							name: userPref,
+							type: "text",
+							value: userPrefValue,
+							style: "width: 100%"
+						}).addClass('textfield text'));
+
+						AJS.$("#"+userPref).auiSelect2({
+							placeholder: 'Select users',
+							allowClear: true,
+							minimumInputLength: 2,
+							multiple: true,
+							width: 'resolve',
+							ajax: {
+								transport: function (params) {
+									return AJS.$.ajax({
+										url: `/rest/api/2/user/picker.json?query=${params.data.query}&maxResults=${params.data.maxResults}`,
+										type: "GET",
+										dataType: "json",
+										headers: {
+											'Accept': "application/json, text/javascript, */*; q=0.01",
+											'Content-Type': "application/json; charset=UTF-8"
+										},
+										success: params.success
+									});
+								},
+								data: function(term) {
+									return {
+										query: term || '%',
+										maxResults: 100
+									};
+								},
+								results: function(data) {
+									return {
+										results: data.users
+									};
+								}
+							},
+							id: function(user) {
+								return user.name;
+							},
+							initSelection: function (element, callback) {
+								var newUserValue = AJS.$(element).val();
+								callback(newUserValue ? newUserValue.split(',').map(user => ({ name: user.trim() })) : []);
+							},
+							formatSelection: function(user) {
+								return user.name;
+							},
+							formatResult: function(user) {
+								return user.html;
+							}
+						});
+				}
+			}
 			
         </script>
 
