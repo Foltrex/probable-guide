@@ -122,7 +122,7 @@
                var extWlCheck=document.getElementById('ExtWl').checked==true?1:0;
                var assignedCheck=0;//document.getElementById('Assigned').checked==true?1:0;
 
-               var gadget123 = createGadget();
+               var gadget123 = createGadget(true);
 
             function checkboxScnClick(){
            	  scnWlCheck=document.getElementById('ScnWl').checked==true?1:0;
@@ -150,7 +150,12 @@
             }
 
             function reloadMe(){
-            	gadget123.showView(true);
+				if (gadget123) {
+					gadget123.showView(true);
+				} else {
+					AJS.$('.gadget.default').remove();
+					gadget123 = createGadget(false);
+				}
 			};
 
 			 function changeView(){
@@ -225,8 +230,8 @@
 				
 			}
 
-			function createGadget() {
-				var needUpdateProps = true;
+			function createGadget(isInitial) {
+				var needUpdateProps = isInitial;
 				return AJS.Gadget({
                     baseUrl: "__ATLASSIAN_BASE_URL__",
                     useOauth: "/rest/gadget/1.0/currentUser",
