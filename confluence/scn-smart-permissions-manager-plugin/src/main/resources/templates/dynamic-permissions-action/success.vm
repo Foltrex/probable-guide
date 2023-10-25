@@ -1,0 +1,60 @@
+<html lang="en">
+<head>
+    <title>Manage Space Permissions</title>
+    <meta name="decorator" content="atl.general"/>
+    $webResourceManager.requireResource("com.scn.confluence.scn-smart-permissions-manager-plugin:scn-smart-permissions-manager-plugin-resources")
+</head>
+<body>
+<div id="scn-smart-permissions-manager-root">
+    <form class="aui" id="space-key-form">
+        <div class="field-group">
+            <label for="space-key">Space Key</label>
+            <div class="text long-field">
+                <input list="spaces" type="search" id="space-key" name="space-key">
+                <datalist id="spaces">
+                    #foreach( $spaceKey in $spaceKeys )
+                        <option value="$spaceKey">
+                    #end
+                </datalist>
+                <button id="search-button">
+                    <span class="aui-icon aui-icon-small aui-iconfont-search">Insert meaningful text here for accessibility</span>
+                </button>
+            </div>
+        </div>
+    </form>
+    <table id="user-table">
+        <datalist id='usernames'>
+            #foreach( $username in $usernames )
+                <option value="$username">
+            #end
+        </datalist>
+
+
+        <section
+            id="delete-permission-dialog"
+            class="aui-dialog2 aui-dialog2-small aui-dialog2-warning aui-layer"
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="demo-warning-dialog--heading"
+            aria-describedby="demo-warning-dialog--description"
+            hidden
+            style='display:none'
+        >
+            <header class="aui-dialog2-header">
+                <h1 class="aui-dialog2-header-main" id="demo-warning-dialog--heading">Warning</h1>
+            </header>
+            <div class="aui-dialog2-content" id="demo-warning-dialog--description">
+                <p id='user-permission-model'></p>
+            </div>
+            <footer class="aui-dialog2-footer">
+                <div class="aui-dialog2-footer-actions">
+                    <button id="delete-permisison-dialog-confirm" class="aui-button aui-button-primary">Delete</button>
+                    <button id="delete-permission-dialog-cancel" class="aui-button aui-button-link">Cancel</button>
+                </div>
+            </footer>
+        </section>
+    </table>
+</div>
+</body>
+</html>

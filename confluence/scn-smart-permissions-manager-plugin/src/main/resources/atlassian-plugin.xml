@@ -7,18 +7,63 @@
         <param name="plugin-logo">images/pluginLogo.png</param>
     </plugin-info>
 
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="scn-smart-permissions-manager-plugin"/>
-    
-    <!-- add our web resources -->
-    <web-resource key="scn-smart-permissions-manager-plugin-resources" name="scn-smart-permissions-manager-plugin Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        
-        <resource type="download" name="scn-smart-permissions-manager-plugin.css" location="/css/scn-smart-permissions-manager-plugin.css"/>
-        <resource type="download" name="scn-smart-permissions-manager-plugin.js" location="/js/scn-smart-permissions-manager-plugin.js"/>
-        <resource type="download" name="images/" location="/images"/>
+	<rest key="scn-smart-permission-rest-resources" name="Plugin Global REST Service"
+		  path="/scn-smart-permissions-manager-plugin" version="1.0">
+		<description>REST endpoint for the Plugin</description>
+	</rest>
 
-        <context>scn-smart-permissions-manager-plugin</context>
-    </web-resource>
-    
+	<web-item name="manage-space-permissions-web-item" key="manage-space-permissions-web-item" section="system.space" weight="10">
+		<description key="item.manage-space-permissions-web-item.link.desc">Manage Space Restrictions</description>
+		<label key="Manage Space Restrictions"/>
+		<link linkId="manage-space-permissions-action">/plugins/manage-space-permissions.action</link>
+		<condition class="com.scn.confluence.spm.impl.condition.UserIsAdminCondition"/>
+	</web-item>
+
+<!--	add /admin to url for protecting purposes -->
+	<xwork name="manage-space-permissions-action-xwork" key="manage-space-permissions-action-xwork">
+		<description key="item.manage-space-permissions-action-xwork.link.desc">Uses for managing permission to space.</description>
+		<package name="manage-space-permissions" extends="default" namespace="/plugins">
+			<interceptor-ref name="adminRoleInterceptor"/>
+			<action name="manage-space-permissions" class="com.scn.confluence.spm.impl.action.DynamicPermissionAction">
+				<result name="success" type="velocity">/templates/dynamic-permissions-action/success.vm</result>
+			</action>
+		</package>
+	</xwork>
+	<!-- DYNAMIC PERMISSIONS -->
+<!--	<web-item key="scn-smartpermission-manager-webitem" name="Space Permissions" section="system.top.navigation.bar"-->
+<!--			  weight="200">-->
+<!--		<label key="space.dynamic.permissions"/>-->
+<!--		<link linkId="scn-automation-mainmenu">/secure/</link>-->
+<!--		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>-->
+<!--	</web-item>-->
+<!--	<webwork1 key="scn-smartpermission-manager-webwork" name="Dynamic Permissions Webwork">-->
+<!--		<actions>-->
+<!--			<action name="com.scn.confluence.spm.impl.action.DynamicPermissionAction" alias="DynamicPermissionAction">-->
+<!--				<view name="success">-->
+<!--					/templates/dynamic-permissions-action/success.vm-->
+<!--				</view>-->
+<!--			</action>-->
+<!--		</actions>-->
+<!--	</webwork1>-->
+
+<!--	<web-section key="my_section" name="MySection" location="system.top.navigation.bar" weight="50"/>-->
+<!--	<web-item key="my_item_link" name="MyTab" section="system.top.navigation.bar/my_section"  weight="10">-->
+<!--		<label key="MyLink" />-->
+<!--		<link linkId="my_item_link">/secure/action.jspa</link>-->
+<!--	</web-item>-->
+
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="scn-smart-permissions-manager-plugin"/>
+
+	<!-- add our web resources -->
+	<web-resource key="scn-smart-permissions-manager-plugin-resources" name="scn-smart-permissions-manager-plugin Web Resources">
+		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<dependency>com.atlassian.auiplugin:aui-experimental-restfultable</dependency>
+
+		<resource type="download" name="scn-smart-permissions-manager-plugin.css" location="/css/scn-smart-permissions-manager-plugin.css"/>
+		<resource type="download" name="scn-smart-permissions-manager-plugin.js" location="/js/scn-smart-permissions-manager-plugin.js"/>
+		<resource type="download" name="images/" location="/images"/>
+
+		<context>scn-smart-permissions-manager-plugin</context>
+	</web-resource>
 </atlassian-plugin>
