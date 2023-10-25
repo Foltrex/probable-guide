@@ -50,13 +50,13 @@ public class WorklogPluginLauncher implements LifecycleAware {
 
     @Override
     public void onStart() {
-        pluginManagerUtils.disableSystemPlugins();
+//        pluginManagerUtils.disableSystemPlugins();
         log.warn(worklogPluginComponent.getName() + " has been started.");
     }
 
     @Override
     public void onStop() {
-        pluginManagerUtils.enableSystemPlugins();
+//        pluginManagerUtils.enableSystemPlugins();
     }
 
     private void migrateIncorrectScnWorklogs() {
