@@ -5,7 +5,9 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueConstant;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.rest.Dates.DateTimeAdapter;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
@@ -17,15 +19,17 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.remote.service.IRemoteScnWorklogService;
 import com.scn.jira.worklog.remote.service.object.RemoteScnWorklog;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
-import javax.ws.rs.DELETE;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-
+import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -37,15 +41,17 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.rmi.RemoteException;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Stream;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 @Path("/scn-worklogs")
 @RequiredArgsConstructor
 public class ScnWLResource {
+
     private final IRemoteScnWorklogService remoteScnWorklogService;
     private final JiraAuthenticationContext authenticationContext;
     private final IScnProjectSettingsManager projectSettingsManager;
@@ -60,7 +66,7 @@ public class ScnWLResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @PublicApi
-    public Response createScnWorklog(@PathParam("issueKey") String issueKey, ScnWorklogRequest request) {
+    public Response createScnWorklog(@PathParam("issueKey") String issueKey, ScnWorklogDto request) {
         Issue issue;
         ApplicationUser author;
         if (StringUtils.isBlank(issueKey) || (issue = issueManager.getIssueObject(issueKey)) == null) {
@@ -85,6 +91,22 @@ public class ScnWLResource {
         return Response.status(Status.CREATED).cacheControl(getNoCacheControl()).build();
     }
 
+    @GET
+    @Path("/issue/{issueKey}/worklog")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @PublicApi
+    public Response getScnWorklog(@PathParam("issueKey") String issueKey) throws RemoteException {
+        User user = authenticationContext.getLoggedInUser().getDirectoryUser();
+        if (user == null) {
+            return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
+        } else if (issueKey == null || issueKey.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
+        }
+        return Response.ok(Stream.of(remoteScnWorklogService.getScnWorklogs(user, issueKey)).filter(Objects::nonNull).map(this::map).collect(Collectors.toList()))
+            .cacheControl(getNoCacheControl()).build();
+    }
+
     @DELETE
     @Path("/issue/{issueIdOrKey}/worklog/{id}")
     @PublicApi
@@ -104,12 +126,14 @@ public class ScnWLResource {
         throws RemoteException {
         User user = authenticationContext.getLoggedInUser().getDirectoryUser();
         Stream<RemoteScnWorklog> issueStream = Stream.of();
-        for (String issueKey : issueKeys.stream().distinct().toArray(String[]::new))
+        for (String issueKey : issueKeys.stream().distinct().toArray(String[]::new)) {
             issueStream = Stream.concat(issueStream, Stream.of(remoteScnWorklogService.getScnWorklogs(user, issueKey)));
+        }
         RemoteScnWorklog[] scnWorklogs = issueStream.sorted(Comparator.comparing(RemoteScnWorklog::getStartDate))
             .toArray(RemoteScnWorklog[]::new);
-        if (scnWorklogs.length == 0)
+        if (scnWorklogs.length == 0) {
             return Response.noContent().cacheControl(getNoCacheControl()).build();
+        }
         return Response.ok(scnWorklogs).cacheControl(getNoCacheControl()).build();
     }
 
@@ -120,14 +144,17 @@ public class ScnWLResource {
     public Response getScnWorklogsByIssue(@Context HttpServletRequest request, @PathParam("ikey") String issueKey)
         throws RemoteException {
         User user = authenticationContext.getLoggedInUser().getDirectoryUser();
-        if (user == null)
+        if (user == null) {
             return Response.status(Status.BAD_REQUEST).entity("User credentials are not valid. ").build();
-        if (issueKey == null || issueKey.isEmpty())
+        }
+        if (issueKey == null || issueKey.isEmpty()) {
             return Response.status(Status.BAD_REQUEST).entity("Issue key can't be NULL or Empty. ").build();
+        }
         RemoteScnWorklog[] scnWorklogs = remoteScnWorklogService.getScnWorklogs(user, issueKey);
-        if (scnWorklogs == null || scnWorklogs.length == 0)
+        if (scnWorklogs == null || scnWorklogs.length == 0) {
             return Response.ok("There are no SCN worklogs or you don't have permission to see them. ").status(204)
                 .cacheControl(getNoCacheControl()).build();
+        }
         return Response.ok(scnWorklogs).cacheControl(getNoCacheControl()).build();
     }
 
@@ -137,20 +164,43 @@ public class ScnWLResource {
         return noCache;
     }
 
-    private boolean isWlAutoCopy(ScnWorklogRequest request, Issue issue) {
+    private boolean isWlAutoCopy(ScnWorklogDto request, Issue issue) {
         return projectSettingsManager.isWLAutoCopyEnabled(issue.getProjectId())
             && (request.getWorklogTypeId() == null ?
             projectSettingsManager.isUnspecifiedWLTypeAutoCopyEnabled(issue.getProjectId())
             : projectSettingsManager.getWorklogTypes(issue.getProjectId()).stream()
-            .anyMatch(worklogType -> worklogType.getId().equals(request.getWorklogTypeId()))
+                .anyMatch(worklogType -> worklogType.getId().equals(request.getWorklogTypeId()))
         );
+    }
+
+    private ScnWorklogDto map(RemoteScnWorklog remoteScnWorklog) {
+        ScnWorklogDto dto = new ScnWorklogDto();
+        dto.setId(remoteScnWorklog.getId());
+        dto.setCreated(remoteScnWorklog.getCreated());
+        dto.setUpdated(remoteScnWorklog.getUpdated());
+        dto.setAuthorKey(
+            Stream.of(userManager.getUserByName(remoteScnWorklog.getAuthor()), userManager.getUserByKey(remoteScnWorklog.getAuthor())).filter(Objects::nonNull).map(ApplicationUser::getUsername)
+                .findFirst().orElse(null));
+        dto.setWorklogTypeId(Stream.of(constantsManager.getWorklogTypeObjects()).filter(Objects::nonNull).flatMap(Collection::stream)
+            .filter(worklogType -> StringUtils.equals(worklogType.getName(), remoteScnWorklog.getWorklogType())).findFirst().map(IssueConstant::getId).orElse(null));
+        dto.setStarted(remoteScnWorklog.getStartDate());
+        dto.setComment(remoteScnWorklog.getComment());
+        dto.setTimeSpentSeconds(remoteScnWorklog.getTimeSpentInSeconds());
+        return dto;
     }
 
     @Data
     @JsonAutoDetect
-    private static class ScnWorklogRequest {
+    private static class ScnWorklogDto {
+
+        private String id;
+        @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = Date.class)
+        private Date created;
+        @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = Date.class)
+        private Date updated;
         private String authorKey;
         private String worklogTypeId;
+        @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = Date.class)
         private Date started;
         private String comment;
         private Long timeSpentSeconds;
