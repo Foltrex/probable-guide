@@ -277,6 +277,17 @@ public class OfBizScnWorklogStore implements IScnWorklogStore {
         return convertToWorklog(worklogGV);
     }
 
+    public IScnWorklog getByWorklogId(Long worklogId) {
+        GenericValue worklogGV = ofBizDelegator
+            .findByAnd(
+                SCN_WORKLOG_ENTITY,
+                MapBuilder.build("linkedWorklog", worklogId),
+                Lists.newArrayList("created ASC")
+            )
+            .get(0);
+        return convertToWorklog(worklogGV);
+    }
+
     public List<IScnWorklog> getByIssue(Issue issue) throws DataAccessException {
         Assertions.notNull("issue", issue);
 

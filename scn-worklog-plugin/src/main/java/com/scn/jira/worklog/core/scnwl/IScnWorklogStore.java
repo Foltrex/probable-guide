@@ -17,7 +17,7 @@ import java.util.List;
 public interface IScnWorklogStore {
     public static final String SCN_WORKLOG_ENTITY = "ScnWorklog";
     public static final String WORKLOG_ENTITY = "Worklog";
-    
+
     boolean deleteLinkedWorklog(Long linkedWorklogId) throws DataAccessException;
 
     IScnWorklog update(IScnWorklog worklog, boolean isLinkedWL) throws DataAccessException;
@@ -25,10 +25,12 @@ public interface IScnWorklogStore {
     IScnWorklog create(IScnWorklog worklog, boolean isLinkedWL) throws DataAccessException;
 
     boolean delete(Long long1, boolean isLinkedWL) throws DataAccessException;
-    
+
     int deleteAllByIssueId(Long issueId);
 
     IScnWorklog getById(Long long1) throws DataAccessException;
+
+    IScnWorklog getByWorklogId(Long worklogId);
 
     List<IScnWorklog> getByIssue(Issue issue) throws DataAccessException;
 

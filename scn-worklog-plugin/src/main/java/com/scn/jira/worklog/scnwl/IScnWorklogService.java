@@ -59,6 +59,8 @@ public interface IScnWorklogService {
 
     IScnWorklog getById(JiraServiceContext paramJiraServiceContext, Long paramLong);
 
+    IScnWorklog getByWorklogId(Long worklogId);
+
     List<IScnWorklog> getByIssue(JiraServiceContext paramJiraServiceContext, Issue paramIssue);
 
     List<IScnWorklog> getByProjectBetweenDates(JiraServiceContext jiraServiceContext, Project project, Date startDate, Date endDate);

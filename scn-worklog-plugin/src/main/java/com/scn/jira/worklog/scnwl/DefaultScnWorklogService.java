@@ -568,6 +568,11 @@ public class DefaultScnWorklogService implements IScnWorklogService {
         return scnWorklog;
     }
 
+    @Override
+    public IScnWorklog getByWorklogId(Long worklogId) {
+        return scnWorklogManager.getByWorklogId(worklogId);
+    }
+
     public List<IScnWorklog> getByIssue(@Nonnull JiraServiceContext jiraServiceContext, Issue issue) {
         ErrorCollection errorCollection = jiraServiceContext.getErrorCollection();
         if (issue == null) {

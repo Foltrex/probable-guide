@@ -97,6 +97,11 @@ public class DefaultScnWorklogManager implements IScnWorklogManager {
         return this.worklogStore.getById(id);
     }
 
+    @Override
+    public IScnWorklog getByWorklogId(Long worklogId) {
+        return this.worklogStore.getByWorklogId(worklogId);
+    }
+
     public List<IScnWorklog> getByIssue(Issue issue) throws DataAccessException {
         Assertions.notNull("issue", issue);
 
