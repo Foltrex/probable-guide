@@ -2,6 +2,7 @@ package com.scn.jira.worklog.rest;
 
 import com.atlassian.annotations.PublicApi;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
@@ -16,6 +17,7 @@ import com.scn.jira.worklog.core.wl.ExtendedConstantsManager;
 import com.scn.jira.worklog.remote.service.IRemoteScnWorklogService;
 import com.scn.jira.worklog.remote.service.object.RemoteScnWorklog;
 import com.scn.jira.worklog.scnwl.IScnWorklogService;
+import javax.ws.rs.DELETE;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.SystemUtils;
@@ -81,6 +83,18 @@ public class ScnWLResource {
             return Response.status(Status.FORBIDDEN).entity(String.join(SystemUtils.LINE_SEPARATOR, context.getErrorCollection().getErrorMessages())).cacheControl(getNoCacheControl()).build();
         }
         return Response.status(Status.CREATED).cacheControl(getNoCacheControl()).build();
+    }
+
+    @DELETE
+    @Path("/issue/{issueIdOrKey}/worklog/{id}")
+    @PublicApi
+    public Response deleteWorklog(@PathParam("issueIdOrKey") String issueIdOrKey, @PathParam("id") Long id) {
+        ApplicationUser user = authenticationContext.getLoggedInUser();
+        JiraServiceContext jiraServiceContext = new JiraServiceContextImpl(user);
+        IScnWorklog scnWorklog = scnDefaultWorklogService.getById(jiraServiceContext, id);
+        scnDefaultWorklogService.deleteAndAutoAdjustRemainingEstimate(jiraServiceContext, scnWorklog, false, true);
+
+        return Response.status(Status.NO_CONTENT).build();
     }
 
     @GET
