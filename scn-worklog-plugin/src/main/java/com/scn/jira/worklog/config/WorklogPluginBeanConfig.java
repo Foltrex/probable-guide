@@ -56,6 +56,7 @@ import com.atlassian.jira.web.action.admin.translation.TranslationManager;
 import com.atlassian.jira.web.action.issue.util.AttachmentHelper;
 import com.atlassian.jira.web.bean.TimeTrackingGraphBeanFactory;
 import com.atlassian.jira.workflow.WorkflowManager;
+import com.atlassian.plugin.PluginController;
 import com.atlassian.plugin.web.WebFragmentHelper;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.ModuleFactoryBean;
 import com.atlassian.plugins.osgi.javaconfig.configs.beans.PluginAccessorBean;
@@ -85,6 +86,11 @@ public class WorklogPluginBeanConfig {
     @Bean
     public AggregateTimeTrackingCalculatorFactory aggregateTimeTrackingCalculatorFactory() {
         return importOsgiService(AggregateTimeTrackingCalculatorFactory.class);
+    }
+
+    @Bean
+    public PluginController pluginController() {
+        return importOsgiService(PluginController.class);
     }
 
     @Bean
